@@ -1,0 +1,22 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/cpsusie/CLionProjects/Int128/cpp/src/cpp/program.cpp
+concepts
+-
+iostream
+-
+iomanip
+-
+string_view
+-
+limits
+-
+cstdint
+-
+
