@@ -1,10 +1,11 @@
 #pragma once
 #ifndef CJM_TESTSETTINGS_HPP 
 #define CJM_TESTSETTINGS_HPP
-#include "uint128_t.h"
 #include <functional>
 #include <type_traits>
 #include <algorithm>
+#include <iostream>
+#include <iomanip>
 namespace cjm
 {
 	namespace testing

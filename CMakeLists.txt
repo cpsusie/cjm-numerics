@@ -3,9 +3,13 @@ project(Int128)
 
 set(CMAKE_CXX_STANDARD 20)
 
-include_directories(cpp)
-include_directories(cpp/src)
-
-add_executable(Int128
+include_directories(cpp/src/cpp)
+include_directories(cpp/src/headers)
+find_package(Boost)
+IF (Boost_FOUND)
+    include_directories(${Boost_INCLUDE_DIR})
+endif()
+    add_executable(Int128
         cpp/src/cpp/program.cpp
-        cpp/src/headers/info.txt)
+        cpp/src/cpp/testing.cpp
+        )

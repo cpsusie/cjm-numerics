@@ -15,6 +15,7 @@ set(CMAKE_MAKEFILE_DEPENDS
   "/home/cpsusie/clion-2020.3/bin/cmake/linux/share/cmake-3.17/Modules/CMakeCXXInformation.cmake"
   "/home/cpsusie/clion-2020.3/bin/cmake/linux/share/cmake-3.17/Modules/CMakeCheckCompilerFlagCommonPatterns.cmake"
   "/home/cpsusie/clion-2020.3/bin/cmake/linux/share/cmake-3.17/Modules/CMakeCommonLanguageInclude.cmake"
+  "/home/cpsusie/clion-2020.3/bin/cmake/linux/share/cmake-3.17/Modules/CMakeDependentOption.cmake"
   "/home/cpsusie/clion-2020.3/bin/cmake/linux/share/cmake-3.17/Modules/CMakeExtraGeneratorDetermineCompilerMacrosAndIncludeDirs.cmake"
   "/home/cpsusie/clion-2020.3/bin/cmake/linux/share/cmake-3.17/Modules/CMakeFindCodeBlocks.cmake"
   "/home/cpsusie/clion-2020.3/bin/cmake/linux/share/cmake-3.17/Modules/CMakeGenericSystem.cmake"
@@ -26,6 +27,9 @@ set(CMAKE_MAKEFILE_DEPENDS
   "/home/cpsusie/clion-2020.3/bin/cmake/linux/share/cmake-3.17/Modules/Compiler/GNU-C.cmake"
   "/home/cpsusie/clion-2020.3/bin/cmake/linux/share/cmake-3.17/Modules/Compiler/GNU-CXX.cmake"
   "/home/cpsusie/clion-2020.3/bin/cmake/linux/share/cmake-3.17/Modules/Compiler/GNU.cmake"
+  "/home/cpsusie/clion-2020.3/bin/cmake/linux/share/cmake-3.17/Modules/FindBoost.cmake"
+  "/home/cpsusie/clion-2020.3/bin/cmake/linux/share/cmake-3.17/Modules/FindPackageHandleStandardArgs.cmake"
+  "/home/cpsusie/clion-2020.3/bin/cmake/linux/share/cmake-3.17/Modules/FindPackageMessage.cmake"
   "/home/cpsusie/clion-2020.3/bin/cmake/linux/share/cmake-3.17/Modules/Internal/CMakeCheckCompilerFlag.cmake"
   "/home/cpsusie/clion-2020.3/bin/cmake/linux/share/cmake-3.17/Modules/Platform/Linux-GNU-C.cmake"
   "/home/cpsusie/clion-2020.3/bin/cmake/linux/share/cmake-3.17/Modules/Platform/Linux-GNU-CXX.cmake"
@@ -33,6 +37,7 @@ set(CMAKE_MAKEFILE_DEPENDS
   "/home/cpsusie/clion-2020.3/bin/cmake/linux/share/cmake-3.17/Modules/Platform/Linux.cmake"
   "/home/cpsusie/clion-2020.3/bin/cmake/linux/share/cmake-3.17/Modules/Platform/UnixPaths.cmake"
   "/home/cpsusie/clion-2020.3/bin/cmake/linux/share/cmake-3.17/Modules/ProcessorCount.cmake"
+  "/home/cpsusie/vcpkg-master/scripts/buildsystems/vcpkg.cmake"
   )
 
 # The corresponding makefile is:

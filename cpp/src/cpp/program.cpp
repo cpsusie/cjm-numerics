@@ -4,6 +4,8 @@
 #include <string_view>
 #include <limits>
 #include <cstdint>
+#include "numerics.hpp"
+#include "uint128.hpp"
 namespace cjm
 {
     constexpr auto newl = '\n';

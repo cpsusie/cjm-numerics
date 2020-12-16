@@ -5,7 +5,7 @@
 		<Option title="Int128"/>
 		<Option makefile_is_custom="1"/>
 		<Option compiler="gcc"/>
-		<Option virtualFolders="CMake Files\;"/>
+		<Option virtualFolders="CMake Files\;CMake Files\..\;CMake Files\..\..\;CMake Files\..\..\vcpkg-master\;CMake Files\..\..\vcpkg-master\scripts\;CMake Files\..\..\vcpkg-master\scripts\buildsystems\;"/>
 		<Build>
 			<Target title="all">
 				<Option working_dir="/home/cpsusie/CLionProjects/Int128/cmake-build-debug"/>
@@ -44,8 +44,9 @@
 				<Option type="1"/>
 				<Option compiler="gcc"/>
 				<Compiler>
-					<Add directory="/home/cpsusie/CLionProjects/Int128/cpp"/>
-					<Add directory="/home/cpsusie/CLionProjects/Int128/cpp/src"/>
+					<Add directory="/home/cpsusie/CLionProjects/Int128/cpp/src/cpp"/>
+					<Add directory="/home/cpsusie/CLionProjects/Int128/cpp/src/headers"/>
+					<Add directory="/home/cpsusie/vcpkg-master/installed/x64-linux/include"/>
 					<Add directory="/usr/include/c++/10"/>
 					<Add directory="/usr/include/x86_64-linux-gnu/c++/10"/>
 					<Add directory="/usr/include/c++/10/backward"/>
@@ -69,8 +70,9 @@
 				<Option type="1"/>
 				<Option compiler="gcc"/>
 				<Compiler>
-					<Add directory="/home/cpsusie/CLionProjects/Int128/cpp"/>
-					<Add directory="/home/cpsusie/CLionProjects/Int128/cpp/src"/>
+					<Add directory="/home/cpsusie/CLionProjects/Int128/cpp/src/cpp"/>
+					<Add directory="/home/cpsusie/CLionProjects/Int128/cpp/src/headers"/>
+					<Add directory="/home/cpsusie/vcpkg-master/installed/x64-linux/include"/>
 					<Add directory="/usr/include/c++/10"/>
 					<Add directory="/usr/include/x86_64-linux-gnu/c++/10"/>
 					<Add directory="/usr/include/c++/10/backward"/>
@@ -91,11 +93,14 @@
 		<Unit filename="/home/cpsusie/CLionProjects/Int128/cpp/src/cpp/program.cpp">
 			<Option target="Int128"/>
 		</Unit>
-		<Unit filename="/home/cpsusie/CLionProjects/Int128/cpp/src/headers/info.txt">
+		<Unit filename="/home/cpsusie/CLionProjects/Int128/cpp/src/cpp/testing.cpp">
 			<Option target="Int128"/>
 		</Unit>
 		<Unit filename="/home/cpsusie/CLionProjects/Int128/CMakeLists.txt">
 			<Option virtualFolder="CMake Files\"/>
+		</Unit>
+		<Unit filename="/home/cpsusie/CLionProjects/Int128/../../vcpkg-master/scripts/buildsystems/vcpkg.cmake">
+			<Option virtualFolder="CMake Files\..\..\vcpkg-master\scripts\buildsystems\"/>
 		</Unit>
 	</Project>
 </CodeBlocks_project_file>

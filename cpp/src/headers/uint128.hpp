@@ -320,7 +320,7 @@ namespace cjm
 			constexpr uint128& operator--() noexcept;
 			friend constexpr uint128 operator/(uint128 lhs, uint128 rhs);
 			friend constexpr uint128 operator%(uint128 lhs, uint128 rhs);
-			template<typename Char, typename CharTraits, typename Allocator = std::allocator<Char>>
+			template<typename Char, typename CharTraits, typename Allocator>
 			friend std::basic_ostream<Char, CharTraits>& operator<<(std::basic_ostream<Char, CharTraits>& os, uint128 v);
 
 			//Accessor for sub-compenents

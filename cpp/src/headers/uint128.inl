@@ -5,7 +5,7 @@
 #include <algorithm>
 #include "cjm_string.hpp"
 #include <cwctype>
-#include "rational.hpp"
+
 
 //
 // Copyright 2017 The Abseil Authors.

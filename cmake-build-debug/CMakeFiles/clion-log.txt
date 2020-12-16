@@ -1,4 +1,5 @@
-/home/cpsusie/clion-2020.3/bin/cmake/linux/bin/cmake -DCMAKE_BUILD_TYPE=Debug -G "CodeBlocks - Unix Makefiles" /home/cpsusie/CLionProjects/Int128
+/home/cpsusie/clion-2020.3/bin/cmake/linux/bin/cmake -DCMAKE_BUILD_TYPE=Debug -DCMAKE_TOOLCHAIN_FILE=/home/cpsusie/vcpkg-master/scripts/buildsystems/vcpkg.cmake -G "CodeBlocks - Unix Makefiles" /home/cpsusie/CLionProjects/Int128
+-- Found Boost: /home/cpsusie/vcpkg-master/installed/x64-linux/include (found version "1.74.0")  
 -- Configuring done
 -- Generating done
 -- Build files have been written to: /home/cpsusie/CLionProjects/Int128/cmake-build-debug

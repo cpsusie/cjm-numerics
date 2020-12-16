@@ -6,5 +6,5 @@ CXX_FLAGS = -g   -std=gnu++2a
 
 CXX_DEFINES = 
 
-CXX_INCLUDES = -I/home/cpsusie/CLionProjects/Int128/cpp -I/home/cpsusie/CLionProjects/Int128/cpp/src 
+CXX_INCLUDES = -I/home/cpsusie/CLionProjects/Int128/cpp/src/cpp -I/home/cpsusie/CLionProjects/Int128/cpp/src/headers -I/home/cpsusie/vcpkg-master/installed/x64-linux/include 
 

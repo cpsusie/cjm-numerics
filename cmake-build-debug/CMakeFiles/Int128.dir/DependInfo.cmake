@@ -5,13 +5,15 @@ set(CMAKE_DEPENDS_LANGUAGES
 # The set of files for implicit dependencies of each language:
 set(CMAKE_DEPENDS_CHECK_CXX
   "/home/cpsusie/CLionProjects/Int128/cpp/src/cpp/program.cpp" "/home/cpsusie/CLionProjects/Int128/cmake-build-debug/CMakeFiles/Int128.dir/cpp/src/cpp/program.cpp.o"
+  "/home/cpsusie/CLionProjects/Int128/cpp/src/cpp/testing.cpp" "/home/cpsusie/CLionProjects/Int128/cmake-build-debug/CMakeFiles/Int128.dir/cpp/src/cpp/testing.cpp.o"
   )
 set(CMAKE_CXX_COMPILER_ID "GNU")
 
 # The include file search paths:
 set(CMAKE_CXX_TARGET_INCLUDE_PATH
-  "../cpp"
-  "../cpp/src"
+  "../cpp/src/cpp"
+  "../cpp/src/headers"
+  "/home/cpsusie/vcpkg-master/installed/x64-linux/include"
   )
 
 # Targets to which this target links.

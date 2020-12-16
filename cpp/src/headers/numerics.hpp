@@ -1,4 +1,3 @@
-#pragma once
 #ifndef CJM_NUMERICS_HPP
 #define CJM_NUMERICS_HPP
 #include <cmath>
@@ -8,7 +7,6 @@
 #include <boost/multiprecision/cpp_dec_float.hpp>
 // ReSharper disable once CppUnusedIncludeDirective
 #include <boost/functional/hash.hpp>
-#include <intrin.h>
 #include <numeric>
 
 namespace cjm
