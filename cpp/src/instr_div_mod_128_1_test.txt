@@ -1,0 +1,34 @@
+BEGIN INSTRUMENTED DIV MOD 128
+dividend: 0xbabfb3f72e024534a0303d20ba365174
+divisor: 0x7c53770e6bef55ce0df0e2a60923c948
+denominator: 0x7c53770e6bef55ce0df0e2a60923c948
+quotient: 0x0
+DECIMAL FLS RESULTS:
+flsDividend: 127
+flsDenominator: 126
+shiftAmount: 1
+HEX FLS RESULTS:
+flsDividend: 0x7f
+flsDenominator: 0x7e
+shiftAmount: 0x1
+denominator <<= 0x1 == 0xf8a6ee1cd7deab9c1be1c54c12479290
+
+
+STARTING CALCULATION LOOP
+i = 0 i <= 1= true
+quotient: 0x0
+(quotient <<= 1): 0x0
+denominator: 0xf8a6ee1cd7deab9c1be1c54c12479290
+dividendGreaterThanOrEqualToDenom: false
+denominator >>= 1: 0x7c53770e6bef55ce0df0e2a60923c948
+i = 1 i <= 1= true
+quotient: 0x0
+(quotient <<= 1): 0x0
+denominator: 0x7c53770e6bef55ce0df0e2a60923c948
+dividendGreaterThanOrEqualToDenom: true
+dividend -= denominator: 0x3e6c3ce8c212ef66923f5a7ab112882c
+quotient |= 1: 0x1
+denominator >>= 1: 0x3e29bb8735f7aae706f871530491e4a4
+final quotient: 0x1
+final remainder (dividend): 0x3e6c3ce8c212ef66923f5a7ab112882c
+END INSTRUMENTED DIV MOD 128
