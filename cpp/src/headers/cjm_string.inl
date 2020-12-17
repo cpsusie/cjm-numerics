@@ -5,6 +5,7 @@
 #include "cjm_string.hpp"
 
 template<typename Char, typename CharTraits, typename Allocator>
+requires cjm::numerics::concepts::char_with_traits_and_allocator<Char, CharTraits, Allocator>
 std::basic_string<Char, CharTraits, Allocator>
 cjm::string::trim(std::basic_string<Char, CharTraits, Allocator>&& trimMe)
 {
@@ -16,6 +17,7 @@ cjm::string::trim(std::basic_string<Char, CharTraits, Allocator>&& trimMe)
 }
 
 template <typename Char, typename CharTraits, typename Allocator>
+requires cjm::numerics::concepts::char_with_traits_and_allocator<Char, CharTraits, Allocator>
 std::basic_string<Char, CharTraits, Allocator> cjm::string::
 trim(const std::basic_string<Char, CharTraits, Allocator>& trimMe)
 {
@@ -25,6 +27,7 @@ trim(const std::basic_string<Char, CharTraits, Allocator>& trimMe)
 }
 
 template <typename Char, typename CharTraits, typename Allocator>
+requires cjm::numerics::concepts::char_with_traits_and_allocator<Char, CharTraits, Allocator>
 void cjm::string::string_helper::ltrim(std::basic_string<Char, CharTraits, Allocator>& toBeLTrimmed)
 {
 	auto it = std::find_if(toBeLTrimmed.begin(), toBeLTrimmed.end(), [](Char c) -> bool
@@ -34,6 +37,7 @@ void cjm::string::string_helper::ltrim(std::basic_string<Char, CharTraits, Alloc
 	toBeLTrimmed.erase(toBeLTrimmed.begin(), it);
 }
 template<typename Char, typename CharTraits, typename Allocator>
+requires cjm::numerics::concepts::char_with_traits_and_allocator<Char, CharTraits, Allocator>
 void cjm::string::string_helper::rtrim(std::basic_string<Char, CharTraits, Allocator>& toBeRTrimmed)
 {
 	auto it = std::find_if(toBeRTrimmed.rbegin(), toBeRTrimmed.rend(), [](Char c) -> bool

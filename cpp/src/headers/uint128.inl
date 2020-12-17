@@ -1,4 +1,3 @@
-
 #ifndef CJM_UINT128_INL
 #define CJM_UINT128_INL
 #include "uint128.hpp"

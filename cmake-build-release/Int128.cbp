@@ -102,6 +102,9 @@
 		<Unit filename="/home/cpsusie/CLionProjects/Int128/cpp/src/cpp/uint128.cpp">
 			<Option target="Int128"/>
 		</Unit>
+		<Unit filename="/home/cpsusie/CLionProjects/Int128/cpp/src/headers/cjm_numeric_concepts.hpp">
+			<Option target="Int128"/>
+		</Unit>
 		<Unit filename="/home/cpsusie/CLionProjects/Int128/CMakeLists.txt">
 			<Option virtualFolder="CMake Files\"/>
 		</Unit>
