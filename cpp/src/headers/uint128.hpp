@@ -61,333 +61,322 @@
 //If compiled on a Big Endian system, change "true" to "false"
 #define CJM_NUMERICS_LITTLE_ENDIAN true
 
-namespace cjm
+namespace cjm::numerics
 {
-	namespace numerics
-	{
-		template<typename LimbType>
-		class fixed_uint;
+    template<typename LimbType>
+    class fixed_uint;
 
-        template <typename Char = char, typename CharTraits=std::char_traits<Char>, typename Allocator = std::allocator<Char>>
-                requires cjm::numerics::concepts::char_with_traits_and_allocator<Char, CharTraits, Allocator>
-        std::basic_ostream<Char, CharTraits>& operator<<(std::basic_ostream<Char, CharTraits>& os, uint128 v);
-		//Comparison operators
-		constexpr bool operator==(uint128 lhs, uint128 rhs) noexcept;
-		constexpr bool operator!=(uint128 lhs, uint128 rhs) noexcept;
-		constexpr bool operator>(uint128 lhs, uint128 rhs) noexcept;
-		constexpr bool operator<(uint128 lhs, uint128 rhs) noexcept;
-		constexpr bool operator>=(uint128 lhs, uint128 rhs) noexcept;
-		constexpr bool operator<=(uint128 lhs, uint128 rhs) noexcept;
-		//Unary operators
-		constexpr uint128 operator-(uint128 operand) noexcept;
-		constexpr uint128 operator+(uint128 operand) noexcept;
-		constexpr uint128 operator~(uint128 operand) noexcept;
-		constexpr uint128 operator!(uint128 operand) noexcept;
-		//Logical operators
-		constexpr uint128 operator&(uint128 lhs, uint128 rhs) noexcept;
-		constexpr uint128 operator|(uint128 lhs, uint128 rhs) noexcept;
-		constexpr uint128 operator^(uint128 lhs, uint128 rhs) noexcept;
-		//bit shift operators
-		constexpr uint128 operator>>(uint128 lhs, int amount) noexcept;
-		constexpr uint128 operator<<(uint128 lhs, int amount) noexcept;
-		constexpr uint128 operator>>(uint128 lhs, uint128 amount) noexcept;
-		constexpr uint128 operator<<(uint128 lhs, uint128 amount) noexcept;
-		//arithmetic operators
-		constexpr uint128 operator+(uint128 lhs, uint128 rhs) noexcept;
-		constexpr uint128 operator-(uint128 lhs, uint128 rhs) noexcept;
-		constexpr uint128 operator*(uint128 lhs, uint128 rhs) noexcept;
-		//Division and modulus are friends declared within class
-
-		namespace math_functions
-		{
-			template<>
-			constexpr uint128 int_sign(uint128 val) noexcept;
-
-			template<>
-			constexpr uint128 int_gcd(uint128 first, uint128 second) noexcept;
-
-			template<>
-			constexpr uint128 int_lcm(uint128 first, uint128 second);
-		}
-
-		enum class u128_str_format
-		{
-			Illegal=0,
-			Zero,
-			Decimal,
-			Hexadecimal
-		};
-
-		template<typename Chars, typename CharTraits = std::char_traits<Chars>>
-		          requires cjm::numerics::concepts::char_with_traits<Chars, CharTraits>
-		struct u128_parsing_helper
-		{
-			
-		};
-
-		template<typename CharTraits>
-		    requires cjm::numerics::concepts::char_with_traits<char8_t, CharTraits>
-		 struct u128_parsing_helper<char8_t, CharTraits>
-         {
-		     template<typename Allocator = std::allocator<char8_t>>
-                requires cjm::numerics::concepts::char_with_traits_and_allocator<char8_t, CharTraits, Allocator>
-             using str128 = typename cjm::numerics::concepts::matching_str_data_ex<char8_t, CharTraits, Allocator>::string_t;
-		     using sv = typename cjm::numerics::concepts::matching_str_data<char8_t, CharTraits>::sv_t;
-		     using char_t = typename cjm::numerics::concepts::matching_str_data<char8_t, CharTraits>::char_t;
-
-         };
-
-		template<typename CharTraits>
-		    requires cjm::numerics::concepts::char_with_traits<char, CharTraits>
-		struct u128_parsing_helper<char, CharTraits>
-		{
-			template<typename Allocator = std::allocator<char>>
-            requires cjm::numerics::concepts::char_with_traits_and_allocator<char , CharTraits, Allocator>
-			using str128 = std::basic_string<char, CharTraits, Allocator>;
-
-			using sv = std::basic_string_view<char, CharTraits>;
-			static constexpr std::array<sv, 2> get_hex_tags();
-
-			static constexpr sv non_decimal_separator();
-
-			static constexpr sv decimal_separator();
-
-			static constexpr std::uint8_t get_value_hex(char c);
-
-			static constexpr std::uint8_t get_value_dec(char c);
-
-			template<typename Allocator = std::allocator<char>>
-			static constexpr u128_str_format get_format(const str128<Allocator>& string);
-
-			static constexpr bool is_legal_hex_char(char c);
-			template<typename Allocator = std::allocator<char>>
-			static str128<Allocator> trim_and_strip(str128<Allocator> trim_and_stripme);
-
-			static constexpr uint128 parse_decimal_str(sv decimal_str);
-			
-		};
-
-		template<typename CharTraits>
-		struct u128_parsing_helper<wchar_t, CharTraits>
-		{
-			template<typename Allocator = std::allocator<wchar_t>>
-			        requires cjm::numerics::concepts::char_with_traits_and_allocator<wchar_t, CharTraits, Allocator>
-			using str128 = std::basic_string<wchar_t, CharTraits, Allocator>;
-
-			using sv = std::basic_string_view<wchar_t, CharTraits>;
-			static constexpr std::array<sv, 2> get_hex_tags();
-
-			static constexpr sv non_decimal_separator();
-
-			static constexpr sv decimal_separator();
-
-			static constexpr std::uint8_t get_value_hex(wchar_t c);
-
-			static constexpr std::uint8_t get_value_dec(wchar_t c);
-
-			template<typename Allocator = std::allocator<wchar_t>>
-			static constexpr u128_str_format get_format(const str128<Allocator>& string);
-
-			static constexpr bool is_legal_hex_wchar_t(wchar_t c);
-			template<typename Allocator = std::allocator<wchar_t>>
-			static str128<Allocator> trim_and_strip(str128<Allocator> trim_and_stripme);
-
-			static constexpr uint128 parse_decimal_str(sv decimal_str);
-
-		};
-	}
-}
-namespace cjm
-{
-	namespace numerics
-	{
-		/************************************************************************/
-		/* An unsigned 128 bit-integer nearly identical algorithmically
-		 * and based almost entirely on the uint128 provided in abseil.io's int128.h
-		 * file.  Some stylistic changes have been made such as naming conventions, etc.
-		 * The string and stream operations have been modified to add support 
-		 * for strings and streams that are wider than const char by turning them into templates.   
-		 * 
-		 * The essence of CJM's modifications  to abseil.io's code is:
-		 *    1- REMOVING ALL SUPPORT FOR C++ VERSIONS PRIOR TO C++17  THIS CODE WILL NOT WORK 
-		 *    ON A C++14 OR ON A C++11 (OR ... SHUDDERS ... EARLIER) ENVIRONMENT.
-		 *    This code makes VERY heavy use of C++17 facilities.	
-		 *    2- making every mathematical operation (exception conversions to binary floating 
-		 *    point representations) constexpr-enabled -- i.e. capable of being performed
-		 *    at compile time (note that stream insertion and string conversion operations
-		 *    ARE NOT constexpr-enabled)
-		 *    3- making nearly every mathematical operation specify noexcept.
-		 *       The operations that MAY throw exceptions are division and modulus,
-		 *       string and stream output, and conversions to and from binary floating 
-		 *       point representations.
-		 *    4- Instead of being undefined behavior, division or modulus by 0 with 
-		 *     the operators provided herein  WILL THROW a std::domain_error exception.
-		 *    5- The support for using uint128 as a thin wrapper around GCC's unsigned __int128
-		 *    type has been removed.  If we get time to test this on GCC and can verify
-		 *    that restoring such support will not disable the constexpr nature of this 
-		 *    class, we will consider re-adding such operations.
-		 *    6- A custom literal has been added.  You will need to use
-		 *    the cjm::numerics::uint128_literals namespace to make use of it.
-		 *    The literal suffix for uint128 is _u128.  It currently supports decimal
-		 *    and hexadecimal literals.  It supports character separator ( ' ).  OCTAL
-		 *    is not supported and there are no plans to support it.  Support for binary
-		 *    literals may be added later (but I can't imagine wanting to out all 128 bits in 1s and
-		 *    zeros...).  For numbers that will fit within a std::uint64_t, you are free 
-		 *    to use those literals if you desire octal or binary.
-		 *    7- numeric limits and type traits information have been added to namespace std 
-		 *    to support interoperation with this type in a metaprogramming context.
-		 *    Example literals
-		 *    Hex examples:
-		 *		constexpr uint128 x =  0x123456789ABCDEF0123456789ABCDEF0_u128;
-		 *		constexpr auto x =  0x1234'5678'9ABC'DEF0'1234'5678'9ABC'DEF0_u128;
-		 *		constexpr auto x =  0x1234'5678'9abc'def0'1234'5678'9abc'def0_u128;
-		 *		constexpr auto x = 0X1234'5678'9abc'def0'1234'5678'9abc'def0_u128;
-		 *		constexpr auto x =  0X1234'5678'9abc'def0'1234'5678'9abc'def0_u128; (capital X ok too)
-		 *		constexpr auto x =  0x1'23'456'789ABCDEF012345678'9AB'C'DEF'0_u128; //stupid but legal
-		 *		constexpr auto x = 0x0_u128;
-		 *	  Decimal examples:
-		 *	    constexpr uint128 x = 340282366920938463463374607431768211455_u128; (i.e. max value)
-		 *	    constexpr auto x = 340'282'366'920'938'463'463'374'607'431'768'211'455_u128; //thousands separators
-		 *	    constexpr auto x = 0_u128; //0 is ok too
-		 *	    constexpr auto x = 00_u128; //even multiple leading zeros if all are 0
-		 *	  Illegal examples:
-		 *		constexpr auto x = 001_u128; //Illegal: non-zero literal other than with hex (0x)
-		 *		                               prefix represents octal and octal is not supported.                                                  
-		 *	   	constexpr auto x = 340'282'366'920'938'463'463'374'607'431'768'211'456_u128;  //(too big by one)	 																		
-		 *     */
-		/************************************************************************/
-		class alignas(uint128_align) uint128
-		{
-		public:
-			
-			friend class fixed_uint<uint128>;
-			using int_part = std::uint64_t;
-			static constexpr size_t byte_array_size{ (128 / CHAR_BIT) / sizeof(unsigned char) };
-
-			using byte_array = std::array<unsigned char, byte_array_size>;
-
-			template<typename Chars, typename CharTraits = std::char_traits<Chars>, typename Allocator = std::allocator<Chars>>
-			static uint128 make_from_string(std::basic_string<Chars, CharTraits, Allocator> parseMe);
-			static constexpr uint128 make_from_bytes_little_endian(byte_array bytes) noexcept;
-			static constexpr uint128 make_from_bytes_big_endian(byte_array bytes) noexcept;
-			static constexpr uint128 MakeUint128(std::uint64_t high, std::uint64_t low) noexcept;
-
-			static void instrumented_div_mod(std::basic_ostream<char>& stream, uint128 dividend, uint128 divisor,
-				uint128* quotient_ret, uint128* remainder_ret);
-			static constexpr int_part int_part_bits{ sizeof(int_part) * CHAR_BIT };
-			static constexpr int_part int_part_bottom_half_bits{ int_part_bits / 2 };
-			static constexpr int_part int_part_bottom_half_bitmask{std::numeric_limits<int_part>::max() >> int_part_bottom_half_bits};
-			constexpr uint128() noexcept = default;
-			constexpr uint128(const uint128& other) noexcept = default;
-			constexpr uint128(uint128&& other) noexcept = default;
-			constexpr uint128& operator=(const uint128& other) noexcept = default;
-			constexpr uint128& operator=(uint128&& other) noexcept = default;
-			~uint128() noexcept = default;
-			// Constructors from arithmetic types
-			constexpr uint128(int v) noexcept;
-			constexpr uint128(unsigned int v) noexcept;
-			constexpr uint128(long v) noexcept;
-			constexpr uint128(unsigned long v) noexcept;
-			constexpr uint128(long long v) noexcept;
-			constexpr uint128(unsigned long long v) noexcept;
-			// Assignment operators from arithmetic types
-			constexpr uint128& operator=(int v) noexcept;
-			constexpr uint128& operator=(unsigned int v) noexcept;
-			constexpr uint128& operator=(long v) noexcept;
-			constexpr uint128& operator=(unsigned long v) noexcept;
-			constexpr uint128& operator=(long long v) noexcept;
-			constexpr uint128& operator=(unsigned long long v) noexcept;
-
-			// Conversion operators to other arithmetic types
-			constexpr explicit operator bool() const noexcept;
-			constexpr explicit operator char() const noexcept;
-			constexpr explicit operator signed char() const noexcept;
-			constexpr explicit operator unsigned char() const noexcept;
-			constexpr explicit operator char16_t() const noexcept;
-			constexpr explicit operator char32_t() const noexcept;
-			constexpr explicit operator wchar_t() const noexcept;
-			constexpr explicit operator short() const noexcept;
-			constexpr explicit operator unsigned short() const noexcept;
-			constexpr explicit operator int() const noexcept;
-			constexpr explicit operator unsigned int() const noexcept;
-			constexpr explicit operator long() const noexcept;
-			constexpr explicit operator unsigned long() const noexcept;
-			constexpr explicit operator long long() const noexcept;
-			constexpr explicit operator unsigned long long() const noexcept;
-			explicit operator float() const;
-			explicit operator double() const;
-			explicit operator long double() const;
-
-			//ctor, assign op and explicit to-conversion for intrinsic unsigned __int128
-#ifdef CJM_HAVE_BUILTIN_128
-            uint128(unsigned __int128 other) noexcept;
-            uint128& operator=(unsigned __int128 other) noexcept;
-            explicit operator unsigned __int128() const noexcept;
-#endif
-			//hash code function and comparison operators
-			constexpr size_t hash_code() const noexcept;
-
-			// Arithmetic operators.
-			constexpr uint128& operator+=(uint128 other) noexcept;
-			constexpr uint128& operator-=(uint128 other) noexcept;
-			constexpr uint128& operator*=(uint128 other) noexcept;
-			// Long division/modulo for uint128.
-			constexpr uint128& operator/=(uint128 other);
-			constexpr uint128& operator%=(uint128 other);
-			constexpr uint128 operator++(int) noexcept;
-			constexpr uint128 operator--(int) noexcept;
-			constexpr uint128& operator<<=(int amount) noexcept;
-			constexpr uint128& operator>>=(int amount) noexcept;
-			constexpr uint128& operator&=(uint128 other) noexcept;
-			constexpr uint128& operator|=(uint128 other) noexcept;
-			constexpr uint128& operator^=(uint128 other) noexcept;
-			constexpr uint128& operator++() noexcept;
-			constexpr uint128& operator--() noexcept;
-			friend constexpr uint128 operator/(uint128 lhs, uint128 rhs);
-			friend constexpr uint128 operator%(uint128 lhs, uint128 rhs);
-			template<typename Char, typename CharTraits, typename Allocator>
-                requires cjm::numerics::concepts::char_with_traits_and_allocator<Char, CharTraits, Allocator>
-			friend std::basic_ostream<Char, CharTraits>& operator<<(std::basic_ostream<Char, CharTraits>& os, uint128 v);
-
-			//Accessor for sub-compenents
-			constexpr int_part low_part() const noexcept;
-			constexpr int_part high_part() const noexcept;
-
-			constexpr byte_array to_little_endian_arr() const noexcept;
-			constexpr byte_array to_big_endian_arr() const noexcept;
-
-		private:
-			constexpr uint128(int_part high, int_part low) noexcept;
-			static constexpr size_t calculate_hash(int_part hi, int_part low) noexcept;
-			static constexpr void hash_combine(size_t& seed, size_t newVal) noexcept;
-			static constexpr void div_mod_impl(uint128 dividend, uint128 divisor, 
-				uint128* quotient_ret, uint128* remainder_ret);
-			template<typename T>
-			static constexpr void step(T& n, int& pos, int shift);
-			static constexpr int fls(uint128 n);
-			static constexpr int fls_int_part(std::uint64_t n);
-			template<typename Char, typename CharTraits = std::char_traits<Char>, typename Allocator = std::allocator<Char>>
+    template <typename Char = char, typename CharTraits=std::char_traits<Char>, typename Allocator = std::allocator<Char>>
             requires cjm::numerics::concepts::char_with_traits_and_allocator<Char, CharTraits, Allocator>
-			static std::basic_string<Char, CharTraits, Allocator> to_string(uint128 item, std::ios_base::fmtflags flags);
-			
-		
-#if CJM_NUMERICS_LITTLE_ENDIAN
-			int_part m_low{};
-			int_part m_high{};
-#else //BIG ENDIAN
-			int_part m_high{};
-			int_part m_low{};
+    std::basic_ostream<Char, CharTraits>& operator<<(std::basic_ostream<Char, CharTraits>& os, uint128 v);
+    //Comparison operators
+    constexpr bool operator==(uint128 lhs, uint128 rhs) noexcept;
+    constexpr bool operator!=(uint128 lhs, uint128 rhs) noexcept;
+    constexpr bool operator>(uint128 lhs, uint128 rhs) noexcept;
+    constexpr bool operator<(uint128 lhs, uint128 rhs) noexcept;
+    constexpr bool operator>=(uint128 lhs, uint128 rhs) noexcept;
+    constexpr bool operator<=(uint128 lhs, uint128 rhs) noexcept;
+    //Unary operators
+    constexpr uint128 operator-(uint128 operand) noexcept;
+    constexpr uint128 operator+(uint128 operand) noexcept;
+    constexpr uint128 operator~(uint128 operand) noexcept;
+    constexpr uint128 operator!(uint128 operand) noexcept;
+    //Logical operators
+    constexpr uint128 operator&(uint128 lhs, uint128 rhs) noexcept;
+    constexpr uint128 operator|(uint128 lhs, uint128 rhs) noexcept;
+    constexpr uint128 operator^(uint128 lhs, uint128 rhs) noexcept;
+    //bit shift operators
+    constexpr uint128 operator>>(uint128 lhs, int amount) noexcept;
+    constexpr uint128 operator<<(uint128 lhs, int amount) noexcept;
+    constexpr uint128 operator>>(uint128 lhs, uint128 amount) noexcept;
+    constexpr uint128 operator<<(uint128 lhs, uint128 amount) noexcept;
+    //arithmetic operators
+    constexpr uint128 operator+(uint128 lhs, uint128 rhs) noexcept;
+    constexpr uint128 operator-(uint128 lhs, uint128 rhs) noexcept;
+    constexpr uint128 operator*(uint128 lhs, uint128 rhs) noexcept;
+    //Division and modulus are friends declared within class
+
+    namespace math_functions
+    {
+        template<>
+        constexpr uint128 int_sign(uint128 val) noexcept;
+
+        template<>
+        constexpr uint128 int_gcd(uint128 first, uint128 second) noexcept;
+
+        template<>
+        constexpr uint128 int_lcm(uint128 first, uint128 second);
+    }
+
+    enum class u128_str_format
+    {
+        Illegal=0,
+        Zero,
+        Decimal,
+        Hexadecimal
+    };
+
+    template<typename Chars, typename CharTraits = std::char_traits<Chars>>
+              requires cjm::numerics::concepts::char_with_traits<Chars, CharTraits>
+    struct u128_parsing_helper
+    {
+
+    };
+
+    template<typename CharTraits>
+        requires cjm::numerics::concepts::char_with_traits<char8_t, CharTraits>
+     struct u128_parsing_helper<char8_t, CharTraits>
+     {
+         template<typename Allocator = std::allocator<char8_t>>
+            requires cjm::numerics::concepts::char_with_traits_and_allocator<char8_t, CharTraits, Allocator>
+         using str128 = typename cjm::numerics::concepts::matching_str_data_ex<char8_t, CharTraits, Allocator>::string_t;
+         using sv = typename cjm::numerics::concepts::matching_str_data<char8_t, CharTraits>::sv_t;
+         using char_t = typename cjm::numerics::concepts::matching_str_data<char8_t, CharTraits>::char_t;
+
+     };
+
+    template<typename CharTraits>
+        requires cjm::numerics::concepts::char_with_traits<char, CharTraits>
+    struct u128_parsing_helper<char, CharTraits>
+    {
+        template<typename Allocator = std::allocator<char>>
+        requires cjm::numerics::concepts::char_with_traits_and_allocator<char , CharTraits, Allocator>
+        using str128 = std::basic_string<char, CharTraits, Allocator>;
+
+        using sv = std::basic_string_view<char, CharTraits>;
+        static constexpr std::array<sv, 2> get_hex_tags();
+
+        static constexpr sv non_decimal_separator();
+
+        static constexpr sv decimal_separator();
+
+        static constexpr std::uint8_t get_value_hex(char c);
+
+        static constexpr std::uint8_t get_value_dec(char c);
+
+        template<typename Allocator = std::allocator<char>>
+        static constexpr u128_str_format get_format(const str128<Allocator>& string);
+
+        static constexpr bool is_legal_hex_char(char c);
+        template<typename Allocator = std::allocator<char>>
+        static str128<Allocator> trim_and_strip(str128<Allocator> trim_and_stripme);
+
+        static constexpr uint128 parse_decimal_str(sv decimal_str);
+
+    };
+
+    template<typename CharTraits>
+    struct u128_parsing_helper<wchar_t, CharTraits>
+    {
+        template<typename Allocator = std::allocator<wchar_t>>
+                requires cjm::numerics::concepts::char_with_traits_and_allocator<wchar_t, CharTraits, Allocator>
+        using str128 = std::basic_string<wchar_t, CharTraits, Allocator>;
+
+        using sv = std::basic_string_view<wchar_t, CharTraits>;
+        static constexpr std::array<sv, 2> get_hex_tags();
+
+        static constexpr sv non_decimal_separator();
+
+        static constexpr sv decimal_separator();
+
+        static constexpr std::uint8_t get_value_hex(wchar_t c);
+
+        static constexpr std::uint8_t get_value_dec(wchar_t c);
+
+        template<typename Allocator = std::allocator<wchar_t>>
+        static constexpr u128_str_format get_format(const str128<Allocator>& string);
+
+        static constexpr bool is_legal_hex_wchar_t(wchar_t c);
+        template<typename Allocator = std::allocator<wchar_t>>
+        static str128<Allocator> trim_and_strip(str128<Allocator> trim_and_stripme);
+
+        static constexpr uint128 parse_decimal_str(sv decimal_str);
+
+    };
+}
+namespace cjm::numerics
+{
+    /************************************************************************/
+    /* An unsigned 128 bit-integer nearly identical algorithmically
+     * and based almost entirely on the uint128 provided in abseil.io's int128.h
+     * file.  Some stylistic changes have been made such as naming conventions, etc.
+     * The string and stream operations have been modified to add support
+     * for strings and streams that are wider than const char by turning them into templates.
+     *
+     * The essence of CJM's modifications  to abseil.io's code is:
+     *    1- REMOVING ALL SUPPORT FOR C++ VERSIONS PRIOR TO C++17  THIS CODE WILL NOT WORK
+     *    ON A C++14 OR ON A C++11 (OR ... SHUDDERS ... EARLIER) ENVIRONMENT.
+     *    This code makes VERY heavy use of C++17 facilities.
+     *    2- making every mathematical operation (exception conversions to binary floating
+     *    point representations) constexpr-enabled -- i.e. capable of being performed
+     *    at compile time (note that stream insertion and string conversion operations
+     *    ARE NOT constexpr-enabled)
+     *    3- making nearly every mathematical operation specify noexcept.
+     *       The operations that MAY throw exceptions are division and modulus,
+     *       string and stream output, and conversions to and from binary floating
+     *       point representations.
+     *    4- Instead of being undefined behavior, division or modulus by 0 with
+     *     the operators provided herein  WILL THROW a std::domain_error exception.
+     *    5- The support for using uint128 as a thin wrapper around GCC's unsigned __int128
+     *    type has been removed.  If we get time to test this on GCC and can verify
+     *    that restoring such support will not disable the constexpr nature of this
+     *    class, we will consider re-adding such operations.
+     *    6- A custom literal has been added.  You will need to use
+     *    the cjm::numerics::uint128_literals namespace to make use of it.
+     *    The literal suffix for uint128 is _u128.  It currently supports decimal
+     *    and hexadecimal literals.  It supports character separator ( ' ).  OCTAL
+     *    is not supported and there are no plans to support it.  Support for binary
+     *    literals may be added later (but I can't imagine wanting to out all 128 bits in 1s and
+     *    zeros...).  For numbers that will fit within a std::uint64_t, you are free
+     *    to use those literals if you desire octal or binary.
+     *    7- numeric limits and type traits information have been added to namespace std
+     *    to support interoperation with this type in a metaprogramming context.
+     *    Example literals
+     *    Hex examples:
+     *		constexpr uint128 x =  0x123456789ABCDEF0123456789ABCDEF0_u128;
+     *		constexpr auto x =  0x1234'5678'9ABC'DEF0'1234'5678'9ABC'DEF0_u128;
+     *		constexpr auto x =  0x1234'5678'9abc'def0'1234'5678'9abc'def0_u128;
+     *		constexpr auto x = 0X1234'5678'9abc'def0'1234'5678'9abc'def0_u128;
+     *		constexpr auto x =  0X1234'5678'9abc'def0'1234'5678'9abc'def0_u128; (capital X ok too)
+     *		constexpr auto x =  0x1'23'456'789ABCDEF012345678'9AB'C'DEF'0_u128; //stupid but legal
+     *		constexpr auto x = 0x0_u128;
+     *	  Decimal examples:
+     *	    constexpr uint128 x = 340282366920938463463374607431768211455_u128; (i.e. max value)
+     *	    constexpr auto x = 340'282'366'920'938'463'463'374'607'431'768'211'455_u128; //thousands separators
+     *	    constexpr auto x = 0_u128; //0 is ok too
+     *	    constexpr auto x = 00_u128; //even multiple leading zeros if all are 0
+     *	  Illegal examples:
+     *		constexpr auto x = 001_u128; //Illegal: non-zero literal other than with hex (0x)
+     *		                               prefix represents octal and octal is not supported.
+     *	   	constexpr auto x = 340'282'366'920'938'463'463'374'607'431'768'211'456_u128;  //(too big by one)
+     *     */
+    /************************************************************************/
+    class alignas(uint128_align) uint128
+    {
+    public:
+
+        friend class fixed_uint<uint128>;
+        using int_part = std::uint64_t;
+        static constexpr size_t byte_array_size{ (128 / CHAR_BIT) / sizeof(unsigned char) };
+
+        using byte_array = std::array<unsigned char, byte_array_size>;
+
+        template<typename Chars, typename CharTraits = std::char_traits<Chars>, typename Allocator = std::allocator<Chars>>
+        static uint128 make_from_string(std::basic_string<Chars, CharTraits, Allocator> parseMe);
+        static constexpr uint128 make_from_bytes_little_endian(byte_array bytes) noexcept;
+        static constexpr uint128 make_from_bytes_big_endian(byte_array bytes) noexcept;
+        static constexpr uint128 MakeUint128(std::uint64_t high, std::uint64_t low) noexcept;
+
+        static void instrumented_div_mod(std::basic_ostream<char>& stream, uint128 dividend, uint128 divisor,
+            uint128* quotient_ret, uint128* remainder_ret);
+        static constexpr int_part int_part_bits{ sizeof(int_part) * CHAR_BIT };
+        static constexpr int_part int_part_bottom_half_bits{ int_part_bits / 2 };
+        static constexpr int_part int_part_bottom_half_bitmask{std::numeric_limits<int_part>::max() >> int_part_bottom_half_bits};
+        constexpr uint128() noexcept = default;
+        constexpr uint128(const uint128& other) noexcept = default;
+        constexpr uint128(uint128&& other) noexcept = default;
+        constexpr uint128& operator=(const uint128& other) noexcept = default;
+        constexpr uint128& operator=(uint128&& other) noexcept = default;
+        ~uint128() noexcept = default;
+        // Constructors from arithmetic types
+        constexpr uint128(int v) noexcept;
+        constexpr uint128(unsigned int v) noexcept;
+        constexpr uint128(long v) noexcept;
+        constexpr uint128(unsigned long v) noexcept;
+        constexpr uint128(long long v) noexcept;
+        constexpr uint128(unsigned long long v) noexcept;
+        // Assignment operators from arithmetic types
+        constexpr uint128& operator=(int v) noexcept;
+        constexpr uint128& operator=(unsigned int v) noexcept;
+        constexpr uint128& operator=(long v) noexcept;
+        constexpr uint128& operator=(unsigned long v) noexcept;
+        constexpr uint128& operator=(long long v) noexcept;
+        constexpr uint128& operator=(unsigned long long v) noexcept;
+
+        // Conversion operators to other arithmetic types
+        constexpr explicit operator bool() const noexcept;
+        constexpr explicit operator char() const noexcept;
+        constexpr explicit operator signed char() const noexcept;
+        constexpr explicit operator unsigned char() const noexcept;
+        constexpr explicit operator char16_t() const noexcept;
+        constexpr explicit operator char32_t() const noexcept;
+        constexpr explicit operator wchar_t() const noexcept;
+        constexpr explicit operator short() const noexcept;
+        constexpr explicit operator unsigned short() const noexcept;
+        constexpr explicit operator int() const noexcept;
+        constexpr explicit operator unsigned int() const noexcept;
+        constexpr explicit operator long() const noexcept;
+        constexpr explicit operator unsigned long() const noexcept;
+        constexpr explicit operator long long() const noexcept;
+        constexpr explicit operator unsigned long long() const noexcept;
+        explicit operator float() const;
+        explicit operator double() const;
+        explicit operator long double() const;
+
+        //ctor, assign op and explicit to-conversion for intrinsic unsigned __int128
+#ifdef CJM_HAVE_BUILTIN_128
+        uint128(unsigned __int128 other) noexcept;
+        uint128& operator=(unsigned __int128 other) noexcept;
+        explicit operator unsigned __int128() const noexcept;
 #endif
-		};
-		namespace math_functions
-		{
-			
-		}
-	
-	}
+        //hash code function and comparison operators
+        constexpr size_t hash_code() const noexcept;
+
+        // Arithmetic operators.
+        constexpr uint128& operator+=(uint128 other) noexcept;
+        constexpr uint128& operator-=(uint128 other) noexcept;
+        constexpr uint128& operator*=(uint128 other) noexcept;
+        // Long division/modulo for uint128.
+        constexpr uint128& operator/=(uint128 other);
+        constexpr uint128& operator%=(uint128 other);
+        constexpr uint128 operator++(int) noexcept;
+        constexpr uint128 operator--(int) noexcept;
+        constexpr uint128& operator<<=(int amount) noexcept;
+        constexpr uint128& operator>>=(int amount) noexcept;
+        constexpr uint128& operator&=(uint128 other) noexcept;
+        constexpr uint128& operator|=(uint128 other) noexcept;
+        constexpr uint128& operator^=(uint128 other) noexcept;
+        constexpr uint128& operator++() noexcept;
+        constexpr uint128& operator--() noexcept;
+        friend constexpr uint128 operator/(uint128 lhs, uint128 rhs);
+        friend constexpr uint128 operator%(uint128 lhs, uint128 rhs);
+        template<typename Char, typename CharTraits, typename Allocator>
+            requires cjm::numerics::concepts::char_with_traits_and_allocator<Char, CharTraits, Allocator>
+        friend std::basic_ostream<Char, CharTraits>& operator<<(std::basic_ostream<Char, CharTraits>& os, uint128 v);
+
+        //Accessor for sub-compenents
+        constexpr int_part low_part() const noexcept;
+        constexpr int_part high_part() const noexcept;
+
+        constexpr byte_array to_little_endian_arr() const noexcept;
+        constexpr byte_array to_big_endian_arr() const noexcept;
+
+    private:
+        constexpr uint128(int_part high, int_part low) noexcept;
+        static constexpr size_t calculate_hash(int_part hi, int_part low) noexcept;
+        static constexpr void hash_combine(size_t& seed, size_t newVal) noexcept;
+        static constexpr void div_mod_impl(uint128 dividend, uint128 divisor,
+            uint128* quotient_ret, uint128* remainder_ret);
+        template<typename T>
+        static constexpr void step(T& n, int& pos, int shift);
+        static constexpr int fls(uint128 n);
+        static constexpr int fls_int_part(std::uint64_t n);
+        template<typename Char, typename CharTraits = std::char_traits<Char>, typename Allocator = std::allocator<Char>>
+        requires cjm::numerics::concepts::char_with_traits_and_allocator<Char, CharTraits, Allocator>
+        static std::basic_string<Char, CharTraits, Allocator> to_string(uint128 item, std::ios_base::fmtflags flags);
+
+
+#if CJM_NUMERICS_LITTLE_ENDIAN
+        int_part m_low{};
+        int_part m_high{};
+#else //BIG ENDIAN
+        int_part m_high{};
+        int_part m_low{};
+#endif
+    };
 }
 namespace std
-{
+{ //fixme todo --- get rid of the traits overloads -- undefined behavior
 	template<>
 	struct make_unsigned<cjm::numerics::uint128>
 	{
