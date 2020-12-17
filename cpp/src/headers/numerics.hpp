@@ -13,6 +13,16 @@ namespace cjm
 {
 	namespace numerics
 	{
+	    constexpr bool has_intrinsic_u128 =
+#ifdef __SIZEOF_INT128__
+        true;
+#else
+	    false;
+#endif
+	    constexpr size_t uint128_align = has_intrinsic_u128 ? alignof(unsigned __int128) : alignof(std::uint64_t);
+
+	    
+
 		class uint128;
 				
 		using uint128_alt = boost::multiprecision::uint128_t;

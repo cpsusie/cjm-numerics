@@ -33,12 +33,35 @@ namespace cjm::base_test_program
 
 int main()
 {
+
+
     std::ios::sync_with_stdio(false);
+
     using namespace std::string_view_literals;
     std::uint64_t ui = 0xc0de'd00d'fea2'b00bu;
     std::int64_t  i1 = 938'336;
+    using cjm::testing::cjm_assert;
     constexpr auto text = "Hi mom!"sv;
     using namespace cjm::base_test_program;
+    using u128native_t = unsigned __int128;
+
+    constexpr std::uint64_t low = 0xdead'beef'face'babe;
+    constexpr std::uint64_t high = 0xc0de'd00d'fea2'b00b;
+    u128native_t native = high;
+    native <<= 64;
+    native |= low;
+    u128native_t copy_native = native;
+
+
+    std::uint64_t rt_low = static_cast<std::uint64_t>(copy_native);
+    copy_native >>= 64;
+    std::uint64_t rt_high = static_cast<std::uint64_t>(copy_native);
+
+    cjm_assert(low == rt_low && high == rt_high);
+
+    cout_saver saver{std::cout};
+
+
     print_spec(ui);
     print_spec(i1);
     print_spec(text);

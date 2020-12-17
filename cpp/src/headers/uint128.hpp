@@ -1,4 +1,3 @@
-#pragma once
 #ifndef CJM_UINT128_HPP
 #define CJM_UINT128_HPP
 #include<cstdint>
@@ -239,7 +238,7 @@ namespace cjm
 		 *	   	constexpr auto x = 340'282'366'920'938'463'463'374'607'431'768'211'456_u128;  //(too big by one)	 																		
 		 *     */
 		/************************************************************************/
-		class uint128
+		class alignas(uint128_align) uint128
 		{
 		public:
 			
