@@ -125,10 +125,24 @@ namespace cjm
 			
 		};
 
-		template<typename CharTraits> requires cjm::numerics::concepts::char_with_traits<char, CharTraits>
+		template<typename CharTraits>
+		    requires cjm::numerics::concepts::char_with_traits<char8_t, CharTraits>
+		 struct u128_parsing_helper<char8_t, CharTraits>
+         {
+		     template<typename Allocator = std::allocator<char8_t>>
+                requires cjm::numerics::concepts::char_with_traits_and_allocator<char8_t, CharTraits, Allocator>
+             using str128 = typename cjm::numerics::concepts::matching_str_data_ex<char8_t, CharTraits, Allocator>::string_t;
+		     using sv = typename cjm::numerics::concepts::matching_str_data<char8_t, CharTraits>::sv_t;
+		     using char_t = typename cjm::numerics::concepts::matching_str_data<char8_t, CharTraits>::char_t;
+
+         };
+
+		template<typename CharTraits>
+		    requires cjm::numerics::concepts::char_with_traits<char, CharTraits>
 		struct u128_parsing_helper<char, CharTraits>
 		{
 			template<typename Allocator = std::allocator<char>>
+            requires cjm::numerics::concepts::char_with_traits_and_allocator<char , CharTraits, Allocator>
 			using str128 = std::basic_string<char, CharTraits, Allocator>;
 
 			using sv = std::basic_string_view<char, CharTraits>;
