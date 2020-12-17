@@ -102,3 +102,29 @@ cjm::numerics::uint128::operator long double() const
 	return static_cast<long double>(m_low) +
 		std::ldexp(static_cast<long double>(m_high), 64);
 }
+#ifdef CJM_HAVE_BUILTIN_128
+cjm::numerics::uint128& cjm::numerics::uint128::operator=(__uint128_t other) noexcept
+{
+    m_low = static_cast<std::uint64_t>(other);
+    other >>= 64;
+    m_high = static_cast<std::uint64_t>(other);
+    return *this;
+}
+
+
+cjm::numerics::uint128::operator unsigned __int128() const noexcept
+{
+    unsigned __int128 ret = m_high;
+    ret <<= 64;
+    ret |= m_low;
+    return ret;
+}
+
+cjm::numerics::uint128::uint128(__uint128_t other) noexcept
+{
+    m_low = static_cast<std::uint64_t>(other);
+    other >>= 64;
+    m_high = static_cast<std::uint64_t>(other);
+}
+
+#endif

@@ -44,7 +44,7 @@ int main()
     constexpr auto text = "Hi mom!"sv;
     using namespace cjm::base_test_program;
     using u128native_t = unsigned __int128;
-
+    constexpr u128native_t is_constexpr = 0xdead'beef'cafe'babe;
     constexpr std::uint64_t low = 0xdead'beef'face'babe;
     constexpr std::uint64_t high = 0xc0de'd00d'fea2'b00b;
     u128native_t native = high;
@@ -58,7 +58,7 @@ int main()
     std::uint64_t rt_high = static_cast<std::uint64_t>(copy_native);
 
     cjm_assert(low == rt_low && high == rt_high);
-
+    static_assert(is_constexpr == 0xdead'beef'cafe'babe);
     cout_saver saver{std::cout};
 
 

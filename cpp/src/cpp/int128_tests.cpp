@@ -13,7 +13,7 @@ void cjm::uint128_tests::execute_basic_test_one()
 {
     constexpr uint128_t big = 0xc0de'd00d'fea2'b00b'c0de'd00d'fea2'b00b_u128;
     cout_saver saver{cout};
-    cout << std::hex << std::setw(32) << std::setfill('0') << "Printing hex: [0x" <<  big << "]." << newl;
+    cout << std::hex << "Printing hex: [0x" <<  big << "]." << newl;
     cout << std::dec << "Printing dec: [" << big << "]." << newl;
 }
 

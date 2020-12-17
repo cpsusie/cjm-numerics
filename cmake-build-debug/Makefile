@@ -224,6 +224,33 @@ cpp/src/cpp/testing.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Int128.dir/build.make CMakeFiles/Int128.dir/cpp/src/cpp/testing.cpp.s
 .PHONY : cpp/src/cpp/testing.cpp.s
 
+cpp/src/cpp/uint128.o: cpp/src/cpp/uint128.cpp.o
+
+.PHONY : cpp/src/cpp/uint128.o
+
+# target to build an object file
+cpp/src/cpp/uint128.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Int128.dir/build.make CMakeFiles/Int128.dir/cpp/src/cpp/uint128.cpp.o
+.PHONY : cpp/src/cpp/uint128.cpp.o
+
+cpp/src/cpp/uint128.i: cpp/src/cpp/uint128.cpp.i
+
+.PHONY : cpp/src/cpp/uint128.i
+
+# target to preprocess a source file
+cpp/src/cpp/uint128.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Int128.dir/build.make CMakeFiles/Int128.dir/cpp/src/cpp/uint128.cpp.i
+.PHONY : cpp/src/cpp/uint128.cpp.i
+
+cpp/src/cpp/uint128.s: cpp/src/cpp/uint128.cpp.s
+
+.PHONY : cpp/src/cpp/uint128.s
+
+# target to generate assembly for a file
+cpp/src/cpp/uint128.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Int128.dir/build.make CMakeFiles/Int128.dir/cpp/src/cpp/uint128.cpp.s
+.PHONY : cpp/src/cpp/uint128.cpp.s
+
 # Help Target
 help:
 	@echo "The following are some of the valid targets for this Makefile:"
@@ -242,6 +269,9 @@ help:
 	@echo "... cpp/src/cpp/testing.o"
 	@echo "... cpp/src/cpp/testing.i"
 	@echo "... cpp/src/cpp/testing.s"
+	@echo "... cpp/src/cpp/uint128.o"
+	@echo "... cpp/src/cpp/uint128.i"
+	@echo "... cpp/src/cpp/uint128.s"
 .PHONY : help
 
 

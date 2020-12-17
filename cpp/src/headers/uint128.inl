@@ -684,8 +684,11 @@ namespace cjm
 			uint128::div_mod_impl(lhs, rhs, &quotient, &remainder);
 			return remainder;
 		}
-				
-		namespace uint128_literals
+
+
+
+
+        namespace uint128_literals
 		{
 			template<char... Chars>
 			constexpr uint128 operator"" _u128()

@@ -99,6 +99,9 @@
 		<Unit filename="/home/cpsusie/CLionProjects/Int128/cpp/src/cpp/testing.cpp">
 			<Option target="Int128"/>
 		</Unit>
+		<Unit filename="/home/cpsusie/CLionProjects/Int128/cpp/src/cpp/uint128.cpp">
+			<Option target="Int128"/>
+		</Unit>
 		<Unit filename="/home/cpsusie/CLionProjects/Int128/CMakeLists.txt">
 			<Option virtualFolder="CMake Files\"/>
 		</Unit>

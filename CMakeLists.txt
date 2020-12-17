@@ -13,4 +13,5 @@ endif()
         cpp/src/cpp/program.cpp
         cpp/src/cpp/testing.cpp
         cpp/src/cpp/int128_tests.cpp
+        cpp/src/cpp/uint128.cpp
         )

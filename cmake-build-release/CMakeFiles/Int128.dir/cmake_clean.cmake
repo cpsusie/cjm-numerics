@@ -2,6 +2,7 @@ file(REMOVE_RECURSE
   "CMakeFiles/Int128.dir/cpp/src/cpp/int128_tests.cpp.o"
   "CMakeFiles/Int128.dir/cpp/src/cpp/program.cpp.o"
   "CMakeFiles/Int128.dir/cpp/src/cpp/testing.cpp.o"
+  "CMakeFiles/Int128.dir/cpp/src/cpp/uint128.cpp.o"
   "Int128"
   "Int128.pdb"
 )

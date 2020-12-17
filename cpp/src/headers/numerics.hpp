@@ -16,12 +16,18 @@ namespace cjm
 	    constexpr bool has_intrinsic_u128 =
 #ifdef __SIZEOF_INT128__
         true;
+#ifndef CJM_HAVE_BUILTIN_128
+#define CJM_HAVE_BUILTIN_128
+#endif
 #else
 	    false;
+#ifdef CJM_HAVE_BUILTIN_128
+#undef CJM_HAVE_BUILTIN_128
+#endif
 #endif
 	    constexpr size_t uint128_align = has_intrinsic_u128 ? alignof(unsigned __int128) : alignof(std::uint64_t);
 
-	    
+
 
 		class uint128;
 				
