@@ -31,6 +31,7 @@ namespace cjm
 	{
 
 		template <typename Char, typename CharTraits, typename Allocator>
+            requires cjm::numerics::concepts::char_with_traits_and_allocator<Char, CharTraits, Allocator>
 		std::basic_ostream<Char, CharTraits>& operator<<(std::basic_ostream<Char, CharTraits>& os, uint128 v)
 		{
 			using ios = std::basic_ios<Char, CharTraits>;
@@ -60,6 +61,7 @@ namespace cjm
 		
 
 		template<typename Char, typename CharTraits, typename Allocator>
+            requires cjm::numerics::concepts::char_with_traits_and_allocator<Char, CharTraits, Allocator>
 		std::basic_string<Char, CharTraits, Allocator> uint128::to_string(uint128 item, std::ios_base::fmtflags flags)
 		{
 			uint128 div;

@@ -115,6 +115,8 @@ cassert
 -
 numerics.hpp
 ../cpp/src/headers/numerics.hpp
+cjm_numeric_concepts.hpp
+../cpp/src/headers/cjm_numeric_concepts.hpp
 uint128.inl
 ../cpp/src/headers/uint128.inl
 

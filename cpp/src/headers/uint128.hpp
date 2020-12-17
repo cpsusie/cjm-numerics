@@ -5,6 +5,7 @@
 #include<limits>
 #include<cassert>
 #include "numerics.hpp"
+#include "cjm_numeric_concepts.hpp"
 // Copyright 2018 CJM Screws, LLC
 // 
 // This contents of this file (uint128.hpp) and its inline implementation file (uint128.inl)
@@ -68,6 +69,7 @@ namespace cjm
 		class fixed_uint;
 
         template <typename Char = char, typename CharTraits=std::char_traits<Char>, typename Allocator = std::allocator<Char>>
+                requires cjm::numerics::concepts::char_with_traits_and_allocator<Char, CharTraits, Allocator>
         std::basic_ostream<Char, CharTraits>& operator<<(std::basic_ostream<Char, CharTraits>& os, uint128 v);
 		//Comparison operators
 		constexpr bool operator==(uint128 lhs, uint128 rhs) noexcept;
@@ -117,12 +119,13 @@ namespace cjm
 		};
 
 		template<typename Chars, typename CharTraits = std::char_traits<Chars>>
+		          requires cjm::numerics::concepts::char_with_traits<Chars, CharTraits>
 		struct u128_parsing_helper
 		{
 			
 		};
 
-		template<typename CharTraits>
+		template<typename CharTraits> requires cjm::numerics::concepts::char_with_traits<char, CharTraits>
 		struct u128_parsing_helper<char, CharTraits>
 		{
 			template<typename Allocator = std::allocator<char>>
@@ -154,6 +157,7 @@ namespace cjm
 		struct u128_parsing_helper<wchar_t, CharTraits>
 		{
 			template<typename Allocator = std::allocator<wchar_t>>
+			        requires cjm::numerics::concepts::char_with_traits_and_allocator<wchar_t, CharTraits, Allocator>
 			using str128 = std::basic_string<wchar_t, CharTraits, Allocator>;
 
 			using sv = std::basic_string_view<wchar_t, CharTraits>;
@@ -328,6 +332,7 @@ namespace cjm
 			friend constexpr uint128 operator/(uint128 lhs, uint128 rhs);
 			friend constexpr uint128 operator%(uint128 lhs, uint128 rhs);
 			template<typename Char, typename CharTraits, typename Allocator>
+                requires cjm::numerics::concepts::char_with_traits_and_allocator<Char, CharTraits, Allocator>
 			friend std::basic_ostream<Char, CharTraits>& operator<<(std::basic_ostream<Char, CharTraits>& os, uint128 v);
 
 			//Accessor for sub-compenents
@@ -348,6 +353,7 @@ namespace cjm
 			static constexpr int fls(uint128 n);
 			static constexpr int fls_int_part(std::uint64_t n);
 			template<typename Char, typename CharTraits = std::char_traits<Char>, typename Allocator = std::allocator<Char>>
+            requires cjm::numerics::concepts::char_with_traits_and_allocator<Char, CharTraits, Allocator>
 			static std::basic_string<Char, CharTraits, Allocator> to_string(uint128 item, std::ios_base::fmtflags flags);
 			
 		
@@ -355,8 +361,8 @@ namespace cjm
 			int_part m_low{};
 			int_part m_high{};
 #else //BIG ENDIAN
-			int_part m_high;
-			int_part m_low;
+			int_part m_high{};
+			int_part m_low{};
 #endif
 		};
 		namespace math_functions
