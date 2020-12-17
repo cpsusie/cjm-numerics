@@ -90,6 +90,9 @@
 				</MakeCommands>
 			</Target>
 		</Build>
+		<Unit filename="/home/cpsusie/CLionProjects/Int128/cpp/src/cpp/int128_tests.cpp">
+			<Option target="Int128"/>
+		</Unit>
 		<Unit filename="/home/cpsusie/CLionProjects/Int128/cpp/src/cpp/program.cpp">
 			<Option target="Int128"/>
 		</Unit>

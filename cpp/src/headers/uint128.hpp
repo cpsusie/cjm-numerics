@@ -68,6 +68,8 @@ namespace cjm
 		template<typename LimbType>
 		class fixed_uint;
 
+        template <typename Char = char, typename CharTraits=std::char_traits<Char>, typename Allocator = std::allocator<Char>>
+        std::basic_ostream<Char, CharTraits>& operator<<(std::basic_ostream<Char, CharTraits>& os, uint128 v);
 		//Comparison operators
 		constexpr bool operator==(uint128 lhs, uint128 rhs) noexcept;
 		constexpr bool operator!=(uint128 lhs, uint128 rhs) noexcept;

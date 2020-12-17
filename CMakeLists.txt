@@ -12,4 +12,5 @@ endif()
     add_executable(Int128
         cpp/src/cpp/program.cpp
         cpp/src/cpp/testing.cpp
+        cpp/src/cpp/int128_tests.cpp
         )
