@@ -83,7 +83,7 @@ namespace cjm::numerics
     constexpr uint128 operator-(uint128 operand) noexcept;
     constexpr uint128 operator+(uint128 operand) noexcept;
     constexpr uint128 operator~(uint128 operand) noexcept;
-    constexpr uint128 operator!(uint128 operand) noexcept;
+    constexpr bool operator!(uint128 operand) noexcept;
     //Logical operators
     constexpr uint128 operator&(uint128 lhs, uint128 rhs) noexcept;
     constexpr uint128 operator|(uint128 lhs, uint128 rhs) noexcept;

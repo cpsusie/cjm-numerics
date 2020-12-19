@@ -421,6 +421,9 @@ namespace cjm
 		constexpr void uint128::div_mod_impl(uint128 dividend, uint128 divisor, uint128* quotient_ret,
 			uint128* remainder_ret)
 		{
+            // Long division/modulo for uint128 implemented using the shift-subtract
+            // division algorithm adapted from:
+            // https://stackoverflow.com/questions/5386377/division-without-using
 			if (divisor == 0)
 			{
 				throw std::domain_error("Division and/or modulus by zero is forbidden.");
@@ -464,6 +467,10 @@ namespace cjm
 
 		constexpr int uint128::fls(uint128 n)
 		{
+		    assert(n != 0);
+		    //check the high part for any set bits,
+		    //if so, call google's magic method on the high part
+		    //if not, call it on the low part.
 			int_part hi = n.high_part();
 			if (hi != 0)
 			{
@@ -477,6 +484,9 @@ namespace cjm
 		template <typename T>
 		constexpr void uint128::step(T& n, int& pos, int shift)
 		{
+		    //again, no freaking clue how this works or what it even does except it
+		    //works as part of fls_int_part .... google programming gods are mysterious
+		    //in their ways.
 			if (n >= (static_cast<T>(1) << shift))
 			{
 				n = n >> shift;
@@ -486,6 +496,9 @@ namespace cjm
 
 		constexpr int uint128::fls_int_part(std::uint64_t n)
 		{
+		    //finding the last set bit (bitpos of most significant bit with a value of one)
+		    //how or why this works is totally beyond me.  It does though ... trust
+		    // the google gods ....
 			assert(n != 0);
 			int pos = 0;
 			step<std::uint64_t>(n, pos, 0x20);
@@ -525,12 +538,37 @@ namespace cjm
 		//Unary operators
 		constexpr uint128 operator-(uint128 operand) noexcept
 		{
-			using intpart = uint128::int_part;
-			intpart high = ~operand.high_part();
-			intpart lo = ~operand.low_part() + 1;
-			if (lo == 0)
-				++high; // carry
-			return uint128::MakeUint128(high, lo);
+
+            if (std::is_constant_evaluated())
+            {
+                using intpart = uint128::int_part;
+                intpart high = ~operand.high_part();
+                intpart lo = ~operand.low_part() + 1;
+                if (lo == 0)
+                    ++high; // carry
+                return uint128::MakeUint128(high, lo);
+            }
+            else
+            {
+                if constexpr (calculation_mode == uint128_calc_mode::intrinsic_u128)
+                {
+                    return -static_cast<unsigned __int128>(operand);
+                }
+//		        else if constexpr (calculation_mode == uint128_calc_mode::msvc_x64)
+//      	    {
+//
+//      	    }
+                else // constexpr (calculation_mode == uint128_calc_mode::default_eval)
+                {
+                    using intpart = uint128::int_part;
+                    intpart high = ~operand.high_part();
+                    intpart lo = ~operand.low_part() + 1;
+                    if (lo == 0)
+                        ++high; // carry
+                    return uint128::MakeUint128(high, lo);
+                }
+            }
+
 		}
 		constexpr uint128 operator+(uint128 operand) noexcept
 		{
@@ -540,9 +578,9 @@ namespace cjm
 		{
 			return uint128::MakeUint128(~operand.high_part(), ~operand.low_part());
 		}
-		constexpr uint128 operator!(uint128 operand) noexcept
+		constexpr bool operator!(uint128 operand) noexcept
 		{
-			return !operand.high_part() && !operand.low_part();
+			return !(static_cast<bool>(operand));
 		}
 		//Logical operators
 		constexpr uint128 operator&(uint128 lhs, uint128 rhs) noexcept
@@ -563,40 +601,108 @@ namespace cjm
 		//bit shift operators
 		constexpr uint128 operator>>(uint128 lhs, int amount) noexcept
 		{
-			//It is undefined behavior to attempt a shift greater than number of bits in an integral type
-			assert(amount < std::numeric_limits<uint128>::digits);
-			// uint64_t shifts of >= 64 are undefined, so we will need some
-			// special-casing.
-			auto absAmount = math_functions::int_abs(amount);
-			if (absAmount < uint128::int_part_bits)
-			{
-				if (absAmount != 0)
-				{
-					return uint128::MakeUint128((lhs.high_part() >> absAmount),
-						(lhs.low_part() >> absAmount) |
-						(lhs.high_part() << (uint128::int_part_bits -absAmount)));
-				}
-				return lhs;
-			}
-			return uint128::MakeUint128(0, lhs.high_part() >> (absAmount - uint128::int_part_bits));
+            if (std::is_constant_evaluated())
+            {
+                //It is undefined behavior to attempt a shift greater than number of bits in an integral type
+                assert(amount < std::numeric_limits<uint128>::digits && amount > -1);
+                // uint64_t shifts of >= 64 are undefined, so we will need some
+                // special-casing.
+                auto absAmount = static_cast<int>(math_functions::int_abs(amount));
+                if (absAmount < static_cast<int>(uint128::int_part_bits))
+                {
+                    if (absAmount != 0)
+                    {
+                        return uint128::MakeUint128((lhs.high_part() >> absAmount),
+                                                    (lhs.low_part() >> absAmount) |
+                                                    (lhs.high_part() << (static_cast<int>(uint128::int_part_bits) -absAmount)));
+                    }
+                    return lhs;
+                }
+                return uint128::MakeUint128(0, lhs.high_part() >> (absAmount - static_cast<int>(uint128::int_part_bits)));
+            }
+            else
+            {
+                if constexpr (calculation_mode == uint128_calc_mode::intrinsic_u128)
+                {
+                    return static_cast<unsigned __int128>(lhs) >> amount;
+                }
+//		        else if constexpr (calculation_mode == uint128_calc_mode::msvc_x64)
+//      	    {
+//
+//      	    }
+                else // constexpr (calculation_mode == uint128_calc_mode::default_eval)
+                {
+                    //It is undefined behavior to attempt a shift greater than number of bits in an integral type
+                    assert(amount < std::numeric_limits<uint128>::digits && amount > -1);
+                    // uint64_t shifts of >= 64 are undefined, so we will need some
+                    // special-casing.
+                    auto absAmount = static_cast<int>(math_functions::int_abs(amount));
+                    if (absAmount < static_cast<int>(uint128::int_part_bits))
+                    {
+                        if (absAmount != 0)
+                        {
+                            return uint128::MakeUint128((lhs.high_part() >> absAmount),
+                                                        (lhs.low_part() >> absAmount) |
+                                                        (lhs.high_part() << (static_cast<int>(uint128::int_part_bits) -absAmount)));
+                        }
+                        return lhs;
+                    }
+                    return uint128::MakeUint128(0, lhs.high_part() >> (absAmount - static_cast<int>(uint128::int_part_bits)));
+                }
+            }
+
 		}
 		constexpr uint128 operator<<(uint128 lhs, int amount) noexcept
 		{
-			//It is undefined behavior to attempt a shift greater than number of bits in an integral type
-			assert(amount < std::numeric_limits<uint128>::digits);
-			// uint64_t shifts of >= 64 are undefined, so we will need some
-			// special-casing.
-			auto absAmount = math_functions::int_abs(amount);
-			if (absAmount < uint128::int_part_bits)
-			{
-				if (absAmount != 0)
-				{
-					return uint128::MakeUint128((lhs.high_part() << absAmount) |
-						(lhs.low_part() >> (uint128::int_part_bits - absAmount)), lhs.low_part() << absAmount);
-				}
-				return lhs;
-			}
-			return uint128::MakeUint128(lhs.low_part() << (absAmount - uint128::int_part_bits), 0);
+
+            if (std::is_constant_evaluated())
+            {
+                //It is undefined behavior to attempt a shift greater than number of bits in an integral type
+                assert(amount < std::numeric_limits<uint128>::digits && amount > -1);
+                // uint64_t shifts of >= 64 are undefined, so we will need some
+                // special-casing.
+                auto absAmount = static_cast<int>(math_functions::int_abs(amount));
+                if (absAmount < static_cast<int>(uint128::int_part_bits))
+                {
+                    if (absAmount != 0)
+                    {
+                        return uint128::MakeUint128((lhs.high_part() << absAmount) |
+                                                    (lhs.low_part() >> (static_cast<int>(uint128::int_part_bits) - absAmount)), lhs.low_part() << absAmount);
+                    }
+                    return lhs;
+                }
+                return uint128::MakeUint128(lhs.low_part() << (absAmount - static_cast<int>(uint128::int_part_bits)), 0);
+            }
+            else
+            {
+                if constexpr (calculation_mode == uint128_calc_mode::intrinsic_u128)
+                {
+                    return static_cast<unsigned __int128>(lhs) << amount;
+                }
+//		        else if constexpr (calculation_mode == uint128_calc_mode::msvc_x64)
+//      	    {
+//
+//            	}
+                else // constexpr (calculation_mode == uint128_calc_mode::default_eval)
+                {
+                    //It is undefined behavior to attempt a shift greater than number of bits in an integral type
+                    assert(amount < std::numeric_limits<uint128>::digits && amount > -1);
+                    // uint64_t shifts of >= 64 are undefined, so we will need some
+                    // special-casing.
+                    auto absAmount = static_cast<int>(math_functions::int_abs(amount));
+                    if (absAmount < static_cast<int>(uint128::int_part_bits))
+                    {
+                        if (absAmount != 0)
+                        {
+                            return uint128::MakeUint128((lhs.high_part() << absAmount) |
+                                                        (lhs.low_part() >> (static_cast<int>(uint128::int_part_bits) - absAmount)), lhs.low_part() << absAmount);
+                        }
+                        return lhs;
+                    }
+                    return uint128::MakeUint128(lhs.low_part() << (absAmount - static_cast<int>(uint128::int_part_bits)), 0);
+                }
+            }
+
 		}
 
 		constexpr uint128 operator>>(uint128 lhs, uint128 amount) noexcept
@@ -625,10 +731,10 @@ namespace cjm
                     assert(absAmount > -1 && absAmount < static_cast<int>(std::numeric_limits<uint128>::digits));
                     return static_cast<unsigned __int128>(lhs) << static_cast<int>(absAmount);
                 }
-                    //		        else if constexpr (calculation_mode == uint128_calc_mode::msvc_x64)
-                    //          	{
-                    //
-                    //      	    }
+//		        else if constexpr (calculation_mode == uint128_calc_mode::msvc_x64)
+//          	{
+//
+//      	    }
                 else // constexpr (calculation_mode == uint128_calc_mode::default_eval)
                 {
                     auto absAmount = static_cast<int>(amount);
