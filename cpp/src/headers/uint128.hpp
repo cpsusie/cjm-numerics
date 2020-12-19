@@ -67,6 +67,8 @@ namespace cjm::numerics
     template<typename LimbType>
     class fixed_uint;
 
+    constexpr uint128_calc_mode calculation_mode = init_eval_mode();
+
     template <typename Char = char, typename CharTraits=std::char_traits<Char>, typename Allocator = std::allocator<Char>>
             requires cjm::numerics::concepts::char_with_traits_and_allocator<Char, CharTraits, Allocator>
     std::basic_ostream<Char, CharTraits>& operator<<(std::basic_ostream<Char, CharTraits>& os, uint128 v);
@@ -403,13 +405,15 @@ namespace cjm::numerics
 
 
 #if CJM_NUMERICS_LITTLE_ENDIAN
-        int_part m_low{};
-        int_part m_high{};
+        int_part m_low;
+        int_part m_high;
 #else //BIG ENDIAN
         int_part m_high{};
         int_part m_low{};
 #endif
     };
+    static_assert(std::is_trivial_v<uint128>, "Needs to be a trivial type.");
+
 }
 namespace std
 { //fixme todo --- get rid of the traits overloads -- undefined behavior

@@ -1,5 +1,12 @@
 #ifndef CJM_NUMERICS_HPP
 #define CJM_NUMERICS_HPP
+#if defined(_MSC_VER) && defined(_M_X64)
+#include <intrin.h>
+#pragma intrinsic(_umul128)
+#ifndef CJM_MSC_X64
+#define CJM_MSC_X64
+#endif
+#endif
 #include <cmath>
 #include <limits>
 #include <type_traits>
@@ -8,11 +15,23 @@
 // ReSharper disable once CppUnusedIncludeDirective
 #include <boost/functional/hash.hpp>
 #include <numeric>
+#include <cstring>
+#include "cjm_numeric_concepts.hpp"
+#ifdef __cpp_lib_bit_cast
+#include <bits>
+#endif
 
 namespace cjm
 {
 	namespace numerics
 	{
+	    constexpr bool has_msc_x64 =
+#ifdef CJM_MSC_X64
+        true;
+#else
+	    false;
+#endif
+
 	    constexpr bool has_intrinsic_u128 =
 #ifdef __SIZEOF_INT128__
         true;
@@ -30,7 +49,40 @@ namespace cjm
 
 
 		class uint128;
-				
+
+		enum class uint128_calc_mode : std::uint8_t
+        {
+		    default_eval = 0x00,
+		    msvc_x64,
+		    intrinsic_u128,
+        };
+		constexpr uint128_calc_mode init_eval_mode() noexcept;
+
+#ifdef __cpp_lib_bit_cast
+		template<typename To, typename From>
+	       requires cjm::numerics::concepts::bit_castable<To, From>
+	    constexpr To bit_cast(const From& f) noexcept
+	    {
+	        return std::bit_cast<To, From>(f);
+	    }
+#else
+        template<typename To, typename From>
+            requires cjm::numerics::concepts::bit_castable<To, From>
+        To bit_cast(const From& f) noexcept
+        {
+            //GCC seems to get all but hurt about private member variables even if type is trivial.
+            //All c++ standard requires is trivially copyable and same size.  the concepts here
+            //enforce MORE than that requirement (also require triviality in general and alignment same)
+            //Suppressing because uint128 is a type that is trivially copyable-to.
+            To dst;
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wclass-memaccess"
+            std::memcpy(&dst, &f, sizeof(To));  /* no diagnostic for this one */
+#pragma GCC diagnostic pop
+            return dst;
+        }
+#endif
+
 		using uint128_alt = boost::multiprecision::uint128_t;
 		using int128 = boost::multiprecision::int128_t;
 		using uint256 = boost::multiprecision::uint256_t;
@@ -67,6 +119,25 @@ namespace cjm
 			
 			
 		}
+
+        #pragma clang diagnostic push
+        #pragma ide diagnostic ignored "UnreachableCode"
+        constexpr uint128_calc_mode init_eval_mode() noexcept
+        {
+            if constexpr (has_intrinsic_u128)
+            {
+                return uint128_calc_mode::intrinsic_u128;
+            }
+            else if constexpr (has_msc_x64)
+            {
+                return uint128_calc_mode::msvc_x64;
+            }
+            else
+            {
+                return uint128_calc_mode::default_eval;
+            }
+        }
+        #pragma clang diagnostic pop
 	}
 }
 

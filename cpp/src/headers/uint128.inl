@@ -1036,7 +1036,7 @@ constexpr cjm::numerics::uint128 std::numeric_limits<cjm::numerics::uint128>::de
 #pragma warning ( disable : 4100)
 template<>
 // ReSharper disable once CppParameterNeverUsed
-constexpr cjm::numerics::uint128 cjm::numerics::math_functions::int_sign(uint128 val) noexcept
+constexpr cjm::numerics::uint128 cjm::numerics::math_functions::int_sign([[maybe_unused]] uint128 val) noexcept
 {
 	return uint128{ 1 };
 }

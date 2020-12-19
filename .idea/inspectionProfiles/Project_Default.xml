@@ -1,0 +1,11 @@
+<component name="InspectionProjectProfileManager">
+  <profile version="1.0">
+    <option name="myName" value="Project Default" />
+    <inspection_tool class="DanglingPointers" enabled="true" level="ERROR" enabled_by_default="true" />
+    <inspection_tool class="InfiniteRecursion" enabled="true" level="ERROR" enabled_by_default="true" />
+    <inspection_tool class="LocalValueEscapesScope" enabled="true" level="ERROR" enabled_by_default="true" />
+    <inspection_tool class="LoopDoesntUseConditionVariable" enabled="true" level="ERROR" enabled_by_default="true" />
+    <inspection_tool class="MissingReturn" enabled="true" level="ERROR" enabled_by_default="true" />
+    <inspection_tool class="NullDereferences" enabled="true" level="ERROR" enabled_by_default="true" />
+  </profile>
+</component>

@@ -57,7 +57,9 @@ namespace cjm::numerics::concepts
     template<typename Allocator>
     concept utf32_char_allocator = std::is_nothrow_convertible_v<std::allocator<char32_t>, Allocator>;
 
-
+    template<typename To, typename From>
+    concept bit_castable =  sizeof(To) == sizeof(From) && alignof(To) == alignof(From)
+            && std::is_trivially_copyable_v<To> && std::is_trivially_copyable_v<From> && !std::is_polymorphic_v<To> && !std::is_polymorphic_v<From> && std::is_trivially_default_constructible_v<To> && std::is_trivially_default_constructible_v<From>;
 
 
     template<typename Char, typename CharTraits> requires char_with_traits<Char, CharTraits>

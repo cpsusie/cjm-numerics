@@ -8,6 +8,8 @@
 #include "numerics.hpp"
 #include "uint128.hpp"
 #include "int128_tests.hpp"
+#include <concepts>
+#include <type_traits>
 #include <boost/io/ios_state.hpp>
 #include "cjm_numeric_concepts.hpp"
 #include "cjm_string.hpp"
@@ -58,8 +60,24 @@ int main()
     native <<= 64;
     native |= low;
     u128native_t copy_native = native;
+    static_assert(std::is_trivial_v<uint128_t>);
+    static_assert(std::is_trivially_default_constructible_v<uint128_t>);
+    static_assert(std::is_trivially_destructible_v<uint128_t> && std::is_trivially_copyable_v<uint128_t> && std::is_trivially_copy_assignable_v<uint128_t> && std::is_trivially_move_constructible_v<uint128_t> && std::is_trivially_assignable_v<uint128_t, uint128_t>);
     uint128_t from_native = static_cast<uint128_t>(native);
+    {
 
+        auto saver = cout_saver {std::cout};
+        std::cout << "Native convert: [0x" <<  std::hex << std::setw(32) << std::setfill('0') << static_cast<uint128_t>(copy_native) << "]." << newl;
+        auto converted = static_cast<uint128_t>(copy_native);
+        u128native_t converted_back = static_cast<u128native_t>(converted);
+        cjm_assert(converted_back == copy_native);
+
+        u128native_t n = static_cast<u128native_t>(my_literal);
+        uint128_t fn = n;
+        std::cout << "Native round tripped: [0x" << std::hex << std::setw(32) << std::setfill('0') << fn << "]." << newl;
+        cjm_assert(fn == my_literal);
+    }
+    static_assert(std::is_trivially_copyable_v<uint128_t>);
 
     static_assert(cjm::numerics::concepts::unsigned_integer<uint128_t>);
 

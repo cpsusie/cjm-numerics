@@ -114,17 +114,16 @@ cjm::numerics::uint128& cjm::numerics::uint128::operator=(__uint128_t other) noe
 
 cjm::numerics::uint128::operator unsigned __int128() const noexcept
 {
-    unsigned __int128 ret = m_high;
-    ret <<= 64;
-    ret |= m_low;
-    return ret;
+    return cjm::numerics::bit_cast<unsigned __int128, uint128>(*this);
+//    unsigned __int128 ret = m_high;
+//    ret <<= 64;
+//    ret |= m_low;
+//    return ret;
 }
 
 cjm::numerics::uint128::uint128(__uint128_t other) noexcept
 {
-    m_low = static_cast<std::uint64_t>(other);
-    other >>= 64;
-    m_high = static_cast<std::uint64_t>(other);
+    *this = cjm::numerics::bit_cast<uint128, unsigned __int128>(other);
 }
 
 #endif
