@@ -91,3 +91,27 @@
 /cpp/src/WinInt128/x64/Debug/vcpkg.applocal.log
 /cpp/src/WinInt128/x64/Debug/vc142.pdb
 /cpp/src/WinInt128/x64/Debug/vc142.idb
+/cpp/src/WinInt128/WinInt128.vcxproj.filters
+/cpp/src/WinInt128/.vs/WinInt128/v16/ipch/AutoPCH/1e3ba972b95e84bc/PROGRAM.ipch
+/cpp/src/WinInt128/.vs/WinInt128/v16/Browse.VC.db
+/cpp/src/headers/Debug/Date.tlog/unsuccessfulbuild
+/cpp/src/headers/Debug/Date.tlog/Date.lastbuildstate
+/cpp/src/headers/Debug/Date.tlog/CL.command.1.tlog
+/cpp/src/.vs/WinInt128/v16/ipch/AutoPCH/d9606950eb37a31/TESTING.ipch
+/cpp/src/.vs/WinInt128/v16/ipch/AutoPCH/d23419394000292c/TESTING.ipch
+/cpp/src/.vs/WinInt128/v16/ipch/AutoPCH/61cd8616c5ebd4cd/UINT128.ipch
+/cpp/src/.vs/WinInt128/v16/ipch/AutoPCH/5f9a14de491539cd/TESTPROGRAM.ipch
+/cpp/src/.vs/WinInt128/v16/ipch/AutoPCH/2b6807c75643e7ee/INT128_TESTS.ipch
+/cpp/src/.vs/WinInt128/v16/ipch/AutoPCH/2b10ef7ece6e25f0/INT128_TESTS.ipch
+/cpp/src/.vs/WinInt128/v16/ipch/AutoPCH/1e3ba972b95e84bc/PROGRAM.ipch
+/cpp/src/.vs/WinInt128/v16/ipch/AutoPCH/1be27789f53a3b4d/PROGRAM.ipch
+/cpp/src/.vs/WinInt128/v16/Browse.VC.opendb
+/cpp/src/.vs/WinInt128/v16/Browse.VC.db-wal
+/cpp/src/.vs/WinInt128/v16/Browse.VC.db-shm
+/cpp/src/.vs/WinInt128/v16/Browse.VC.db
+/.vs/VSWorkspaceState.json
+/.vs/slnx.sqlite
+/.vs/ProjectSettings.json
+/.vs/Int128/v16/ipch/AutoPCH/645c862a3e6c5c6d/INT128_TESTS.ipch
+/.vs/Int128/v16/Browse.VC.db
+/.vs/CMake Overview
