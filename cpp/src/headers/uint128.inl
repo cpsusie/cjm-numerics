@@ -601,94 +601,298 @@ namespace cjm
 
 		constexpr uint128 operator>>(uint128 lhs, uint128 amount) noexcept
 		{
-			assert(amount < std::numeric_limits<uint128>::digits);
-			auto absAmount = static_cast<uint128::int_part>(amount);
-			if (absAmount < uint128::int_part_bits)
-			{
-				if (absAmount != 0)
-				{
-					return uint128::MakeUint128((lhs.high_part() >> absAmount),
+            if (std::is_constant_evaluated())
+            {
+                auto absAmount = static_cast<int>(amount);
+                assert(absAmount > -1 && absAmount < std::numeric_limits<uint128>::digits);
+                if (absAmount < static_cast<int>(uint128::int_part_bits))
+                {
+                    if (absAmount != 0)
+                    {
+                        return uint128::MakeUint128((lhs.high_part() >> absAmount),
 						(lhs.low_part() >> absAmount) |
-						(lhs.high_part() << (uint128::int_part_bits - absAmount)));
-				}
-				return lhs;
-			}
-			return uint128::MakeUint128(0, lhs.high_part() >> (absAmount - uint128::int_part_bits));
+                            (lhs.high_part() << (uint128::int_part_bits - absAmount)));
+                    }
+                    return lhs;
+                }
+                return uint128::MakeUint128(0, lhs.high_part() >> (absAmount - uint128::int_part_bits));
+            }
+            else
+            {
+                if constexpr (calculation_mode == uint128_calc_mode::intrinsic_u128)
+                {
+                    auto absAmount = static_cast<int>(amount);
+                    assert(absAmount > -1 && absAmount < static_cast<int>(std::numeric_limits<uint128>::digits));
+                    return static_cast<unsigned __int128>(lhs) << static_cast<int>(absAmount);
+                }
+                    //		        else if constexpr (calculation_mode == uint128_calc_mode::msvc_x64)
+                    //          	{
+                    //
+                    //      	    }
+                else // constexpr (calculation_mode == uint128_calc_mode::default_eval)
+                {
+                    auto absAmount = static_cast<int>(amount);
+                    assert(absAmount > -1 && absAmount < std::numeric_limits<uint128>::digits);
+                    if (absAmount < static_cast<int>(uint128::int_part_bits))
+                    {
+                        if (absAmount != 0)
+                        {
+                            return uint128::MakeUint128((lhs.high_part() >> absAmount),
+                                                        (lhs.low_part() >> absAmount) |
+                                                        (lhs.high_part() << (uint128::int_part_bits - absAmount)));
+                        }
+                        return lhs;
+                    }
+                    return uint128::MakeUint128(0, lhs.high_part() >> (absAmount - uint128::int_part_bits));
+                }
+            }
+
+//			assert(amount < std::numeric_limits<uint128>::digits);
+//			auto absAmount = static_cast<uint128::int_part>(amount);
+//			if (absAmount < uint128::int_part_bits)
+//			{
+//				if (absAmount != 0)
+//				{
+//					return uint128::MakeUint128((lhs.high_part() >> absAmount),
+//						(lhs.low_part() >> absAmount) |
+//						(lhs.high_part() << (uint128::int_part_bits - absAmount)));
+//				}
+//				return lhs;
+//			}
+//			return uint128::MakeUint128(0, lhs.high_part() >> (absAmount - uint128::int_part_bits));
 		}
 		constexpr uint128 operator<<(uint128 lhs, uint128 amount) noexcept
 		{
-			assert(amount < std::numeric_limits<uint128>::digits);
-			auto absAmount = static_cast<uint128::int_part>(amount);
-			if (absAmount < uint128::int_part_bits)
-			{
-				if (absAmount != 0)
-				{
-					return uint128::MakeUint128((lhs.high_part() << absAmount) |
-						(lhs.low_part() >> (uint128::int_part_bits - absAmount)), lhs.low_part() << absAmount);
-				}
-				return lhs;
-			}
-			return uint128::MakeUint128(lhs.low_part() << (absAmount - uint128::int_part_bits), 0);
+            if (std::is_constant_evaluated())
+            {
+                auto absAmount = static_cast<int>(amount);
+                assert(absAmount > -1 && absAmount < std::numeric_limits<uint128>::digits);
+                if (absAmount < static_cast<int>(uint128::int_part_bits))
+                {
+                    if (absAmount != 0)
+                    {
+                        return uint128::MakeUint128((lhs.high_part() << absAmount) |
+                                                    (lhs.low_part() >> (uint128::int_part_bits - absAmount)), lhs.low_part() << absAmount);
+                    }
+                    return lhs;
+                }
+                return uint128::MakeUint128(lhs.low_part() << (absAmount - uint128::int_part_bits), 0);
+            }
+            else
+            {
+                if constexpr (calculation_mode == uint128_calc_mode::intrinsic_u128)
+                {
+                    auto absAmount = static_cast<int>(amount);
+                    assert(absAmount > -1 && absAmount < static_cast<int>(std::numeric_limits<uint128>::digits));
+                    return static_cast<unsigned __int128>(lhs) << static_cast<int>(absAmount);
+                }
+//		        else if constexpr (calculation_mode == uint128_calc_mode::msvc_x64)
+//          	{
+//
+//      	    }
+                else // constexpr (calculation_mode == uint128_calc_mode::default_eval)
+                {
+                    auto absAmount = static_cast<int>(amount);
+                    assert(absAmount > -1 && absAmount < static_cast<int>(std::numeric_limits<uint128>::digits));
+                    if (absAmount < static_cast<int>(uint128::int_part_bits))
+                    {
+                        if (absAmount != 0)
+                        {
+                            return uint128::MakeUint128((lhs.high_part() << absAmount) |
+                                                        (lhs.low_part() >> (uint128::int_part_bits - absAmount)), lhs.low_part() << absAmount);
+                        }
+                        return lhs;
+                    }
+                    return uint128::MakeUint128(lhs.low_part() << (absAmount - uint128::int_part_bits), 0);
+                }
+            }
+
+
 		}
 		//arithmetic operators
 		constexpr uint128 operator+(uint128 lhs, uint128 rhs) noexcept
 		{
-			uint128 result = uint128::MakeUint128(lhs.high_part() + rhs.high_part(),
-				lhs.low_part() + rhs.low_part());
-			if (result.low_part() < lhs.low_part()) // check for carry
-			{
-				return uint128::MakeUint128(result.high_part() + 1, result.low_part());
-			}
-			return result;
+            if (std::is_constant_evaluated())
+            {
+                uint128 result = uint128::MakeUint128(lhs.high_part() + rhs.high_part(),
+                                                      lhs.low_part() + rhs.low_part());
+                if (result.low_part() < lhs.low_part()) // check for carry
+                {
+                    return uint128::MakeUint128(result.high_part() + 1, result.low_part());
+                }
+                return result;
+            }
+            else
+            {
+                if constexpr (calculation_mode == uint128_calc_mode::intrinsic_u128)
+                {
+                    return static_cast<unsigned __int128>(lhs) + static_cast<unsigned __int128>(rhs);
+                }
+//	            else if constexpr (calculation_mode == uint128_calc_mode::msvc_x64)
+//              {
+//
+//              }
+                else // constexpr (calculation_mode == uint128_calc_mode::default_eval)
+                {
+                    uint128 result = uint128::MakeUint128(lhs.high_part() + rhs.high_part(),
+                                                          lhs.low_part() + rhs.low_part());
+                    if (result.low_part() < lhs.low_part()) // check for carry
+                    {
+                        return uint128::MakeUint128(result.high_part() + 1, result.low_part());
+                    }
+                    return result;
+                }
+            }
+
 		}
 		constexpr uint128 operator-(uint128 lhs, uint128 rhs) noexcept
 		{
-			uint128 result = uint128::MakeUint128(lhs.high_part() - rhs.high_part(),
-				lhs.low_part() - rhs.low_part());
-			if (lhs.low_part() < rhs.low_part()) // check for borrow
-			{
-				return uint128::MakeUint128(result.high_part() - 1, result.low_part());
-			}
-			return result;
+            if (std::is_constant_evaluated())
+            {
+                uint128 result = uint128::MakeUint128(lhs.high_part() - rhs.high_part(),
+                                                      lhs.low_part() - rhs.low_part());
+                if (lhs.low_part() < rhs.low_part()) // check for borrow
+                {
+                    return uint128::MakeUint128(result.high_part() - 1, result.low_part());
+                }
+                return result;
+            }
+            else
+            {
+                if constexpr (calculation_mode == uint128_calc_mode::intrinsic_u128)
+                {
+                    return static_cast<unsigned __int128>(lhs) - static_cast<unsigned __int128>(rhs);
+                }
+//	            else if constexpr (calculation_mode == uint128_calc_mode::msvc_x64)
+//              {
+//
+//              }
+                else // constexpr (calculation_mode == uint128_calc_mode::default_eval)
+                {
+                    uint128 result = uint128::MakeUint128(lhs.high_part() - rhs.high_part(),
+                                                          lhs.low_part() - rhs.low_part());
+                    if (lhs.low_part() < rhs.low_part()) // check for borrow
+                    {
+                        return uint128::MakeUint128(result.high_part() - 1, result.low_part());
+                    }
+                    return result;
+                }
+            }
 		}
 		constexpr uint128 operator*(uint128 lhs, uint128 rhs) noexcept
 		{
-			using int_part = uint128::int_part;
-			int_part a32 = lhs.low_part() >> uint128::int_part_bottom_half_bits;
-			int_part a00 = lhs.low_part() & uint128::int_part_bottom_half_bitmask;
-			int_part b32 = rhs.low_part() >> uint128::int_part_bottom_half_bits;
-			int_part b00 = rhs.low_part() & uint128::int_part_bottom_half_bitmask;
+            if (std::is_constant_evaluated())
+            {
+                using int_part = uint128::int_part;
+                int_part a32 = lhs.low_part() >> uint128::int_part_bottom_half_bits;
+                int_part a00 = lhs.low_part() & uint128::int_part_bottom_half_bitmask;
+                int_part b32 = rhs.low_part() >> uint128::int_part_bottom_half_bits;
+                int_part b00 = rhs.low_part() & uint128::int_part_bottom_half_bitmask;
 
-			uint128 result = uint128::MakeUint128(lhs.high_part() * rhs.low_part() +
-				lhs.low_part() * rhs.high_part() +
-				a32 * b32,
-				a00 * b00);
-			result += uint128(a32 * b00) << uint128::int_part_bottom_half_bits;
-			result += uint128(a00 * b32) << uint128::int_part_bottom_half_bits;
-			return result;
+                uint128 result = uint128::MakeUint128(lhs.high_part() * rhs.low_part() +
+                                                      lhs.low_part() * rhs.high_part() +
+                                                      a32 * b32,
+                                                      a00 * b00);
+                result += uint128(a32 * b00) << uint128::int_part_bottom_half_bits;
+                result += uint128(a00 * b32) << uint128::int_part_bottom_half_bits;
+                return result;
+            }
+            else
+            {
+                if constexpr (calculation_mode == uint128_calc_mode::intrinsic_u128)
+                {
+                    return static_cast<unsigned __int128>(lhs) * static_cast<unsigned __int128>(rhs);
+                }
+//	            else if constexpr (calculation_mode == uint128_calc_mode::msvc_x64)
+//              {
+//
+//              }
+                else // constexpr (calculation_mode == uint128_calc_mode::default_eval)
+                {
+                    using int_part = uint128::int_part;
+                    int_part a32 = lhs.low_part() >> uint128::int_part_bottom_half_bits;
+                    int_part a00 = lhs.low_part() & uint128::int_part_bottom_half_bitmask;
+                    int_part b32 = rhs.low_part() >> uint128::int_part_bottom_half_bits;
+                    int_part b00 = rhs.low_part() & uint128::int_part_bottom_half_bitmask;
+
+                    uint128 result = uint128::MakeUint128(lhs.high_part() * rhs.low_part() +
+                                                          lhs.low_part() * rhs.high_part() +
+                                                          a32 * b32,
+                                                          a00 * b00);
+                    result += uint128(a32 * b00) << uint128::int_part_bottom_half_bits;
+                    result += uint128(a00 * b32) << uint128::int_part_bottom_half_bits;
+                    return result;
+                }
+            }
 		}
 		constexpr uint128 operator/(uint128 lhs, uint128 rhs)
 		{
-			if (rhs == 0)
-			{
-				throw std::domain_error("Division by zero is illegal.");
-			}
-			uint128 quotient = 0;
-			uint128 remainder = 0;
-			uint128::div_mod_impl(lhs, rhs, &quotient, &remainder);
-			return quotient;
+		    if (std::is_constant_evaluated())
+		    {
+                if (rhs == 0) { throw std::domain_error("Division by zero is illegal."); }
+                uint128 quotient = 0;
+                uint128 remainder = 0;
+                uint128::div_mod_impl(lhs, rhs, &quotient, &remainder);
+                return quotient;
+            }
+		    else
+            {
+		        if constexpr (calculation_mode == uint128_calc_mode::intrinsic_u128)
+                {
+                    return static_cast<unsigned __int128>(lhs) / static_cast<unsigned __int128>(rhs);
+                }
+//		        else if constexpr (calculation_mode == uint128_calc_mode::msvc_x64)
+//              {
+//
+//              }
+                else // constexpr (calculation_mode == uint128_calc_mode::default_eval)
+                {
+                    if (rhs == 0) { throw std::domain_error("Division by zero is illegal."); }
+                    uint128 quotient = 0;
+                    uint128 remainder = 0;
+                    uint128::div_mod_impl(lhs, rhs, &quotient, &remainder);
+                    return quotient;
+                }
+            }
 		}
 
 		constexpr uint128 operator%(uint128 lhs, uint128 rhs)
 		{
-			if (rhs == 0)
-			{
-				throw std::domain_error("Modulus by zero is illegal.");
-			}
-			uint128 quotient = 0;
-			uint128 remainder = 0;
-			uint128::div_mod_impl(lhs, rhs, &quotient, &remainder);
-			return remainder;
+            if (std::is_constant_evaluated())
+            {
+                if (rhs == 0)
+                {
+                    throw std::domain_error("Modulus by zero is illegal.");
+                }
+                uint128 quotient = 0;
+                uint128 remainder = 0;
+                uint128::div_mod_impl(lhs, rhs, &quotient, &remainder);
+                return remainder;
+            }
+            else
+            {
+                if constexpr (calculation_mode == uint128_calc_mode::intrinsic_u128)
+                {
+                    return static_cast<unsigned __int128>(lhs) % static_cast<unsigned __int128>(rhs);
+                }
+//		        else if constexpr (calculation_mode == uint128_calc_mode::msvc_x64)
+//              {
+//
+//              }
+                else // constexpr (calculation_mode == uint128_calc_mode::default_eval)
+                {
+                    if (rhs == 0)
+                    {
+                        throw std::domain_error("Modulus by zero is illegal.");
+                    }
+                    uint128 quotient = 0;
+                    uint128 remainder = 0;
+                    uint128::div_mod_impl(lhs, rhs, &quotient, &remainder);
+                    return remainder;
+                }
+            }
+
+
 		}
 
 

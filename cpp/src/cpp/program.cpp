@@ -60,6 +60,7 @@ int main()
     native <<= 64;
     native |= low;
     u128native_t copy_native = native;
+
     static_assert(std::is_trivial_v<uint128_t>);
     static_assert(std::is_trivially_default_constructible_v<uint128_t>);
     static_assert(std::is_trivially_destructible_v<uint128_t> && std::is_trivially_copyable_v<uint128_t> && std::is_trivially_copy_assignable_v<uint128_t> && std::is_trivially_move_constructible_v<uint128_t> && std::is_trivially_assignable_v<uint128_t, uint128_t>);
