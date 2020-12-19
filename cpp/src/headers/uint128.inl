@@ -64,6 +64,8 @@ namespace cjm
             requires cjm::numerics::concepts::char_with_traits_and_allocator<Char, CharTraits, Allocator>
 		std::basic_string<Char, CharTraits, Allocator> uint128::to_string(uint128 item, std::ios_base::fmtflags flags)
 		{
+		    constexpr char zero_char_temp = '0';
+		    constexpr Char zero_char = static_cast<Char>(zero_char_temp);
 			uint128 div;
 			int div_base_log;
 			switch (flags & std::basic_ios<Char, CharTraits>::basefield)
@@ -92,14 +94,14 @@ namespace cjm
 			if (high.low_part() != 0)
 			{
 				os << high.low_part();
-				os << std::noshowbase << std::setfill('0') << std::setw(div_base_log);
+				os << std::noshowbase << std::setfill(zero_char) << std::setw(div_base_log);
 				os << mid.low_part();
 				os << std::setw(div_base_log);
 			}
 			else if (mid.low_part() != 0)
 			{
 				os << mid.low_part();
-				os << std::noshowbase << std::setfill('0') << std::setw(div_base_log);
+				os << std::noshowbase << std::setfill(zero_char) << std::setw(div_base_log);
 			}
 			os << low.low_part();
 			return os.str();
@@ -179,11 +181,14 @@ namespace cjm
 			m_high = 0;
 			return *this;
 		}
-		template <typename Chars, typename CharTraits, typename Allocator>
-		uint128 uint128::make_from_string(std::basic_string<Chars, CharTraits, Allocator> parseMe)
+
+        template<typename Chars, typename CharTraits>
+            requires cjm::numerics::concepts::char_with_traits<Chars, CharTraits>
+		uint128 uint128::make_from_string(std::basic_string_view<Chars, CharTraits> parseMe)
 		{
 			using ph = u128_parsing_helper<Chars, CharTraits>;
-			auto trimmed = ph::trim_and_strip(parseMe);
+			auto str = std::basic_string<Chars, CharTraits>{parseMe};
+			auto trimmed = ph::trim_and_strip(str);
 			auto parseFormat = ph::get_format(trimmed);
 			uint128 ret;
 			switch (parseFormat)
@@ -1080,201 +1085,590 @@ constexpr cjm::numerics::uint128 cjm::numerics::math_functions::floor_log2(uint1
 	return rshiftCount;
 }
 
-template <typename CharTraits>
-constexpr std::array<typename cjm::numerics::u128_parsing_helper<char, CharTraits>::sv, 2> cjm::numerics::u128_parsing_helper<char, CharTraits>::
-get_hex_tags()
+template<typename Chars, typename CharTraits>
+requires cjm::numerics::concepts::char_with_traits<Chars, CharTraits>
+constexpr std::array<typename cjm::numerics::u128_parsing_helper<Chars, CharTraits>::sv, 2>
+    cjm::numerics::u128_parsing_helper<Chars, CharTraits>::
+        get_hex_tags()
 {
-	std::array<sv, 2> ret{ "0x", "0X" };
-	return ret;
+    static_assert(  std::is_same_v<char_t, char> ||
+                    std::is_same_v<char_t, wchar_t> ||
+                    std::is_same_v<char_t, char8_t> ||
+                    std::is_same_v<char_t, char16_t> ||
+                    std::is_same_v<char_t, char32_t>, "It needs to be a character.");
+    using namespace std::string_view_literals;
+    if constexpr (std::is_same_v<char_t, char>)
+    {
+        std::array<sv, 2> ret{ "0x"sv, "0X"sv };
+	    return ret;
+    }
+    else if constexpr (std::is_same_v<char_t, wchar_t>)
+    {
+        std::array<sv, 2> ret{ L"0x"sv, L"0X"sv };
+        return ret;
+    }
+    else if constexpr (std::is_same_v<char_t, char8_t>)
+    {
+        std::array<sv, 2> ret{ u8"0x"sv, u8"0X"sv };
+        return ret;
+    }
+    else if constexpr (std::is_same_v<char_t, char16_t>)
+    {
+        std::array<sv, 2> ret{ u"0x"sv, u"0X"sv };
+        return ret;
+    }
+    else
+    {
+        std::array<sv, 2> ret{ U"0x"sv, U"0X"sv };
+        return ret;
+    }
 }
 
-template <typename CharTraits>
-constexpr typename cjm::numerics::u128_parsing_helper<char, CharTraits>::sv cjm::numerics::u128_parsing_helper<char,
+template<typename Chars, typename CharTraits>
+requires cjm::numerics::concepts::char_with_traits<Chars, CharTraits>
+constexpr typename cjm::numerics::u128_parsing_helper<Chars, CharTraits>::sv cjm::numerics::u128_parsing_helper<Chars,
                                                                                                          CharTraits>::
 non_decimal_separator()
 {
-	return ",";
+    static_assert(  std::is_same_v<char_t, char> ||
+                    std::is_same_v<char_t, wchar_t> ||
+                    std::is_same_v<char_t, char8_t> ||
+                    std::is_same_v<char_t, char16_t> ||
+                    std::is_same_v<char_t, char32_t>, "It needs to be a character.");
+    using namespace std::string_view_literals;
+
+    if constexpr (std::is_same_v<char_t, char>)
+    {
+        return ","sv;
+    }
+    else if constexpr (std::is_same_v<char_t, wchar_t>)
+    {
+        return L","sv;
+    }
+    else if constexpr (std::is_same_v<char_t, char8_t>)
+    {
+        return u8","sv;
+    }
+    else if constexpr (std::is_same_v<char_t, char16_t>)
+    {
+        return u","sv;
+    }
+    else
+    {
+        return U","sv;
+    }
 }
 
-template <typename CharTraits>
-constexpr typename cjm::numerics::u128_parsing_helper<char, CharTraits>::sv cjm::numerics::u128_parsing_helper<char,
-                                                                                                         CharTraits>::
-decimal_separator()
+template<typename Chars, typename CharTraits>
+requires cjm::numerics::concepts::char_with_traits<Chars, CharTraits>
+constexpr typename cjm::numerics::u128_parsing_helper<Chars, CharTraits>::sv
+    cjm::numerics::u128_parsing_helper<Chars, CharTraits>::decimal_separator()
 {
-	return ".";
+    static_assert(  std::is_same_v<char_t, char> ||
+                    std::is_same_v<char_t, wchar_t> ||
+                    std::is_same_v<char_t, char8_t> ||
+                    std::is_same_v<char_t, char16_t> ||
+                    std::is_same_v<char_t, char32_t>, "It needs to be a character.");
+    using namespace std::string_view_literals;
+    if constexpr (std::is_same_v<char_t, char>)
+    {
+        return "."sv;
+    }
+    else if constexpr (std::is_same_v<char_t, wchar_t>)
+    {
+        return L"."sv;
+    }
+    else if constexpr (std::is_same_v<char_t, char8_t>)
+    {
+        return u8"."sv;
+    }
+    else if constexpr (std::is_same_v<char_t, char16_t>)
+    {
+        return u"."sv;
+    }
+    else
+    {
+        return U"."sv;
+    }
 }
 
-template <typename CharTraits>
-constexpr std::uint8_t cjm::numerics::u128_parsing_helper<char, CharTraits>::get_value_hex(char c)
+template<typename Chars, typename CharTraits>
+requires cjm::numerics::concepts::char_with_traits<Chars, CharTraits>
+constexpr std::uint8_t cjm::numerics::u128_parsing_helper<Chars, CharTraits>::get_value_hex(char_t c)
 {
-	switch (c)
-	{
-	case '0':
-		return 0;
-	case '1':
-		return 1;
-	case '2':
-		return 2;
-	case '3':
-		return 3;
-	case '4':
-		return 4;
-	case '5':
-		return 5;
-	case '6':
-		return 6;
-	case '7':
-		return 7;
-	case '8':
-		return 8;
-	case '9':
-		return 9;
-	case 'A':
-	case 'a':
-		return 10;
-	case 'b':
-	case 'B':
-		return 11;
-	case 'c':
-	case 'C':
-		return 12;
-	case 'd':
-	case 'D':
-		return 13;
-	case 'e':
-	case 'E':
-		return 14;
-	case 'f':
-	case 'F':
-		return 15;
-	default:
-		throw std::invalid_argument("Unrecognized character");
-	}
+    static_assert(  std::is_same_v<char_t, char> ||
+                    std::is_same_v<char_t, wchar_t> ||
+                    std::is_same_v<char_t, char8_t> ||
+                    std::is_same_v<char_t, char16_t> ||
+                    std::is_same_v<char_t, char32_t>, "It needs to be a character.");
+    using namespace std::string_view_literals;
+
+
+    if constexpr (std::is_same_v<char_t, char>)
+    {
+        switch (c)
+        {
+            case '0':
+                return 0;
+            case '1':
+                return 1;
+            case '2':
+                return 2;
+            case '3':
+                return 3;
+            case '4':
+                return 4;
+            case '5':
+                return 5;
+            case '6':
+                return 6;
+            case '7':
+                return 7;
+            case '8':
+                return 8;
+            case '9':
+                return 9;
+            case 'A':
+            case 'a':
+                return 10;
+            case 'b':
+            case 'B':
+                return 11;
+            case 'c':
+            case 'C':
+                return 12;
+            case 'd':
+            case 'D':
+                return 13;
+            case 'e':
+            case 'E':
+                return 14;
+            case 'f':
+            case 'F':
+                return 15;
+            default:
+                throw std::invalid_argument("Unrecognized character");
+        }
+    }
+    else if constexpr (std::is_same_v<char_t, wchar_t>)
+    {
+        switch (c)
+        {
+            case L'0':
+                return 0;
+            case L'1':
+                return 1;
+            case L'2':
+                return 2;
+            case L'3':
+                return 3;
+            case L'4':
+                return 4;
+            case L'5':
+                return 5;
+            case L'6':
+                return 6;
+            case L'7':
+                return 7;
+            case L'8':
+                return 8;
+            case L'9':
+                return 9;
+            case L'A':
+            case L'a':
+                return 10;
+            case L'b':
+            case L'B':
+                return 11;
+            case L'c':
+            case L'C':
+                return 12;
+            case L'd':
+            case L'D':
+                return 13;
+            case L'e':
+            case L'E':
+                return 14;
+            case L'f':
+            case L'F':
+                return 15;
+            default:
+                throw std::invalid_argument("Unrecognized character");
+        }
+    }
+    else if constexpr (std::is_same_v<char_t, char8_t>)
+    {
+        switch (c)
+        {
+            case u8'0':
+                return 0;
+            case u8'1':
+                return 1;
+            case u8'2':
+                return 2;
+            case u8'3':
+                return 3;
+            case u8'4':
+                return 4;
+            case u8'5':
+                return 5;
+            case u8'6':
+                return 6;
+            case u8'7':
+                return 7;
+            case u8'8':
+                return 8;
+            case u8'9':
+                return 9;
+            case u8'A':
+            case u8'a':
+                return 10;
+            case u8'b':
+            case u8'B':
+                return 11;
+            case u8'c':
+            case u8'C':
+                return 12;
+            case u8'd':
+            case u8'D':
+                return 13;
+            case u8'e':
+            case u8'E':
+                return 14;
+            case u8'f':
+            case u8'F':
+                return 15;
+            default:
+                throw std::invalid_argument("Unrecognized character");
+        }
+    }
+    else if constexpr (std::is_same_v<char_t, char16_t>)
+    {
+        switch (c)
+        {
+            case u'0':
+                return 0;
+            case u'1':
+                return 1;
+            case u'2':
+                return 2;
+            case u'3':
+                return 3;
+            case u'4':
+                return 4;
+            case u'5':
+                return 5;
+            case u'6':
+                return 6;
+            case u'7':
+                return 7;
+            case u'8':
+                return 8;
+            case u'9':
+                return 9;
+            case u'A':
+            case u'a':
+                return 10;
+            case u'b':
+            case u'B':
+                return 11;
+            case u'c':
+            case u'C':
+                return 12;
+            case u'd':
+            case u'D':
+                return 13;
+            case u'e':
+            case u'E':
+                return 14;
+            case u'f':
+            case u'F':
+                return 15;
+            default:
+                throw std::invalid_argument("Unrecognized character");
+        }
+    }
+    else
+    {
+        switch (c)
+        {
+            case U'0':
+                return 0;
+            case U'1':
+                return 1;
+            case U'2':
+                return 2;
+            case U'3':
+                return 3;
+            case U'4':
+                return 4;
+            case U'5':
+                return 5;
+            case U'6':
+                return 6;
+            case U'7':
+                return 7;
+            case U'8':
+                return 8;
+            case U'9':
+                return 9;
+            case U'A':
+            case U'a':
+                return 10;
+            case U'b':
+            case U'B':
+                return 11;
+            case U'c':
+            case U'C':
+                return 12;
+            case U'd':
+            case U'D':
+                return 13;
+            case U'e':
+            case U'E':
+                return 14;
+            case U'f':
+            case U'F':
+                return 15;
+            default:
+                throw std::invalid_argument("Unrecognized character");
+        }
+    }
 }
 
-template <typename CharTraits>
-constexpr std::uint8_t cjm::numerics::u128_parsing_helper<char, CharTraits>::get_value_dec(char c)
+template<typename Chars, typename CharTraits>
+requires cjm::numerics::concepts::char_with_traits<Chars, CharTraits>
+constexpr std::uint8_t cjm::numerics::u128_parsing_helper<Chars, CharTraits>::get_value_dec(char_t c)
 {
-	switch (c)
-	{
-	case '0':
-		return 0;
-	case '1':
-		return 1;
-	case '2':
-		return 2;
-	case '3':
-		return 3;
-	case '4':
-		return 4;
-	case '5':
-		return 5;
-	case '6':
-		return 6;
-	case '7':
-		return 7;
-	case '8':
-		return 8;
-	case '9':
-		return 9;
-	default:
-		throw std::invalid_argument("Unrecognized character");
-	}
-}
-template <typename CharTraits>
-template <typename Allocator>
-std::basic_string<char, CharTraits, Allocator> cjm::numerics::u128_parsing_helper<char, CharTraits>::trim_and_strip(
-	str128<Allocator> trim_and_stripme)
-{
-	auto trimmed = string::trim(std::move(trim_and_stripme));
-	trimmed.erase(std::remove(trimmed.begin(), trimmed.end(), non_decimal_separator()[0]), trimmed.end());
-	return trimmed;
+    static_assert(  std::is_same_v<char_t, char> ||
+                    std::is_same_v<char_t, wchar_t> ||
+                    std::is_same_v<char_t, char8_t> ||
+                    std::is_same_v<char_t, char16_t> ||
+                    std::is_same_v<char_t, char32_t>, "It needs to be a character.");
+    using namespace std::string_view_literals;
+
+
+    if constexpr (std::is_same_v<char_t, char>)
+    {
+        switch (c)
+        {
+            case '0':
+                return 0;
+            case '1':
+                return 1;
+            case '2':
+                return 2;
+            case '3':
+                return 3;
+            case '4':
+                return 4;
+            case '5':
+                return 5;
+            case '6':
+                return 6;
+            case '7':
+                return 7;
+            case '8':
+                return 8;
+            case '9':
+                return 9;
+            default:
+                throw std::invalid_argument("Unrecognized character");
+        }
+    }
+    else if constexpr (std::is_same_v<char_t, wchar_t>)
+    {
+        switch (c)
+        {
+            case L'0':
+                return 0;
+            case L'1':
+                return 1;
+            case L'2':
+                return 2;
+            case L'3':
+                return 3;
+            case L'4':
+                return 4;
+            case L'5':
+                return 5;
+            case L'6':
+                return 6;
+            case L'7':
+                return 7;
+            case L'8':
+                return 8;
+            case L'9':
+                return 9;
+            default:
+                throw std::invalid_argument("Unrecognized character");
+        }
+    }
+    else if constexpr (std::is_same_v<char_t, char8_t>)
+    {
+        switch (c)
+        {
+            case u8'0':
+                return 0;
+            case u8'1':
+                return 1;
+            case u8'2':
+                return 2;
+            case u8'3':
+                return 3;
+            case u8'4':
+                return 4;
+            case u8'5':
+                return 5;
+            case u8'6':
+                return 6;
+            case u8'7':
+                return 7;
+            case u8'8':
+                return 8;
+            case u8'9':
+                return 9;
+            default:
+                throw std::invalid_argument("Unrecognized character");
+        }
+    }
+    else if constexpr (std::is_same_v<char_t, char16_t>)
+    {
+        switch (c)
+        {
+            case u'0':
+                return 0;
+            case u'1':
+                return 1;
+            case u'2':
+                return 2;
+            case u'3':
+                return 3;
+            case u'4':
+                return 4;
+            case u'5':
+                return 5;
+            case u'6':
+                return 6;
+            case u'7':
+                return 7;
+            case u'8':
+                return 8;
+            case u'9':
+                return 9;
+            default:
+                throw std::invalid_argument("Unrecognized character");
+        }
+    }
+    else
+    {
+        switch (c)
+        {
+            case U'0':
+                return 0;
+            case U'1':
+                return 1;
+            case U'2':
+                return 2;
+            case U'3':
+                return 3;
+            case U'4':
+                return 4;
+            case U'5':
+                return 5;
+            case U'6':
+                return 6;
+            case U'7':
+                return 7;
+            case U'8':
+                return 8;
+            case U'9':
+                return 9;
+            default:
+                throw std::invalid_argument("Unrecognized character");
+        }
+    }
 }
 
-template <typename CharTraits>
-template <typename Allocator>
-std::basic_string<wchar_t, CharTraits, Allocator> cjm::numerics::u128_parsing_helper<wchar_t, CharTraits>::
-trim_and_strip(str128<Allocator> trim_and_stripme)
+
+
+
+template<typename Chars, typename CharTraits>
+requires cjm::numerics::concepts::char_with_traits<Chars, CharTraits>
+constexpr bool cjm::numerics::u128_parsing_helper<Chars, CharTraits>::is_legal_hex_char(char_t c)
 {
-	auto trimmed = string::trim(std::move(trim_and_stripme));
-	trimmed.erase(std::remove(trimmed.begin(), trimmed.end(), non_decimal_separator()[0]), trimmed.end());
-	return trimmed;
+    static_assert(  std::is_same_v<char_t, char> ||
+                    std::is_same_v<char_t, wchar_t> ||
+                    std::is_same_v<char_t, char8_t> ||
+                    std::is_same_v<char_t, char16_t> ||
+                    std::is_same_v<char_t, char32_t>, "It needs to be a character.");
+    if constexpr (std::is_same_v<char_t, char>)
+    {
+        switch (c)
+        {
+            case '0':
+            case '1':
+            case '2':
+            case '3':
+            case '4':
+            case '5':
+            case '6':
+            case '7':
+            case '8':
+            case '9':
+            case 'A':
+            case 'a':
+            case 'b':
+            case 'B':
+            case 'c':
+            case 'C':
+            case 'd':
+            case 'D':
+            case 'e':
+            case 'E':
+            case 'f':
+            case 'F':
+                return true;
+            default:
+                return false;
+        }
+    }
+    else
+    {
+        switch(static_cast<char>(c))
+        {
+            case '0':
+            case '1':
+            case '2':
+            case '3':
+            case '4':
+            case '5':
+            case '6':
+            case '7':
+            case '8':
+            case '9':
+            case 'A':
+            case 'a':
+            case 'b':
+            case 'B':
+            case 'c':
+            case 'C':
+            case 'd':
+            case 'D':
+            case 'e':
+            case 'E':
+            case 'f':
+            case 'F':
+                return true;
+            default:
+                return false;
+        }
+    }
 }
 
-template <typename CharTraits>
-template <typename Allocator>
-constexpr cjm::numerics::u128_str_format cjm::numerics::u128_parsing_helper<char, CharTraits>::get_format(
-	const str128<Allocator>& string)
-{
-	auto length = string.length();
-	if (length < 1)
-		return u128_str_format::Illegal;
-	bool allZero = std::all_of(string.cbegin(), string.cend(), [] (char c) -> bool
-	{
-		return c == '0';
-	});
-	if (string[0] == '0' && (length == 1 || allZero))
-		return u128_str_format::Zero;
-	if (length < 3)
-	{
-		if (string[0] == '0')
-			return u128_str_format::Illegal;
-		return std::all_of(string.cbegin(), string.cend(), 
-			[](char c) -> bool { return c >= 0x30 && c <= 0x39; }) ? 
-				u128_str_format::Decimal : 
-				u128_str_format::Illegal;
-	}
-	sv firstTwo = string.substr(0, 2);
-	auto hex_tags = get_hex_tags();
-	bool hasHexTag = std::any_of(hex_tags.cbegin(), hex_tags.cend(), [=](sv tag) -> bool { return tag == firstTwo; });
-	if (!hasHexTag)
-	{
-		return string[0] != '0' && std::all_of(string.cbegin(), string.cend(), 
-			[](char c) -> bool { return c >= 0x30 && c <= 0x39; }) 
-				?	u128_str_format::Decimal : 
-					u128_str_format::Illegal;
-	}
-	sv afterFirstTwo = string.substr(2, string.length() - 2);
-	return std::all_of(afterFirstTwo.cbegin(), afterFirstTwo.cend(), [](char c) -> bool {return is_legal_hex_char(c); }) 
-		?	u128_str_format::Hexadecimal : 
-			u128_str_format::Illegal;
-}
-
-template <typename CharTraits>
-constexpr bool cjm::numerics::u128_parsing_helper<char, CharTraits>::is_legal_hex_char(char c)
-{
-	switch (c)
-	{
-	case '0':
-	case '1':
-	case '2':
-	case '3':
-	case '4':
-	case '5':
-	case '6':
-	case '7':
-	case '8':
-	case '9':
-	case 'A':
-	case 'a':
-	case 'b':
-	case 'B':
-	case 'c':
-	case 'C':
-	case 'd':
-	case 'D':
-	case 'e':
-	case 'E':
-	case 'f':
-	case 'F':
-		return true;
-	default:
-		return false;
-	}
-}
-
-template <typename CharTraits>
-constexpr cjm::numerics::uint128 cjm::numerics::u128_parsing_helper<char, CharTraits>::
+template<typename Chars, typename CharTraits>
+    requires cjm::numerics::concepts::char_with_traits<Chars, CharTraits>
+constexpr  cjm::numerics::uint128 cjm::numerics::u128_parsing_helper<Chars, CharTraits>::
 parse_decimal_str(sv decimal_str)
 {
 	uint128 ret = 0;
@@ -1290,194 +1684,7 @@ parse_decimal_str(sv decimal_str)
 	return ret;
 }
 
-template <typename CharTraits>
-constexpr std::array<typename cjm::numerics::u128_parsing_helper<wchar_t, CharTraits>::sv, 2> cjm::numerics::
-u128_parsing_helper<wchar_t, CharTraits>::get_hex_tags()
-{
-	std::array<sv, 2> ret{ L"0x", L"0X" };
-	return ret;
-}
 
-template <typename CharTraits>
-constexpr typename cjm::numerics::u128_parsing_helper<wchar_t, CharTraits>::sv cjm::numerics::u128_parsing_helper<
-wchar_t, CharTraits>::non_decimal_separator()
-{
-	return L",";
-}
-
-template <typename CharTraits>
-constexpr typename cjm::numerics::u128_parsing_helper<wchar_t, CharTraits>::sv cjm::numerics::u128_parsing_helper<
-wchar_t, CharTraits>::decimal_separator()
-{
-	return L".";
-}
-
-template <typename CharTraits>
-constexpr std::uint8_t cjm::numerics::u128_parsing_helper<wchar_t, CharTraits>::get_value_hex(wchar_t c)
-{
-	switch (c)
-	{
-	case L'0':
-		return 0;
-	case L'1':
-		return 1;
-	case L'2':
-		return 2;
-	case L'3':
-		return 3;
-	case L'4':
-		return 4;
-	case L'5':
-		return 5;
-	case L'6':
-		return 6;
-	case L'7':
-		return 7;
-	case L'8':
-		return 8;
-	case L'9':
-		return 9;
-	case L'A':
-	case L'a':
-		return 10;
-	case L'b':
-	case L'B':
-		return 11;
-	case L'c':
-	case L'C':
-		return 12;
-	case L'd':
-	case L'D':
-		return 13;
-	case L'e':
-	case L'E':
-		return 14;
-	case L'f':
-	case L'F':
-		return 15;
-	default:
-		throw std::invalid_argument("Unrecognized character");
-	}
-}
-
-template <typename CharTraits>
-constexpr std::uint8_t cjm::numerics::u128_parsing_helper<wchar_t, CharTraits>::get_value_dec(wchar_t c)
-{
-	switch (c)
-	{
-	case L'0':
-		return 0;
-	case L'1':
-		return 1;
-	case L'2':
-		return 2;
-	case L'3':
-		return 3;
-	case L'4':
-		return 4;
-	case L'5':
-		return 5;
-	case L'6':
-		return 6;
-	case L'7':
-		return 7;
-	case L'8':
-		return 8;
-	case L'9':
-		return 9;
-	default:
-		throw std::invalid_argument("Unrecognized character");
-	}
-}
-
-template <typename CharTraits>
-template <typename Allocator>
-constexpr cjm::numerics::u128_str_format cjm::numerics::u128_parsing_helper<wchar_t, CharTraits>::get_format(
-	const str128<Allocator>& string)
-{
-	auto length = string.length();
-	if (length < 1)
-		return u128_str_format::Illegal;
-	bool allZero = std::all_of(string.cbegin(), string.cend(), [](wchar_t c) -> bool
-	{
-		return c == L'0';
-	});
-	if (string[0] == L'0' && (length == 1 || allZero))
-		return u128_str_format::Zero;
-	if (length < 3)
-	{
-		if (string[0] == L'0')
-			return u128_str_format::Illegal;
-		return std::all_of(string.cbegin(), string.cend(),
-			[](wchar_t c) -> bool { return std::iswdigit(c); }) ?
-			u128_str_format::Decimal :
-			u128_str_format::Illegal;
-	}
-	sv firstTwo = string.substr(0, 2);
-	auto hex_tags = get_hex_tags();
-	bool hasHexTag = std::any_of(hex_tags.cbegin(), hex_tags.cend(), [=](sv tag) -> bool { return tag == firstTwo; });
-	if (!hasHexTag)
-	{
-		return string[0] != L'0' && std::all_of(string.cbegin(), string.cend(),
-			[](wchar_t c) -> bool { return std::iswdigit(c); })
-			? u128_str_format::Decimal :
-			u128_str_format::Illegal;
-	}
-	sv afterFirstTwo = string.substr(2, string.length() - 2);
-	return std::all_of(afterFirstTwo.cbegin(), afterFirstTwo.cend(), [](wchar_t c) -> bool {return is_legal_hex_wchar_t(c); })
-		? u128_str_format::Hexadecimal :
-		u128_str_format::Illegal;
-}
-
-template <typename CharTraits>
-constexpr bool cjm::numerics::u128_parsing_helper<wchar_t, CharTraits>::is_legal_hex_wchar_t(wchar_t c)
-{
-	switch (c)
-	{
-	case L'0':
-	case L'1':
-	case L'2':
-	case L'3':
-	case L'4':
-	case L'5':
-	case L'6':
-	case L'7':
-	case L'8':
-	case L'9':
-	case L'A':
-	case L'a':
-	case L'b':
-	case L'B':
-	case L'c':
-	case L'C':
-	case L'd':
-	case L'D':
-	case L'e':
-	case L'E':
-	case L'f':
-	case L'F':
-		return true;
-	default:
-		return false;
-	}
-}
-
-template <typename CharTraits>
-constexpr cjm::numerics::uint128 cjm::numerics::u128_parsing_helper<wchar_t, CharTraits>::
-parse_decimal_str(sv decimal_str)
-{
-	uint128 ret = 0;
-	uint128 exp = 1;
-	for (auto i = decimal_str.length() - 1; i != std::numeric_limits<size_t>::max(); --i)
-	{
-		auto oldRet = ret;
-		ret += static_cast<uint128>(get_value_dec(decimal_str[i])) * exp;
-		if (oldRet > ret)
-			throw std::overflow_error("The string represents a number too large to parse as a uint128.");
-		exp *= 10;
-	}
-	return ret;
-}
 
 /*
  * Evil macro'd up version of fls64 from google:

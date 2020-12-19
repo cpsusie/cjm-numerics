@@ -6,6 +6,7 @@
 #include<cassert>
 #include "numerics.hpp"
 #include "cjm_numeric_concepts.hpp"
+#include "cjm_string.hpp"
 // Copyright 2018 CJM Screws, LLC
 // 
 // This contents of this file (uint128.hpp) and its inline implementation file (uint128.inl)
@@ -120,79 +121,113 @@ namespace cjm::numerics
               requires cjm::numerics::concepts::char_with_traits<Chars, CharTraits>
     struct u128_parsing_helper
     {
+        using char_t = Chars;
 
-    };
+        template<typename Allocator = std::allocator<Chars>>
+        requires cjm::numerics::concepts::char_with_traits_and_allocator<Chars, CharTraits, Allocator>
+        using str128 = std::basic_string<Chars, CharTraits, Allocator>;
 
-    template<typename CharTraits>
-        requires cjm::numerics::concepts::char_with_traits<char8_t, CharTraits>
-     struct u128_parsing_helper<char8_t, CharTraits>
-     {
-         template<typename Allocator = std::allocator<char8_t>>
-            requires cjm::numerics::concepts::char_with_traits_and_allocator<char8_t, CharTraits, Allocator>
-         using str128 = typename cjm::numerics::concepts::matching_str_data_ex<char8_t, CharTraits, Allocator>::string_t;
-         using sv = typename cjm::numerics::concepts::matching_str_data<char8_t, CharTraits>::sv_t;
-         using char_t = typename cjm::numerics::concepts::matching_str_data<char8_t, CharTraits>::char_t;
+        using sv = std::basic_string_view<Chars, CharTraits>;
 
-     };
 
-    template<typename CharTraits>
-        requires cjm::numerics::concepts::char_with_traits<char, CharTraits>
-    struct u128_parsing_helper<char, CharTraits>
-    {
-        template<typename Allocator = std::allocator<char>>
-        requires cjm::numerics::concepts::char_with_traits_and_allocator<char , CharTraits, Allocator>
-        using str128 = std::basic_string<char, CharTraits, Allocator>;
-
-        using sv = std::basic_string_view<char, CharTraits>;
         static constexpr std::array<sv, 2> get_hex_tags();
 
         static constexpr sv non_decimal_separator();
 
         static constexpr sv decimal_separator();
 
-        static constexpr std::uint8_t get_value_hex(char c);
+        static constexpr std::uint8_t get_value_hex(char_t c);
 
-        static constexpr std::uint8_t get_value_dec(char c);
+        static constexpr std::uint8_t get_value_dec(char_t c);
+        static constexpr bool is_legal_hex_char(char_t c);
 
-        template<typename Allocator = std::allocator<char>>
-        static constexpr u128_str_format get_format(const str128<Allocator>& string);
+        template<typename Allocator = std::allocator<char_t>>
+            requires cjm::numerics::concepts::char_with_traits_and_allocator<Chars, CharTraits, Allocator>
+        static constexpr u128_str_format get_format(const str128<Allocator>& string)
+        {
+            constexpr char zero = '0';
+            constexpr char_t zero_cast = static_cast<char_t>(zero);
+            auto length = string.length();
+            if (length < 1)
+                return u128_str_format::Illegal;
+            bool allZero = std::all_of(string.cbegin(), string.cend(), [] (char_t c) -> bool
+            {
+                return c == zero_cast;
+            });
+            if (string[0] == zero_cast && (length == 1 || allZero))
+                return u128_str_format::Zero;
+            if (length < 3)
+            {
+                if (string[0] == zero_cast)
+                    return u128_str_format::Illegal;
+                return std::all_of(string.cbegin(), string.cend(),
+                                   [](char_t c) -> bool { return static_cast<char>(c) >= 0x30 && static_cast<char>(c) <= 0x39; }) ?
+                       u128_str_format::Decimal :
+                       u128_str_format::Illegal;
+            }
+            sv firstTwo = string.substr(0, 2);
+            auto hex_tags = get_hex_tags();
+            bool hasHexTag = std::any_of(hex_tags.cbegin(), hex_tags.cend(), [=](sv tag) -> bool { return tag == firstTwo; });
+            if (!hasHexTag)
+            {
+                return string[0] != zero_cast && std::all_of(string.cbegin(), string.cend(),
+                                                       [](char_t c) -> bool { return static_cast<char>(c) >= 0x30 && static_cast<char>(c) <= 0x39; })
+                       ?	u128_str_format::Decimal :
+                       u128_str_format::Illegal;
+            }
+            sv afterFirstTwo = string.substr(2, string.length() - 2);
+            return std::all_of(afterFirstTwo.cbegin(), afterFirstTwo.cend(), [](char c) -> bool {return is_legal_hex_char(c); })
+                   ?	u128_str_format::Hexadecimal :
+                   u128_str_format::Illegal;
+        }
 
-        static constexpr bool is_legal_hex_char(char c);
-        template<typename Allocator = std::allocator<char>>
-        static str128<Allocator> trim_and_strip(str128<Allocator> trim_and_stripme);
+
+        template<typename Allocator = std::allocator<char_t>>
+            requires cjm::numerics::concepts::char_with_traits_and_allocator<Chars, CharTraits, Allocator>
+        static str128<Allocator> trim_and_strip(str128<Allocator> trim_and_strip_me)
+        {
+            auto trimmed = cjm::string::trim(std::move(trim_and_strip_me));
+            trimmed.erase(std::remove(trimmed.begin(), trimmed.end(), non_decimal_separator()[0]), trimmed.end());
+            return trimmed;
+        }
 
         static constexpr uint128 parse_decimal_str(sv decimal_str);
 
     };
 
-    template<typename CharTraits>
-    struct u128_parsing_helper<wchar_t, CharTraits>
-    {
-        template<typename Allocator = std::allocator<wchar_t>>
-                requires cjm::numerics::concepts::char_with_traits_and_allocator<wchar_t, CharTraits, Allocator>
-        using str128 = std::basic_string<wchar_t, CharTraits, Allocator>;
 
-        using sv = std::basic_string_view<wchar_t, CharTraits>;
-        static constexpr std::array<sv, 2> get_hex_tags();
 
-        static constexpr sv non_decimal_separator();
+//    template<typename CharTraits>
+//        requires cjm::numerics::concepts::char_with_traits<char, CharTraits>
+//    struct u128_parsing_helper<char, CharTraits>
+//    {
+//        template<typename Allocator = std::allocator<char>>
+//        requires cjm::numerics::concepts::char_with_traits_and_allocator<char , CharTraits, Allocator>
+//        using str128 = std::basic_string<char, CharTraits, Allocator>;
+//
+//        using sv = std::basic_string_view<char, CharTraits>;
+//        static constexpr std::array<sv, 2> get_hex_tags();
+//
+//        static constexpr sv non_decimal_separator();
+//
+//        static constexpr sv decimal_separator();
+//
+//        static constexpr std::uint8_t get_value_hex(char c);
+//
+//        static constexpr std::uint8_t get_value_dec(char c);
+//
+//        template<typename Allocator = std::allocator<char>>
+//        static constexpr u128_str_format get_format(const str128<Allocator>& string);
+//
+//        static constexpr bool is_legal_hex_char(char c);
+//        template<typename Allocator = std::allocator<char>>
+//        static str128<Allocator> trim_and_strip(str128<Allocator> trim_and_stripme);
+//
+//        static constexpr uint128 parse_decimal_str(sv decimal_str);
+//
+//    };
 
-        static constexpr sv decimal_separator();
 
-        static constexpr std::uint8_t get_value_hex(wchar_t c);
-
-        static constexpr std::uint8_t get_value_dec(wchar_t c);
-
-        template<typename Allocator = std::allocator<wchar_t>>
-        static constexpr u128_str_format get_format(const str128<Allocator>& string);
-
-        static constexpr bool is_legal_hex_wchar_t(wchar_t c);
-        template<typename Allocator = std::allocator<wchar_t>>
-        static str128<Allocator> trim_and_strip(str128<Allocator> trim_and_stripme);
-
-        static constexpr uint128 parse_decimal_str(sv decimal_str);
-
-    };
 }
 namespace cjm::numerics
 {
@@ -261,8 +296,9 @@ namespace cjm::numerics
 
         using byte_array = std::array<unsigned char, byte_array_size>;
 
-        template<typename Chars, typename CharTraits = std::char_traits<Chars>, typename Allocator = std::allocator<Chars>>
-        static uint128 make_from_string(std::basic_string<Chars, CharTraits, Allocator> parseMe);
+        template<typename Chars, typename CharTraits = std::char_traits<Chars>>
+                requires cjm::numerics::concepts::char_with_traits<Chars, CharTraits>
+        static uint128 make_from_string(std::basic_string_view<Chars, CharTraits> parseMe);
         static constexpr uint128 make_from_bytes_little_endian(byte_array bytes) noexcept;
         static constexpr uint128 make_from_bytes_big_endian(byte_array bytes) noexcept;
         static constexpr uint128 MakeUint128(std::uint64_t high, std::uint64_t low) noexcept;

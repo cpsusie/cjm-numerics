@@ -37,14 +37,28 @@ namespace cjm::numerics::concepts
                             std::is_nothrow_convertible_v<T, char16_t> ||
                                     std::is_nothrow_convertible_v<T, char32_t>;
 
-    template<typename Char, typename CharTrait>
-    concept char_with_traits = character<Char> && std::is_nothrow_convertible_v<CharTrait, std::char_traits<Char>>;
+    template<typename Char, typename CharTraits>
+    concept char_with_traits = character<Char> && std::is_nothrow_convertible_v<CharTraits, std::char_traits<Char>>;
 
     template<typename Char, typename CharAllocator>
     concept char_with_allocator = character<Char> && std::is_nothrow_convertible_v<std::allocator<Char>, CharAllocator>;
 
     template<typename Char, typename CharTraits, typename CharAllocator>
     concept char_with_traits_and_allocator = character<Char> && char_with_traits<Char, CharTraits> && char_with_allocator<Char, CharAllocator>;
+
+    template<typename Allocator>
+    concept char_allocator = std::is_nothrow_convertible_v<std::allocator<char>, Allocator>;
+    template<typename Allocator>
+    concept wchar_allocator = std::is_nothrow_convertible_v<std::allocator<wchar_t>, Allocator>;
+    template<typename Allocator>
+    concept utf8_char_allocator = std::is_nothrow_convertible_v<std::allocator<char8_t>, Allocator>;
+    template<typename Allocator>
+    concept utf16_char_allocator = std::is_nothrow_convertible_v<std::allocator<char16_t>, Allocator>;
+    template<typename Allocator>
+    concept utf32_char_allocator = std::is_nothrow_convertible_v<std::allocator<char32_t>, Allocator>;
+
+
+
 
     template<typename Char, typename CharTraits> requires char_with_traits<Char, CharTraits>
     struct matching_str_data

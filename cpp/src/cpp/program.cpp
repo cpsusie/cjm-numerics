@@ -2,6 +2,7 @@
 #include <iostream>
 #include <iomanip>
 #include <string_view>
+#include <sstream>
 #include <limits>
 #include <cstdint>
 #include "numerics.hpp"
@@ -9,6 +10,9 @@
 #include "int128_tests.hpp"
 #include <boost/io/ios_state.hpp>
 #include "cjm_numeric_concepts.hpp"
+#include "cjm_string.hpp"
+#include <fstream>
+#include <locale>
 
 namespace cjm::base_test_program
 {
@@ -35,8 +39,6 @@ namespace cjm::base_test_program
 int main()
 {
 
-
-    std::ios::sync_with_stdio(false);
 
     using namespace std::string_view_literals;
     std::uint64_t ui = 0xc0de'd00d'fea2'b00bu;

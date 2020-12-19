@@ -31,6 +31,7 @@ namespace cjm::uint128_tests
 
     void execute_uint128_tests();
     void execute_basic_test_one();
+    void execute_string_parse_test();
 }
 
 template<typename Invocable>
@@ -53,5 +54,6 @@ void cjm::uint128_tests::execute_test(Invocable test, std::string_view test_name
         throw;
     }
 }
+
 
 #endif //INT128_INT128_TESTS_HPP
