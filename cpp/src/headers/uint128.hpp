@@ -167,18 +167,19 @@ namespace cjm::numerics
                        u128_str_format::Decimal :
                        u128_str_format::Illegal;
             }
-            sv firstTwo = string.substr(0, 2);
+            std::basic_string_view<Chars, CharTraits>  orig_view = string;
+            auto firstTwo = orig_view.substr(0, 2);
             auto hex_tags = get_hex_tags();
             bool hasHexTag = std::any_of(hex_tags.cbegin(), hex_tags.cend(), [=](sv tag) -> bool { return tag == firstTwo; });
             if (!hasHexTag)
             {
-                return string[0] != zero_cast && std::all_of(string.cbegin(), string.cend(),
+                return orig_view[0] != zero_cast && std::all_of(orig_view.cbegin(), orig_view.cend(),
                                                        [](char_t c) -> bool { return static_cast<char>(c) >= 0x30 && static_cast<char>(c) <= 0x39; })
                        ?	u128_str_format::Decimal :
                        u128_str_format::Illegal;
             }
-            sv afterFirstTwo = string.substr(2, string.length() - 2);
-            return std::all_of(afterFirstTwo.cbegin(), afterFirstTwo.cend(), [](char c) -> bool {return is_legal_hex_char(c); })
+            sv afterFirstTwo = orig_view.substr(2, string.length() - 2);
+            return std::all_of(afterFirstTwo.cbegin(), afterFirstTwo.cend(), [](char_t c) -> bool {return is_legal_hex_char(c); })
                    ?	u128_str_format::Hexadecimal :
                    u128_str_format::Illegal;
         }
@@ -408,8 +409,8 @@ namespace cjm::numerics
         int_part m_low;
         int_part m_high;
 #else //BIG ENDIAN
-        int_part m_high{};
-        int_part m_low{};
+        int_part m_high;
+        int_part m_low;
 #endif
     };
     static_assert(std::is_trivial_v<uint128>, "Needs to be a trivial type.");

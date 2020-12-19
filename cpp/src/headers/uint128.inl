@@ -476,7 +476,7 @@ namespace cjm
 			{
 				auto flsHigh = fls_int_part(hi);
 				auto sum = flsHigh + int_part_bits;
-				return sum;
+				return static_cast<int>(sum);
 			}
 			return fls_int_part(n.low_part());
 		}
@@ -552,7 +552,7 @@ namespace cjm
             {
                 if constexpr (calculation_mode == uint128_calc_mode::intrinsic_u128)
                 {
-                    return -static_cast<unsigned __int128>(operand);
+                    return -static_cast<natuint128_t>(operand);
                 }
 //		        else if constexpr (calculation_mode == uint128_calc_mode::msvc_x64)
 //      	    {
@@ -624,7 +624,7 @@ namespace cjm
             {
                 if constexpr (calculation_mode == uint128_calc_mode::intrinsic_u128)
                 {
-                    return static_cast<unsigned __int128>(lhs) >> amount;
+                    return static_cast<natuint128_t>(lhs) >> amount;
                 }
 //		        else if constexpr (calculation_mode == uint128_calc_mode::msvc_x64)
 //      	    {
@@ -677,7 +677,7 @@ namespace cjm
             {
                 if constexpr (calculation_mode == uint128_calc_mode::intrinsic_u128)
                 {
-                    return static_cast<unsigned __int128>(lhs) << amount;
+                    return static_cast<natuint128_t>(lhs) << amount;
                 }
 //		        else if constexpr (calculation_mode == uint128_calc_mode::msvc_x64)
 //      	    {
@@ -729,7 +729,7 @@ namespace cjm
                 {
                     auto absAmount = static_cast<int>(amount);
                     assert(absAmount > -1 && absAmount < static_cast<int>(std::numeric_limits<uint128>::digits));
-                    return static_cast<unsigned __int128>(lhs) << static_cast<int>(absAmount);
+                    return static_cast<natuint128_t>(lhs) << static_cast<int>(absAmount);
                 }
 //		        else if constexpr (calculation_mode == uint128_calc_mode::msvc_x64)
 //          	{
@@ -790,7 +790,7 @@ namespace cjm
                 {
                     auto absAmount = static_cast<int>(amount);
                     assert(absAmount > -1 && absAmount < static_cast<int>(std::numeric_limits<uint128>::digits));
-                    return static_cast<unsigned __int128>(lhs) << static_cast<int>(absAmount);
+                    return static_cast<natuint128_t>(lhs) << static_cast<int>(absAmount);
                 }
 //		        else if constexpr (calculation_mode == uint128_calc_mode::msvc_x64)
 //          	{
@@ -832,7 +832,7 @@ namespace cjm
             {
                 if constexpr (calculation_mode == uint128_calc_mode::intrinsic_u128)
                 {
-                    return static_cast<unsigned __int128>(lhs) + static_cast<unsigned __int128>(rhs);
+                    return static_cast<natuint128_t>(lhs) + static_cast<natuint128_t>(rhs);
                 }
 //	            else if constexpr (calculation_mode == uint128_calc_mode::msvc_x64)
 //              {
@@ -867,7 +867,7 @@ namespace cjm
             {
                 if constexpr (calculation_mode == uint128_calc_mode::intrinsic_u128)
                 {
-                    return static_cast<unsigned __int128>(lhs) - static_cast<unsigned __int128>(rhs);
+                    return static_cast<natuint128_t>(lhs) - static_cast<natuint128_t>(rhs);
                 }
 //	            else if constexpr (calculation_mode == uint128_calc_mode::msvc_x64)
 //              {
@@ -907,7 +907,7 @@ namespace cjm
             {
                 if constexpr (calculation_mode == uint128_calc_mode::intrinsic_u128)
                 {
-                    return static_cast<unsigned __int128>(lhs) * static_cast<unsigned __int128>(rhs);
+                    return static_cast<natuint128_t>(lhs) * static_cast<natuint128_t>(rhs);
                 }
 //	            else if constexpr (calculation_mode == uint128_calc_mode::msvc_x64)
 //              {
@@ -945,7 +945,7 @@ namespace cjm
             {
 		        if constexpr (calculation_mode == uint128_calc_mode::intrinsic_u128)
                 {
-                    return static_cast<unsigned __int128>(lhs) / static_cast<unsigned __int128>(rhs);
+                    return static_cast<natuint128_t>(lhs) / static_cast<natuint128_t>(rhs);
                 }
 //		        else if constexpr (calculation_mode == uint128_calc_mode::msvc_x64)
 //              {
@@ -979,7 +979,7 @@ namespace cjm
             {
                 if constexpr (calculation_mode == uint128_calc_mode::intrinsic_u128)
                 {
-                    return static_cast<unsigned __int128>(lhs) % static_cast<unsigned __int128>(rhs);
+                    return static_cast<natuint128_t>(lhs) % static_cast<natuint128_t>(rhs);
                 }
 //		        else if constexpr (calculation_mode == uint128_calc_mode::msvc_x64)
 //              {

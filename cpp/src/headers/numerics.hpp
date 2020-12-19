@@ -18,13 +18,15 @@
 #include <cstring>
 #include "cjm_numeric_concepts.hpp"
 #ifdef __cpp_lib_bit_cast
-#include <bits>
+#include <bit>
 #endif
 
 namespace cjm
 {
+	
 	namespace numerics
 	{
+		class uint128;
 	    constexpr bool has_msc_x64 =
 #ifdef CJM_MSC_X64
         true;
@@ -35,20 +37,23 @@ namespace cjm
 	    constexpr bool has_intrinsic_u128 =
 #ifdef __SIZEOF_INT128__
         true;
+		using uint128_align_t = unsigned __int128;
+		using natuint128_t = unsigned __int128;
 #ifndef CJM_HAVE_BUILTIN_128
 #define CJM_HAVE_BUILTIN_128
 #endif
 #else
 	    false;
+		using uint128_align_t = std::uint64_t;
+		using natuint128_t = uint128;
 #ifdef CJM_HAVE_BUILTIN_128
 #undef CJM_HAVE_BUILTIN_128
 #endif
 #endif
-	    constexpr size_t uint128_align = has_intrinsic_u128 ? alignof(unsigned __int128) : alignof(std::uint64_t);
+	    constexpr size_t uint128_align = alignof(uint128_align_t);
 
 
-
-		class uint128;
+		
 
 		enum class uint128_calc_mode : std::uint8_t
         {
@@ -119,7 +124,8 @@ namespace cjm
 			
 			
 		}
-
+		#pragma warning(push)
+		#pragma warning (disable:4068) 
         #pragma clang diagnostic push
         #pragma ide diagnostic ignored "UnreachableCode"
         constexpr uint128_calc_mode init_eval_mode() noexcept
@@ -138,6 +144,7 @@ namespace cjm
             }
         }
         #pragma clang diagnostic pop
+		#pragma warning(pop)
 	}
 }
 

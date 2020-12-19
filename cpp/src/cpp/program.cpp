@@ -2,14 +2,11 @@
 #include <iostream>
 #include <iomanip>
 #include <string_view>
-#include <sstream>
 #include <limits>
 #include <cstdint>
 #include "numerics.hpp"
 #include "uint128.hpp"
 #include "int128_tests.hpp"
-#include <concepts>
-#include <type_traits>
 #include <boost/io/ios_state.hpp>
 #include "cjm_numeric_concepts.hpp"
 #include "cjm_string.hpp"
@@ -36,68 +33,105 @@ namespace cjm::base_test_program
         cout_saver{std::cout};
         std::cout << "Thing that isn't unsigned integer: [" << std::dec << val << "]." << newl;
     }
+
+    int execute_test_program() noexcept;
+
+    void native_test();
 }
 
 int main()
 {
+    return cjm::base_test_program::execute_test_program();
+}
+
+int cjm::base_test_program::execute_test_program() noexcept
+{
+    try
+    {
+        using namespace numerics::uint128_literals;
+        using uint128_t = numerics::uint128;
+        using testing::cjm_assert;
+        using namespace std::string_view_literals;
+
+        std::uint64_t ui = 0xc0de'd00d'fea2'b00bu;
+        std::int64_t  i1 = 938'336;
+        constexpr auto text = "Hi mom!"sv;
+        constexpr std::uint64_t low = 0xdead'beef'face'babe;
+        constexpr std::uint64_t high = 0xc0de'd00d'fea2'b00b;
+        constexpr auto my_literal = 0xc0de'd00d'fea2'b00b'dead'beef'face'babe_u128;
+        constexpr auto my_second_literal = 0xc0de'd00d'fea2'cafe'babe'b00b'face'dad0_u128;
+        static_assert(cjm::numerics::concepts::unsigned_integer<uint128_t>);
+
+        native_test();
+
+        print_spec(ui);
+        print_spec(i1);
+        print_spec(text);
+        uint128_tests::execute_uint128_tests();
+        std::cout << "Bye now!" << std::endl;
+
+        std::cout << "Another cute literal: [0x" << std::hex << my_second_literal << "]." << newl;
+        std::cout << "Another cute literal as dec: [" << std::dec << my_second_literal << "]." << newl;
+    }
+	catch (const std::exception& ex)
+	{
+        
+		try
+		{
+            std::cerr << "Test program FAILED!  Unhandled exception with message: [" << ex.what() << "].  Program will now terminate." << newl;
+            return -1;
+		}
+		catch (...)
+		{
+			//naught else can do here....
+            return -1;
+		}
+	}
+	catch (...)
+	{
+        try
+        {
+            std::cerr << "Test program FAILED!  A non-standard, unhandled exception was thrown.  The program must terminate.";
+            return -1;
+        }
+		catch (...)
+		{
+            //naught else can do here....
+            return -1;
+		}        
+	}
+    return 0;
+}
 
 
-    using namespace std::string_view_literals;
-    std::uint64_t ui = 0xc0de'd00d'fea2'b00bu;
-    std::int64_t  i1 = 938'336;
-    using namespace cjm::numerics::uint128_literals;
-    using uint128_t = cjm::numerics::uint128;
-    using cjm::testing::cjm_assert;
-    constexpr auto text = "Hi mom!"sv;
-    using namespace cjm::base_test_program;
+#ifdef CJM_HAVE_BUILTIN_128
+void cjm::base_test_program::native_test()
+{
     using u128native_t = unsigned __int128;
     constexpr u128native_t is_constexpr = 0xdead'beef'cafe'babe;
-    constexpr std::uint64_t low = 0xdead'beef'face'babe;
-    constexpr std::uint64_t high = 0xc0de'd00d'fea2'b00b;
-    constexpr auto my_literal = 0xc0de'd00d'fea2'b00b'dead'beef'face'babe_u128;
-    constexpr auto my_second_literal = 0xc0de'd00d'fea2'cafe'babe'b00b'face'dad0_u128;
     u128native_t native = high;
     native <<= 64;
     native |= low;
     u128native_t copy_native = native;
-
-    static_assert(std::is_trivial_v<uint128_t>);
-    static_assert(std::is_trivially_default_constructible_v<uint128_t>);
-    static_assert(std::is_trivially_destructible_v<uint128_t> && std::is_trivially_copyable_v<uint128_t> && std::is_trivially_copy_assignable_v<uint128_t> && std::is_trivially_move_constructible_v<uint128_t> && std::is_trivially_assignable_v<uint128_t, uint128_t>);
     uint128_t from_native = static_cast<uint128_t>(native);
-    {
-
-        auto saver = cout_saver {std::cout};
-        std::cout << "Native convert: [0x" <<  std::hex << std::setw(32) << std::setfill('0') << static_cast<uint128_t>(copy_native) << "]." << newl;
-        auto converted = static_cast<uint128_t>(copy_native);
-        u128native_t converted_back = static_cast<u128native_t>(converted);
-        cjm_assert(converted_back == copy_native);
-
-        u128native_t n = static_cast<u128native_t>(my_literal);
-        uint128_t fn = n;
-        std::cout << "Native round tripped: [0x" << std::hex << std::setw(32) << std::setfill('0') << fn << "]." << newl;
-        cjm_assert(fn == my_literal);
-    }
-    static_assert(std::is_trivially_copyable_v<uint128_t>);
-
-    static_assert(cjm::numerics::concepts::unsigned_integer<uint128_t>);
-
+    static_assert(is_constexpr == 0xdead'beef'cafe'babe);
+	
     std::uint64_t rt_low = static_cast<std::uint64_t>(copy_native);
     copy_native >>= 64;
     std::uint64_t rt_high = static_cast<std::uint64_t>(copy_native);
 
     cjm_assert(low == rt_low && high == rt_high);
-    static_assert(is_constexpr == 0xdead'beef'cafe'babe);
-    cout_saver saver{std::cout};
-    cjm_assert(from_native == my_literal);
 
-    print_spec(ui);
-    print_spec(i1);
-    print_spec(text);
-    cjm::uint128_tests::execute_uint128_tests();
-    std::cout << "Bye now!" << std::endl;
+    cout_saver saver{ std::cout };
+    cjm_assert(from_native == my_literal);
     std::cout << "from native: [0x" << std::hex << from_native << "]." << newl;
-    std::cout << "Another cute literal: [0x" << std::hex << my_second_literal << "]." << newl;
-    std::cout << "Another cute literal as dec: [" << std::dec << my_second_literal << "]." << newl;
 }
+#else
+void cjm::base_test_program::native_test()
+{
+    using namespace cjm::base_test_program;
+    std::cout << "Native uint128 not supported in this environment.  Will not run native tests." << newl;
+}
+#endif
+
 

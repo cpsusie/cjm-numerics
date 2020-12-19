@@ -32,3 +32,62 @@
 *.app
 /cmake-build-release/CMakeFiles/clion-log.txt
 /cmake-build-debug/file.txt
+*.user
+/out/build/x64-Debug (default)/VSInheritEnvironments.txt
+/out/build/x64-Debug (default)/Testing/Temporary/LastTest.log
+/out/build/x64-Debug (default)/cmake_install.cmake
+/out/build/x64-Debug (default)/CMakeFiles/TargetDirectories.txt
+/out/build/x64-Debug (default)/CMakeFiles/ShowIncludes/main.c
+/out/build/x64-Debug (default)/CMakeFiles/ShowIncludes/foo.h
+/out/build/x64-Debug (default)/CMakeFiles/rules.ninja
+/out/build/x64-Debug (default)/CMakeFiles/Int128.dir/vc140.pdb
+/out/build/x64-Debug (default)/CMakeFiles/CMakeOutput.log
+/out/build/x64-Debug (default)/CMakeFiles/cmake.check_cache
+/out/build/x64-Debug (default)/CMakeFiles/3.18.20081302-MSVC_2/CompilerIdCXX/CMakeCXXCompilerId.cpp
+/out/build/x64-Debug (default)/CMakeFiles/3.18.20081302-MSVC_2/CompilerIdC/CMakeCCompilerId.c
+/out/build/x64-Debug (default)/CMakeFiles/3.18.20081302-MSVC_2/CMakeSystem.cmake
+/out/build/x64-Debug (default)/CMakeFiles/3.18.20081302-MSVC_2/CMakeRCCompiler.cmake
+/out/build/x64-Debug (default)/CMakeFiles/3.18.20081302-MSVC_2/CMakeDetermineCompilerABI_CXX.bin
+/out/build/x64-Debug (default)/CMakeFiles/3.18.20081302-MSVC_2/CMakeDetermineCompilerABI_C.bin
+/out/build/x64-Debug (default)/CMakeFiles/3.18.20081302-MSVC_2/CMakeCXXCompiler.cmake
+/out/build/x64-Debug (default)/CMakeFiles/3.18.20081302-MSVC_2/CMakeCCompiler.cmake
+/out/build/x64-Debug (default)/CMakeCache.txt
+/out/build/x64-Debug (default)/build.ninja
+/out/build/x64-Debug (default)/.ninja_log
+/out/build/x64-Debug (default)/.ninja_deps
+/out/build/x64-Debug (default)/.cmake/api/v1/reply/target-Int128-Debug-4f88e71ac89146c61621.json
+/out/build/x64-Debug (default)/.cmake/api/v1/reply/index-2020-12-19T21-49-28-0473.json
+/out/build/x64-Debug (default)/.cmake/api/v1/reply/codemodel-v2-77558a1f470ed432cb54.json
+/out/build/x64-Debug (default)/.cmake/api/v1/reply/cmakeFiles-v1-ae5c340a2d3f2e088bb0.json
+/out/build/x64-Debug (default)/.cmake/api/v1/reply/cache-v2-960884393001887660d9.json
+/out/build/x64-Debug (default)/.cmake/api/v1/query/client-MicrosoftVS/query.json
+/cpp/src/x64/Release/WinInt128.pdb
+/cpp/src/x64/Release/WinInt128.ipdb
+/cpp/src/x64/Release/WinInt128.iobj
+/cpp/src/x64/Debug/WinInt128.pdb
+/cpp/src/x64/Debug/WinInt128.ilk
+/cpp/src/WinInt128/x64/Release/WinInt128.tlog/WinInt128.write.1u.tlog
+/cpp/src/WinInt128/x64/Release/WinInt128.tlog/WinInt128.lastbuildstate
+/cpp/src/WinInt128/x64/Release/WinInt128.tlog/link.write.1.tlog
+/cpp/src/WinInt128/x64/Release/WinInt128.tlog/link.read.1.tlog
+/cpp/src/WinInt128/x64/Release/WinInt128.tlog/link.command.1.tlog
+/cpp/src/WinInt128/x64/Release/WinInt128.tlog/CL.write.1.tlog
+/cpp/src/WinInt128/x64/Release/WinInt128.tlog/CL.read.1.tlog
+/cpp/src/WinInt128/x64/Release/WinInt128.tlog/CL.command.1.tlog
+/cpp/src/WinInt128/x64/Release/WinInt128.log
+/cpp/src/WinInt128/x64/Release/WinInt128.exe.recipe
+/cpp/src/WinInt128/x64/Release/vcpkg.applocal.log
+/cpp/src/WinInt128/x64/Release/vc142.pdb
+/cpp/src/WinInt128/x64/Debug/WinInt128.tlog/WinInt128.write.1u.tlog
+/cpp/src/WinInt128/x64/Debug/WinInt128.tlog/WinInt128.lastbuildstate
+/cpp/src/WinInt128/x64/Debug/WinInt128.tlog/link.write.1.tlog
+/cpp/src/WinInt128/x64/Debug/WinInt128.tlog/link.read.1.tlog
+/cpp/src/WinInt128/x64/Debug/WinInt128.tlog/link.command.1.tlog
+/cpp/src/WinInt128/x64/Debug/WinInt128.tlog/CL.write.1.tlog
+/cpp/src/WinInt128/x64/Debug/WinInt128.tlog/CL.read.1.tlog
+/cpp/src/WinInt128/x64/Debug/WinInt128.tlog/CL.command.1.tlog
+/cpp/src/WinInt128/x64/Debug/WinInt128.log
+/cpp/src/WinInt128/x64/Debug/WinInt128.exe.recipe
+/cpp/src/WinInt128/x64/Debug/vcpkg.applocal.log
+/cpp/src/WinInt128/x64/Debug/vc142.pdb
+/cpp/src/WinInt128/x64/Debug/vc142.idb
