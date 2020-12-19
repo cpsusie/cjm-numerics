@@ -30,3 +30,4 @@
 *.exe
 *.out
 *.app
+/cmake-build-release/CMakeFiles/clion-log.txt
