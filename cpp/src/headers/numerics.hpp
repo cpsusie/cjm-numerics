@@ -29,9 +29,9 @@ namespace cjm
 	
 	namespace numerics
 	{
-		//alternate declarations for cjm_intrinsic_macros ... never defined because never used but need something that won't blow compiler up
+	    //alternate declarations for cjm_intrinsic_macros ... never defined because never used but need something that won't blow compiler up
 		//when examining untaken if constexpr branch.
-		extern unsigned long long cjm_bad_umul128(unsigned long long multiplicand, unsigned long long multiplicand_two, unsigned long long* carry);
+		extern std::uint64_t cjm_bad_umul128(std::uint64_t multiplicand, std::uint64_t multiplicand_two, std::uint64_t* carry);
 		class uint128;
 	    constexpr bool has_msc_x64 =
 #ifdef CJM_MSC_X64
