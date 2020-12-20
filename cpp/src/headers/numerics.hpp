@@ -3,12 +3,15 @@
 #if defined(_MSC_VER) && defined(_M_X64)
 #include <intrin.h>
 #pragma intrinsic(_umul128)
+#pragma intrinsic(_BitScanReverse64)
 #ifndef CJM_MSC_X64
 #define CJM_MSC_X64
 #define CJM_UMUL128 _umul128
+#define CJM_BITSCAN_REV_64 _BitScanReverse64
 #endif
 #else
 #define CJM_UMUL128 cjm_bad_umul128
+#define CJM_BITSCAN_REV_64 cjm_badrev_bitscan_64
 #endif
 #include <cmath>
 #include <limits>
@@ -29,9 +32,10 @@ namespace cjm
 	
 	namespace numerics
 	{
-	    //alternate declarations for cjm_intrinsic_macros ... never defined because never used but need something that won't blow compiler up
+		//alternate declarations for cjm_intrinsic_macros ... never defined because never used but need something that won't blow compiler up
 		//when examining untaken if constexpr branch.
-		extern std::uint64_t cjm_bad_umul128(std::uint64_t multiplicand, std::uint64_t multiplicand_two, std::uint64_t* carry);
+		extern unsigned char cjm_badrev_bitscan_64(unsigned long* index, std::uint64_t mask);
+	    extern std::uint64_t cjm_bad_umul128(std::uint64_t multiplicand, std::uint64_t multiplicand_two, std::uint64_t* carry);
 		class uint128;
 	    constexpr bool has_msc_x64 =
 #ifdef CJM_MSC_X64
@@ -82,10 +86,10 @@ namespace cjm
         To bit_cast(const From& f) noexcept
         {
             //GCC seems to get all but hurt about private member variables even if type is trivial.
-            //All c++ standard requires is trivially copyable and same size.  the concepts here
+            //All c++ standard requires is trivially copyable and same size (and non-overlapping).  the concepts here
             //enforce MORE than that requirement (also require triviality in general and alignment same)
             //Suppressing because uint128 is a type that is trivially copyable-to.
-            To dst;
+            To dst =0;
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wclass-memaccess"
             std::memcpy(&dst, &f, sizeof(To));  /* no diagnostic for this one */
@@ -152,6 +156,8 @@ namespace cjm
         #pragma clang diagnostic pop
 		#pragma warning(pop)
 	}
+
+	
 }
 
 

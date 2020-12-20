@@ -21,6 +21,7 @@ void cjm::uint128_tests::execute_uint128_tests()
     execute_test(execute_basic_test_one, "basic_test_one"sv);
     execute_test(execute_string_parse_test, "string_parse_text"sv);
     execute_test(execute_basic_multiplication_test, "basic_multiplication_test"sv);
+    execute_test(test_fls, "test_fls"sv);
     cout_saver saver{cout};
     cout << "All tests PASSED." << newl;
 }
@@ -170,6 +171,23 @@ void cjm::uint128_tests::execute_basic_multiplication_test()
     print_res(test_fit_times_another_big_one, "test_fit_times_another_big_one"sv);
     print_res(test_big_ones_product, "test_big_ones_product"sv);
 	
+}
+
+void cjm::uint128_tests::test_fls()
+{
+    constexpr auto final_test = 0x8000'0000'0000'0000u;
+    constexpr auto final_res = cjm::numerics::internal::fls_slow(final_test);
+    constexpr auto numbers = get_pow2_arr();
+    constexpr auto results = get_pow2_res_arr();
+    static_assert(numbers.size() == results.size());
+    auto saver = cout_saver{ cout };
+	for (auto i = 0_szt; i < numbers.size(); ++i)
+	{
+        cjm_assert(cjm::numerics::internal::fls_int_part(numbers[i]) == results[i]);
+        cout << "For [0x" << std::hex << std::setw(16) << std::setfill('0') << numbers[i] << "], the result is: [" << std::dec << results[i] << "]." << newl;
+	}
+    cjm_assert(cjm::numerics::internal::fls_int_part(final_test) == final_res);
+    cout << "For [0x" << std::hex << std::setw(16) << std::setfill('0') << final_test << "], the result is: [" << std::dec << final_res << "]." << newl;
 }
 
 void cjm::uint128_tests::test_interconversion(const ctrl_uint128_t& control, uint128_t test)

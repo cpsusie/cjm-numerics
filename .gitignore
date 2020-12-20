@@ -5,6 +5,11 @@
 bin/
 obj/
 .vs/
+Debug/
+Release/
+*.tlog
+*.pdb
+*.idb
 
 # Compiled Object files
 *.slo

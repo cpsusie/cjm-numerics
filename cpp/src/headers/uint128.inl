@@ -472,7 +472,7 @@ namespace cjm
 			*remainder_ret = dividend;
 		}
 
-		constexpr int uint128::fls(uint128 n)
+		constexpr int uint128::fls(uint128 n)  noexcept
 		{
 		    assert(n != 0);
 		    //check the high part for any set bits,
@@ -481,15 +481,15 @@ namespace cjm
 			int_part hi = n.high_part();
 			if (hi != 0)
 			{
-				auto flsHigh = fls_int_part(hi);
+				auto flsHigh = internal::fls_int_part(hi);
 				auto sum = flsHigh + int_part_bits;
 				return static_cast<int>(sum);
 			}
-			return fls_int_part(n.low_part());
+			return internal::fls_int_part(n.low_part());
 		}
 
 		template <typename T>
-		constexpr void uint128::step(T& n, int& pos, int shift)
+		constexpr void internal::step(T& n, int& pos, int shift) noexcept
 		{
 		    //again, no freaking clue how this works or what it even does except it
 		    //works as part of fls_int_part .... google programming gods are mysterious
@@ -501,11 +501,35 @@ namespace cjm
 			}
 		}
 
-		constexpr int uint128::fls_int_part(std::uint64_t n)
+		constexpr int internal::fls_int_part(std::uint64_t n) noexcept
 		{
-		    //finding the last set bit (bitpos of most significant bit with a value of one)
-		    //how or why this works is totally beyond me.  It does though ... trust
-		    // the google gods ....
+			if (std::is_constant_evaluated())
+			{
+				return fls_slow(n);
+			}
+			else
+			{
+				if constexpr (calculation_mode == uint128_calc_mode::msvc_x64)
+				{
+					assert(n != 0);
+					unsigned long result = 0;
+					unsigned char res = CJM_BITSCAN_REV_64(&result, n);
+					assert(res != 0);
+					return static_cast<int>(result);
+				}
+				else
+				{
+					return fls_slow(n);					
+				}
+			}
+
+		}
+
+		constexpr int internal::fls_slow(std::uint64_t n) noexcept
+		{
+			//finding the last set bit (bitpos of most significant bit with a value of one)
+				//how or why this works is totally beyond me.  It does though ... trust
+				// the google gods ....
 			assert(n != 0);
 			int pos = 0;
 			step<std::uint64_t>(n, pos, 0x20);
@@ -513,7 +537,7 @@ namespace cjm
 			step<std::uint32_t>(n32, pos, 0x10);
 			step<std::uint32_t>(n32, pos, 0x08);
 			step<std::uint32_t>(n32, pos, 0x04);
-			return pos + ((std::uint64_t{ 0x3333333322221100 } >> (n32 << 2)) & 0x3);
+			return static_cast<int>((std::uint64_t{ 0x3333333322221100 } >> (n32 << 2) & 0x3) + pos);
 		}
 
 		constexpr bool operator==(uint128 lhs, uint128 rhs) noexcept
