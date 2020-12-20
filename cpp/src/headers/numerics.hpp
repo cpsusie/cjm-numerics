@@ -158,7 +158,7 @@ namespace std
 	template<>
 	class numeric_limits<cjm::numerics::uint128>;
 
-	template <>
+	/*template <>
 	struct is_arithmetic <cjm::numerics::uint128>;
 
 	template <> struct is_integral<cjm::numerics::uint128>;
@@ -304,7 +304,7 @@ namespace std
 
 	template<>
 	struct is_floating_point<cjm::numerics::norm_decimal> : std::conditional_t<std::numeric_limits<cjm::numerics::norm_decimal>::is_integer,
-		std::false_type, std::true_type> {};
+		std::false_type, std::true_type> {};*/
 
 }
 
