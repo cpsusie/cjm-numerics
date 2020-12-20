@@ -115,3 +115,4 @@
 /.vs/Int128/v16/ipch/AutoPCH/645c862a3e6c5c6d/INT128_TESTS.ipch
 /.vs/Int128/v16/Browse.VC.db
 /.vs/CMake Overview
+*.ipch
