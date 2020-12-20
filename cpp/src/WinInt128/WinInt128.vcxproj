@@ -54,6 +54,7 @@
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
+    <Import Project="$(VCTargetsPath)\BuildCustomizations\masm.props" />
   </ImportGroup>
   <ImportGroup Label="Shared">
   </ImportGroup>
@@ -188,6 +189,7 @@
     <ClInclude Include="..\headers\uint128.hpp" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\asm\asmops.asm" />
     <None Include="..\headers\cjm_string.inl" />
     <None Include="..\headers\fixed_uint.inl" />
     <None Include="..\headers\numerics.inl" />
@@ -195,5 +197,6 @@
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
+    <Import Project="$(VCTargetsPath)\BuildCustomizations\masm.targets" />
   </ImportGroup>
 </Project>

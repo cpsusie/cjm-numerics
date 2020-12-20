@@ -70,5 +70,8 @@
     <None Include="..\headers\uint128.inl">
       <Filter>Header Files</Filter>
     </None>
+    <None Include="..\asm\asmops.asm">
+      <Filter>Source Files</Filter>
+    </None>
   </ItemGroup>
 </Project>
