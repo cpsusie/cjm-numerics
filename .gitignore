@@ -1,6 +1,11 @@
 # Prerequisites
 *.d
 
+# Visual studio
+bin/
+obj/
+.vs/
+
 # Compiled Object files
 *.slo
 *.lo
@@ -30,89 +35,378 @@
 *.exe
 *.out
 *.app
-/cmake-build-release/CMakeFiles/clion-log.txt
-/cmake-build-debug/file.txt
 *.user
-/out/build/x64-Debug (default)/VSInheritEnvironments.txt
-/out/build/x64-Debug (default)/Testing/Temporary/LastTest.log
-/out/build/x64-Debug (default)/cmake_install.cmake
-/out/build/x64-Debug (default)/CMakeFiles/TargetDirectories.txt
-/out/build/x64-Debug (default)/CMakeFiles/ShowIncludes/main.c
-/out/build/x64-Debug (default)/CMakeFiles/ShowIncludes/foo.h
-/out/build/x64-Debug (default)/CMakeFiles/rules.ninja
-/out/build/x64-Debug (default)/CMakeFiles/Int128.dir/vc140.pdb
-/out/build/x64-Debug (default)/CMakeFiles/CMakeOutput.log
-/out/build/x64-Debug (default)/CMakeFiles/cmake.check_cache
-/out/build/x64-Debug (default)/CMakeFiles/3.18.20081302-MSVC_2/CompilerIdCXX/CMakeCXXCompilerId.cpp
-/out/build/x64-Debug (default)/CMakeFiles/3.18.20081302-MSVC_2/CompilerIdC/CMakeCCompilerId.c
-/out/build/x64-Debug (default)/CMakeFiles/3.18.20081302-MSVC_2/CMakeSystem.cmake
-/out/build/x64-Debug (default)/CMakeFiles/3.18.20081302-MSVC_2/CMakeRCCompiler.cmake
-/out/build/x64-Debug (default)/CMakeFiles/3.18.20081302-MSVC_2/CMakeDetermineCompilerABI_CXX.bin
-/out/build/x64-Debug (default)/CMakeFiles/3.18.20081302-MSVC_2/CMakeDetermineCompilerABI_C.bin
-/out/build/x64-Debug (default)/CMakeFiles/3.18.20081302-MSVC_2/CMakeCXXCompiler.cmake
-/out/build/x64-Debug (default)/CMakeFiles/3.18.20081302-MSVC_2/CMakeCCompiler.cmake
-/out/build/x64-Debug (default)/CMakeCache.txt
-/out/build/x64-Debug (default)/build.ninja
-/out/build/x64-Debug (default)/.ninja_log
-/out/build/x64-Debug (default)/.ninja_deps
-/out/build/x64-Debug (default)/.cmake/api/v1/reply/target-Int128-Debug-4f88e71ac89146c61621.json
-/out/build/x64-Debug (default)/.cmake/api/v1/reply/index-2020-12-19T21-49-28-0473.json
-/out/build/x64-Debug (default)/.cmake/api/v1/reply/codemodel-v2-77558a1f470ed432cb54.json
-/out/build/x64-Debug (default)/.cmake/api/v1/reply/cmakeFiles-v1-ae5c340a2d3f2e088bb0.json
-/out/build/x64-Debug (default)/.cmake/api/v1/reply/cache-v2-960884393001887660d9.json
-/out/build/x64-Debug (default)/.cmake/api/v1/query/client-MicrosoftVS/query.json
-/cpp/src/x64/Release/WinInt128.pdb
-/cpp/src/x64/Release/WinInt128.ipdb
-/cpp/src/x64/Release/WinInt128.iobj
-/cpp/src/x64/Debug/WinInt128.pdb
-/cpp/src/x64/Debug/WinInt128.ilk
-/cpp/src/WinInt128/x64/Release/WinInt128.tlog/WinInt128.write.1u.tlog
-/cpp/src/WinInt128/x64/Release/WinInt128.tlog/WinInt128.lastbuildstate
-/cpp/src/WinInt128/x64/Release/WinInt128.tlog/link.write.1.tlog
-/cpp/src/WinInt128/x64/Release/WinInt128.tlog/link.read.1.tlog
-/cpp/src/WinInt128/x64/Release/WinInt128.tlog/link.command.1.tlog
-/cpp/src/WinInt128/x64/Release/WinInt128.tlog/CL.write.1.tlog
-/cpp/src/WinInt128/x64/Release/WinInt128.tlog/CL.read.1.tlog
-/cpp/src/WinInt128/x64/Release/WinInt128.tlog/CL.command.1.tlog
-/cpp/src/WinInt128/x64/Release/WinInt128.log
-/cpp/src/WinInt128/x64/Release/WinInt128.exe.recipe
-/cpp/src/WinInt128/x64/Release/vcpkg.applocal.log
-/cpp/src/WinInt128/x64/Release/vc142.pdb
-/cpp/src/WinInt128/x64/Debug/WinInt128.tlog/WinInt128.write.1u.tlog
-/cpp/src/WinInt128/x64/Debug/WinInt128.tlog/WinInt128.lastbuildstate
-/cpp/src/WinInt128/x64/Debug/WinInt128.tlog/link.write.1.tlog
-/cpp/src/WinInt128/x64/Debug/WinInt128.tlog/link.read.1.tlog
-/cpp/src/WinInt128/x64/Debug/WinInt128.tlog/link.command.1.tlog
-/cpp/src/WinInt128/x64/Debug/WinInt128.tlog/CL.write.1.tlog
-/cpp/src/WinInt128/x64/Debug/WinInt128.tlog/CL.read.1.tlog
-/cpp/src/WinInt128/x64/Debug/WinInt128.tlog/CL.command.1.tlog
-/cpp/src/WinInt128/x64/Debug/WinInt128.log
-/cpp/src/WinInt128/x64/Debug/WinInt128.exe.recipe
-/cpp/src/WinInt128/x64/Debug/vcpkg.applocal.log
-/cpp/src/WinInt128/x64/Debug/vc142.pdb
-/cpp/src/WinInt128/x64/Debug/vc142.idb
-/cpp/src/WinInt128/WinInt128.vcxproj.filters
-/cpp/src/WinInt128/.vs/WinInt128/v16/ipch/AutoPCH/1e3ba972b95e84bc/PROGRAM.ipch
-/cpp/src/WinInt128/.vs/WinInt128/v16/Browse.VC.db
-/cpp/src/headers/Debug/Date.tlog/unsuccessfulbuild
-/cpp/src/headers/Debug/Date.tlog/Date.lastbuildstate
-/cpp/src/headers/Debug/Date.tlog/CL.command.1.tlog
-/cpp/src/.vs/WinInt128/v16/ipch/AutoPCH/d9606950eb37a31/TESTING.ipch
-/cpp/src/.vs/WinInt128/v16/ipch/AutoPCH/d23419394000292c/TESTING.ipch
-/cpp/src/.vs/WinInt128/v16/ipch/AutoPCH/61cd8616c5ebd4cd/UINT128.ipch
-/cpp/src/.vs/WinInt128/v16/ipch/AutoPCH/5f9a14de491539cd/TESTPROGRAM.ipch
-/cpp/src/.vs/WinInt128/v16/ipch/AutoPCH/2b6807c75643e7ee/INT128_TESTS.ipch
-/cpp/src/.vs/WinInt128/v16/ipch/AutoPCH/2b10ef7ece6e25f0/INT128_TESTS.ipch
-/cpp/src/.vs/WinInt128/v16/ipch/AutoPCH/1e3ba972b95e84bc/PROGRAM.ipch
-/cpp/src/.vs/WinInt128/v16/ipch/AutoPCH/1be27789f53a3b4d/PROGRAM.ipch
-/cpp/src/.vs/WinInt128/v16/Browse.VC.opendb
-/cpp/src/.vs/WinInt128/v16/Browse.VC.db-wal
-/cpp/src/.vs/WinInt128/v16/Browse.VC.db-shm
-/cpp/src/.vs/WinInt128/v16/Browse.VC.db
-/.vs/VSWorkspaceState.json
-/.vs/slnx.sqlite
-/.vs/ProjectSettings.json
-/.vs/Int128/v16/ipch/AutoPCH/645c862a3e6c5c6d/INT128_TESTS.ipch
-/.vs/Int128/v16/Browse.VC.db
-/.vs/CMake Overview
 *.ipch
+
+# Cmake
+CMakeLists.txt.user
+CMakeCache.txt
+CMakeFiles
+CMakeScripts
+Testing
+Makefile
+cmake_install.cmake
+install_manifest.txt
+compile_commands.json
+CTestTestfile.cmake
+cmake-build-debug/
+cmake-build-release/
+_deps
+
+# User-specific files
+*.rsuser
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# User-specific files (MonoDevelop/Xamarin Studio)
+*.userprefs
+
+# Mono auto generated files
+mono_crash.*
+
+# Build results
+[Dd]ebug/
+[Dd]ebugPublic/
+[Rr]elease/
+[Rr]eleases/
+x64/
+x86/
+[Ww][Ii][Nn]32/
+[Aa][Rr][Mm]/
+[Aa][Rr][Mm]64/
+bld/
+[Bb]in/
+[Oo]bj/
+[Ll]og/
+[Ll]ogs/
+
+# Visual Studio 2015/2017 cache/options directory
+.vs/
+# Uncomment if you have tasks that create the project's static files in wwwroot
+#wwwroot/
+
+# Visual Studio 2017 auto generated files
+Generated\ Files/
+
+# MSTest test Results
+[Tt]est[Rr]esult*/
+[Bb]uild[Ll]og.*
+
+# NUnit
+*.VisualState.xml
+TestResult.xml
+nunit-*.xml
+
+# Build Results of an ATL Project
+[Dd]ebugPS/
+[Rr]eleasePS/
+dlldata.c
+
+# Benchmark Results
+BenchmarkDotNet.Artifacts/
+
+# .NET Core
+project.lock.json
+project.fragment.lock.json
+artifacts/
+
+# ASP.NET Scaffolding
+ScaffoldingReadMe.txt
+
+# StyleCop
+StyleCopReport.xml
+
+# Files built by Visual Studio
+*_i.c
+*_p.c
+*_h.h
+*.ilk
+*.meta
+*.obj
+*.iobj
+*.pch
+*.pdb
+*.ipdb
+*.pgc
+*.pgd
+*.rsp
+*.sbr
+*.tlb
+*.tli
+*.tlh
+*.tmp
+*.tmp_proj
+*_wpftmp.csproj
+*.log
+*.vspscc
+*.vssscc
+.builds
+*.pidb
+*.svclog
+*.scc
+
+# Chutzpah Test files
+_Chutzpah*
+
+# Visual C++ cache files
+ipch/
+*.aps
+*.ncb
+*.opendb
+*.opensdf
+*.sdf
+*.cachefile
+*.VC.db
+*.VC.VC.opendb
+
+# Visual Studio profiler
+*.psess
+*.vsp
+*.vspx
+*.sap
+
+# Visual Studio Trace Files
+*.e2e
+
+# TFS 2012 Local Workspace
+$tf/
+
+# Guidance Automation Toolkit
+*.gpState
+
+# ReSharper is a .NET coding add-in
+_ReSharper*/
+*.[Rr]e[Ss]harper
+*.DotSettings.user
+
+# TeamCity is a build add-in
+_TeamCity*
+
+# DotCover is a Code Coverage Tool
+*.dotCover
+
+# AxoCover is a Code Coverage Tool
+.axoCover/*
+!.axoCover/settings.json
+
+# Coverlet is a free, cross platform Code Coverage Tool
+coverage*.json
+coverage*.xml
+coverage*.info
+
+# Visual Studio code coverage results
+*.coverage
+*.coveragexml
+
+# NCrunch
+_NCrunch_*
+.*crunch*.local.xml
+nCrunchTemp_*
+
+# MightyMoose
+*.mm.*
+AutoTest.Net/
+
+# Web workbench (sass)
+.sass-cache/
+
+# Installshield output folder
+[Ee]xpress/
+
+# DocProject is a documentation generator add-in
+DocProject/buildhelp/
+DocProject/Help/*.HxT
+DocProject/Help/*.HxC
+DocProject/Help/*.hhc
+DocProject/Help/*.hhk
+DocProject/Help/*.hhp
+DocProject/Help/Html2
+DocProject/Help/html
+
+# Click-Once directory
+publish/
+
+# Publish Web Output
+*.[Pp]ublish.xml
+*.azurePubxml
+# Note: Comment the next line if you want to checkin your web deploy settings,
+# but database connection strings (with potential passwords) will be unencrypted
+*.pubxml
+*.publishproj
+
+# Microsoft Azure Web App publish settings. Comment the next line if you want to
+# checkin your Azure Web App publish settings, but sensitive information contained
+# in these scripts will be unencrypted
+PublishScripts/
+
+# NuGet Packages
+*.nupkg
+# NuGet Symbol Packages
+*.snupkg
+# The packages folder can be ignored because of Package Restore
+**/[Pp]ackages/*
+# except build/, which is used as an MSBuild target.
+!**/[Pp]ackages/build/
+# Uncomment if necessary however generally it will be regenerated when needed
+#!**/[Pp]ackages/repositories.config
+# NuGet v3's project.json files produces more ignorable files
+*.nuget.props
+*.nuget.targets
+
+# Microsoft Azure Build Output
+csx/
+*.build.csdef
+
+# Microsoft Azure Emulator
+ecf/
+rcf/
+
+# Windows Store app package directories and files
+AppPackages/
+BundleArtifacts/
+Package.StoreAssociation.xml
+_pkginfo.txt
+*.appx
+*.appxbundle
+*.appxupload
+
+# Visual Studio cache files
+# files ending in .cache can be ignored
+*.[Cc]ache
+# but keep track of directories ending in .cache
+!?*.[Cc]ache/
+
+# Others
+ClientBin/
+~$*
+*~
+*.dbmdl
+*.dbproj.schemaview
+*.jfm
+*.pfx
+*.publishsettings
+orleans.codegen.cs
+
+# Including strong name files can present a security risk
+# (https://github.com/github/gitignore/pull/2483#issue-259490424)
+#*.snk
+
+# Since there are multiple workflows, uncomment next line to ignore bower_components
+# (https://github.com/github/gitignore/pull/1529#issuecomment-104372622)
+#bower_components/
+
+# RIA/Silverlight projects
+Generated_Code/
+
+# Backup & report files from converting an old project file
+# to a newer Visual Studio version. Backup files are not needed,
+# because we have git ;-)
+_UpgradeReport_Files/
+Backup*/
+UpgradeLog*.XML
+UpgradeLog*.htm
+ServiceFabricBackup/
+*.rptproj.bak
+
+# SQL Server files
+*.mdf
+*.ldf
+*.ndf
+
+# Business Intelligence projects
+*.rdl.data
+*.bim.layout
+*.bim_*.settings
+*.rptproj.rsuser
+*- [Bb]ackup.rdl
+*- [Bb]ackup ([0-9]).rdl
+*- [Bb]ackup ([0-9][0-9]).rdl
+
+# Microsoft Fakes
+FakesAssemblies/
+
+# GhostDoc plugin setting file
+*.GhostDoc.xml
+
+# Node.js Tools for Visual Studio
+.ntvs_analysis.dat
+node_modules/
+
+# Visual Studio 6 build log
+*.plg
+
+# Visual Studio 6 workspace options file
+*.opt
+
+# Visual Studio 6 auto-generated workspace file (contains which files were open etc.)
+*.vbw
+
+# Visual Studio LightSwitch build output
+**/*.HTMLClient/GeneratedArtifacts
+**/*.DesktopClient/GeneratedArtifacts
+**/*.DesktopClient/ModelManifest.xml
+**/*.Server/GeneratedArtifacts
+**/*.Server/ModelManifest.xml
+_Pvt_Extensions
+
+# Paket dependency manager
+.paket/paket.exe
+paket-files/
+
+# FAKE - F# Make
+.fake/
+
+# CodeRush personal settings
+.cr/personal
+
+# Python Tools for Visual Studio (PTVS)
+__pycache__/
+*.pyc
+
+# Cake - Uncomment if you are using it
+# tools/**
+# !tools/packages.config
+
+# Tabs Studio
+*.tss
+
+# Telerik's JustMock configuration file
+*.jmconfig
+
+# BizTalk build output
+*.btp.cs
+*.btm.cs
+*.odx.cs
+*.xsd.cs
+
+# OpenCover UI analysis results
+OpenCover/
+
+# Azure Stream Analytics local run output
+ASALocalRun/
+
+# MSBuild Binary and Structured Log
+*.binlog
+
+# NVidia Nsight GPU debugger configuration file
+*.nvuser
+
+# MFractors (Xamarin productivity tool) working folder
+.mfractor/
+
+# Local History for Visual Studio
+.localhistory/
+
+# BeatPulse healthcheck temp database
+healthchecksdb
+
+# Backup folder for Package Reference Convert tool in Visual Studio 2017
+MigrationBackup/
+
+# Ionide (cross platform F# VS Code tools) working folder
+.ionide/
+
+# Fody - auto-generated XML schema
+FodyWeavers.xsd
