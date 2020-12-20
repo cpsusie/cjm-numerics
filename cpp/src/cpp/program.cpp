@@ -41,6 +41,7 @@ namespace cjm::base_test_program
 
 int main()
 {
+    std::ios_base::sync_with_stdio(false);
     return cjm::base_test_program::execute_test_program();
 }
 

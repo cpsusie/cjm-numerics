@@ -39,20 +39,24 @@ namespace cjm
 			iosflags flags = os.flags();
 			auto rep = uint128::to_string<Char, CharTraits, Allocator>(v, flags);
 			std::streamsize width = os.width(0);
-			if (static_cast<size_t>(width) > rep.size())
+			using str_size_t = std::remove_cvref_t<std::make_signed_t<decltype(rep.size())>>;
+			using common_type_t = std::common_type_t<str_size_t, std::streamsize>;
+			if (static_cast<common_type_t>(width) > static_cast<common_type_t>( rep.size()))
 			{
 				iosflags adjustfield = flags & ios::adjustfield;
 				if (adjustfield == ios::left)
 				{
-					rep.append(width - rep.size(), os.fill());
+					rep.append(static_cast<str_size_t>(static_cast<common_type_t>(width) - static_cast<common_type_t>(rep.size())), os.fill());
 				}
 				else if (adjustfield == ios::internal && (flags & ios::showbase) && (flags & ios::basefield) == ios::hex && v != 0)
 				{
-					rep.insert(2, width = rep.size(), os.fill());
+					width = static_cast<common_type_t>(rep.size());
+					rep.insert(2, static_cast<str_size_t>(width), os.fill());
 				}
 				else
 				{
-					rep.insert(0, width = rep.size(), os.fill());
+					width = static_cast<common_type_t>(rep.size());
+					rep.insert(0, static_cast<str_size_t>(width), os.fill());
 				}
 			}
 			return os << rep;
@@ -87,9 +91,9 @@ namespace cjm
 			std::ios_base::fmtflags copyMask = std::basic_ios<Char, CharTraits>::basefield | std::basic_ios<Char, CharTraits>::showbase | std::basic_ios<Char, CharTraits>::uppercase;
 			os.setf(flags & copyMask, copyMask);
 			uint128 high = item;
-			uint128 low;
+			uint128 low=0;
 			div_mod_impl(high, div, &high, &low);
-			uint128 mid;
+			uint128 mid=0;
 			div_mod_impl(high, div, &high, &mid);
 			if (high.low_part() != 0)
 			{
@@ -395,8 +399,11 @@ namespace cjm
 			size_t hash{ 0 };
 			if constexpr(sizeof(size_t) == 8)
 			{
+#pragma warning(push)
+#pragma warning (disable: 4244) //this warning pops in in msvc when compiling as 32 bit even though this if constexpr branch never taken in that case.
 				hash = low + 0x9e3779b9 + (hash << 6) + (hash >> 2);
 				hash = hi + 0x9e3779b9 + (hash << 6) + (hash >> 2);
+#pragma warning(pop)				
 			}
 			else // ReSharper disable once CppUnreachableCode
 			{
@@ -909,10 +916,12 @@ namespace cjm
                 {
                     return static_cast<natuint128_t>(lhs) * static_cast<natuint128_t>(rhs);
                 }
-//	            else if constexpr (calculation_mode == uint128_calc_mode::msvc_x64)
-//              {
-//
-//              }
+	            else if constexpr (calculation_mode == uint128_calc_mode::msvc_x64)
+	            {
+					std::uint64_t carry = 0;
+					std::uint64_t low_product = CJM_UMUL128(lhs.low_part(), rhs.low_part(), &carry);
+					return uint128::MakeUint128(lhs.low_part() * rhs.high_part() + lhs.high_part() * rhs.low_part() + carry, low_product);
+		        }
                 else // constexpr (calculation_mode == uint128_calc_mode::default_eval)
                 {
                     using int_part = uint128::int_part;

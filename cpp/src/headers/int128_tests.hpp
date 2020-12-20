@@ -15,9 +15,11 @@
 #include <boost/io/ios_state.hpp>
 #include <exception>
 #include <stdexcept>
+#include <boost/multiprecision/cpp_int.hpp>
 
 namespace cjm::uint128_tests
 {
+    using ctrl_uint128_t = boost::multiprecision::uint128_t;
     using uint128_t = numerics::uint128;
     using namespace numerics::uint128_literals;
     using namespace std::string_literals;
@@ -29,9 +31,15 @@ namespace cjm::uint128_tests
     template<typename Invocable>
     void execute_test(Invocable test, std::string_view test_name);
 
+    ctrl_uint128_t to_ctrl(uint128_t convert);
+    uint128_t to_test(const ctrl_uint128_t& convert);
+	
     void execute_uint128_tests();
     void execute_basic_test_one();
     void execute_string_parse_test();
+    void execute_basic_multiplication_test();
+
+    void test_interconversion(const ctrl_uint128_t& control, uint128_t test);
 }
 
 template<typename Invocable>

@@ -5,7 +5,10 @@
 #pragma intrinsic(_umul128)
 #ifndef CJM_MSC_X64
 #define CJM_MSC_X64
+#define CJM_UMUL128 _umul128
 #endif
+#else
+#define CJM_UMUL128 cjm_bad_umul128
 #endif
 #include <cmath>
 #include <limits>
@@ -26,6 +29,9 @@ namespace cjm
 	
 	namespace numerics
 	{
+		//alternate declarations for cjm_intrinsic_macros ... never defined because never used but need something that won't blow compiler up
+		//when examining untaken if constexpr branch.
+		extern unsigned long long cjm_bad_umul128(unsigned long long multiplicand, unsigned long long multiplicand_two, unsigned long long* carry);
 		class uint128;
 	    constexpr bool has_msc_x64 =
 #ifdef CJM_MSC_X64
