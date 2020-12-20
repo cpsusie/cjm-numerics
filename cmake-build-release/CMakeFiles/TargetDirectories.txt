@@ -1,3 +1,0 @@
-/home/cpsusie/CLionProjects/Int128/cmake-build-release/CMakeFiles/rebuild_cache.dir
-/home/cpsusie/CLionProjects/Int128/cmake-build-release/CMakeFiles/edit_cache.dir
-/home/cpsusie/CLionProjects/Int128/cmake-build-release/CMakeFiles/Int128.dir

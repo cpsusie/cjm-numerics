@@ -67,6 +67,18 @@ namespace cjm::numerics
     template<typename LimbType>
     class fixed_uint;
 
+    constexpr uint128_calc_mode calculation_mode = init_eval_mode();
+
+    namespace internal
+    {
+        constexpr int fls_int_part(std::uint64_t n) noexcept;
+
+        constexpr int fls_slow(std::uint64_t n) noexcept;
+
+        template <typename T>
+        constexpr void step(T& n, int& pos, int shift) noexcept;
+    }
+	
     template <typename Char = char, typename CharTraits=std::char_traits<Char>, typename Allocator = std::allocator<Char>>
             requires cjm::numerics::concepts::char_with_traits_and_allocator<Char, CharTraits, Allocator>
     std::basic_ostream<Char, CharTraits>& operator<<(std::basic_ostream<Char, CharTraits>& os, uint128 v);
@@ -81,7 +93,7 @@ namespace cjm::numerics
     constexpr uint128 operator-(uint128 operand) noexcept;
     constexpr uint128 operator+(uint128 operand) noexcept;
     constexpr uint128 operator~(uint128 operand) noexcept;
-    constexpr uint128 operator!(uint128 operand) noexcept;
+    constexpr bool operator!(uint128 operand) noexcept;
     //Logical operators
     constexpr uint128 operator&(uint128 lhs, uint128 rhs) noexcept;
     constexpr uint128 operator|(uint128 lhs, uint128 rhs) noexcept;
@@ -165,18 +177,19 @@ namespace cjm::numerics
                        u128_str_format::Decimal :
                        u128_str_format::Illegal;
             }
-            sv firstTwo = string.substr(0, 2);
+            std::basic_string_view<Chars, CharTraits>  orig_view = string;
+            auto firstTwo = orig_view.substr(0, 2);
             auto hex_tags = get_hex_tags();
             bool hasHexTag = std::any_of(hex_tags.cbegin(), hex_tags.cend(), [=](sv tag) -> bool { return tag == firstTwo; });
             if (!hasHexTag)
             {
-                return string[0] != zero_cast && std::all_of(string.cbegin(), string.cend(),
+                return orig_view[0] != zero_cast && std::all_of(orig_view.cbegin(), orig_view.cend(),
                                                        [](char_t c) -> bool { return static_cast<char>(c) >= 0x30 && static_cast<char>(c) <= 0x39; })
                        ?	u128_str_format::Decimal :
                        u128_str_format::Illegal;
             }
-            sv afterFirstTwo = string.substr(2, string.length() - 2);
-            return std::all_of(afterFirstTwo.cbegin(), afterFirstTwo.cend(), [](char c) -> bool {return is_legal_hex_char(c); })
+            sv afterFirstTwo = orig_view.substr(2, string.length() - 2);
+            return std::all_of(afterFirstTwo.cbegin(), afterFirstTwo.cend(), [](char_t c) -> bool {return is_legal_hex_char(c); })
                    ?	u128_str_format::Hexadecimal :
                    u128_str_format::Illegal;
         }
@@ -300,7 +313,8 @@ namespace cjm::numerics
                 requires cjm::numerics::concepts::char_with_traits<Chars, CharTraits>
         static uint128 make_from_string(std::basic_string_view<Chars, CharTraits> parseMe);
         static constexpr uint128 make_from_bytes_little_endian(byte_array bytes) noexcept;
-        static constexpr uint128 make_from_bytes_big_endian(byte_array bytes) noexcept;
+        //todo fixit implement:
+    	//static constexpr uint128 make_from_bytes_big_endian(byte_array bytes) noexcept;
         static constexpr uint128 MakeUint128(std::uint64_t high, std::uint64_t low) noexcept;
 
         static void instrumented_div_mod(std::basic_ostream<char>& stream, uint128 dividend, uint128 divisor,
@@ -391,25 +405,28 @@ namespace cjm::numerics
         constexpr uint128(int_part high, int_part low) noexcept;
         static constexpr size_t calculate_hash(int_part hi, int_part low) noexcept;
         static constexpr void hash_combine(size_t& seed, size_t newVal) noexcept;
+        
         static constexpr void div_mod_impl(uint128 dividend, uint128 divisor,
             uint128* quotient_ret, uint128* remainder_ret);
         template<typename T>
-        static constexpr void step(T& n, int& pos, int shift);
-        static constexpr int fls(uint128 n);
-        static constexpr int fls_int_part(std::uint64_t n);
+        static constexpr void step(T& n, int& pos, int shift) noexcept;
+        static constexpr int fls(uint128 n) noexcept;
+       
         template<typename Char, typename CharTraits = std::char_traits<Char>, typename Allocator = std::allocator<Char>>
         requires cjm::numerics::concepts::char_with_traits_and_allocator<Char, CharTraits, Allocator>
         static std::basic_string<Char, CharTraits, Allocator> to_string(uint128 item, std::ios_base::fmtflags flags);
 
 
 #if CJM_NUMERICS_LITTLE_ENDIAN
-        int_part m_low{};
-        int_part m_high{};
+        int_part m_low;
+        int_part m_high;
 #else //BIG ENDIAN
-        int_part m_high{};
-        int_part m_low{};
+        int_part m_high;
+        int_part m_low;
 #endif
     };
+    static_assert(std::is_trivial_v<uint128>, "Needs to be a trivial type.");
+
 }
 namespace std
 { //fixme todo --- get rid of the traits overloads -- undefined behavior
@@ -523,6 +540,13 @@ namespace cjm
 {
 	namespace numerics
 	{
+		namespace literals
+		{
+			constexpr size_t operator"" _szt(unsigned long long val)
+			{
+                return static_cast<size_t>(val);
+			}
+		}
 		namespace fixed_uint_literals
 		{
 			class fixed_uint_lit_helper;

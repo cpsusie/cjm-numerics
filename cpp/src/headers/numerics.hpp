@@ -1,5 +1,18 @@
 #ifndef CJM_NUMERICS_HPP
 #define CJM_NUMERICS_HPP
+#if defined(_MSC_VER) && defined(_M_X64)
+#include <intrin.h>
+#pragma intrinsic(_umul128)
+#pragma intrinsic(_BitScanReverse64)
+#ifndef CJM_MSC_X64
+#define CJM_MSC_X64
+#define CJM_UMUL128 _umul128
+#define CJM_BITSCAN_REV_64 _BitScanReverse64
+#endif
+#else
+#define CJM_UMUL128 cjm_bad_umul128
+#define CJM_BITSCAN_REV_64 cjm_badrev_bitscan_64
+#endif
 #include <cmath>
 #include <limits>
 #include <type_traits>
@@ -8,29 +21,83 @@
 // ReSharper disable once CppUnusedIncludeDirective
 #include <boost/functional/hash.hpp>
 #include <numeric>
+#include <cstring>
+#include "cjm_numeric_concepts.hpp"
+#ifdef __cpp_lib_bit_cast
+#include <bit>
+#endif
 
 namespace cjm
 {
+	
 	namespace numerics
 	{
+		//alternate declarations for cjm_intrinsic_macros ... never defined because never used but need something that won't blow compiler up
+		//when examining untaken if constexpr branch.
+		extern unsigned char cjm_badrev_bitscan_64(unsigned long* index, std::uint64_t mask);
+	    extern std::uint64_t cjm_bad_umul128(std::uint64_t multiplicand, std::uint64_t multiplicand_two, std::uint64_t* carry);
+		class uint128;
+	    constexpr bool has_msc_x64 =
+#ifdef CJM_MSC_X64
+        true;
+#else
+	    false;
+#endif
+
 	    constexpr bool has_intrinsic_u128 =
 #ifdef __SIZEOF_INT128__
         true;
+		using uint128_align_t = unsigned __int128;
+		using natuint128_t = unsigned __int128;
 #ifndef CJM_HAVE_BUILTIN_128
 #define CJM_HAVE_BUILTIN_128
 #endif
 #else
 	    false;
+		using uint128_align_t = std::uint64_t;
+		using natuint128_t = uint128;
 #ifdef CJM_HAVE_BUILTIN_128
 #undef CJM_HAVE_BUILTIN_128
 #endif
 #endif
-	    constexpr size_t uint128_align = has_intrinsic_u128 ? alignof(unsigned __int128) : alignof(std::uint64_t);
+	    constexpr size_t uint128_align = alignof(uint128_align_t);
 
 
+		
 
-		class uint128;
-				
+		enum class uint128_calc_mode : std::uint8_t
+        {
+		    default_eval = 0x00,
+		    msvc_x64,
+		    intrinsic_u128,
+        };
+		constexpr uint128_calc_mode init_eval_mode() noexcept;
+
+#ifdef __cpp_lib_bit_cast
+		template<typename To, typename From>
+	       requires cjm::numerics::concepts::bit_castable<To, From>
+	    constexpr To bit_cast(const From& f) noexcept
+	    {
+	        return std::bit_cast<To, From>(f);
+	    }
+#else
+        template<typename To, typename From>
+            requires cjm::numerics::concepts::bit_castable<To, From>
+        To bit_cast(const From& f) noexcept
+        {
+            //GCC seems to get all butthurt about private member variables even if type is trivial.
+            //All c++ standard requires is trivially copyable and same size (and non-overlapping).  the concepts here
+            //enforce MORE than that requirement (also require triviality in general and alignment same)
+            //Suppressing because uint128 is a type that is trivially copyable-to.
+            To dst =0;
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wclass-memaccess"
+            std::memcpy(&dst, &f, sizeof(To));  /* no diagnostic for this one */
+#pragma GCC diagnostic pop
+            return dst;
+        }
+#endif
+
 		using uint128_alt = boost::multiprecision::uint128_t;
 		using int128 = boost::multiprecision::int128_t;
 		using uint256 = boost::multiprecision::uint256_t;
@@ -67,7 +134,30 @@ namespace cjm
 			
 			
 		}
+		#pragma warning(push)
+		#pragma warning (disable:4068) 
+        #pragma clang diagnostic push
+        #pragma ide diagnostic ignored "UnreachableCode"
+        constexpr uint128_calc_mode init_eval_mode() noexcept
+        {
+            if constexpr (has_intrinsic_u128)
+            {
+                return uint128_calc_mode::intrinsic_u128;
+            }
+            else if constexpr (has_msc_x64)
+            {
+                return uint128_calc_mode::msvc_x64;
+            }
+            else
+            {
+                return uint128_calc_mode::default_eval;
+            }
+        }
+        #pragma clang diagnostic pop
+		#pragma warning(pop)
 	}
+
+	
 }
 
 
@@ -80,7 +170,7 @@ namespace std
 	template<>
 	class numeric_limits<cjm::numerics::uint128>;
 
-	template <>
+	/*template <>
 	struct is_arithmetic <cjm::numerics::uint128>;
 
 	template <> struct is_integral<cjm::numerics::uint128>;
@@ -226,7 +316,7 @@ namespace std
 
 	template<>
 	struct is_floating_point<cjm::numerics::norm_decimal> : std::conditional_t<std::numeric_limits<cjm::numerics::norm_decimal>::is_integer,
-		std::false_type, std::true_type> {};
+		std::false_type, std::true_type> {};*/
 
 }
 
