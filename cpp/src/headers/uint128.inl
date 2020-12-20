@@ -513,7 +513,7 @@ namespace cjm
 				{
 					assert(n != 0);
 					unsigned long result = 0;
-					unsigned char res = CJM_BITSCAN_REV_64(&result, n);
+					[[maybe_unused]] unsigned char res = CJM_BITSCAN_REV_64(&result, n);
 					assert(res != 0);
 					return static_cast<int>(result);
 				}
