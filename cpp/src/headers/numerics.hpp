@@ -85,7 +85,7 @@ namespace cjm
             requires cjm::numerics::concepts::bit_castable<To, From>
         To bit_cast(const From& f) noexcept
         {
-            //GCC seems to get all but hurt about private member variables even if type is trivial.
+            //GCC seems to get all butthurt about private member variables even if type is trivial.
             //All c++ standard requires is trivially copyable and same size (and non-overlapping).  the concepts here
             //enforce MORE than that requirement (also require triviality in general and alignment same)
             //Suppressing because uint128 is a type that is trivially copyable-to.
