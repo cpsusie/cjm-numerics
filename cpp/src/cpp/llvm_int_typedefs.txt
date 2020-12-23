@@ -128,3 +128,59 @@ typedef union {
 
 typedef union {
   udwords u;
+double f;
+} double_bits;
+
+typedef struct {
+#if _YUGA_LITTLE_ENDIAN
+  udwords low;
+  udwords high;
+#else
+  udwords high;
+  udwords low;
+#endif // _YUGA_LITTLE_ENDIAN
+} uqwords;
+
+// Check if the target supports 80 bit extended precision long doubles.
+// Notably, on x86 Windows, MSVC only provides a 64-bit long double, but GCC
+// still makes it 80 bits. Clang will match whatever compiler it is trying to
+// be compatible with. On 32-bit x86 Android, long double is 64 bits, while on
+// x86_64 Android, long double is 128 bits.
+#if (defined(__i386__) || defined(__x86_64__)) &&                              \
+    !(defined(_MSC_VER) || defined(__ANDROID__))
+#define HAS_80_BIT_LONG_DOUBLE 1
+#elif defined(__m68k__) || defined(__ia64__)
+#define HAS_80_BIT_LONG_DOUBLE 1
+#else
+#define HAS_80_BIT_LONG_DOUBLE 0
+#endif
+
+typedef union {
+  uqwords u;
+  long double f;
+} long_double_bits;
+
+#if __STDC_VERSION__ >= 199901L
+typedef float _Complex Fcomplex;
+typedef double _Complex Dcomplex;
+typedef long double _Complex Lcomplex;
+
+#define COMPLEX_REAL(x) __real__(x)
+#define COMPLEX_IMAGINARY(x) __imag__(x)
+#else
+typedef struct {
+  float real, imaginary;
+} Fcomplex;
+
+typedef struct {
+  double real, imaginary;
+} Dcomplex;
+
+typedef struct {
+  long double real, imaginary;
+} Lcomplex;
+
+#define COMPLEX_REAL(x) (x).real
+#define COMPLEX_IMAGINARY(x) (x).imaginary
+#endif
+#endif // INT_TYPES_H
