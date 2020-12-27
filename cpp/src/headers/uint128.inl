@@ -542,6 +542,11 @@ namespace cjm
 			return static_cast<int>((std::uint64_t{ 0x3333333322221100 } >> (n32 << 2) & 0x3) + pos);
 		}
 
+		constexpr auto operator<=>(uint128 lhs, uint128 rhs) noexcept
+		{
+			return lhs == rhs ? 0 : ((lhs > rhs) ? 1 : -1);
+		}
+
 		constexpr bool operator==(uint128 lhs, uint128 rhs) noexcept
 		{
 			return lhs.high_part() == rhs.high_part() && lhs.low_part() == rhs.low_part();

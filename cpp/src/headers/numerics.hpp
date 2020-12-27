@@ -5,7 +5,7 @@
 #pragma intrinsic(_umul128)
 #pragma intrinsic(_BitScanReverse64)
 #pragma intrinsic(__lzcnt64)
-#pragma intrinsic(_udiv128)
+#pragma intrinsic(_udiv128)  // NOLINT(clang-diagnostic-ignored-pragma-intrinsic)
 #ifndef CJM_MSC_X64
 #define CJM_MSC_X64
 #define CJM_UMUL128 _umul128

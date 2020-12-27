@@ -70,6 +70,8 @@ namespace cjm::uint128_tests
     void test_fls();
 
     void test_interconversion(const ctrl_uint128_t& control, uint128_t test);
+
+	
 }
 
 template<typename Invocable>

@@ -98,6 +98,7 @@ namespace cjm::numerics
             requires cjm::numerics::concepts::char_with_traits_and_allocator<Char, CharTraits, Allocator>
     std::basic_ostream<Char, CharTraits>& operator<<(std::basic_ostream<Char, CharTraits>& os, uint128 v);
     //Comparison operators
+    constexpr auto operator <=>(uint128 lhs, uint128 rhs) noexcept; 
     constexpr bool operator==(uint128 lhs, uint128 rhs) noexcept;
     constexpr bool operator!=(uint128 lhs, uint128 rhs) noexcept;
     constexpr bool operator>(uint128 lhs, uint128 rhs) noexcept;
