@@ -228,6 +228,7 @@ void uint128::div_mod_msc_x64_impl(uint128 dividend, uint128 divisor, uint128* q
 #else
 void uint128::div_mod_msc_x64_impl([[maybe_unused]]uint128 dividend,[[maybe_unused]] uint128 divisor, uint128* quotient_ret, uint128* remainder_ret)
 {
+    //do nothing ... in gcc this never gets called but still needs to be there
     *quotient_ret =0;
     *remainder_ret = 0;
 }
