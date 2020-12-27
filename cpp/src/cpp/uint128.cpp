@@ -150,7 +150,7 @@ cjm::numerics::uint128::uint128(__uint128_t other) noexcept
     *this = cjm::numerics::bit_cast<uint128, unsigned __int128>(other);
 }
 #endif
-
+#if defined(_MSC_VER) && defined(_M_X64)
 void uint128::div_mod_msc_x64_impl(uint128 dividend, uint128 divisor, uint128* quotient_ret, uint128* remainder_ret)
 {
 	constexpr size_t n_utword_bits = sizeof(uint128) * CHAR_BIT;
@@ -225,3 +225,10 @@ void uint128::div_mod_msc_x64_impl(uint128 dividend, uint128 divisor, uint128* q
 	*quotient_ret = quotient;
 	return;
 }
+#else
+void uint128::div_mod_msc_x64_impl([[maybe_unused]]uint128 dividend,[[maybe_unused]] uint128 divisor, uint128* quotient_ret, uint128* remainder_ret)
+{
+    *quotient_ret =0;
+    *remainder_ret = 0;
+}
+#endif
