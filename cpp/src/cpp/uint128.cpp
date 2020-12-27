@@ -150,11 +150,29 @@ cjm::numerics::uint128::uint128(__uint128_t other) noexcept
     *this = cjm::numerics::bit_cast<uint128, unsigned __int128>(other);
 }
 #endif
+
+//This method is based on the 128-bit unsigned integer division
+//provided by clang / LLVM for a built-in unsigned __int128 type
+//the original version from which this was based can be found in the
+//source repository in the file "Llvm_u128div.txt" The original is
+//part of the LLVM project, licensed to CJM Screws, LLC under
+//the Apache-2.0 license with LLVM exceptions.  No copyright claimed
+//by CJM Screws, LLC to the original, unaltered form of the LLVM code.
+//Here, it was modified to use microsoft's intrinsic functions in place
+//of GCC/Clang intrinsic functions as well as to use a compiler intrinsic
+//for the most optimized path of the algorithm rather than inline assembly
+//language (because 1- x64 Microsoft does not support inline assembly and 2-
+//because compiler can deal with intrinsics more efficiently than either
+//inline or separately written assembly).
+//Also, the clang version used unions for type punning which 1-
+//(though allowed in C) is undefined behavior in C++ and 2- isn't necessary
+//anyway because this function is a static member of uint128 and has
+//direct access to its m_high and m_low members anyway.
 #if defined(_MSC_VER) && defined(_M_X64)
 void uint128::div_mod_msc_x64_impl(uint128 dividend, uint128 divisor, uint128* quotient_ret, uint128* remainder_ret)
 {
 	constexpr size_t n_utword_bits = sizeof(uint128) * CHAR_BIT;
-	assert(quotient_ret != nullptr && remainder_ret != nullptr);
+	assert(quotient_ret != nullptr && remainder_ret != nullptr && divisor != 0);
 	uint128 quotient=0;
 	uint128 remainder=0;
 	if (divisor > dividend)
