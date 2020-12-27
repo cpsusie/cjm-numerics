@@ -19,18 +19,8 @@ namespace
 		return ret;
 	}
 
-	constexpr inline ones_arr ones_lookup = init_ones_lookup();
+	constexpr inline ones_arr ones_lookup = init_ones_lookup();	
 	
-	constexpr cjm::numerics::uint128 get_ones_for_sim_signed_rshift(int num_ones)
-	{
-		assert(num_ones > -1 && num_ones <= 128);
-		constexpr uint128 max_value = 0xffff'ffff'ffff'ffff'ffff'ffff'ffff'ffff_u128;
-		if (num_ones == 0)
-		{
-			return 0;
-		}
-		return max_value << (128 - num_ones);
-	}
 }
 
 constexpr cjm::numerics::uint128 GetZero() noexcept
@@ -198,8 +188,8 @@ void uint128::div_mod_msc_x64_impl(uint128 dividend, uint128 divisor, uint128* q
 		return;		
 	}
 	// 0 <= shift <= 63.
-	unsigned long high_shift = CJM_BITSCAN_64(divisor.m_high);
-	unsigned long low_shift = CJM_BITSCAN_64(divisor.m_low);
+	auto high_shift = CJM_BITSCAN_64(divisor.m_high);
+	auto low_shift = CJM_BITSCAN_64(divisor.m_low);
 	auto shift = static_cast<long>(high_shift) - static_cast<long>(low_shift);
 	//auto shift =
 	//	__builtin_clzll(divisor.s.high) - __builtin_clzll(dividend.s.high);
