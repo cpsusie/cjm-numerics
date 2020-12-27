@@ -23,7 +23,15 @@
 #include <limits>
 #include <type_traits>
 #include <boost/multiprecision/cpp_int.hpp>
+#ifdef  __clang__
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wunused-parameter"
 #include <boost/multiprecision/cpp_dec_float.hpp>
+#pragma clang diagnostic pop
+#else
+#include <boost/multiprecision/cpp_dec_float.hpp>
+#endif
+
 // ReSharper disable once CppUnusedIncludeDirective
 #include <boost/functional/hash.hpp>
 #include <numeric>
@@ -100,11 +108,15 @@ namespace cjm
             //All c++ standard requires is trivially copyable and same size (and non-overlapping).  the concepts here
             //enforce MORE than that requirement (also require triviality in general and alignment same)
             //Suppressing because uint128 is a type that is trivially copyable-to.
-            To dst =0;
+            auto dst = To{};
+#if  (defined(__GNUC__) && !defined(__clang__))
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wclass-memaccess"
             std::memcpy(&dst, &f, sizeof(To));  /* no diagnostic for this one */
 #pragma GCC diagnostic pop
+#else
+            std::memcpy(&dst, &f, sizeof(To));
+#endif
             return dst;
         }
 #endif

@@ -68,13 +68,13 @@ void cjm::uint128_tests::execute_string_parse_test()
         cjm_assert(y == test_dec);
         cjm_assert(x == y);
     }
-#if defined __clang__ || defined _MSC_VER
+#if (defined _MSC_VER)
     {
-        constexpr std::u8string_view u8as_hex = u8"0xc0ded00dfacecafebabeb00bfea2dad0";
+        [[maybe_unused]] constexpr std::u8string_view u8as_hex = u8"0xc0ded00dfacecafebabeb00bfea2dad0";
         constexpr std::u8string_view u8as_dec = u8"256368684942083501355085096987188714192";
-        constexpr std::u8string_view u16as_hex = u8"0xc0ded00dfacecafebabeb00bfea2dad0";
+        [[maybe_unused]] constexpr std::u8string_view u16as_hex = u8"0xc0ded00dfacecafebabeb00bfea2dad0";
         constexpr std::u8string_view u16as_dec = u8"256368684942083501355085096987188714192";
-        constexpr std::u8string_view u32as_hex = u8"0xc0ded00dfacecafebabeb00bfea2dad0";
+        [[maybe_unused]] constexpr std::u8string_view u32as_hex = u8"0xc0ded00dfacecafebabeb00bfea2dad0";
         constexpr std::u8string_view u32as_dec = u8"256368684942083501355085096987188714192";
 
         uint128_t x = test_hex;
@@ -171,7 +171,7 @@ void cjm::uint128_tests::execute_basic_multiplication_test()
 
         uint128_t back_test_div_res = fit_times_big_one / big_one;
     	cout    << "back_test_div_res := [0x" << std::hex << std::setw(32)
-				<< std::setfill('0') << back_test_div_big << "]" << newl;
+				<< std::setfill('0') << back_test_div_res << "]" << newl;
     	
     	cjm_assert(back_test_div_big == fit_times_big_one / big_one);
     }

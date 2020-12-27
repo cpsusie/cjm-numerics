@@ -18,8 +18,8 @@ namespace
 		}
 		return ret;
 	}
-
-	constexpr inline ones_arr ones_lookup = init_ones_lookup();	
+    [[maybe_unused]]
+    constexpr inline ones_arr ones_lookup = init_ones_lookup();
 	
 }
 

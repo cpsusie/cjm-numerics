@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6"/>
+	<Project>
+		<Option title="Int128"/>
+		<Option makefile_is_custom="1"/>
+		<Option compiler="clang"/>
+		<Option virtualFolders="CMake Files\;CMake Files\..\;CMake Files\..\..\;CMake Files\..\..\vcpkg-master\;CMake Files\..\..\vcpkg-master\scripts\;CMake Files\..\..\vcpkg-master\scripts\buildsystems\;"/>
+		<Build>
+			<Target title="all">
+				<Option working_dir="/home/cpsusie/CLionProjects/Int128/cmake-build-release-clang"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j6 -f &quot;/home/cpsusie/CLionProjects/Int128/cmake-build-release-clang/Makefile&quot;  VERBOSE=1 all"/>
+					<CompileFile command="/usr/bin/make -j6 -f &quot;/home/cpsusie/CLionProjects/Int128/cmake-build-release-clang/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j6 -f &quot;/home/cpsusie/CLionProjects/Int128/cmake-build-release-clang/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j6 -f &quot;/home/cpsusie/CLionProjects/Int128/cmake-build-release-clang/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="rebuild_cache">
+				<Option working_dir="/home/cpsusie/CLionProjects/Int128/cmake-build-release-clang"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j6 -f &quot;/home/cpsusie/CLionProjects/Int128/cmake-build-release-clang/Makefile&quot;  VERBOSE=1 rebuild_cache"/>
+					<CompileFile command="/usr/bin/make -j6 -f &quot;/home/cpsusie/CLionProjects/Int128/cmake-build-release-clang/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j6 -f &quot;/home/cpsusie/CLionProjects/Int128/cmake-build-release-clang/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j6 -f &quot;/home/cpsusie/CLionProjects/Int128/cmake-build-release-clang/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="edit_cache">
+				<Option working_dir="/home/cpsusie/CLionProjects/Int128/cmake-build-release-clang"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j6 -f &quot;/home/cpsusie/CLionProjects/Int128/cmake-build-release-clang/Makefile&quot;  VERBOSE=1 edit_cache"/>
+					<CompileFile command="/usr/bin/make -j6 -f &quot;/home/cpsusie/CLionProjects/Int128/cmake-build-release-clang/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j6 -f &quot;/home/cpsusie/CLionProjects/Int128/cmake-build-release-clang/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j6 -f &quot;/home/cpsusie/CLionProjects/Int128/cmake-build-release-clang/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="Int128">
+				<Option output="/home/cpsusie/CLionProjects/Int128/cmake-build-release-clang/Int128" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/cpsusie/CLionProjects/Int128/cmake-build-release-clang"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="clang"/>
+				<Compiler>
+					<Add directory="/home/cpsusie/CLionProjects/Int128/cpp/src/cpp"/>
+					<Add directory="/home/cpsusie/CLionProjects/Int128/cpp/src/headers"/>
+					<Add directory="/home/cpsusie/vcpkg-master/installed/x64-linux/include"/>
+					<Add directory="/usr/bin/../lib/gcc/x86_64-linux-gnu/10/../../../../include/c++/10"/>
+					<Add directory="/usr/bin/../lib/gcc/x86_64-linux-gnu/10/../../../../include/x86_64-linux-gnu/c++/10"/>
+					<Add directory="/usr/bin/../lib/gcc/x86_64-linux-gnu/10/../../../../include/c++/10/backward"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/lib/llvm-10/lib/clang/10.0.0/include"/>
+					<Add directory="/usr/include/x86_64-linux-gnu"/>
+					<Add directory="/usr/include"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/9/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j6 -f &quot;/home/cpsusie/CLionProjects/Int128/cmake-build-release-clang/Makefile&quot;  VERBOSE=1 Int128"/>
+					<CompileFile command="/usr/bin/make -j6 -f &quot;/home/cpsusie/CLionProjects/Int128/cmake-build-release-clang/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j6 -f &quot;/home/cpsusie/CLionProjects/Int128/cmake-build-release-clang/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j6 -f &quot;/home/cpsusie/CLionProjects/Int128/cmake-build-release-clang/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="Int128/fast">
+				<Option output="/home/cpsusie/CLionProjects/Int128/cmake-build-release-clang/Int128" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/cpsusie/CLionProjects/Int128/cmake-build-release-clang"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="clang"/>
+				<Compiler>
+					<Add directory="/home/cpsusie/CLionProjects/Int128/cpp/src/cpp"/>
+					<Add directory="/home/cpsusie/CLionProjects/Int128/cpp/src/headers"/>
+					<Add directory="/home/cpsusie/vcpkg-master/installed/x64-linux/include"/>
+					<Add directory="/usr/bin/../lib/gcc/x86_64-linux-gnu/10/../../../../include/c++/10"/>
+					<Add directory="/usr/bin/../lib/gcc/x86_64-linux-gnu/10/../../../../include/x86_64-linux-gnu/c++/10"/>
+					<Add directory="/usr/bin/../lib/gcc/x86_64-linux-gnu/10/../../../../include/c++/10/backward"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/lib/llvm-10/lib/clang/10.0.0/include"/>
+					<Add directory="/usr/include/x86_64-linux-gnu"/>
+					<Add directory="/usr/include"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/9/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j6 -f &quot;/home/cpsusie/CLionProjects/Int128/cmake-build-release-clang/Makefile&quot;  VERBOSE=1 Int128/fast"/>
+					<CompileFile command="/usr/bin/make -j6 -f &quot;/home/cpsusie/CLionProjects/Int128/cmake-build-release-clang/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j6 -f &quot;/home/cpsusie/CLionProjects/Int128/cmake-build-release-clang/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j6 -f &quot;/home/cpsusie/CLionProjects/Int128/cmake-build-release-clang/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+		</Build>
+		<Unit filename="/home/cpsusie/CLionProjects/Int128/cpp/src/cpp/int128_tests.cpp">
+			<Option target="Int128"/>
+		</Unit>
+		<Unit filename="/home/cpsusie/CLionProjects/Int128/cpp/src/cpp/program.cpp">
+			<Option target="Int128"/>
+		</Unit>
+		<Unit filename="/home/cpsusie/CLionProjects/Int128/cpp/src/cpp/testing.cpp">
+			<Option target="Int128"/>
+		</Unit>
+		<Unit filename="/home/cpsusie/CLionProjects/Int128/cpp/src/cpp/uint128.cpp">
+			<Option target="Int128"/>
+		</Unit>
+		<Unit filename="/home/cpsusie/CLionProjects/Int128/cpp/src/headers/cjm_numeric_concepts.hpp">
+			<Option target="Int128"/>
+		</Unit>
+		<Unit filename="/home/cpsusie/CLionProjects/Int128/CMakeLists.txt">
+			<Option virtualFolder="CMake Files\"/>
+		</Unit>
+		<Unit filename="/home/cpsusie/CLionProjects/Int128/../../vcpkg-master/scripts/buildsystems/vcpkg.cmake">
+			<Option virtualFolder="CMake Files\..\..\vcpkg-master\scripts\buildsystems\"/>
+		</Unit>
+	</Project>
+</CodeBlocks_project_file>
