@@ -16,7 +16,7 @@
 #else
 #define CJM_UMUL128 internal::cjm_bad_umul128
 #define CJM_BITSCAN_REV_64 internal::cjm_badrev_bitscan_64
-#define CJM_BITSCAN_64 internal::cjm_bad_lzcnt_64
+#define CJM_LZCNT_64 internal::cjm_bad_lzcnt_64
 #define CJM_UDIV128 internal::cjm_bad_udiv128;
 #endif
 #include <cmath>
