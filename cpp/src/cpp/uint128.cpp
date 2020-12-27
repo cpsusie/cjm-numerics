@@ -9,7 +9,7 @@ namespace
 	constexpr uint128 all_ones = 0xffff'ffff'ffff'ffff'ffff'ffff'ffff'ffff_u128;
 	constexpr ones_arr init_ones_lookup() noexcept
 	{
-		ones_arr ret;
+		auto ret = ones_arr{};
 		uint128 ones = all_ones;
 		for (auto i = 128; i > -1; --i)
 		{
@@ -219,19 +219,13 @@ void uint128::div_mod_msc_x64_impl(uint128 dividend, uint128 divisor, uint128* q
 	for (; shift >= 0; --shift) 
 	{
 		quotient.m_low <<= 1;
-		// Branch free version of.
-		// if (dividend.all >= divisor.all)
-		// {
-		//    dividend.all -= divisor.all;
-		//    carry = 1;
-		// }
 		auto to_right_shift = divisor - dividend - 1;
 		auto right_shift_amount = static_cast<long>(n_utword_bits) - 1;
 		assert(right_shift_amount <= 128 && right_shift_amount >= 0);
 		auto s =
 			to_right_shift >> right_shift_amount;
 		//if signed, would be negative, so or in ones to the left
-		if (s & 0x8000'0000'0000'0000'0000'0000'0000'0000_u128 != 0)
+		if (to_right_shift & 0x8000'0000'0000'0000'0000'0000'0000'0000_u128 != 0)
 		{
 			s |= ones_lookup[right_shift_amount];
 		}
