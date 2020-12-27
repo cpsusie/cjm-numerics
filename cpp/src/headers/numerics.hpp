@@ -4,14 +4,17 @@
 #include <intrin.h>
 #pragma intrinsic(_umul128)
 #pragma intrinsic(_BitScanReverse64)
+#pragma intrinsic(_BitScanForward64)
 #ifndef CJM_MSC_X64
 #define CJM_MSC_X64
 #define CJM_UMUL128 _umul128
 #define CJM_BITSCAN_REV_64 _BitScanReverse64
+#define CJM_BITSCAN_64 _BitScanForward64
 #endif
 #else
-#define CJM_UMUL128 cjm_bad_umul128
-#define CJM_BITSCAN_REV_64 cjm_badrev_bitscan_64
+#define CJM_UMUL128 internal::cjm_bad_umul128
+#define CJM_BITSCAN_REV_64 internal::cjm_badrev_bitscan_64
+#define CJM_BITSCAN_64 internal::cjm_bad_bitscan_64
 #endif
 #include <cmath>
 #include <limits>
@@ -32,10 +35,14 @@ namespace cjm
 	
 	namespace numerics
 	{
-		//alternate declarations for cjm_intrinsic_macros ... never defined because never used but need something that won't blow compiler up
-		//when examining untaken if constexpr branch.
-		extern unsigned char cjm_badrev_bitscan_64(unsigned long* index, std::uint64_t mask);
-	    extern std::uint64_t cjm_bad_umul128(std::uint64_t multiplicand, std::uint64_t multiplicand_two, std::uint64_t* carry);
+		namespace internal
+		{
+			//alternate declarations for cjm_intrinsic_macros ... never defined because never used but need something that won't blow compiler up
+			//when examining untaken if constexpr branch.
+			extern unsigned char cjm_badrev_bitscan_64(unsigned long* index, std::uint64_t mask);
+			extern unsigned char cjm_bad_bitscan_64(unsigned long* index, std::uint64_t mask);
+			extern std::uint64_t cjm_bad_umul128(std::uint64_t multiplicand, std::uint64_t multiplicand_two, std::uint64_t* carry);
+		}
 		class uint128;
 	    constexpr bool has_msc_x64 =
 #ifdef CJM_MSC_X64
