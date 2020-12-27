@@ -66,7 +66,13 @@ namespace cjm::numerics
 {
     template<typename LimbType>
     class fixed_uint;
-
+    /// <summary>
+    /// The calculation mode used when not constant evaluating uint128s.
+    /// For GCC and Clang, if a built-in uint128_t is available, that logic is used.
+    /// On microsoft x64 (Intel/AMD), compiler intrinsics are used
+    /// Otherwise, the --presumably-- slower, constant-evaluation-capable
+    /// algorithm is used.
+    /// </summary>
     constexpr uint128_calc_mode calculation_mode = init_eval_mode();
 
     namespace internal
@@ -78,7 +84,16 @@ namespace cjm::numerics
         template <typename T>
         constexpr void step(T& n, int& pos, int shift) noexcept;
     }
-	
+
+    /// <summary>
+    /// Stream insertion operator for uint128
+    /// </summary>
+    /// <typeparam name="Char">The Character type</typeparam>
+    /// <typeparam name="CharTraits">traits for character</typeparam>
+    /// <typeparam name="Allocator">allocator for character</typeparam>
+    /// <param name="os">the stream to insert</param>
+    /// <param name="v">the value to stringify and insert into the stream</param>
+    /// <returns>the stream with the value inserted.</returns>
     template <typename Char = char, typename CharTraits=std::char_traits<Char>, typename Allocator = std::allocator<Char>>
             requires cjm::numerics::concepts::char_with_traits_and_allocator<Char, CharTraits, Allocator>
     std::basic_ostream<Char, CharTraits>& operator<<(std::basic_ostream<Char, CharTraits>& os, uint128 v);
@@ -411,7 +426,8 @@ namespace cjm::numerics
         template<typename T>
         static constexpr void step(T& n, int& pos, int shift) noexcept;
         static constexpr int fls(uint128 n) noexcept;
-       
+        static void div_mod_msc_x64_impl(uint128 dividend, uint128 divisor,
+            uint128 * quotient_ret, uint128 * remainder_ret);
         template<typename Char, typename CharTraits = std::char_traits<Char>, typename Allocator = std::allocator<Char>>
         requires cjm::numerics::concepts::char_with_traits_and_allocator<Char, CharTraits, Allocator>
         static std::basic_string<Char, CharTraits, Allocator> to_string(uint128 item, std::ios_base::fmtflags flags);

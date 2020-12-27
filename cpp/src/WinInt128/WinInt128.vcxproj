@@ -195,6 +195,10 @@
     <None Include="..\headers\numerics.inl" />
     <None Include="..\headers\uint128.inl" />
   </ItemGroup>
+  <ItemGroup>
+    <Text Include="..\cpp\llvm_int_typedefs.txt" />
+    <Text Include="..\cpp\Llvm_u128div.txt" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
     <Import Project="$(VCTargetsPath)\BuildCustomizations\masm.targets" />

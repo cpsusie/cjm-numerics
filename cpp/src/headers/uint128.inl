@@ -488,6 +488,8 @@ namespace cjm
 			return internal::fls_int_part(n.low_part());
 		}
 
+		
+
 		template <typename T>
 		constexpr void internal::step(T& n, int& pos, int shift) noexcept
 		{
@@ -980,10 +982,13 @@ namespace cjm
                 {
                     return static_cast<natuint128_t>(lhs) / static_cast<natuint128_t>(rhs);
                 }
-//		        else if constexpr (calculation_mode == uint128_calc_mode::msvc_x64)
-//              {
-//
-//              }
+		        else if constexpr (calculation_mode == uint128_calc_mode::msvc_x64)
+				{
+					uint128 quotient = 0;
+					uint128 remainder = 0;
+					uint128::div_mod_msc_x64_impl(lhs, rhs, &quotient, &remainder);
+					return quotient;
+				}
                 else // constexpr (calculation_mode == uint128_calc_mode::default_eval)
                 {
                     if (rhs == 0) { throw std::domain_error("Division by zero is illegal."); }
@@ -1014,10 +1019,13 @@ namespace cjm
                 {
                     return static_cast<natuint128_t>(lhs) % static_cast<natuint128_t>(rhs);
                 }
-//		        else if constexpr (calculation_mode == uint128_calc_mode::msvc_x64)
-//              {
-//
-//              }
+				else if constexpr (calculation_mode == uint128_calc_mode::msvc_x64)
+				{
+					uint128 quotient = 0;
+					uint128 remainder = 0;
+					uint128::div_mod_msc_x64_impl(lhs, rhs, &quotient, &remainder);
+					return remainder;
+				}
                 else // constexpr (calculation_mode == uint128_calc_mode::default_eval)
                 {
                     if (rhs == 0)

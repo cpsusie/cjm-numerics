@@ -74,4 +74,12 @@
       <Filter>Source Files</Filter>
     </None>
   </ItemGroup>
+  <ItemGroup>
+    <Text Include="..\cpp\llvm_int_typedefs.txt">
+      <Filter>Source Files</Filter>
+    </Text>
+    <Text Include="..\cpp\Llvm_u128div.txt">
+      <Filter>Source Files</Filter>
+    </Text>
+  </ItemGroup>
 </Project>

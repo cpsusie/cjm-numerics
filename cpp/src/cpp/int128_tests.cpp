@@ -156,10 +156,27 @@ void cjm::uint128_tests::execute_basic_multiplication_test()
     ctrl_uint128_t ctrl_fit_64 = to_ctrl(fit_64);
     test_interconversion(ctrl_fit_64, fit_64);
 
-    ctrl_uint128_t ctrl_fit_big_div_res = ctrl_fit_times_big_one / ctrl_big_one;
-    uint128_t back_test_div_big = to_test(ctrl_fit_big_div_res);
-    cjm_assert(back_test_div_big == fit_times_big_one / big_one);
-    ctrl_uint128_t ctrl_fit_fit_div_res = ctrl_fit_times_big_one / ctrl_fit_64;
+    {
+        auto save_me = cout_saver{ cout };
+        ctrl_uint128_t ctrl_fit_big_div_res = ctrl_fit_times_big_one / ctrl_big_one;
+
+        cjm_assert(to_test(ctrl_fit_times_big_one) == fit_times_big_one && to_test(ctrl_big_one) == big_one);
+    	
+        cout    << "ctrl_fit_big_div_res:= [0x" << std::hex << std::setw(32)
+    			<< std::setfill('0') << ctrl_fit_big_div_res << "]" << newl;
+    	
+        uint128_t back_test_div_big = to_test(ctrl_fit_big_div_res);
+    	cout    << "back_test_div_big := [0x" << std::hex << std::setw(32)
+				<< std::setfill('0') << back_test_div_big << "]" << newl;
+
+        uint128_t back_test_div_res = fit_times_big_one / big_one;
+    	cout    << "back_test_div_res := [0x" << std::hex << std::setw(32)
+				<< std::setfill('0') << back_test_div_big << "]" << newl;
+    	
+    	cjm_assert(back_test_div_big == fit_times_big_one / big_one);
+    }
+
+	ctrl_uint128_t ctrl_fit_fit_div_res = ctrl_fit_times_big_one / ctrl_fit_64;
     uint128_t back_test_div_fit = to_test(ctrl_fit_fit_div_res);
     cjm_assert(back_test_div_fit == fit_times_big_one / fit_64);
 		
