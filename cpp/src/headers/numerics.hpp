@@ -10,13 +10,13 @@
 #define CJM_MSC_X64
 #define CJM_UMUL128 _umul128
 #define CJM_BITSCAN_REV_64 _BitScanReverse64
-#define CJM_BITSCAN_64 __lzcnt64
+#define CJM_LZCNT_64 __lzcnt64
 #define CJM_UDIV128 _udiv128
 #endif
 #else
 #define CJM_UMUL128 internal::cjm_bad_umul128
 #define CJM_BITSCAN_REV_64 internal::cjm_badrev_bitscan_64
-#define CJM_BITSCAN_64 internal::cjm_bad_bitscan_64
+#define CJM_BITSCAN_64 internal::cjm_bad_lzcnt_64
 #define CJM_UDIV128 internal::cjm_bad_udiv128;
 #endif
 #include <cmath>
@@ -43,7 +43,7 @@ namespace cjm
 			//alternate declarations for cjm_intrinsic_macros ... never defined because never used but need something that won't blow compiler up
 			//when examining untaken if constexpr branch.
 			extern unsigned char cjm_badrev_bitscan_64(unsigned long* index, std::uint64_t mask);
-			extern std::uint64_t cjm_bad_bitscan_64(std::uint64_t mask);
+			extern std::uint64_t cjm_bad_lzcnt_64(std::uint64_t mask);
 			extern std::uint64_t cjm_bad_umul128(std::uint64_t multiplicand, std::uint64_t multiplicand_two, std::uint64_t* carry);
 			extern std::uint64_t cjm_bad_udiv128(std::uint64_t high_dividend, std::uint64_t low_dividend, std::uint64_t divisor, std::uint64_t* remainder);
 		}
