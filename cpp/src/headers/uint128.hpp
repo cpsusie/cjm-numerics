@@ -277,24 +277,20 @@ namespace cjm::numerics
      * for strings and streams that are wider than const char by turning them into templates.
      *
      * The essence of CJM's modifications  to abseil.io's code is:
-     *    1- REMOVING ALL SUPPORT FOR C++ VERSIONS PRIOR TO C++17  THIS CODE WILL NOT WORK
-     *    ON A C++14 OR ON A C++11 (OR ... SHUDDERS ... EARLIER) ENVIRONMENT.
-     *    This code makes VERY heavy use of C++17 facilities.
+     *    1- REMOVING ALL SUPPORT FOR C++ VERSIONS PRIOR TO C++20  THIS CODE WILL NOT WORK
+     *    ON A C++17 OR EARLIER (OR ... SHUDDERS ... EARLIER) ENVIRONMENT.
+     *    This code makes VERY heavy use of C++17 and C++20 facilities.
      *    2- making every mathematical operation (exception conversions to binary floating
      *    point representations) constexpr-enabled -- i.e. capable of being performed
      *    at compile time (note that stream insertion and string conversion operations
      *    ARE NOT constexpr-enabled)
      *    3- making nearly every mathematical operation specify noexcept.
-     *       The operations that MAY throw exceptions are division and modulus,
-     *       string and stream output, and conversions to and from binary floating
-     *       point representations.
+     *     The operations that MAY throw exceptions are division and modulus,
+     *     string and stream output, and conversions to and from binary floating
+     *     point representations.
      *    4- Instead of being undefined behavior, division or modulus by 0 with
      *     the operators provided herein  WILL THROW a std::domain_error exception.
-     *    5- The support for using uint128 as a thin wrapper around GCC's unsigned __int128
-     *    type has been removed.  If we get time to test this on GCC and can verify
-     *    that restoring such support will not disable the constexpr nature of this
-     *    class, we will consider re-adding such operations.
-     *    6- A custom literal has been added.  You will need to use
+     *    5- A custom literal has been added.  You will need to use
      *    the cjm::numerics::uint128_literals namespace to make use of it.
      *    The literal suffix for uint128 is _u128.  It currently supports decimal
      *    and hexadecimal literals.  It supports character separator ( ' ).  OCTAL
@@ -302,8 +298,25 @@ namespace cjm::numerics
      *    literals may be added later (but I can't imagine wanting to out all 128 bits in 1s and
      *    zeros...).  For numbers that will fit within a std::uint64_t, you are free
      *    to use those literals if you desire octal or binary.
-     *    7- numeric limits and type traits information have been added to namespace std
+     *    6- numeric limits and type traits information have been added to namespace std
      *    to support interoperation with this type in a metaprogramming context.
+     *    7- where available (e.g. 64-bit versions of GCC and Clang), this type serves
+     *       as a thin wrapper around the native support those compilers add for unsigned __int128.
+     *       Using this type still provides advantages over direct use of the native version:
+     *          a. Literal support (constexpr of course!)
+     *          b. stream insertion and extraction support / string conversion and parsing support
+     *          c. uses built-in type for arithmetic anyway
+     *          d. portable to compilers that DO NOT offer such a type
+     *          e. full constexpr support (except string / float ops) even if those compilers do not treat unsigned __int128
+     *             as a completely constexpr-enabled type
+     *    8- if using microsoft's compiler targeting windows with an Intel or AMD 64 bit processor,
+     *       compiler intrinsics will be used for heavy arithmetic computation in lieu of fallback arithmetic
+     *       used when calculations are PERFORMED AT RUNTIME.  This means you get the full-benefit of constexpr
+     *       for compile-time evaluation but (presumably) more efficient compiler intrinsics for runtime evaluation.
+     *   9- if using microsoft's compiler targeting windows with an Intel or AMD 64 bit processor the RUNTIME division algorithm
+     *      is based on Clang-LLVM's division algorithm for the native unsigned __int128.  The paths in that algorithm
+     *      that make use of inline assembly in Clang make use of x64 compiler intrinsics for this adaptation.  NOTE:
+     *      constant-evaluated division uses the adapted fallback algorithm from abseil/google.
      *    Example literals
      *    Hex examples:
      *		constexpr uint128 x =  0x123456789ABCDEF0123456789ABCDEF0_u128;

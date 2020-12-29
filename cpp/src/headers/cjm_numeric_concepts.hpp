@@ -16,18 +16,38 @@
 
 namespace cjm::numerics::concepts
 {
+    /// <summary>
+    /// Applies if the type is a number ... considers anything that specializes
+    /// std::numeric_limits to be a number.
+    /// </summary>
     template<typename T>
     concept number = std::numeric_limits<T>::is_specialized;
 
+    /// <summary>
+    /// Represents an integer, whether built-in or user defined
+    /// </summary>
+    /// <remarks>considers whether numeric_limits<T>::is_integer is true for that type.
+    /// If not specialized, not considered an integer.</remarks>
     template<typename T>
     concept integer = number<T> && std::numeric_limits<T>::is_integer;
 
+    /// <summary>
+    /// True if an integer that is also a built-in type.
+    /// </summary>
     template<typename T>
     concept builtin_integer = integer<T> && std::is_integral_v<T>;
 
+    /// <summary>
+    /// True for an unsigned integer, whether built-in or user-defined
+    /// </summary>
+    /// <remarks>bases determination off of specialization of std::numeric_limits for the
+    /// type in question.</remarks>
     template<typename T>
     concept unsigned_integer = integer<T> && !std::numeric_limits<T>::is_signed;
 
+    /// <summary>
+    /// Applies to unsigned integers that are also built-in fundamental types
+    /// </summary>
     template<typename T>
     concept builtin_unsigned_integer = builtin_integer<T> && unsigned_integer<T>;
 
@@ -58,6 +78,13 @@ namespace cjm::numerics::concepts
     template<typename Allocator>
     concept utf32_char_allocator = std::is_nothrow_convertible_v<std::allocator<char32_t>, Allocator>;
 
+    /// <summary>
+    /// Determines whether you can bitcast From to To:
+    ///    to be bit_castable, the types must both:
+    ///     1- have the same size and alignment as the other
+    ///     2- be no-throw default constructible
+    ///     3- be trivially copyable
+    /// </summary>
     template<typename To, typename From>
     concept bit_castable = sizeof(To) == sizeof(From) && alignof(To) == alignof(From)
         && std::is_trivially_copyable_v<To> && std::is_trivially_copyable_v<From> && !std::is_polymorphic_v<To> && !std::is_polymorphic_v<From> && std::is_nothrow_default_constructible_v<To> && std::is_nothrow_default_constructible_v<From>;
