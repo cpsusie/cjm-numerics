@@ -6,18 +6,24 @@
 #pragma intrinsic(_BitScanReverse64)
 #pragma intrinsic(__lzcnt64)
 #pragma intrinsic(_udiv128)  // NOLINT(clang-diagnostic-ignored-pragma-intrinsic)
+#pragma intrinsic(__shiftleft128)
+#pragma intrinsic(__shiftright128)
 #ifndef CJM_MSC_X64
 #define CJM_MSC_X64
 #define CJM_UMUL128 _umul128
 #define CJM_BITSCAN_REV_64 _BitScanReverse64
 #define CJM_LZCNT_64 __lzcnt64
 #define CJM_UDIV128 _udiv128
+#define CJM_LSHIFT128 __shiftleft128
+#define CJM_RSHIFT128 __shiftright128
 #endif
 #else
 #define CJM_UMUL128 internal::cjm_bad_umul128
 #define CJM_BITSCAN_REV_64 internal::cjm_badrev_bitscan_64
 #define CJM_LZCNT_64 internal::cjm_bad_lzcnt_64
-#define CJM_UDIV128 internal::cjm_bad_udiv128;
+#define CJM_UDIV128 internal::cjm_bad_udiv128
+#define CJM_LSHIFT128 internal::cjm_bad_shiftleft128
+#define CJM_RSHIFT128 internal::cjm_bad_shiftright128
 #endif
 #include <cmath>
 #include <limits>
@@ -50,10 +56,13 @@ namespace cjm
 		{
 			//alternate declarations for cjm_intrinsic_macros ... never defined because never used but need something that won't blow compiler up
 			//when examining untaken if constexpr branch.
+			
 			extern unsigned char cjm_badrev_bitscan_64(unsigned long* index, std::uint64_t mask);
 			extern std::uint64_t cjm_bad_lzcnt_64(std::uint64_t mask);
 			extern std::uint64_t cjm_bad_umul128(std::uint64_t multiplicand, std::uint64_t multiplicand_two, std::uint64_t* carry);
 			extern std::uint64_t cjm_bad_udiv128(std::uint64_t high_dividend, std::uint64_t low_dividend, std::uint64_t divisor, std::uint64_t* remainder);
+			extern std::uint64_t cjm_bad_shiftleft128(std::uint64_t low, std::uint64_t high, unsigned char shift_amount);
+			extern std::uint64_t cjm_bad_shiftright128(std::uint64_t low, std::uint64_t high, unsigned char shift_amount);
 		}
 		class uint128;
 	    constexpr bool has_msc_x64 =
@@ -73,7 +82,14 @@ namespace cjm
 #endif
 #else
 	    false;
-		using uint128_align_t = std::uint64_t;
+		namespace internal
+		{
+			struct alignas(alignof(std::uint64_t) * 2) cjm_align {
+				std::uint64_t m_low;
+				std::uint64_t m_high;
+			};
+		}
+		using uint128_align_t = std::conditional_t<has_msc_x64, internal::cjm_align, std::uint64_t>;
 		using natuint128_t = uint128;
 #ifdef CJM_HAVE_BUILTIN_128
 #undef CJM_HAVE_BUILTIN_128
@@ -184,14 +200,69 @@ namespace cjm
 }
 
 
+namespace std
+{
 
+}
 namespace std
 {
 	template<>
 	struct hash<cjm::numerics::uint128>;
 
+	/************************************************************************/
+	/* Defines numeric limits and various traits for this object
+	* to facilitate interoperability with code  that relies on these traits.  */
+	/************************************************************************/
 	template<>
-	class numeric_limits<cjm::numerics::uint128>;
+	class numeric_limits<cjm::numerics::uint128>
+	{
+		static constexpr int times_log10_of_two(int x)
+		{
+			return x * 301'299 / 1'000'000;
+		}
+	public:
+		static constexpr bool is_specialized = true;
+		static constexpr bool is_signed = false;
+		static constexpr bool is_integer{ true };
+		static constexpr bool is_exact = true;
+		static constexpr bool is_bounded = true;
+		static constexpr bool has_denorm = std::denorm_absent;
+		static constexpr bool has_infinity = false;
+		static constexpr bool has_quiet_NaN = std::numeric_limits<uint64_t>::has_quiet_NaN;
+		static constexpr bool has_signaling_NaN = std::numeric_limits<uint64_t>::has_signaling_NaN;
+		static constexpr bool has_denorm_loss = std::numeric_limits<uint64_t>::has_denorm_loss;
+		static constexpr std::float_round_style round_style = std::numeric_limits<uint64_t>::round_style;
+		static constexpr bool is_arithmetic = true;
+		static constexpr bool is_iec559 = std::numeric_limits<uint64_t>::is_iec559;
+		static constexpr bool is_modulo = std::numeric_limits<uint64_t>::is_modulo;
+		static constexpr int digits = CHAR_BIT * (sizeof(std::uint64_t) + sizeof(std::uint64_t));
+		static constexpr int digits10 = digits * 301'299 / 1'000'000;
+		static constexpr int max_digits10 = std::numeric_limits<uint64_t>::max_digits10;
+		static constexpr int radix = 2;
+		static constexpr int min_exponent = 0;
+		static constexpr int max_exponent = 0;
+		static constexpr int min_exponent10 = 0;
+		static constexpr int max_exponent10 = 0;
+		static constexpr bool traps = true;
+
+		static constexpr cjm::numerics::uint128 min() noexcept;
+
+		static constexpr cjm::numerics::uint128 lowest() noexcept;
+
+		static constexpr cjm::numerics::uint128 max() noexcept;
+
+		static constexpr cjm::numerics::uint128 epsilon() noexcept;
+
+		static constexpr cjm::numerics::uint128 round_error() noexcept;
+
+		static constexpr cjm::numerics::uint128 infinity() noexcept;
+
+		static constexpr cjm::numerics::uint128 quiet_NaN() noexcept;
+
+		static constexpr cjm::numerics::uint128 signaling_NaN() noexcept;
+
+		static constexpr cjm::numerics::uint128 denorm_min() noexcept;
+	};
 
 	/*template <>
 	struct is_arithmetic <cjm::numerics::uint128>;

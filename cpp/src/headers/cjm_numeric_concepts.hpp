@@ -1,3 +1,5 @@
+#ifndef CJM_NUMERIC_CONCEPTS_HPP_
+#define CJM_NUMERIC_CONCEPTS_HPP_
 //
 // Created by cpsusie on 12/17/20.
 //
@@ -10,8 +12,7 @@
 #include <sstream>
 #include <string>
 
-#ifndef INT128_CJM_NUMERIC_CONCEPTS_HPP
-#define INT128_CJM_NUMERIC_CONCEPTS_HPP
+
 
 namespace cjm::numerics::concepts
 {
@@ -58,8 +59,8 @@ namespace cjm::numerics::concepts
     concept utf32_char_allocator = std::is_nothrow_convertible_v<std::allocator<char32_t>, Allocator>;
 
     template<typename To, typename From>
-    concept bit_castable =  sizeof(To) == sizeof(From) && alignof(To) == alignof(From)
-            && std::is_trivially_copyable_v<To> && std::is_trivially_copyable_v<From> && !std::is_polymorphic_v<To> && !std::is_polymorphic_v<From> && std::is_trivially_default_constructible_v<To> && std::is_trivially_default_constructible_v<From>;
+    concept bit_castable = sizeof(To) == sizeof(From) && alignof(To) == alignof(From)
+        && std::is_trivially_copyable_v<To> && std::is_trivially_copyable_v<From> && !std::is_polymorphic_v<To> && !std::is_polymorphic_v<From> && std::is_nothrow_default_constructible_v<To> && std::is_nothrow_default_constructible_v<From>;
 
 
     template<typename Char, typename CharTraits> requires char_with_traits<Char, CharTraits>
