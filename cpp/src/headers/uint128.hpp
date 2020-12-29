@@ -231,39 +231,6 @@ namespace cjm::numerics
 
     };
 
-
-
-//    template<typename CharTraits>
-//        requires cjm::numerics::concepts::char_with_traits<char, CharTraits>
-//    struct u128_parsing_helper<char, CharTraits>
-//    {
-//        template<typename Allocator = std::allocator<char>>
-//        requires cjm::numerics::concepts::char_with_traits_and_allocator<char , CharTraits, Allocator>
-//        using str128 = std::basic_string<char, CharTraits, Allocator>;
-//
-//        using sv = std::basic_string_view<char, CharTraits>;
-//        static constexpr std::array<sv, 2> get_hex_tags();
-//
-//        static constexpr sv non_decimal_separator();
-//
-//        static constexpr sv decimal_separator();
-//
-//        static constexpr std::uint8_t get_value_hex(char c);
-//
-//        static constexpr std::uint8_t get_value_dec(char c);
-//
-//        template<typename Allocator = std::allocator<char>>
-//        static constexpr u128_str_format get_format(const str128<Allocator>& string);
-//
-//        static constexpr bool is_legal_hex_char(char c);
-//        template<typename Allocator = std::allocator<char>>
-//        static str128<Allocator> trim_and_strip(str128<Allocator> trim_and_stripme);
-//
-//        static constexpr uint128 parse_decimal_str(sv decimal_str);
-//
-//    };
-
-
 }
 
 
