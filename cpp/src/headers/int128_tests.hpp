@@ -97,7 +97,7 @@ namespace cjm::uint128_tests
     void execute_string_parse_test();
     void execute_basic_multiplication_test();
     void test_fls();
-
+    void print_uint128_eval_mode();
     void test_interconversion(const ctrl_uint128_t& control, uint128_t test);
 
     struct binary_operation final
@@ -196,6 +196,8 @@ void cjm::uint128_tests::execute_test(Invocable test, std::string_view test_name
         throw;
     }
 }
+
+
 
 
 #endif //INT128_INT128_TESTS_HPP

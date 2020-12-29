@@ -23,6 +23,7 @@ cjm::uint128_tests::uint128_t cjm::uint128_tests::to_test(const ctrl_uint128_t& 
 
 void cjm::uint128_tests::execute_uint128_tests()
 {
+    print_uint128_eval_mode();
     execute_test(execute_basic_test_one, "basic_test_one"sv);
     execute_test(execute_string_parse_test, "string_parse_text"sv);
     execute_test(execute_basic_multiplication_test, "basic_multiplication_test"sv);
@@ -304,6 +305,26 @@ uint128_t cjm::uint128_tests::binary_operation::perform_calculate_result(uint128
 
     }
     return ret;
+}
+
+void cjm::uint128_tests::print_uint128_eval_mode()
+{
+    using namespace numerics;
+    cout_saver o_saver{cout};
+    std::string_view eval_text = "Unknown/Unrecognized Arithmetic Mode"sv;
+    switch (cjm::numerics::calculation_mode)
+    {
+        case uint128_calc_mode::intrinsic_u128:
+            eval_text = "Built-in unsigned __int128 Arithmetic"sv;
+            break;
+        case uint128_calc_mode::msvc_x64:
+            eval_text = "Microsoft x64 Compiler-Intrinsic Optimized Arithmetic"sv;
+            break;
+        case uint128_calc_mode::default_eval:
+            eval_text = "Fallback Arithmetic"sv;
+            break;
+    }
+    cout << "Arithmetic mode: [" << eval_text << "]." << newl;
 }
 
 
