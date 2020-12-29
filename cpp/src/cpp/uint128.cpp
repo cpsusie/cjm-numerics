@@ -169,7 +169,7 @@ cjm::numerics::uint128::uint128(__uint128_t other) noexcept
 //anyway because this function is a static member of uint128 and has
 //direct access to its m_high and m_low members anyway.
 #if defined(_MSC_VER) && defined(_M_X64)
-void uint128::div_mod_msc_x64_impl(uint128 dividend, uint128 divisor, uint128* quotient_ret, uint128* remainder_ret)
+void uint128::div_mod_msc_x64_impl(uint128 dividend, uint128 divisor, uint128* quotient_ret, uint128* remainder_ret) noexcept
 {
 	constexpr size_t n_utword_bits = sizeof(uint128) * CHAR_BIT;
 	assert(quotient_ret != nullptr && remainder_ret != nullptr && divisor != 0);
@@ -238,7 +238,7 @@ void uint128::div_mod_msc_x64_impl(uint128 dividend, uint128 divisor, uint128* q
 	return;
 }
 #else
-void uint128::div_mod_msc_x64_impl([[maybe_unused]]uint128 dividend,[[maybe_unused]] uint128 divisor, uint128* quotient_ret, uint128* remainder_ret)
+void uint128::div_mod_msc_x64_impl([[maybe_unused]]uint128 dividend,[[maybe_unused]] uint128 divisor, uint128* quotient_ret, uint128* remainder_ret) noexcept
 {
     //do nothing ... in gcc this never gets called but still needs to be there
     *quotient_ret =0;

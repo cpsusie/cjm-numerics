@@ -4,6 +4,7 @@
 #include<type_traits>
 #include<limits>
 #include<cassert>
+#include<optional>
 #include "numerics.hpp"
 #include "cjm_numeric_concepts.hpp"
 #include "cjm_string.hpp"
@@ -64,8 +65,14 @@
 
 namespace cjm::numerics
 {
+    class uint128;
     template<typename LimbType>
     class fixed_uint;
+
+    template<concepts::integer IntegerType>
+    struct divmod_result;
+    
+	
     /// <summary>
     /// The calculation mode used when not constant evaluating uint128s.
     /// For GCC and Clang, if a built-in uint128_t is available, that logic is used.
@@ -258,6 +265,8 @@ namespace cjm::numerics
 
 
 }
+
+
 namespace cjm::numerics
 {
     /************************************************************************/
@@ -318,13 +327,14 @@ namespace cjm::numerics
     class alignas(uint128_align) uint128
     {
     public:
-
-        friend class fixed_uint<uint128>;
-        using int_part = std::uint64_t;
         static constexpr size_t byte_array_size{ (128 / CHAR_BIT) / sizeof(unsigned char) };
 
+    	friend class fixed_uint<uint128>;
+            	
+        using int_part = std::uint64_t;      
         using byte_array = std::array<unsigned char, byte_array_size>;
-
+        using divmod_result_t = divmod_result<uint128>;
+    	
         template<typename Chars, typename CharTraits = std::char_traits<Chars>>
                 requires cjm::numerics::concepts::char_with_traits<Chars, CharTraits>
         static uint128 make_from_string(std::basic_string_view<Chars, CharTraits> parseMe);
@@ -332,13 +342,15 @@ namespace cjm::numerics
         //todo fixit implement:
     	//static constexpr uint128 make_from_bytes_big_endian(byte_array bytes) noexcept;
         static constexpr uint128 MakeUint128(std::uint64_t high, std::uint64_t low) noexcept;
-
+        static constexpr std::optional<divmod_result_t> try_div_mod(uint128 dividend, uint128 divisor) noexcept;
+    	static constexpr divmod_result_t div_mod(uint128 dividend, uint128 divisor);
+        static constexpr divmod_result_t unsafe_div_mod(uint128 dividend, uint128 divisor) noexcept;
         static void instrumented_div_mod(std::basic_ostream<char>& stream, uint128 dividend, uint128 divisor,
             uint128* quotient_ret, uint128* remainder_ret);
         static constexpr int_part int_part_bits{ sizeof(int_part) * CHAR_BIT };
         static constexpr int_part int_part_bottom_half_bits{ int_part_bits / 2 };
         static constexpr int_part int_part_bottom_half_bitmask{std::numeric_limits<int_part>::max() >> int_part_bottom_half_bits};
-        constexpr uint128() noexcept = default;
+        constexpr uint128() noexcept;
         constexpr uint128(const uint128& other) noexcept = default;
         constexpr uint128(uint128&& other) noexcept = default;
         constexpr uint128& operator=(const uint128& other) noexcept = default;
@@ -383,11 +395,11 @@ namespace cjm::numerics
 #ifdef CJM_HAVE_BUILTIN_128
         uint128(unsigned __int128 other) noexcept;
         uint128& operator=(unsigned __int128 other) noexcept;
-        explicit operator unsigned __int128() const noexcept;
+        explicit operator unsigned __int128() const noexcept;    	
 #endif
         //hash code function and comparison operators
         constexpr size_t hash_code() const noexcept;
-
+               
         // Arithmetic operators.
         constexpr uint128& operator+=(uint128 other) noexcept;
         constexpr uint128& operator-=(uint128 other) noexcept;
@@ -406,6 +418,10 @@ namespace cjm::numerics
         constexpr uint128& operator--() noexcept;
         friend constexpr uint128 operator/(uint128 lhs, uint128 rhs);
         friend constexpr uint128 operator%(uint128 lhs, uint128 rhs);
+        friend constexpr uint128 operator>>(uint128 lhs, int amount) noexcept;
+        friend constexpr uint128 operator<<(uint128 lhs, int amount) noexcept;
+        friend constexpr uint128 operator>>(uint128 lhs, uint128 amount) noexcept;
+        friend constexpr uint128 operator<<(uint128 lhs, uint128 amount) noexcept;
         template<typename Char, typename CharTraits, typename Allocator>
             requires cjm::numerics::concepts::char_with_traits_and_allocator<Char, CharTraits, Allocator>
         friend std::basic_ostream<Char, CharTraits>& operator<<(std::basic_ostream<Char, CharTraits>& os, uint128 v);
@@ -421,14 +437,17 @@ namespace cjm::numerics
         constexpr uint128(int_part high, int_part low) noexcept;
         static constexpr size_t calculate_hash(int_part hi, int_part low) noexcept;
         static constexpr void hash_combine(size_t& seed, size_t newVal) noexcept;
-        
-        static constexpr void div_mod_impl(uint128 dividend, uint128 divisor,
-            uint128* quotient_ret, uint128* remainder_ret);
+        inline static uint128 lshift_msvc_x64(uint128 shift_me, int shift_amount) noexcept;
+        inline static uint128 rshift_msvc_x64(uint128 shift_me, int shift_amount) noexcept;
+        static constexpr void constexpr_div_mod_impl(uint128 dividend, uint128 divisor,
+            uint128 * quotient_ret, uint128 * remainder_ret);
+        static constexpr void unsafe_constexpr_div_mod_impl(uint128 dividend, uint128 divisor,
+            uint128 * quotient_ret, uint128 * remainder_ret) noexcept;
         template<typename T>
         static constexpr void step(T& n, int& pos, int shift) noexcept;
         static constexpr int fls(uint128 n) noexcept;
         static void div_mod_msc_x64_impl(uint128 dividend, uint128 divisor,
-            uint128 * quotient_ret, uint128 * remainder_ret);
+            uint128 * quotient_ret, uint128 * remainder_ret) noexcept;
         template<typename Char, typename CharTraits = std::char_traits<Char>, typename Allocator = std::allocator<Char>>
         requires cjm::numerics::concepts::char_with_traits_and_allocator<Char, CharTraits, Allocator>
         static std::basic_string<Char, CharTraits, Allocator> to_string(uint128 item, std::ios_base::fmtflags flags);
@@ -442,8 +461,8 @@ namespace cjm::numerics
         int_part m_low;
 #endif
     };
-    static_assert(std::is_trivial_v<uint128>, "Needs to be a trivial type.");
-
+    
+    static_assert(concepts::integer<uint128>, "Needs to be an integer.");
 }
 namespace std
 { //fixme todo --- get rid of the traits overloads -- undefined behavior
@@ -461,95 +480,16 @@ namespace std
 	struct hash<cjm::numerics::uint128>
 	{
 		constexpr hash() noexcept = default;
-		constexpr size_t operator()(const cjm::numerics::uint128& keyVal) const
+		constexpr size_t operator()(const cjm::numerics::uint128& keyVal) const noexcept 
 		{
 			return keyVal.hash_code();
 		}
 	};
-	/************************************************************************/
-	/* Defines numeric limits and various traits for this object
-	* to facilitate interoperability with code  that relies on these traits.  */
-	/************************************************************************/
-	template<>
-	class numeric_limits<cjm::numerics::uint128>
-	{
-		static constexpr int times_log10_of_two(int x)
-		{
-			return x * 301'299 / 1'000'000;
-		}
-	public:
-		static constexpr bool is_specialized = true;
-		static constexpr bool is_signed = false;
-		static constexpr bool is_integer{ true };
-		static constexpr bool is_exact = true;
-		static constexpr bool is_bounded = true;
-		static constexpr bool has_denorm = std::denorm_absent;
-		static constexpr bool has_infinity = false;
-		static constexpr bool has_quiet_NaN = std::numeric_limits<uint64_t>::has_quiet_NaN;
-		static constexpr bool has_signaling_NaN = std::numeric_limits<uint64_t>::has_signaling_NaN;
-		static constexpr bool has_denorm_loss = std::numeric_limits<uint64_t>::has_denorm_loss;
-		static constexpr std::float_round_style round_style = std::numeric_limits<uint64_t>::round_style;
-		static constexpr bool is_arithmetic = true;
-		static constexpr bool is_iec559 = std::numeric_limits<uint64_t>::is_iec559;
-		static constexpr bool is_modulo = std::numeric_limits<uint64_t>::is_modulo;
-		static constexpr int digits = CHAR_BIT * (sizeof(std::uint64_t) + sizeof(std::uint64_t));
-		static constexpr int digits10 = digits * 301'299/1'000'000;
-		static constexpr int max_digits10 = std::numeric_limits<uint64_t>::max_digits10;
-		static constexpr int radix = 2;
-		static constexpr int min_exponent = 0;
-		static constexpr int max_exponent = 0;
-		static constexpr int min_exponent10 = 0;
-		static constexpr int max_exponent10 = 0;
-		static constexpr bool traps = true;
-
-		static constexpr cjm::numerics::uint128 min() noexcept;
-
-		static constexpr cjm::numerics::uint128 lowest() noexcept;
-
-		static constexpr cjm::numerics::uint128 max() noexcept;
-
-		static constexpr cjm::numerics::uint128 epsilon() noexcept;
-
-		static constexpr cjm::numerics::uint128 round_error() noexcept;
-
-		static constexpr cjm::numerics::uint128 infinity() noexcept;
-
-		static constexpr cjm::numerics::uint128 quiet_NaN() noexcept;
-
-		static constexpr cjm::numerics::uint128 signaling_NaN() noexcept;
-
-		static constexpr cjm::numerics::uint128 denorm_min() noexcept;
-	};
 
 
 
-	//THE FOLLOWING SPECIALIZATIONS PROVIDE INFORMATION ON UINT128 that is
-	//DEFINED in the <traits> header
-	/************************************************************************/
-	/*  Sets specified that uint128 is an arithmetic type                  */
-	/************************************************************************/
-	template <>
-	struct is_arithmetic <cjm::numerics::uint128> :
-		std::conditional_t<std::numeric_limits<cjm::numerics::uint128>::is_specialized,
-		std::true_type, std::false_type> {};
-	/************************************************************************/
-	/* Specifies that uint128 is an integral type                           */
-	/************************************************************************/
-	template <> struct is_integral<cjm::numerics::uint128> :
-		std::conditional_t<numeric_limits<cjm::numerics::uint128>::is_integer,
-		std::true_type, std::false_type> {};
-	/************************************************************************/
-	/* Specifies that uint128 is unsigned                                   */
-	/************************************************************************/
-	template <> struct is_unsigned<cjm::numerics::uint128> :
-		std::conditional_t<numeric_limits<cjm::numerics::uint128>::is_signed,
-		std::false_type, std::true_type> {};
-	/************************************************************************/
-	/* Specified that uint128 IS NOT SIGNED                                  */
-	/************************************************************************/
-	template<> struct is_signed<cjm::numerics::uint128> :
-		std::conditional_t<numeric_limits<cjm::numerics::uint128>::is_signed,
-		std::true_type, std::false_type> {};
+
+
 }
 
 
@@ -657,6 +597,32 @@ namespace cjm
 				uint128_lit_helper& operator=(uint128_lit_helper&& other) noexcept = delete;
 			};
 		}
+
+        template<concepts::integer IntegerType>
+        struct divmod_result final
+        {
+            using int_t = IntegerType;
+            int_t quotient;
+            int_t remainder;
+            constexpr divmod_result(int_t quot, int_t rem) noexcept : quotient{ quot }, remainder{ rem } {}
+            constexpr divmod_result() noexcept : quotient{}, remainder{} {}
+            constexpr divmod_result(const divmod_result& other) noexcept = default;
+            constexpr divmod_result(divmod_result&& other) noexcept = default;
+            constexpr divmod_result& operator=(const divmod_result& other) noexcept = default;
+            constexpr divmod_result& operator=(divmod_result&& other) noexcept = default;
+            ~divmod_result() = default;
+
+            constexpr auto operator<=>(const divmod_result& other) const noexcept
+            {
+                if (other.quotient == quotient)
+                {
+                    if (other.remainder == remainder)
+                        return 0;
+                    return other.remainder > remainder ? -1 : 1;
+                }
+                return other.quotient > quotient ? -1 : 1;
+            }
+        };
 	}
 }
 

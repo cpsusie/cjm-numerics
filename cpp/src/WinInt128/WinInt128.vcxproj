@@ -198,6 +198,7 @@
   <ItemGroup>
     <Text Include="..\cpp\llvm_int_typedefs.txt" />
     <Text Include="..\cpp\Llvm_u128div.txt" />
+    <Text Include="..\headers\lshift.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

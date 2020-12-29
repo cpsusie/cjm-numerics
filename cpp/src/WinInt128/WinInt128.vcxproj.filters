@@ -81,5 +81,8 @@
     <Text Include="..\cpp\Llvm_u128div.txt">
       <Filter>Source Files</Filter>
     </Text>
+    <Text Include="..\headers\lshift.txt">
+      <Filter>Source Files</Filter>
+    </Text>
   </ItemGroup>
 </Project>
