@@ -337,7 +337,7 @@ namespace cjm::numerics
      *	   	constexpr auto x = 340'282'366'920'938'463'463'374'607'431'768'211'456_u128;  //(too big by one)
      *     */
     /************************************************************************/
-    class alignas(uint128_align) uint128
+    class alignas(uint128_align) uint128 final
     {
     public:
         static constexpr size_t byte_array_size{ (128 / CHAR_BIT) / sizeof(unsigned char) };
@@ -411,7 +411,7 @@ namespace cjm::numerics
         explicit operator unsigned __int128() const noexcept;    	
 #endif
         //hash code function and comparison operators
-        constexpr size_t hash_code() const noexcept;
+        [[nodiscard]] constexpr size_t hash_code() const noexcept;
                
         // Arithmetic operators.
         constexpr uint128& operator+=(uint128 other) noexcept;
@@ -440,11 +440,11 @@ namespace cjm::numerics
         friend std::basic_ostream<Char, CharTraits>& operator<<(std::basic_ostream<Char, CharTraits>& os, uint128 v);
 
         //Accessor for sub-compenents
-        constexpr int_part low_part() const noexcept;
-        constexpr int_part high_part() const noexcept;
+        [[nodiscard]] constexpr int_part low_part() const noexcept;
+        [[nodiscard]] constexpr int_part high_part() const noexcept;
 
-        constexpr byte_array to_little_endian_arr() const noexcept;
-        constexpr byte_array to_big_endian_arr() const noexcept;
+        [[nodiscard]] constexpr byte_array to_little_endian_arr() const noexcept;
+        [[nodiscard]] constexpr byte_array to_big_endian_arr() const noexcept;
 
     private:
         constexpr uint128(int_part high, int_part low) noexcept;
@@ -452,6 +452,7 @@ namespace cjm::numerics
         static constexpr void hash_combine(size_t& seed, size_t newVal) noexcept;
         inline static uint128 lshift_msvc_x64(uint128 shift_me, int shift_amount) noexcept;
         inline static uint128 rshift_msvc_x64(uint128 shift_me, int shift_amount) noexcept;
+        static void best_safe_div_mod(uint128 dividend, uint128 divisor, uint128 * quotient, uint128 * remainder);
         static constexpr void constexpr_div_mod_impl(uint128 dividend, uint128 divisor,
             uint128 * quotient_ret, uint128 * remainder_ret);
         static constexpr void unsafe_constexpr_div_mod_impl(uint128 dividend, uint128 divisor,
@@ -474,7 +475,9 @@ namespace cjm::numerics
         int_part m_low;
 #endif
     };
-    
+
+   
+
     static_assert(concepts::integer<uint128>, "Needs to be an integer.");
 }
 namespace std

@@ -124,13 +124,22 @@ cjm::numerics::uint128::operator long double() const
 	return static_cast<long double>(m_low) +
 		std::ldexp(static_cast<long double>(m_high), 64);
 }
+
+void uint128::best_safe_div_mod(uint128 dividend, uint128 divisor, uint128* quotient, uint128* remainder)
+{
+	if (divisor == 0) throw std::domain_error{ "Division and/or modulus by zero is forbidden." };
+	if (!quotient) throw std::invalid_argument{ "quotient is nullptr!" };
+	if (!remainder) throw std::invalid_argument{ "remainder is nullptr!" };
+
+	uint128::divmod_result_t result = unsafe_div_mod(dividend, divisor);
+	*quotient = result.quotient;
+	*remainder = result.remainder;
+}
+
 #ifdef CJM_HAVE_BUILTIN_128
 cjm::numerics::uint128& cjm::numerics::uint128::operator=(__uint128_t other) noexcept
 {
-    m_low = static_cast<std::uint64_t>(other);
-    other >>= 64;
-    m_high = static_cast<std::uint64_t>(other);
-    return *this;
+    return (*this = cjm::numerics::bit_cast<uint128, unsigned __int128>(other));
 }
 
 

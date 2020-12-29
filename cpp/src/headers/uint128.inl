@@ -92,9 +92,9 @@ namespace cjm
 			os.setf(flags & copyMask, copyMask);
 			uint128 high = item;
 			uint128 low=0;
-			constexpr_div_mod_impl(high, div, &high, &low);
+			best_safe_div_mod(high, div, &high, &low);
 			uint128 mid=0;
-			constexpr_div_mod_impl(high, div, &high, &mid);
+			best_safe_div_mod(high, div, &high, &mid);
 			if (high.low_part() != 0)
 			{
 				os << high.low_part();
@@ -133,7 +133,7 @@ namespace cjm
 		{
 			return uint128(high, low);
 		}
-
+		
 		constexpr std::optional<uint128::divmod_result_t> uint128::try_div_mod(uint128 dividend,
 			uint128 divisor) noexcept
 		{
@@ -532,6 +532,7 @@ namespace cjm
 		constexpr void uint128::unsafe_constexpr_div_mod_impl(uint128 dividend, uint128 divisor, uint128* quotient_ret,
 			uint128* remainder_ret) noexcept
 		{
+			assert(divisor != 0);
 			// Long division/modulo for uint128 implemented using the shift-subtract
 		   // division algorithm adapted from:
 		   // https://stackoverflow.com/questions/5386377/division-without-using
