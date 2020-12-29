@@ -418,3 +418,6 @@ MigrationBackup/
 FodyWeavers.xsd
 /cmake-build-release/CMakeFiles/clion-log.txt
 /cmake-build-debug/file.txt
+/cmake-build-debug-clang/
+/cmake-build-release-clang/
+/cmake-build-release-clang/
