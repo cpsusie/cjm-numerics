@@ -1,58 +1,6 @@
 #ifndef CJM_NUMERICS_INL
 #define CJM_NUMERICS_INL
 
-
-
-/* FLS64 IMPROVEMENTS
-template <typename T>
-constexpr inline void step(T& n, int& pos, int shift) noexcept
-{
-    if (n >= (static_cast<T>(1) << shift))
-    {
-        n = n >> shift;
-        pos |= shift;
-    }   
-}
-
-// Returns the 0-based position of the last set bit (i.e., most significant bit)
-// in the given uint64_t. The argument may not be 0.
-//
-// For example:
-//   Given: 5 (decimal) == 101 (binary)
-//   Returns: 2
-#define STEP(T, n, pos, sh)           \
-    do {                                        \
-    if ((n) >= (static_cast<T>(1) << (sh))) { \
-        (n) = (n) >> (sh);                      \
-        (pos) |= (sh);                          \
-    }                                         \
-    } while (0)
-constexpr inline int fls64_v1(std::uint64_t n) noexcept
-{
-    assert(n != 0);
-    int pos = 0;
-    STEP(uint64_t, n, pos, 0x20);
-    auto n32 = static_cast<std::uint32_t>(n);
-    STEP(std::uint32_t, n32, pos, 0x10);
-    STEP(std::uint32_t, n32, pos, 0x08);
-    STEP(std::uint32_t, n32, pos, 0x04);
-    return pos + ((std::uint64_t{ 0x3333333322221100 } >> (n32 << 2)) & 0x3);
-}
-#undef STEP
-
-constexpr inline int fls64_v2(std::uint64_t n) noexcept
-{
-    assert(n != 0);
-    int pos = 0;
-    step(n, pos, 0x20);
-    auto n32 = static_cast<std::uint32_t>(n);
-    step(n32, pos, 0x10);
-    step(n32, pos, 0x08);
-    step(n32, pos, 0x04);
-    return pos + ((std::uint64_t{ 0x3333333322221100 } >> (n32 << 2)) & 0x3);
-}
-
-*/
 constexpr long double cjm::numerics::math_functions::ten_to_the_power(int exponent)
 {
 	if (exponent == 1)
@@ -163,6 +111,35 @@ constexpr TInt cjm::numerics::math_functions::int_gcd(TInt first, TInt second) n
 {
 	return std::gcd(first, second);
 }
+
+#ifdef __cpp_lib_bit_cast
+template<typename To, typename From>
+requires cjm::numerics::concepts::bit_castable<To, From>
+CJM_BIT_CAST_CONST To cjm::numerics::bit_cast(const From& f) noexcept
+{
+	return std::bit_cast<To, From>(f);
+}
+#else
+template<typename To, typename From>
+requires cjm::numerics::concepts::bit_castable<To, From>
+CJM_BIT_CAST_CONST To cjm::numerics::bit_cast(const From& f) noexcept
+{
+	//GCC seems to get all butt-hurt about private member variables even if type is trivial.
+	//All c++ standard requires is trivially copyable and same size (and non-overlapping).  the concepts here
+	//enforce MORE than that requirement (also require nothrow default constructible and alignment same)
+	//Suppressing because uint128 is a type that is trivially copyable-to.
+	auto dst = To{};
+#if  (defined(__GNUC__) && !defined(__clang__))
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wclass-memaccess"
+	std::memcpy(&dst, &f, sizeof(To));  /* no diagnostic for this one */
+#pragma GCC diagnostic pop
+#else
+	std::memcpy(&dst, &f, sizeof(To));
+#endif
+	return dst;
+}
+#endif
 
 
 #endif 

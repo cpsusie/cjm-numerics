@@ -57,7 +57,7 @@ void cjm::numerics::uint128::instrumented_div_mod(std::basic_ostream<char>& stre
 	stream << "divisor: 0x" << divisor << newl;
 
 	auto denominator = divisor;
-	auto quotient = MakeUint128(0, 0);
+	auto quotient = make_uint128(0, 0);
 
 	stream << "denominator: 0x" << denominator << newl;
 	stream << "quotient: 0x" << quotient << newl;

@@ -1,7 +1,6 @@
-#ifndef cjm_string_inl
-#define cjm_string_inl
-#include <algorithm>
-#include <locale>
+#ifndef CJM_STRING_INL_
+#define CJM_STRING_INL_
+
 #include "cjm_string.hpp"
 
 template<typename Char, typename CharTraits, typename Allocator>

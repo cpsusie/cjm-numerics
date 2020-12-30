@@ -18,11 +18,14 @@ cjm::uint128_tests::uint128_t cjm::uint128_tests::to_test(const ctrl_uint128_t& 
 {
     std::uint64_t low_part = static_cast<std::uint64_t>(convert);
     std::uint64_t high_part = static_cast<std::uint64_t>(convert >> 64);
-    return uint128_t::MakeUint128(high_part, low_part);
+    return uint128_t::make_uint128(high_part, low_part);
 }
 
 void cjm::uint128_tests::execute_uint128_tests()
 {
+    constexpr auto two_fifty_five = 0xff_u128;
+	constexpr auto all_at_ends = 0xff00'0000'0000'0000'0000'0000'0000'0000_u128;
+    static_assert(((two_fifty_five << (15 * 8)) == all_at_ends) && ((all_at_ends >> (15 * 8)) == two_fifty_five));
     print_uint128_eval_mode();
     execute_test(execute_basic_test_one, "basic_test_one"sv);
     execute_test(execute_string_parse_test, "string_parse_text"sv);

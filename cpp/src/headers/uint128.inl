@@ -114,22 +114,52 @@ namespace cjm
 		constexpr uint128 uint128::make_from_bytes_little_endian(byte_array bytes) noexcept
 		{
 			using ret_t = uint128;
-			constexpr size_t byteCount = sizeof(ret_t);
-			static_assert(byteCount == bytes.size());
-			constexpr size_t byte_shift_size = CHAR_BIT;
+			constexpr size_t byte_count = sizeof(ret_t);
+			static_assert(byte_count == bytes.size());
 			using byte = unsigned char;
-			ret_t ret = 0;
-			for (size_t index = 0; index < byteCount; ++index)
+			static_assert(std::endian::native == std::endian::little || std::endian::native == std::endian::big, 
+				"mixed endian not supported by this library.");
+			
+			if constexpr (std::endian::native == std::endian::little)
 			{
-				byte b = bytes[index];
-				auto temp = static_cast<ret_t>(b);
-				temp <<= static_cast<int>((index * byte_shift_size));
-				ret |= temp;
+				return make_from_bytes_native(bytes);
 			}
-			return ret;
+			else // constexpr (std::endian::native == std::endian::big)
+			{
+				byte_array reversed{};
+				for (size_t i = 0; i < reversed.size(); ++i)
+				{
+					reversed[reversed.size() - 1 - i] = bytes[i];
+				}
+				return make_from_bytes_native(reversed);
+			}
 		}
 
-		constexpr uint128 uint128::MakeUint128(std::uint64_t high, std::uint64_t low) noexcept
+		constexpr uint128 uint128::make_from_bytes_big_endian(byte_array bytes) noexcept
+		{
+			using ret_t = uint128;
+			constexpr size_t byte_count = sizeof(ret_t);
+			static_assert(byte_count == bytes.size());
+			using byte = unsigned char;
+			static_assert(std::endian::native == std::endian::little || std::endian::native == std::endian::big,
+				"mixed endian not supported by this library.");
+
+			if  constexpr (std::endian::native == std::endian::big)
+			{
+				return make_from_bytes_native(bytes);
+			}
+			else //constexpr (std::endian::native == std::endian::little)
+			{
+				byte_array reversed{};
+				for (size_t i = 0; i < reversed.size(); ++i)
+				{
+					reversed[reversed.size() - 1 - i] = bytes[i];
+				}
+				return make_from_bytes_native(reversed);
+			}
+		}
+
+		constexpr uint128 uint128::make_uint128(std::uint64_t high, std::uint64_t low) noexcept
 		{
 			return uint128(high, low);
 		}
@@ -210,7 +240,7 @@ namespace cjm
 			m_high = v < 0 ? std::numeric_limits<int_part>::max() : 0;
 			return *this;
 		}
-		constexpr uint128& uint128::operator=(unsigned v) noexcept
+		constexpr uint128& uint128::operator=(unsigned int v) noexcept
 		{
 			m_low = static_cast<int_part>(v);
 			m_high = 0;
@@ -306,9 +336,9 @@ namespace cjm
 		{
 			return static_cast<int>(m_low);
 		}
-		constexpr uint128::operator unsigned() const noexcept
+		constexpr uint128::operator unsigned int() const noexcept
 		{
-			return static_cast<unsigned>(m_low);
+			return static_cast<unsigned int>(m_low);
 		}
 		constexpr uint128::operator long() const noexcept
 		{
@@ -433,16 +463,49 @@ namespace cjm
 
 		constexpr uint128::byte_array uint128::to_little_endian_arr() const noexcept
 		{
+			constexpr size_t byte_count = sizeof(byte_array);
+			static_assert(byte_count == sizeof(uint128));
 			using byte = unsigned char;
-			byte_array ret{};
-			constexpr size_t shiftAmount = CHAR_BIT;
-			for (size_t bytesToShift = 0; bytesToShift < ret.size(); ++bytesToShift)
+			static_assert(std::endian::native == std::endian::little || std::endian::native == std::endian::big,
+				"mixed endian not supported by this library.");
+
+			if constexpr (std::endian::native == std::endian::little)
 			{
-				auto temp = (*this >> static_cast<int>((bytesToShift * shiftAmount)));
-				auto b = static_cast<byte>(temp);
-				ret[bytesToShift] = b;
+				return to_bytes_native(*this);
 			}
-			return ret;
+			else // constexpr (std::endian::native == std::endian::big)
+			{
+				byte_array temp = to_bytes_native(*this);
+				byte_array reversed{};
+				for (size_t i = 0; i < reversed.size(); ++i)
+				{
+					reversed[reversed.size() - 1 - i] = temp[i];
+				}
+				return reversed;
+			}			
+		}
+
+		constexpr uint128::byte_array uint128::to_big_endian_arr() const noexcept
+		{
+			constexpr size_t byte_count = sizeof(byte_array);
+			static_assert(byte_count == sizeof(uint128));
+			using byte = unsigned char;
+			static_assert(std::endian::native == std::endian::little || std::endian::native == std::endian::big,
+				"mixed endian not supported by this library.");
+			if constexpr (std::endian::native == std::endian::big)
+			{
+				return to_bytes_native(*this);
+			}
+			else //constexpr (std::endian::native == std::endian::little)
+			{
+				byte_array temp = to_bytes_native(*this);
+				byte_array reversed{};
+				for (size_t i = 0; i < reversed.size(); ++i)
+				{
+					reversed[reversed.size() - 1 - i] = temp[i];
+				}
+				return reversed;
+			}
 		}
 
 		constexpr uint128::uint128(int_part high, int_part low) noexcept
@@ -480,7 +543,106 @@ namespace cjm
 			seed ^= (newVal + 0x9e3779b9 + (seed << 6) + (seed >> 2));
 		}
 
+		constexpr uint128 uint128::make_from_bytes_native(byte_array bytes) noexcept
+		{
+			using ret_t = uint128;
+			constexpr size_t byteCount = sizeof(ret_t);
+			static_assert(byteCount == bytes.size());
+			constexpr size_t byte_shift_size = CHAR_BIT;
+			using byte = unsigned char;
+			static_assert(std::endian::native == std::endian::little || std::endian::native == std::endian::big, 
+				"Mixed endian is not supported.");
+			if (std::is_constant_evaluated())
+			{
+				if constexpr (constexpr_bit_casting)
+				{
+					return bit_cast<uint128, byte_array>(bytes);
+				}
+				else if constexpr (std::endian::native == std::endian::little)
+				{
+					ret_t ret = 0;
+					for (size_t index = 0; index < byteCount; ++index)
+					{
+						byte b = bytes[index];
+						auto temp = static_cast<ret_t>(b);
+						temp <<= static_cast<int>((index * byte_shift_size));
+						ret |= temp;
+					}
+					return ret;
+				}
+				else //constexpr (std::endian::native == std::endian::big)
+				{
+					ret_t ret = 0;
+					for (size_t index = 0 ; index < byteCount; ++index)
+					{
+						byte b = bytes[index];
+						auto temp = static_cast<ret_t>(b);
+						//if will become when cast negative, result of subtraction will be bigger than byteCount
+						assert((byteCount - 1 - index) < byteCount); 
+						const auto left_shift_amount = static_cast<int>(byteCount - 1 - index);
+						temp <<= left_shift_amount;
+						ret |= temp;
+					}
+					return ret;
+				}
+			}
+			else
+			{
+				return bit_cast<uint128, byte_array>(bytes);
+			}
+		}
 
+		constexpr uint128::byte_array uint128::to_bytes_native(uint128 convert_me) noexcept
+		{
+			static_assert(std::endian::native == std::endian::little || std::endian::native == std::endian::big,
+				"Mixed endian is not supported.");
+			using namespace cjm::numerics::uint128_literals;
+			constexpr size_t shift_amount = CHAR_BIT;
+			if (std::is_constant_evaluated())
+			{
+				if constexpr (constexpr_bit_casting)
+				{
+					return bit_cast<byte_array, uint128>(convert_me);
+				}
+				else
+				{
+					if constexpr (std::endian::native == std::endian::little)
+					{
+						auto all_ones_in_byte = 0xff_u128;
+						const size_t num_bytes = sizeof(uint128);
+						auto ret = byte_array{};
+						for (size_t index = 0; index < ret.size(); ++index)
+						{
+							const auto mask = all_ones_in_byte << static_cast<int>(index * shift_amount);
+							const auto zeroed_out_except_relevant = mask & convert_me;
+							ret[index] = static_cast<unsigned char>((zeroed_out_except_relevant >> static_cast<int>(index * shift_amount)));
+						}
+						return ret;
+					}
+					else // constexpr (std::endian::native == std::endian::big)
+					{
+						auto all_ones_in_byte = 0xff00'0000'0000'0000'0000'0000'0000'0000_u128;
+						const size_t num_bytes = sizeof(uint128);
+						auto ret = byte_array{};
+						for (size_t index = 0; index < ret.size(); ++index)
+						{
+							const auto mask = all_ones_in_byte >> static_cast<int>(index * shift_amount);
+							const auto zeroed_out_except_relevant = mask & convert_me;
+							const auto rshift_amount = static_cast<int>((ret.size() - 1 - index) * shift_amount);
+							assert(rshift_amount > -1);
+							ret[index] = static_cast<unsigned char>((zeroed_out_except_relevant >> rshift_amount));
+						}
+						return ret;
+					}
+				}
+			}
+			else
+			{
+				return bit_cast<byte_array, uint128>(convert_me);
+			}
+
+		}
+		
 
 		inline uint128 uint128::lshift_msvc_x64(uint128 shift_me, int shift_amount) noexcept
 		{
@@ -685,7 +847,7 @@ namespace cjm
                 intpart lo = ~operand.low_part() + 1;
                 if (lo == 0)
                     ++high; // carry
-                return uint128::MakeUint128(high, lo);
+                return uint128::make_uint128(high, lo);
             }
             else
             {
@@ -704,7 +866,7 @@ namespace cjm
                     intpart lo = ~operand.low_part() + 1;
                     if (lo == 0)
                         ++high; // carry
-                    return uint128::MakeUint128(high, lo);
+                    return uint128::make_uint128(high, lo);
                 }
             }
 
@@ -715,7 +877,7 @@ namespace cjm
 		}
 		constexpr uint128 operator~(uint128 operand) noexcept
 		{
-			return uint128::MakeUint128(~operand.high_part(), ~operand.low_part());
+			return uint128::make_uint128(~operand.high_part(), ~operand.low_part());
 		}
 		constexpr bool operator!(uint128 operand) noexcept
 		{
@@ -724,17 +886,17 @@ namespace cjm
 		//Logical operators
 		constexpr uint128 operator&(uint128 lhs, uint128 rhs) noexcept
 		{
-			return uint128::MakeUint128(lhs.high_part() & rhs.high_part(),
+			return uint128::make_uint128(lhs.high_part() & rhs.high_part(),
 				lhs.low_part() & rhs.low_part());
 		}
 		constexpr uint128 operator|(uint128 lhs, uint128 rhs) noexcept
 		{
-			return uint128::MakeUint128(lhs.high_part() | rhs.high_part(),
+			return uint128::make_uint128(lhs.high_part() | rhs.high_part(),
 				lhs.low_part() | rhs.low_part());
 		}
 		constexpr uint128 operator^(uint128 lhs, uint128 rhs) noexcept
 		{
-			return uint128::MakeUint128(lhs.high_part() ^ rhs.high_part(),
+			return uint128::make_uint128(lhs.high_part() ^ rhs.high_part(),
 				lhs.low_part() ^ rhs.low_part());
 		}
 		//bit shift operators
@@ -751,13 +913,13 @@ namespace cjm
                 {
                     if (absAmount != 0)
                     {
-                        return uint128::MakeUint128((lhs.high_part() >> absAmount),
+                        return uint128::make_uint128((lhs.high_part() >> absAmount),
                                                     (lhs.low_part() >> absAmount) |
                                                     (lhs.high_part() << (static_cast<int>(uint128::int_part_bits) -absAmount)));
                     }
                     return lhs;
                 }
-                return uint128::MakeUint128(0, lhs.high_part() >> (absAmount - static_cast<int>(uint128::int_part_bits)));
+                return uint128::make_uint128(0, lhs.high_part() >> (absAmount - static_cast<int>(uint128::int_part_bits)));
             }
             else
             {
@@ -780,13 +942,13 @@ namespace cjm
                     {
                         if (absAmount != 0)
                         {
-                            return uint128::MakeUint128((lhs.high_part() >> absAmount),
+                            return uint128::make_uint128((lhs.high_part() >> absAmount),
                                                         (lhs.low_part() >> absAmount) |
                                                         (lhs.high_part() << (static_cast<int>(uint128::int_part_bits) -absAmount)));
                         }
                         return lhs;
                     }
-                    return uint128::MakeUint128(0, lhs.high_part() >> (absAmount - static_cast<int>(uint128::int_part_bits)));
+                    return uint128::make_uint128(0, lhs.high_part() >> (absAmount - static_cast<int>(uint128::int_part_bits)));
                 }
             }
 
@@ -805,12 +967,12 @@ namespace cjm
                 {
                     if (absAmount != 0)
                     {
-                        return uint128::MakeUint128((lhs.high_part() << absAmount) |
+                        return uint128::make_uint128((lhs.high_part() << absAmount) |
                                                     (lhs.low_part() >> (static_cast<int>(uint128::int_part_bits) - absAmount)), lhs.low_part() << absAmount);
                     }
                     return lhs;
                 }
-                return uint128::MakeUint128(lhs.low_part() << (absAmount - static_cast<int>(uint128::int_part_bits)), 0);
+                return uint128::make_uint128(lhs.low_part() << (absAmount - static_cast<int>(uint128::int_part_bits)), 0);
             }
             else
             {
@@ -834,12 +996,12 @@ namespace cjm
                     {
                         if (absAmount != 0)
                         {
-                            return uint128::MakeUint128((lhs.high_part() << absAmount) |
+                            return uint128::make_uint128((lhs.high_part() << absAmount) |
                                                         (lhs.low_part() >> (static_cast<int>(uint128::int_part_bits) - absAmount)), lhs.low_part() << absAmount);
                         }
                         return lhs;
                     }
-                    return uint128::MakeUint128(lhs.low_part() << (absAmount - static_cast<int>(uint128::int_part_bits)), 0);
+                    return uint128::make_uint128(lhs.low_part() << (absAmount - static_cast<int>(uint128::int_part_bits)), 0);
                 }
             }
 
@@ -860,11 +1022,11 @@ namespace cjm
 		{
             if (std::is_constant_evaluated())
             {
-                uint128 result = uint128::MakeUint128(lhs.high_part() + rhs.high_part(),
+                uint128 result = uint128::make_uint128(lhs.high_part() + rhs.high_part(),
                                                       lhs.low_part() + rhs.low_part());
                 if (result.low_part() < lhs.low_part()) // check for carry
                 {
-                    return uint128::MakeUint128(result.high_part() + 1, result.low_part());
+                    return uint128::make_uint128(result.high_part() + 1, result.low_part());
                 }
                 return result;
             }
@@ -880,11 +1042,11 @@ namespace cjm
 //              }
                 else // constexpr (calculation_mode == uint128_calc_mode::default_eval)
                 {
-                    uint128 result = uint128::MakeUint128(lhs.high_part() + rhs.high_part(),
+                    uint128 result = uint128::make_uint128(lhs.high_part() + rhs.high_part(),
                                                           lhs.low_part() + rhs.low_part());
                     if (result.low_part() < lhs.low_part()) // check for carry
                     {
-                        return uint128::MakeUint128(result.high_part() + 1, result.low_part());
+                        return uint128::make_uint128(result.high_part() + 1, result.low_part());
                     }
                     return result;
                 }
@@ -895,11 +1057,11 @@ namespace cjm
 		{
             if (std::is_constant_evaluated())
             {
-                uint128 result = uint128::MakeUint128(lhs.high_part() - rhs.high_part(),
+                uint128 result = uint128::make_uint128(lhs.high_part() - rhs.high_part(),
                                                       lhs.low_part() - rhs.low_part());
                 if (lhs.low_part() < rhs.low_part()) // check for borrow
                 {
-                    return uint128::MakeUint128(result.high_part() - 1, result.low_part());
+                    return uint128::make_uint128(result.high_part() - 1, result.low_part());
                 }
                 return result;
             }
@@ -915,11 +1077,11 @@ namespace cjm
 //              }
                 else // constexpr (calculation_mode == uint128_calc_mode::default_eval)
                 {
-                    uint128 result = uint128::MakeUint128(lhs.high_part() - rhs.high_part(),
+                    uint128 result = uint128::make_uint128(lhs.high_part() - rhs.high_part(),
                                                           lhs.low_part() - rhs.low_part());
                     if (lhs.low_part() < rhs.low_part()) // check for borrow
                     {
-                        return uint128::MakeUint128(result.high_part() - 1, result.low_part());
+                        return uint128::make_uint128(result.high_part() - 1, result.low_part());
                     }
                     return result;
                 }
@@ -935,7 +1097,7 @@ namespace cjm
                 int_part b32 = rhs.low_part() >> uint128::int_part_bottom_half_bits;
                 int_part b00 = rhs.low_part() & uint128::int_part_bottom_half_bitmask;
 
-                uint128 result = uint128::MakeUint128(lhs.high_part() * rhs.low_part() +
+                uint128 result = uint128::make_uint128(lhs.high_part() * rhs.low_part() +
                                                       lhs.low_part() * rhs.high_part() +
                                                       a32 * b32,
                                                       a00 * b00);
@@ -953,7 +1115,7 @@ namespace cjm
 	            {
 					std::uint64_t carry = 0;
 					std::uint64_t low_product = CJM_UMUL128(lhs.low_part(), rhs.low_part(), &carry);
-					return uint128::MakeUint128(lhs.low_part() * rhs.high_part() + lhs.high_part() * rhs.low_part() + carry, low_product);
+					return uint128::make_uint128(lhs.low_part() * rhs.high_part() + lhs.high_part() * rhs.low_part() + carry, low_product);
 		        }
                 else // constexpr (calculation_mode == uint128_calc_mode::default_eval)
                 {
@@ -963,7 +1125,7 @@ namespace cjm
                     int_part b32 = rhs.low_part() >> uint128::int_part_bottom_half_bits;
                     int_part b00 = rhs.low_part() & uint128::int_part_bottom_half_bitmask;
 
-                    uint128 result = uint128::MakeUint128(lhs.high_part() * rhs.low_part() +
+                    uint128 result = uint128::make_uint128(lhs.high_part() * rhs.low_part() +
                                                           lhs.low_part() * rhs.high_part() +
                                                           a32 * b32,
                                                           a00 * b00);
@@ -1355,7 +1517,7 @@ constexpr cjm::numerics::uint128 std::numeric_limits<cjm::numerics::uint128>::lo
 
 constexpr cjm::numerics::uint128 std::numeric_limits<cjm::numerics::uint128>::max() noexcept
 {
-	return cjm::numerics::uint128::MakeUint128(
+	return cjm::numerics::uint128::make_uint128(
 		std::numeric_limits<std::uint64_t>::max(),
 		std::numeric_limits<std::uint64_t>::max());
 }

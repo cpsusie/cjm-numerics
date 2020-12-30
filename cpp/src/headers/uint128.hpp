@@ -5,6 +5,7 @@
 #include<limits>
 #include<cassert>
 #include<optional>
+#include<array>
 #include "numerics.hpp"
 #include "cjm_numeric_concepts.hpp"
 #include "cjm_string.hpp"
@@ -319,9 +320,10 @@ namespace cjm::numerics
                 requires cjm::numerics::concepts::char_with_traits<Chars, CharTraits>
         static uint128 make_from_string(std::basic_string_view<Chars, CharTraits> parseMe);
         static constexpr uint128 make_from_bytes_little_endian(byte_array bytes) noexcept;
+        static constexpr uint128 make_from_bytes_big_endian(byte_array bytes) noexcept;
         //todo fixit implement:
     	//static constexpr uint128 make_from_bytes_big_endian(byte_array bytes) noexcept;
-        static constexpr uint128 MakeUint128(std::uint64_t high, std::uint64_t low) noexcept;
+        static constexpr uint128 make_uint128(std::uint64_t high, std::uint64_t low) noexcept;
         static constexpr std::optional<divmod_result_t> try_div_mod(uint128 dividend, uint128 divisor) noexcept;
     	static constexpr divmod_result_t div_mod(uint128 dividend, uint128 divisor);
         static constexpr divmod_result_t unsafe_div_mod(uint128 dividend, uint128 divisor) noexcept;
@@ -406,7 +408,7 @@ namespace cjm::numerics
             requires cjm::numerics::concepts::char_with_traits_and_allocator<Char, CharTraits, Allocator>
         friend std::basic_ostream<Char, CharTraits>& operator<<(std::basic_ostream<Char, CharTraits>& os, uint128 v);
 
-        //Accessor for sub-compenents
+        //Accessor for sub-components
         [[nodiscard]] constexpr int_part low_part() const noexcept;
         [[nodiscard]] constexpr int_part high_part() const noexcept;
 
@@ -417,6 +419,8 @@ namespace cjm::numerics
         constexpr uint128(int_part high, int_part low) noexcept;
         static constexpr size_t calculate_hash(int_part hi, int_part low) noexcept;
         static constexpr void hash_combine(size_t& seed, size_t newVal) noexcept;
+        static constexpr uint128 make_from_bytes_native(byte_array b) noexcept;
+        static constexpr byte_array to_bytes_native(uint128 convert_me) noexcept;
         inline static uint128 lshift_msvc_x64(uint128 shift_me, int shift_amount) noexcept;
         inline static uint128 rshift_msvc_x64(uint128 shift_me, int shift_amount) noexcept;
         static void best_safe_div_mod(uint128 dividend, uint128 divisor, uint128 * quotient, uint128 * remainder);

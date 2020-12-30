@@ -86,7 +86,7 @@ namespace cjm::numerics::concepts
     ///     3- be trivially copyable
     /// </summary>
     template<typename To, typename From>
-    concept bit_castable = sizeof(To) == sizeof(From) && alignof(To) == alignof(From)
+    concept bit_castable = sizeof(To) == sizeof(From) 
         && std::is_trivially_copyable_v<To> && std::is_trivially_copyable_v<From> && !std::is_polymorphic_v<To> && !std::is_polymorphic_v<From> && std::is_nothrow_default_constructible_v<To> && std::is_nothrow_default_constructible_v<From>;
 
 

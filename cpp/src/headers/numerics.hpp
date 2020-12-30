@@ -1,5 +1,5 @@
-#ifndef CJM_NUMERICS_HPP
-#define CJM_NUMERICS_HPP
+#ifndef CJM_NUMERICS_HPP_
+#define CJM_NUMERICS_HPP_
 #if defined(_MSC_VER) && defined(_M_X64)
 #include <intrin.h>
 #pragma intrinsic(_umul128)
@@ -25,28 +25,19 @@
 #define CJM_LSHIFT128 internal::cjm_bad_shiftleft128
 #define CJM_RSHIFT128 internal::cjm_bad_shiftright128
 #endif
+
 #include <cmath>
 #include <limits>
 #include <type_traits>
-#include <boost/multiprecision/cpp_int.hpp>
-#ifdef  __clang__
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wunused-parameter"
-#include <boost/multiprecision/cpp_dec_float.hpp>
-#pragma clang diagnostic pop
-#else
-#include <boost/multiprecision/cpp_dec_float.hpp>
-#endif
-
-// ReSharper disable once CppUnusedIncludeDirective
-#include <boost/functional/hash.hpp>
 #include <numeric>
 #include <cstring>
 #include "cjm_numeric_concepts.hpp"
-#ifdef __cpp_lib_bit_cast
 #include <bit>
+#ifdef __cpp_lib_bit_cast
+#define CJM_BIT_CAST_CONST constexpr
+#else
+#define CJM_BIT_CAST_CONST inline
 #endif
-
 namespace cjm
 {
 	
@@ -65,6 +56,13 @@ namespace cjm
 			extern std::uint64_t cjm_bad_shiftright128(std::uint64_t low, std::uint64_t high, unsigned char shift_amount);
 		}
 		class uint128;
+
+		constexpr bool constexpr_bit_casting =
+#ifdef __cpp_lib_bit_cast
+			true;
+#else
+			false;
+#endif
 	    constexpr bool has_msc_x64 =
 #ifdef CJM_MSC_X64
         true;
@@ -108,43 +106,29 @@ namespace cjm
         };
 		constexpr uint128_calc_mode init_eval_mode() noexcept;
 
-#ifdef __cpp_lib_bit_cast
+		/// <summary>
+		/// Serves as a proxy for C++20's std::bit_cast which is not
+		/// yet available on Clang.  If std::bit_cast is available,
+		/// it simply delegates to std::bit_cast and IS constexpr.
+		///
+		/// If std::bit_cast is NOT available, uses std::memcpy and
+		/// IS NOT constexpr.
+		/// </summary>
+		/// <typeparam name="To">The type to bit_cast to.</typeparam>
+		/// <typeparam name="From">The type to bit_cast from.</typeparam>
+		/// <param name="f">the object to bit_cast</param>
+		/// <returns>An object of type To that contains the same bit-pattern
+		/// as f.</returns>
+		/// <remarks>
+		/// The concept bit_castable requires:
+		///		To and From must have same size and alignment.
+		///		To and From must be nothrow default constructible.
+		///		To and From must be trivially copyable.
+		/// </remarks>
 		template<typename To, typename From>
-	       requires cjm::numerics::concepts::bit_castable<To, From>
-	    constexpr To bit_cast(const From& f) noexcept
-	    {
-	        return std::bit_cast<To, From>(f);
-	    }
-#else
-        template<typename To, typename From>
-            requires cjm::numerics::concepts::bit_castable<To, From>
-        To bit_cast(const From& f) noexcept
-        {
-            //GCC seems to get all butthurt about private member variables even if type is trivial.
-            //All c++ standard requires is trivially copyable and same size (and non-overlapping).  the concepts here
-            //enforce MORE than that requirement (also require triviality in general and alignment same)
-            //Suppressing because uint128 is a type that is trivially copyable-to.
-            auto dst = To{};
-#if  (defined(__GNUC__) && !defined(__clang__))
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wclass-memaccess"
-            std::memcpy(&dst, &f, sizeof(To));  /* no diagnostic for this one */
-#pragma GCC diagnostic pop
-#else
-            std::memcpy(&dst, &f, sizeof(To));
-#endif
-            return dst;
-        }
-#endif
-
-		using uint128_alt = boost::multiprecision::uint128_t;
-		using int128 = boost::multiprecision::int128_t;
-		using uint256 = boost::multiprecision::uint256_t;
-		using int256 = boost::multiprecision::int256_t;
-		using huge_decimal = boost::multiprecision::cpp_dec_float_100;
-		using large_decimal = boost::multiprecision::cpp_dec_float_50;
-		using norm_decimal = boost::multiprecision::number<boost::multiprecision::cpp_dec_float<28>>;
-
+		requires cjm::numerics::concepts::bit_castable<To, From>
+		CJM_BIT_CAST_CONST To bit_cast(const From& f) noexcept;
+		
 		namespace math_functions
 		{
 			template<typename TInt>
@@ -199,11 +183,6 @@ namespace cjm
 	
 }
 
-
-namespace std
-{
-
-}
 namespace std
 {
 	template<>

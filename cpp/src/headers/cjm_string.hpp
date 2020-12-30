@@ -1,8 +1,11 @@
-#ifndef  cjm_string_hpp
-#define cjm_string_hpp
+#ifndef CJM_STRING_HPP_
+#define CJM_STRING_HPP_
+#include <iostream>
+#include <iomanip>
 #include <string>
 #include <string_view>
 #include <sstream>
+#include <algorithm>
 #include <locale>
 #include "cjm_numeric_concepts.hpp"
 namespace cjm::string
@@ -59,5 +62,5 @@ namespace cjm::string
 	
 }
 #include "cjm_string.inl"
-#endif // ! cjm_string_hpp
+#endif // ! CJM_STRING_HPP_
 
