@@ -459,9 +459,12 @@ namespace cjm
 			return std::make_optional(unsafe_div_mod(dividend, divisor));
 		}
 
-		constexpr uint128::divmod_result_t uint128::unsafe_div_mod(uint128 dividend, uint128 divisor) noexcept
-		{
-			assert(divisor != 0);
+		constexpr uint128::divmod_result_t uint128::unsafe_div_mod(uint128 dividend, uint128 divisor) noexcept //NOLINT (bugprone-exception-escape)
+		{   //exception can only be thrown if natuint128_t is NOT a built-in (i.e. is alias for uint128)
+        	//AND calc_mode is intrinsic_u128: this is not possible .. thus linting is suppressed
+            static_assert(calculation_mode != uint128_calc_mode::intrinsic_u128 || !std::is_same_v<natuint128_t, uint128>, 
+                "It should not be possible for calc_mode to be intrinsic and have natuint128_t be set as uint128/");
+            assert(divisor != 0);
 			if (std::is_constant_evaluated())
 			{
 				uint128 quotient{};
@@ -469,7 +472,9 @@ namespace cjm
 				unsafe_constexpr_div_mod_impl(dividend, divisor, &quotient, &remainder);
 				return divmod_result_t{ quotient, remainder };
 			}
-			else
+			// ReSharper disable once CppRedundantElseKeywordInsideCompoundStatement
+        	//(I use this style with explicit else when using if constexpr or std::is_constant_evaluated)
+			else  // ReSharper disable CppUnreachableCode				
 			{
 				if constexpr (calculation_mode == uint128_calc_mode::intrinsic_u128)
 				{
@@ -489,7 +494,8 @@ namespace cjm
 					unsafe_constexpr_div_mod_impl(dividend, divisor, &quotient, &remainder);
 					return divmod_result_t{ quotient, remainder };
 				}
-			}
+			}// ReSharper restore CppUnreachableCode
+            
 		}
 
 #ifdef CJM_NUMERICS_LITTLE_ENDIAN
