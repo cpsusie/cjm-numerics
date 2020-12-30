@@ -321,8 +321,6 @@ namespace cjm::numerics
         static uint128 make_from_string(std::basic_string_view<Chars, CharTraits> parseMe);
         static constexpr uint128 make_from_bytes_little_endian(byte_array bytes) noexcept;
         static constexpr uint128 make_from_bytes_big_endian(byte_array bytes) noexcept;
-        //todo fixit implement:
-    	//static constexpr uint128 make_from_bytes_big_endian(byte_array bytes) noexcept;
         static constexpr uint128 make_uint128(std::uint64_t high, std::uint64_t low) noexcept;
         static constexpr std::optional<divmod_result_t> try_div_mod(uint128 dividend, uint128 divisor) noexcept;
     	static constexpr divmod_result_t div_mod(uint128 dividend, uint128 divisor);
