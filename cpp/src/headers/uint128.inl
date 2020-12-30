@@ -25,6 +25,12 @@
 // File: int128.h 
 // -----------------------------------------------------------------------------
 
+
+constexpr size_t std::hash<cjm::numerics::uint128>::operator()(const cjm::numerics::uint128& keyVal) const noexcept
+{
+    return keyVal.hash_code();
+}
+
 namespace cjm
 {
 	namespace numerics
@@ -83,15 +89,15 @@ namespace cjm
             constexpr std::pair<bool, size_t> uint128_lit_helper::scan_chars_dec(std::array<char, Size> arr)
             {
                 std::pair<bool, size_t> ret;
-                if (arr.size() == 0)
+                if (arr.empty())
                 {
                     ret.first = false;
                     ret.second = 0;
                 }
                 else
                 {
-                    char currentChar = arr[0];
-                    if (currentChar == '0' || !(currentChar >= 0x30 && currentChar <= 0x39))
+                    char current_char = arr[0];
+                    if (current_char == '0' || !(current_char >= 0x30 && current_char <= 0x39))
                     {
                         ret.first = false;
                         ret.second = 0;
@@ -100,15 +106,15 @@ namespace cjm
                     {
                         ret.first = true;
                         ret.second = 1;
-                        currentChar = ret.second < arr.size() ? arr[ret.second] : '\0';
-                        if (currentChar != '\0')
+                        current_char = ret.second < arr.size() ? arr[ret.second] : '\0';
+                        if (current_char != '\0')
                         {
-                            while (currentChar != '\0')
+                            while (current_char != '\0')
                             {
                                 ++ret.second;
                                 if (ret.first)
-                                    ret.first = (currentChar == '\'') || (currentChar >= 0x30 && currentChar <= 0x39);
-                                currentChar = ret.second < arr.size() ? arr[ret.second] : '\0';
+                                    ret.first = (current_char == '\'') || (current_char >= 0x30 && current_char <= 0x39);
+                                current_char = ret.second < arr.size() ? arr[ret.second] : '\0';
                             }
                         }
                         else
@@ -125,8 +131,8 @@ namespace cjm
             {
                 //if we got here we know that every char in chars is either \' or a legal digit
                 std::pair<size_t, size_t> ret;
-                char currentChar = arr[index--];
-                if (currentChar == '\'')
+                char current_char = arr[index--];
+                if (current_char == '\'')
                 {
                     //since we cannot reasonably expect a literal to ever have size_t::max digits,
                     //if it equals the size_t::max, that means it was zero (zero - 1 == max) that
@@ -135,21 +141,21 @@ namespace cjm
                     {
                         throw std::domain_error("Cannot begin with a separator.");
                     }
-                    while (currentChar == '\'')
+                    while (current_char == '\'')
                     {
                         if (index == 0 && arr[0] == '\'')
                         {
                             throw std::domain_error("Cannot begin with a separator.");
                         }
-                        currentChar = arr[index--];
+                        current_char = arr[index--];
                     }
-                    ret.first = static_cast<size_t>(currentChar) & 0x000Full;
+                    ret.first = static_cast<size_t>(current_char) & 0x000Full;
                     assert(ret.first <= 9);
                     ret.second = index;
                 }
                 else
                 {
-                    ret.first = static_cast<size_t>(currentChar) & 0x000Full;
+                    ret.first = static_cast<size_t>(current_char) & 0x000Full;
                     ret.second = index;
                 }
                 return ret;
@@ -513,7 +519,7 @@ namespace cjm
 		constexpr uint128::uint128(int v) noexcept
 			: m_low{ static_cast<int_part>(v) },
 			m_high{ v < 0 ? std::numeric_limits<int_part>::max() : 0 } {}
-		constexpr uint128::uint128(unsigned v) noexcept : m_low{ v }, m_high{ 0 } {}
+		constexpr uint128::uint128(unsigned int v) noexcept : m_low{ v }, m_high{ 0 } {}
 		constexpr uint128::uint128(long v) noexcept
 			: m_low{ static_cast<int_part>(v) },
 			m_high{ v < 0 ? std::numeric_limits<int_part>::max() : 0 } {}
@@ -603,7 +609,13 @@ namespace cjm
 		{
 			return static_cast<unsigned char>(m_low);
 		}
-		constexpr uint128::operator char16_t() const noexcept
+
+        constexpr uint128::operator char8_t() const noexcept
+        {
+            return static_cast<char8_t>(m_low);
+        }
+
+        constexpr uint128::operator char16_t() const noexcept
 		{
 			return static_cast<char16_t>(m_low);
 		}
@@ -875,7 +887,8 @@ namespace cjm
 					return ret;
 				}
 			}
-			else
+			// ReSharper disable once CppRedundantElseKeywordInsideCompoundStatement
+			else // ReSharper disable once CppUnreachableCode
 			{
 				return bit_cast<uint128, byte_array>(bytes);
 			}
@@ -922,24 +935,23 @@ namespace cjm
 						return ret;
 					}
 				}
-			}
-			else
+			} // ReSharper disable once CppRedundantElseKeywordInsideCompoundStatement
+			else // ReSharper disable once CppUnreachableCode
 			{
 				return bit_cast<byte_array, uint128>(convert_me);
 			}
-
 		}
 		
 
 		inline uint128 uint128::lshift_msvc_x64(uint128 shift_me, int shift_amount) noexcept
 		{
 			assert(shift_amount > -1 && shift_amount < std::numeric_limits<uint128>::digits);
-			auto ret = uint128{};
+            uint128 ret;
 			if (shift_amount >= 64)
 			{
 				ret.m_high = shift_me.m_low;
 				ret.m_low = 0;
-				ret.m_high <<= (shift_amount - 64);
+				ret.m_high =  (ret.m_high << (shift_amount - 64)); 
 			}
 			else
 			{

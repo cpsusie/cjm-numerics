@@ -6,6 +6,7 @@
 #include<cassert>
 #include<optional>
 #include<array>
+#include<functional>
 #include "numerics.hpp"
 #include "cjm_numeric_concepts.hpp"
 #include "cjm_string.hpp"
@@ -233,7 +234,22 @@ namespace cjm::numerics
     };
 
 }
+namespace std
+{
+    /************************************************************************/
+    /* Defines the default hash-code generator struct
+    * so uint128's can be used in unordered_maps, unordered_sets,
+    * or any other use for which std::hash is used by default       */
+    /************************************************************************/
+    template<>
+    struct hash<cjm::numerics::uint128>
+    {
+        constexpr hash() noexcept = default;
+        constexpr size_t operator()(const cjm::numerics::uint128& keyVal) const noexcept;      
+    };
 
+    
+}
 
 namespace cjm::numerics
 {
@@ -324,7 +340,7 @@ namespace cjm::numerics
         static constexpr uint128 make_uint128(std::uint64_t high, std::uint64_t low) noexcept;
         static constexpr std::optional<divmod_result_t> try_div_mod(uint128 dividend, uint128 divisor) noexcept;
     	static constexpr divmod_result_t div_mod(uint128 dividend, uint128 divisor);
-        static constexpr divmod_result_t unsafe_div_mod(uint128 dividend, uint128 divisor) noexcept;
+        static constexpr divmod_result_t unsafe_div_mod(uint128 dividend, uint128 divisor) noexcept; //NOLINT (bugprone-exception-escape)
         static void instrumented_div_mod(std::basic_ostream<char>& stream, uint128 dividend, uint128 divisor,
             uint128* quotient_ret, uint128* remainder_ret);
         static constexpr int_part int_part_bits{ sizeof(int_part) * CHAR_BIT };
@@ -356,6 +372,7 @@ namespace cjm::numerics
         constexpr explicit operator char() const noexcept;
         constexpr explicit operator signed char() const noexcept;
         constexpr explicit operator unsigned char() const noexcept;
+        constexpr explicit operator char8_t() const noexcept;
         constexpr explicit operator char16_t() const noexcept;
         constexpr explicit operator char32_t() const noexcept;
         constexpr explicit operator wchar_t() const noexcept;
@@ -445,10 +462,13 @@ namespace cjm::numerics
 #endif
     };
 
-   
-
+    static_assert(concepts::nothrow_convertible<std::array<unsigned char, sizeof(uint128)>, typename uint128::byte_array>);
+    static_assert(concepts::cjm_unsigned_integer<uint128>, "Needs to comply with cjm_unsigned_integer concept.");
     static_assert(concepts::integer<uint128>, "Needs to be an integer.");
 }
+
+
+
 namespace std
 { //fixme todo --- get rid of the traits overloads -- undefined behavior
 	template<>
@@ -456,20 +476,7 @@ namespace std
 	{
 		using type = cjm::numerics::uint128;
 	};
-	/************************************************************************/
-	/* Defines the default hash-code generator struct
-	* so uint128's can be used in unordered_maps, unordered_sets,
-	* or any other use for which std::hash is used by default       */
-	/************************************************************************/
-	template<>
-	struct hash<cjm::numerics::uint128>
-	{
-		constexpr hash() noexcept = default;
-		constexpr size_t operator()(const cjm::numerics::uint128& keyVal) const noexcept 
-		{
-			return keyVal.hash_code();
-		}
-	};
+	
 
 
 
@@ -583,31 +590,7 @@ namespace cjm
 			};
 		}
 
-        template<concepts::integer IntegerType>
-        struct divmod_result final
-        {
-            using int_t = IntegerType;
-            int_t quotient;
-            int_t remainder;
-            constexpr divmod_result(int_t quot, int_t rem) noexcept : quotient{ quot }, remainder{ rem } {}
-            constexpr divmod_result() noexcept : quotient{}, remainder{} {}
-            constexpr divmod_result(const divmod_result& other) noexcept = default;
-            constexpr divmod_result(divmod_result&& other) noexcept = default;
-            constexpr divmod_result& operator=(const divmod_result& other) noexcept = default;
-            constexpr divmod_result& operator=(divmod_result&& other) noexcept = default;
-            ~divmod_result() = default;
-
-            constexpr auto operator<=>(const divmod_result& other) const noexcept
-            {
-                if (other.quotient == quotient)
-                {
-                    if (other.remainder == remainder)
-                        return 0;
-                    return other.remainder > remainder ? -1 : 1;
-                }
-                return other.quotient > quotient ? -1 : 1;
-            }
-        };
+        
 	}
 }
 

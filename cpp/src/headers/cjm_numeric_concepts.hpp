@@ -11,11 +11,13 @@
 #include <iostream>
 #include <sstream>
 #include <string>
+#include <functional>
 
 
 
 namespace cjm::numerics::concepts
 {
+
     /// <summary>
     /// Applies if the type is a number ... considers anything that specializes
     /// std::numeric_limits to be a number.
@@ -50,7 +52,94 @@ namespace cjm::numerics::concepts
     /// </summary>
     template<typename T>
     concept builtin_unsigned_integer = builtin_integer<T> && unsigned_integer<T>;
+}
 
+namespace cjm::numerics
+{
+    template<concepts::integer IntegerType>
+    struct divmod_result final
+    {
+        using int_t = IntegerType;
+        int_t quotient;
+        int_t remainder;
+        constexpr divmod_result(int_t quot, int_t rem) noexcept : quotient{ quot }, remainder{ rem } {}
+        constexpr divmod_result() noexcept : quotient{}, remainder{} {}
+        constexpr divmod_result(const divmod_result& other) noexcept = default;
+        constexpr divmod_result(divmod_result&& other) noexcept = default;
+        constexpr divmod_result& operator=(const divmod_result& other) noexcept = default;
+        constexpr divmod_result& operator=(divmod_result&& other) noexcept = default;
+        ~divmod_result() = default;
+
+        constexpr auto operator<=>(const divmod_result& other) const noexcept
+        {
+            if (other.quotient == quotient)
+            {
+                if (other.remainder == remainder)
+                    return 0;
+                return other.remainder > remainder ? -1 : 1;
+            }
+            return other.quotient > quotient ? -1 : 1;
+        }
+    };
+}
+
+namespace cjm::numerics::concepts
+{
+    template<typename T, size_t Size>
+    concept matches_size = (sizeof(T) == Size);
+
+	template<typename TArray, typename TElement, size_t Size>
+    concept is_array_of_T_of_size = std::is_same_v<std::array<TElement, Size>, TArray>;
+
+    template<typename To, typename From>
+    concept nothrow_convertible = std::is_same_v<To, From> || std::is_nothrow_convertible_v<From, To>;
+
+	namespace internal
+	{
+		template<typename To, typename From>
+        concept nothrow_castable_helper = requires (From x)
+        {
+            {static_cast<To>(x)} noexcept -> nothrow_convertible<To>;
+        };
+	}
+
+    template<typename To, typename From>
+    concept nothrow_castable = nothrow_convertible<To, From> || internal::nothrow_castable_helper<To, From>;
+	
+    template<typename T>
+    concept hashable = requires(T x)
+    {
+        {std::hash<T>{}(x)} noexcept -> nothrow_convertible<size_t>;
+    };
+
+    template<concepts::integer IntegerType>
+    struct divmod_result;
+	
+    template<typename T>
+    concept cjm_unsigned_integer = !builtin_integer<T> &&
+        unsigned_integer<T> &&
+        std::is_nothrow_default_constructible_v<T> &&
+        std::is_nothrow_convertible_v<typename T::int_part, T> &&
+        std::is_nothrow_convertible_v<typename T::divmod_result_t, numerics::divmod_result<T>> && 
+        std::is_trivially_copyable_v<T> &&
+        std::is_trivially_move_constructible_v<T> &&
+        std::is_trivially_copy_assignable_v<T> &&
+        std::is_trivially_move_assignable_v<T> &&
+        std::is_trivially_destructible_v<T> &&
+        !std::is_polymorphic_v<T> &&
+        std::is_final_v<T> &&
+        std::regular<T> &&
+        unsigned_integer<typename T::int_part> &&
+        matches_size<typename T::int_part, (sizeof(T) / 2)> &&
+        is_array_of_T_of_size<typename T::byte_array, unsigned char, sizeof(T)> && 
+        hashable<T>
+	;/*&&
+									requires (T x, T y, const T& x_const, const T& y_const, int s)
+    {
+        
+    
+    };*/
+	
     template<typename T>
     concept character = std::is_nothrow_convertible_v<T, char> ||
             std::is_nothrow_convertible_v<T, char8_t> ||

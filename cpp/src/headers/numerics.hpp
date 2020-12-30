@@ -31,6 +31,7 @@
 #include <type_traits>
 #include <numeric>
 #include <cstring>
+#include <functional>
 #include "cjm_numeric_concepts.hpp"
 #include <bit>
 #ifdef __cpp_lib_bit_cast
