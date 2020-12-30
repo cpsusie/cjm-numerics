@@ -25,7 +25,7 @@
 #define CJM_LSHIFT128 internal::cjm_bad_shiftleft128
 #define CJM_RSHIFT128 internal::cjm_bad_shiftright128
 #endif
-
+#include <climits>
 #include <cmath>
 #include <limits>
 #include <type_traits>
