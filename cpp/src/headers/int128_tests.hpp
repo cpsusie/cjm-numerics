@@ -98,6 +98,7 @@ namespace cjm::uint128_tests
     void execute_basic_multiplication_test();
     void test_fls();
     void print_uint128_eval_mode();
+    void print_constexpr_bitcast_available();
     void test_interconversion(const ctrl_uint128_t& control, uint128_t test);
 
     struct binary_operation final

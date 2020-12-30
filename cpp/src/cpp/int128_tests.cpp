@@ -26,7 +26,10 @@ void cjm::uint128_tests::execute_uint128_tests()
     constexpr auto two_fifty_five = 0xff_u128;
 	constexpr auto all_at_ends = 0xff00'0000'0000'0000'0000'0000'0000'0000_u128;
     static_assert(((two_fifty_five << (15 * 8)) == all_at_ends) && ((all_at_ends >> (15 * 8)) == two_fifty_five));
+    cout << "ENVIRONMENT DATA: " << newl;
+    print_constexpr_bitcast_available();
     print_uint128_eval_mode();
+    cout << "END ENVIRONMENT DATA" << newl << newl;
     execute_test(execute_basic_test_one, "basic_test_one"sv);
     execute_test(execute_string_parse_test, "string_parse_text"sv);
     execute_test(execute_basic_multiplication_test, "basic_multiplication_test"sv);
@@ -328,6 +331,14 @@ void cjm::uint128_tests::print_uint128_eval_mode()
             break;
     }
     cout << "Arithmetic mode: [" << eval_text << "]." << newl;
+}
+
+void cjm::uint128_tests::print_constexpr_bitcast_available()
+{
+    constexpr auto avail_text = cjm::numerics::constexpr_bit_casting ? "YES"sv : "NO"sv;
+    using namespace numerics;
+    cout_saver o_saver{cout};
+    cout << "Is constexpr bitcasting available?: [" << avail_text << "]." << newl;
 }
 
 
