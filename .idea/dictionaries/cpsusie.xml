@@ -1,0 +1,36 @@
+<component name="ProjectDictionaryState">
+  <dictionary name="cpsusie">
+    <words>
+      <w>Invocable</w>
+      <w>LSHIFT</w>
+      <w>RSHIFT</w>
+      <w>adjustfield</w>
+      <w>badrev</w>
+      <w>bitscan</w>
+      <w>bugprone</w>
+      <w>cbegin</w>
+      <w>cend</w>
+      <w>constructible</w>
+      <w>cout</w>
+      <w>crbegin</w>
+      <w>crend</w>
+      <w>denorm</w>
+      <w>divmod</w>
+      <w>endian</w>
+      <w>istream</w>
+      <w>lzcnt</w>
+      <w>natuint</w>
+      <w>newl</w>
+      <w>numerics</w>
+      <w>ostream</w>
+      <w>rbegin</w>
+      <w>rgen</w>
+      <w>shiftleft</w>
+      <w>shiftright</w>
+      <w>sstream</w>
+      <w>udiv</w>
+      <w>umul</w>
+      <w>unsynchronized</w>
+    </words>
+  </dictionary>
+</component>

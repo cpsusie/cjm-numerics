@@ -180,10 +180,10 @@ namespace cjm::numerics::concepts
         nothrow_hashable<T> &&
         //implicit no-throw conversions exist to it from at least the following types:
         //bool, char, signed char, short, int, long, std::int64_t.
-        //unsigned char, unsighed short, unsigned int, unsigned long, std::uint64_t
+        //unsigned char, unsigned short, unsigned int, unsigned long, std::uint64_t
         //I do not include long long or unsigned long long because it is possible that
         //a compiler might want to make a built-in int128 defined as long long or unsigned long long
-        //std::uint64_t and std::int64_t cover the case of integers that, by definition must be 64-bit
+        //std::uint64_t and std::int64_t cover the case of integers that, by definition, must be 64-bit
         nothrow_convertible<T, bool> &&
         nothrow_convertible<T, char> &&
         nothrow_convertible<T, signed char> &&
@@ -228,50 +228,50 @@ namespace cjm::numerics::concepts
         requires (T x, T y, const T x_const, const T y_const, const int s)
     {
         //implements all binary arithmetic operators.  Only division and modulus may throw exception.
-        {x_const + y_const}     noexcept    ->  nothrow_convertible<T>;
-        {x_const - y_const}     noexcept    ->  nothrow_convertible<T>;
-        {x_const* y_const}      noexcept    ->  nothrow_convertible<T>;
-        {x_const / y_const}                 ->  nothrow_convertible<T>;
-        {x_const% y_const}                  ->  nothrow_convertible<T>;
+        {x_const + y_const}                 noexcept    ->  nothrow_convertible<T>;
+        {x_const - y_const}                 noexcept    ->  nothrow_convertible<T>;
+        {x_const* y_const}                  noexcept    ->  nothrow_convertible<T>;
+        {x_const / y_const}                             ->  nothrow_convertible<T>;
+        {x_const% y_const}                              ->  nothrow_convertible<T>;
         //implements binary bitwise operators all nothrow
-        {x_const& y_const}      noexcept    ->  nothrow_convertible<T>;
-        {x_const | y_const}     noexcept    ->  nothrow_convertible<T>;
-        {x_const^ y_const}      noexcept    ->  nothrow_convertible<T>;
+        {x_const& y_const}                  noexcept    ->  nothrow_convertible<T>;
+        {x_const | y_const}                 noexcept    ->  nothrow_convertible<T>;
+        {x_const^ y_const}                  noexcept    ->  nothrow_convertible<T>;
         //implements binary bit-shift operators with both a T operand and and int operand none throw exceptions
-        {x_const << y_const}    noexcept    ->  nothrow_convertible<T>;
-        {x_const >> y_const}    noexcept    ->  nothrow_convertible<T>;
-        {x_const << s}          noexcept    ->  nothrow_convertible<T>;
-        {x_const >> s}          noexcept    ->  nothrow_convertible<T>;
+        {x_const << y_const}                noexcept    ->  nothrow_convertible<T>;
+        {x_const >> y_const}                noexcept    ->  nothrow_convertible<T>;
+        {x_const << s}                      noexcept    ->  nothrow_convertible<T>;
+        {x_const >> s}                      noexcept    ->  nothrow_convertible<T>;
         //implements unary +,-,~,! operators
-        {+x_const}              noexcept    ->  nothrow_convertible<T>;
-        {-x_const}              noexcept    ->  nothrow_convertible<T>;
-        {~x_const}              noexcept    ->  nothrow_convertible<T>;
-        {!x_const}              noexcept    ->  nothrow_convertible<bool>;
+        {+x_const}                          noexcept    ->  nothrow_convertible<T>;
+        {-x_const}                          noexcept    ->  nothrow_convertible<T>;
+        {~x_const}                          noexcept    ->  nothrow_convertible<T>;
+        {!x_const}                          noexcept    ->  nothrow_convertible<bool>;
         //implements prefix and postfix increment and decrement operators, which do not throw exceptions
-        {T{ ++x }}              noexcept    ->  std::same_as<T>;
-        {T{ --x }}              noexcept    ->  std::same_as<T>;
-        {T{ x-- }}              noexcept    ->  std::same_as<T>;
-        {T{ x++ }}              noexcept    ->  std::same_as<T>;
+        {T{ ++x }}                          noexcept    ->  std::same_as<T>;
+        {T{ --x }}                          noexcept    ->  std::same_as<T>;
+        {T{ x-- }}                          noexcept    ->  std::same_as<T>;
+        {T{ x++ }}                          noexcept    ->  std::same_as<T>;
         //implements the following compound assignment operators which may not throw exceptions:
         // +=(const T); -=(const T); *=(const T); &=(const T); |=(const T); ^=(const T);
         // <<=(const int), >>=(const int) --- AND TO BE ADDED: <<=(const T), >>=(const T)
-        {y += x_const}          noexcept;
-        {y -= x_const}          noexcept;
-        {y *= x_const}          noexcept;
-        {y &= x_const}          noexcept;
-        {y |= x_const}          noexcept;
-        {y ^= x_const}          noexcept;
+        {y += x_const}                      noexcept;
+        {y -= x_const}                      noexcept;
+        {y *= x_const}                      noexcept;
+        {y &= x_const}                      noexcept;
+        {y |= x_const}                      noexcept;
+        {y ^= x_const}                      noexcept;
         //todo fixit implement
-        //{y <<= x_const}         noexcept;
-        //{y >>= x_const}         noexcept;
-        {y <<= s}               noexcept;
-        {y >>= s}               noexcept;
+        //{y <<= x_const}                   noexcept;
+        //{y >>= x_const}                   noexcept;
+        {y <<= s}                           noexcept;
+        {y >>= s}                           noexcept;
         //implements the following compound assignment operators which may throw exceptions:
         {y /= x_const};
         {y %= x_const};
         //has nothrow const functions that return int_part
-        {x_const.low_part()}    noexcept    -> nothrow_convertible<typename T::int_part>;
-        {x_const.high_part()}   noexcept    -> nothrow_convertible<typename T::int_part>;
+        {x_const.low_part()}                noexcept    -> nothrow_convertible<typename T::int_part>;
+        {x_const.high_part()}               noexcept    -> nothrow_convertible<typename T::int_part>;
         //has nothrow const functions that return byte_array
         {x_const.to_little_endian_arr()}    noexcept    -> nothrow_convertible<typename T::byte_array>;
         {x_const.to_big_endian_arr()}       noexcept    -> nothrow_convertible<typename T::byte_array>;
