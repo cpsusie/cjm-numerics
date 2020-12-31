@@ -307,7 +307,7 @@ namespace cjm
                 uint128 temp;
                 switch (lt)
                 {
-                    default:
+                    default:  // NOLINT(clang-diagnostic-covered-switch-default) 
                     case lit_type::Illegal:
                         throw std::domain_error("Illegal literal: only hexadecimal and decimal are supported.");
                     case lit_type::Decimal:
@@ -1104,9 +1104,9 @@ namespace cjm
 			return static_cast<int>((std::uint64_t{ 0x3333333322221100 } >> (n32 << 2) & 0x3) + pos);
 		}
 
-		constexpr auto operator<=>(uint128 lhs, uint128 rhs) noexcept
+		constexpr std::strong_ordering operator<=>(uint128 lhs, uint128 rhs) noexcept
 		{
-			return lhs == rhs ? 0 : ((lhs > rhs) ? 1 : -1);
+			return lhs == rhs ? std::strong_ordering::equal : ((lhs > rhs) ? std::strong_ordering::greater : std::strong_ordering::less);
 		}
 
 		constexpr bool operator==(uint128 lhs, uint128 rhs) noexcept

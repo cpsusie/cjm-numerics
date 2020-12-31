@@ -1,5 +1,7 @@
 #ifndef CJM_UINT128_HPP
 #define CJM_UINT128_HPP
+#include <iostream>
+#include <compare>
 #include<cstdint>
 #include<type_traits>
 #include<limits>
@@ -107,7 +109,7 @@ namespace cjm::numerics
             requires cjm::numerics::concepts::char_with_traits_and_allocator<Char, CharTraits, Allocator>
     std::basic_ostream<Char, CharTraits>& operator<<(std::basic_ostream<Char, CharTraits>& os, uint128 v);
     //Comparison operators
-    constexpr auto operator <=>(uint128 lhs, uint128 rhs) noexcept; 
+    constexpr std::strong_ordering operator <=>(uint128 lhs, uint128 rhs) noexcept; 
     constexpr bool operator==(uint128 lhs, uint128 rhs) noexcept;
     constexpr bool operator!=(uint128 lhs, uint128 rhs) noexcept;
     constexpr bool operator>(uint128 lhs, uint128 rhs) noexcept;
@@ -351,6 +353,7 @@ namespace cjm::numerics
         constexpr uint128(uint128&& other) noexcept = default;
         constexpr uint128& operator=(const uint128& other) noexcept = default;
         constexpr uint128& operator=(uint128&& other) noexcept = default;
+        constexpr explicit uint128(int_part high, int_part low) noexcept;
         ~uint128() noexcept = default;
         // Constructors from arithmetic types
         constexpr uint128(int v) noexcept;
@@ -431,7 +434,7 @@ namespace cjm::numerics
         [[nodiscard]] constexpr byte_array to_big_endian_arr() const noexcept;
 
     private:
-        constexpr uint128(int_part high, int_part low) noexcept;
+        
         static constexpr size_t calculate_hash(int_part hi, int_part low) noexcept;
         static constexpr void hash_combine(size_t& seed, size_t newVal) noexcept;
         static constexpr uint128 make_from_bytes_native(byte_array b) noexcept;
@@ -462,6 +465,15 @@ namespace cjm::numerics
 #endif
     };
 
+    [[maybe_unused]] static void fornicate()
+    {
+    	uint128 x = 123;
+        uint128 y = ++x;
+        static_assert(std::is_nothrow_convertible_v<decltype(y=x++), uint128>);
+        //static_assert(std::is_same_v<res_t, uint128> && std::is_nothrow_convertible_v<res_t, uint128>);
+        std::cout << "Here is the answer: [" << y << "]." << std::endl;
+    }
+	
     static_assert(concepts::nothrow_convertible<std::array<unsigned char, sizeof(uint128)>, typename uint128::byte_array>);
     static_assert(concepts::cjm_unsigned_integer<uint128>, "Needs to comply with cjm_unsigned_integer concept.");
     static_assert(concepts::integer<uint128>, "Needs to be an integer.");
