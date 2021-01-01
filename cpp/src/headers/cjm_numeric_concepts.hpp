@@ -57,6 +57,9 @@ namespace cjm::numerics::concepts
 namespace cjm::numerics
 {
     template<concepts::integer IntegerType>
+    struct divmod_result;
+    	
+    template<concepts::integer IntegerType>
     struct divmod_result final
     {
         using int_t = IntegerType;
@@ -70,17 +73,48 @@ namespace cjm::numerics
         constexpr divmod_result& operator=(divmod_result&& other) noexcept = default;
         ~divmod_result() = default;
 
-        constexpr auto operator<=>(const divmod_result& other) const noexcept
+        constexpr std::strong_ordering operator<=>(const divmod_result& other) const noexcept
         {
             if (other.quotient == quotient)
             {
                 if (other.remainder == remainder)
-                    return 0;
-                return other.remainder > remainder ? -1 : 1;
+                    return std::strong_ordering::equal;
+                return other.remainder > remainder ? std::strong_ordering::less : std::strong_ordering::greater;
             }
-            return other.quotient > quotient ? -1 : 1;
+            return other.quotient > quotient ? std::strong_ordering::less : std::strong_ordering::greater;;
         }
+
+        friend constexpr bool operator==(const divmod_result& l, const divmod_result& r) noexcept = default;
+        friend constexpr bool operator!=(const divmod_result& l, const divmod_result& r) noexcept = default;
+        friend constexpr bool operator<(const divmod_result& l, const divmod_result& r) noexcept = default;
+        friend constexpr bool operator>(const divmod_result & l, const divmod_result & r) noexcept = default;
+        friend constexpr bool operator>=(const divmod_result& l, const divmod_result& r) noexcept = default;
+        friend constexpr bool operator<=(const divmod_result& l, const divmod_result& r) noexcept = default;
     };
+}
+
+namespace std
+{
+	template<cjm::numerics::concepts::integer Integer>
+	struct hash<cjm::numerics::divmod_result<Integer>>
+	{
+        constexpr hash() noexcept = default;
+        constexpr size_t operator()(const cjm::numerics::divmod_result<Integer>& hash_me) const noexcept;
+	};
+
+	template <cjm::numerics::concepts::integer Integer>
+	constexpr size_t hash<cjm::numerics::divmod_result<Integer>>::operator()(
+		const cjm::numerics::divmod_result<Integer>& hash_me) const noexcept
+	{
+        static_assert(sizeof(size_t) == 8 || sizeof(size_t) == 4, "Only 32 and 64 bit architecture supported.");
+        auto hash = size_t{ 0 };
+		size_t hash_quot = std::hash<Integer>{}(hash_me.quotient);
+		size_t hash_rem = std::hash<Integer>{}(hash_me.remainder);
+		hash = hash_quot + 0x9e3779b9 + (hash << 6) + (hash >> 2);
+        hash = hash_rem + 0x9e3779b9 + (hash << 6) + (hash >> 2);
+        return hash;
+		
+	}
 }
 
 namespace cjm::numerics::concepts
@@ -128,18 +162,47 @@ namespace cjm::numerics::concepts
         {std::hash<T>{}(x)} noexcept -> nothrow_convertible<size_t>;
     };
 
-    template<concepts::integer IntegerType>
-    struct divmod_result;
 
+
+    template<typename DivModResType, typename IntegerType>
+    concept division_modulus_result =   integer<IntegerType> &&
+										std::is_nothrow_default_constructible_v<DivModResType> &&
+										std::is_trivially_copyable_v<DivModResType> &&
+										std::constructible_from<IntegerType, IntegerType> &&
+										std::is_standard_layout_v<DivModResType> &&
+										nothrow_hashable<IntegerType> &&
+										nothrow_hashable<DivModResType> &&
+										std::totally_ordered<DivModResType> && requires (const DivModResType dmres, IntegerType it)
+    {
+        {it = dmres.quotient}    noexcept;
+        {it = dmres.remainder}   noexcept;
+        {DivModResType{ it, it }}  noexcept;
+    };
+	
+    static_assert(division_modulus_result<divmod_result<std::uint64_t>, std::uint64_t>);
+    static_assert(integer<std::uint64_t>);
+    static_assert(std::is_standard_layout_v<divmod_result<std::uint64_t>>);
+    static_assert(std::totally_ordered < divmod_result<std::uint64_t>>);
     template<typename T>
     concept size_evenly_divisible_by_char_bit = (sizeof(T) % CHAR_BIT) == 0;
 	
     template<typename T>
     concept cjm_unsigned_integer =
+        //limb tye is half size of type
+        (sizeof(typename T::int_part) == sizeof(T) /2) &&
+        //has static constexpr member called int_parts_bits equal to number of bits in int_part
+		(T::int_part_bits == std::numeric_limits<typename T::int_part>::digits) &&
+        //has static constexpr member called int_part_bottom_half_bits that equals half of int_part_bits
+        (T::int_part_bottom_half_bits == T::int_part_bits / 2) &&
+        //has static constexpr member called int_part_bottom_half_bitmask equal to the maximum value of type int_part
+        //right shifted by int_part_bottom_half_bits
+        (T::int_part_bottom_half_bitmask == std::numeric_limits<typename T::int_part>::max() 
+            >> T::int_part_bottom_half_bits )&&
         //not a built-in type
         !builtin_integer<T> &&
         //is an unsigned integer
         unsigned_integer<T> &&
+        division_modulus_result<typename T::divmod_result_t, T> &&
         // size evenly divides CHAR_BIT ... (CHAR_BIT == bits in byte on current platform)
         size_evenly_divisible_by_char_bit<T> &&
         //default constructible without exceptions
@@ -225,7 +288,7 @@ namespace cjm::numerics::concepts
         castable<float, T> &&
         castable<double, T> &&
         castable<long double, T> &&
-        requires (T x, T y, const T x_const, const T y_const, const int s)
+        requires (T x, T y, const T x_const, const T y_const, const int s, const typename T::byte_array arr)
     {
         //implements all binary arithmetic operators.  Only division and modulus may throw exception.
         {x_const + y_const}                 noexcept    ->  nothrow_convertible<T>;
@@ -275,8 +338,23 @@ namespace cjm::numerics::concepts
         //has nothrow const functions that return byte_array
         {x_const.to_little_endian_arr()}    noexcept    -> nothrow_convertible<typename T::byte_array>;
         {x_const.to_big_endian_arr()}       noexcept    -> nothrow_convertible<typename T::byte_array>;
-        //offers spaceship comparisons, which will not except:
-        { x_const <=> y_const } noexcept    -> nothrow_convertible<std::strong_ordering>;
+        //offers spaceship comparisons, which will not throw and will return a std::strong_ordering:
+        { x_const <=> y_const }             noexcept    -> nothrow_convertible<std::strong_ordering>;
+        //has nothrow static factories that create type when passed T::byte_arr
+    	{T::make_from_bytes_little_endian(arr)}
+											noexcept    -> nothrow_convertible<T>;
+		{T::make_from_bytes_big_endian(arr)}
+                                            noexcept    -> nothrow_convertible<T>;
+		//offers a static nothrow unsafe div_mod method that returns T::divmod_result_t (undefined behavior if divisor == 0
+    	{T::unsafe_div_mod(x_const, y_const)}
+											noexcept    -> nothrow_convertible<typename T::divmod_result_t>;
+        //offers a static nothrow  try_div_mod method that returns std::optional<T::divmod_result_t> returns
+    	//std::nullopt if and only if divisor == 0
+        {T::try_div_mod(x_const, y_const)}
+                                            noexcept    -> nothrow_convertible<std::optional<typename T::divmod_result_t>>;
+        //offers a div_mod method that returns T::divmod_result_t (throws std::domain_error if and only if divisor == 0)
+        {T::div_mod(x_const, y_const)}
+													    -> nothrow_convertible<typename T::divmod_result_t>;
     };
 	
     template<typename T>
