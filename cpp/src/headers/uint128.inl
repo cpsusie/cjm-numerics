@@ -1050,8 +1050,25 @@ namespace cjm
 			return internal::fls_int_part(n.low_part());
 		}
 
-		
 
+        template <cjm::numerics::concepts::builtin_unsigned_integer UI>
+        constexpr int internal::countl_zero(UI n) noexcept
+        {
+            assert(n != 0);
+            return std::countl_zero(n);
+        }
+
+        constexpr int internal::countl_zero(uint128 ui) noexcept
+        {
+            assert(ui != 0);
+            auto hp = ui.high_part();
+        	if ( hp != 0)
+        	{
+                return std::countl_zero(hp);
+        	}
+            return std::numeric_limits<typename uint128::int_part>::digits + std::countl_zero(ui.low_part());
+        }
+		
 		template <typename T>
 		constexpr void internal::step(T& n, int& pos, int shift) noexcept
 		{
@@ -1111,9 +1128,9 @@ namespace cjm
                 step<std::uint32_t>(n32, pos, 0x04);
                 return static_cast<int>((std::uint64_t{ 0x3333333322221100 } >> (n32 << 2) & 0x3) + pos);
             }
-		}
+		}       
 
-		constexpr std::strong_ordering operator<=>(uint128 lhs, uint128 rhs) noexcept
+        constexpr std::strong_ordering operator<=>(uint128 lhs, uint128 rhs) noexcept
 		{
 			return lhs == rhs ? std::strong_ordering::equal : ((lhs > rhs) ? std::strong_ordering::greater : std::strong_ordering::less);
 		}
@@ -1468,7 +1485,7 @@ namespace cjm
             {
                 if constexpr (constexpr_bit_casting)
                 {
-                    auto lz = std::countl_zero(bit_cast<natuint128_t>(value));
+                    auto lz = internal::countl_zero(bit_cast<natuint128_t>(value));
                     return static_cast<int>(std::numeric_limits<natuint128_t>::digits - 1 - lz);
                 }
                 else
@@ -1622,8 +1639,10 @@ constexpr cjm::numerics::uint128 cjm::numerics::math_functions::int_sign([[maybe
 }
 #pragma warning ( pop )
 template<>
-constexpr cjm::numerics::uint128 cjm::numerics::math_functions::int_gcd(uint128 first, uint128 second) noexcept
+constexpr cjm::numerics::uint128 cjm::numerics::math_functions::int_gcd(uint128 first, //NOLINT (bugprone-exception-escape)
+    uint128 second) noexcept //modulus operator only throws for zero divisor.  logic herein prevents divisor from being zero
 {
+    assert(first != 0 || second != 0);
 	while (second != 0)
 	{
 		uint128 r = first % second;

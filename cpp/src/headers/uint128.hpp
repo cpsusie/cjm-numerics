@@ -94,6 +94,11 @@ namespace cjm::numerics
 
         constexpr int fls_default(std::uint64_t n) noexcept;
 
+    	template<cjm::numerics::concepts::builtin_unsigned_integer UI>
+        constexpr int countl_zero(UI n) noexcept;
+
+    	constexpr int countl_zero(uint128 n) noexcept;
+    	
         template <typename T>
         constexpr void step(T& n, int& pos, int shift) noexcept;
     }
@@ -144,7 +149,8 @@ namespace cjm::numerics
         constexpr uint128 int_sign(uint128 val) noexcept;
 
         template<>
-        constexpr uint128 int_gcd(uint128 first, uint128 second) noexcept;
+        constexpr uint128 int_gcd(uint128 first, //NOLINT (bugprone-exception-escape)
+            uint128 second) noexcept;  
 
         template<>
         constexpr uint128 int_lcm(uint128 first, uint128 second);

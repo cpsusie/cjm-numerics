@@ -52,7 +52,6 @@ namespace cjm
 		{
 			//alternate declarations for cjm_intrinsic_macros ... never defined because never used but need something that won't blow compiler up
 			//when examining untaken if constexpr branch.
-			
 			extern unsigned char cjm_badrev_bitscan_64(unsigned long* index, std::uint64_t mask);
 			extern std::uint64_t cjm_bad_lzcnt_64(std::uint64_t mask);
 			extern std::uint64_t cjm_bad_umul128(std::uint64_t multiplicand, std::uint64_t multiplicand_two, std::uint64_t* carry);
@@ -105,7 +104,7 @@ namespace cjm
 #endif
 	    constexpr size_t uint128_align = alignof(uint128_align_t);
 
-
+		
 		
 
 		enum class uint128_calc_mode : std::uint8_t
