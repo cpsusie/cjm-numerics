@@ -76,7 +76,9 @@ namespace cjm::numerics
     template<concepts::integer IntegerType>
     struct divmod_result;
     
-	
+	template<cjm::numerics::concepts::can_find_most_significant_set_bitpos UI>
+    constexpr int most_sign_set_bit(UI value) noexcept;
+
     /// <summary>
     /// The calculation mode used when not constant evaluating uint128s.
     /// For GCC and Clang, if a built-in uint128_t is available, that logic is used.
@@ -90,7 +92,7 @@ namespace cjm::numerics
     {
         constexpr int fls_int_part(std::uint64_t n) noexcept;
 
-        constexpr int fls_slow(std::uint64_t n) noexcept;
+        constexpr int fls_default(std::uint64_t n) noexcept;
 
         template <typename T>
         constexpr void step(T& n, int& pos, int shift) noexcept;
@@ -348,6 +350,7 @@ namespace cjm::numerics
         static constexpr int_part int_part_bits{ sizeof(int_part) * CHAR_BIT };
         static constexpr int_part int_part_bottom_half_bits{ int_part_bits / 2 };
         static constexpr int_part int_part_bottom_half_bitmask{std::numeric_limits<int_part>::max() >> int_part_bottom_half_bits};
+        static constexpr int most_sign_set_bit(uint128 value) noexcept;
         constexpr uint128() noexcept;
         constexpr uint128(const uint128& other) noexcept = default;
         constexpr uint128(uint128&& other) noexcept = default;

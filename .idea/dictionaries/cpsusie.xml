@@ -6,6 +6,8 @@
       <w>RSHIFT</w>
       <w>adjustfield</w>
       <w>badrev</w>
+      <w>bitops</w>
+      <w>bitpos</w>
       <w>bitscan</w>
       <w>bugprone</w>
       <w>cbegin</w>

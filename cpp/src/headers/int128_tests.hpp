@@ -86,7 +86,7 @@ namespace cjm::uint128_tests
         std::array<int, pow_2_arr_size> ret{};
     	for (auto i = 0_szt; i < work_on_me.size(); ++i)
     	{
-            ret[i] = cjm::numerics::internal::fls_slow(work_on_me[i]);
+            ret[i] = cjm::numerics::internal::fls_default(work_on_me[i]);
     	}
         return ret;
     }	
@@ -99,7 +99,10 @@ namespace cjm::uint128_tests
     void test_fls();
     void print_uint128_eval_mode();
     void print_constexpr_bitcast_available();
+    void print_cpp20_bitops_available();
+    void print_builtin_uint128_data_if_present();
     void test_interconversion(const ctrl_uint128_t& control, uint128_t test);
+    void execute_builtin_u128fls_test_if_avail();
 
     struct binary_operation final
     {
@@ -197,7 +200,6 @@ void cjm::uint128_tests::execute_test(Invocable test, std::string_view test_name
         throw;
     }
 }
-
 
 
 

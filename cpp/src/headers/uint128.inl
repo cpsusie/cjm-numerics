@@ -1069,7 +1069,7 @@ namespace cjm
 		{
 			if (std::is_constant_evaluated())
 			{
-				return fls_slow(n);
+				return fls_default(n);
 			}
 			else
 			{
@@ -1083,25 +1083,34 @@ namespace cjm
 				}
 				else
 				{
-					return fls_slow(n);					
+					return fls_default(n);
 				}
 			}
 
 		}
 
-		constexpr int internal::fls_slow(std::uint64_t n) noexcept
+		constexpr int internal::fls_default(std::uint64_t n) noexcept
 		{
-			//finding the last set bit (bitpos of most significant bit with a value of one)
-				//how or why this works is totally beyond me.  It does though ... trust
-				// the google gods ....
-			assert(n != 0);
-			int pos = 0;
-			step<std::uint64_t>(n, pos, 0x20);
-			auto n32 = static_cast<std::uint32_t>(n);
-			step<std::uint32_t>(n32, pos, 0x10);
-			step<std::uint32_t>(n32, pos, 0x08);
-			step<std::uint32_t>(n32, pos, 0x04);
-			return static_cast<int>((std::uint64_t{ 0x3333333322221100 } >> (n32 << 2) & 0x3) + pos);
+            if constexpr (has_cpp20_bitops)
+            {
+                assert(n != 0);
+                auto lz = std::countl_zero(n);
+                return static_cast<int>(std::numeric_limits<std::uint64_t>::digits - 1 - lz);
+            }
+            else
+            {
+                //finding the last set bit (bitpos of most significant bit with a value of one)
+                    //how or why this works is totally beyond me.  It does though ... trust
+                    // the google gods ....
+                assert(n != 0);
+                int pos = 0;
+                step<std::uint64_t>(n, pos, 0x20);
+                auto n32 = static_cast<std::uint32_t>(n);
+                step<std::uint32_t>(n32, pos, 0x10);
+                step<std::uint32_t>(n32, pos, 0x08);
+                step<std::uint32_t>(n32, pos, 0x04);
+                return static_cast<int>((std::uint64_t{ 0x3333333322221100 } >> (n32 << 2) & 0x3) + pos);
+            }
 		}
 
 		constexpr std::strong_ordering operator<=>(uint128 lhs, uint128 rhs) noexcept
@@ -1434,7 +1443,46 @@ namespace cjm
                 }
             }
 		}
-		constexpr uint128 operator/(uint128 lhs, uint128 rhs)
+
+		template<cjm::numerics::concepts::can_find_most_significant_set_bitpos UI128>
+        constexpr int most_sign_set_bit(UI128 value) noexcept
+        {
+            if constexpr (cjm::numerics::concepts::builtin_unsigned_integer<UI128>)
+            {
+                assert(value != 0);
+                auto lz = std::countl_zero(value);
+                return static_cast<int>(std::numeric_limits<UI128>::digits - 1 - lz);
+            }
+            else //has static method
+            {
+                return UI128::most_sign_set_bit(value);
+            }
+
+        }
+
+
+        constexpr int uint128::most_sign_set_bit(uint128 value) noexcept
+        {
+            assert(value != 0);
+            if constexpr (calculation_mode == uint128_calc_mode::intrinsic_u128)
+            {
+                if constexpr (constexpr_bit_casting)
+                {
+                    auto lz = std::countl_zero(bit_cast<natuint128_t>(value));
+                    return static_cast<int>(std::numeric_limits<natuint128_t>::digits - 1 - lz);
+                }
+                else
+                {
+                    return uint128::fls(value);
+                }
+            }
+            else
+            {
+                return uint128::fls(value);
+            }
+        }
+
+        constexpr uint128 operator/(uint128 lhs, uint128 rhs)
 		{
 		    if (std::is_constant_evaluated())
 		    {
