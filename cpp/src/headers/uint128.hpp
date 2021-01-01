@@ -9,6 +9,8 @@
 #include<optional>
 #include<array>
 #include<functional>
+#include <utility>
+#include <algorithm>
 #include "numerics.hpp"
 #include "cjm_numeric_concepts.hpp"
 #include "cjm_string.hpp"
@@ -184,7 +186,7 @@ namespace cjm::numerics
         static constexpr sv decimal_separator();
 
         static constexpr std::uint8_t get_value_hex(char_t c);
-
+        static constexpr std::pair<std::uint8_t, sv> get_value_hex(sv text);
         static constexpr std::uint8_t get_value_dec(char_t c);
         static constexpr bool is_legal_hex_char(char_t c);
 
@@ -240,7 +242,7 @@ namespace cjm::numerics
         }
 
         static constexpr uint128 parse_decimal_str(sv decimal_str);
-
+        static constexpr uint128 parse_hex_str(sv hex_str);
     };
 
 }

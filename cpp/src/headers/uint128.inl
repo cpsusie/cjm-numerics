@@ -589,7 +589,8 @@ namespace cjm
 				ret = ph::parse_decimal_str(trimmed);
 				break;
 			case u128_str_format::Hexadecimal:
-				throw std::exception();
+                ret = ph::parse_hex_str(trimmed);
+                break;
 			}
 			return ret;
 		}
@@ -2035,6 +2036,33 @@ constexpr std::uint8_t cjm::numerics::u128_parsing_helper<Chars, CharTraits>::ge
     }
 }
 
+template<typename Chars, typename CharTraits = std::char_traits<Chars>>
+requires cjm::numerics::concepts::char_with_traits<Chars, CharTraits>
+constexpr std::pair<std::uint8_t, typename cjm::numerics::u128_parsing_helper<Chars, CharTraits>::sv> cjm::numerics::u128_parsing_helper<Chars, CharTraits>::get_value_hex(sv text)
+{
+    uint8_t high_nibble, low_nibble;
+    auto ret = sv{};
+    switch (text.size())
+    {
+    case 0:
+        throw std::invalid_argument{ "Function requires a non-empty string." };
+    case 1:
+        return std::make_pair(get_value_hex(text[0]), ret);
+    case 2:
+        high_nibble = get_value_hex(text[0]);
+        low_nibble = get_value_hex(text[1]);
+        break;
+    default:
+        high_nibble = get_value_hex(text[0]);
+        low_nibble = get_value_hex(text[1]);
+        ret = text.substr(2, text.size() - 2);
+        break;
+    }
+    high_nibble <<= (CHAR_BIT / 2);
+    high_nibble |= low_nibble;
+    return std::make_pair(high_nibble, ret);
+}
+
 template<typename Chars, typename CharTraits>
 requires cjm::numerics::concepts::char_with_traits<Chars, CharTraits>
 constexpr std::uint8_t cjm::numerics::u128_parsing_helper<Chars, CharTraits>::get_value_dec(char_t c)
@@ -2283,6 +2311,73 @@ parse_decimal_str(sv decimal_str)
 	return ret;
 }
 
+
+template<typename Chars, typename CharTraits>
+requires cjm::numerics::concepts::char_with_traits<Chars, CharTraits>
+constexpr  cjm::numerics::uint128 cjm::numerics::u128_parsing_helper<Chars, CharTraits>::
+parse_hex_str(sv hex_str)
+{
+    constexpr char zero = '0';
+    constexpr char_t zero_cast = static_cast<char_t>(zero);
+    auto length = hex_str.length();
+	
+    if (length < 1)
+    {
+        throw std::invalid_argument{ "Cannot parse supplied string as 128-bit unsigned integer: string is empty." };
+    };
+    bool allZero = std::all_of(hex_str.cbegin(), hex_str.cend(), [](char_t c) -> bool
+        {
+            return c == zero_cast;
+        });
+    if (hex_str[0] == zero_cast && (length == 1 || allZero))
+    {
+        return 0;
+    }
+	if (length == 2)
+	{
+        uint8_t high_nibble = get_value_hex(hex_str[0]) << (CHAR_BIT / 2);
+        uint8_t low_nibble = get_value_hex(hex_str[1]);
+        return high_nibble | low_nibble;
+	}
+	else
+	{
+        using namespace numerics::uint128_literals;
+        const auto first_two = hex_str.substr(0, 2);
+        const auto hex_tags = get_hex_tags();
+        const bool has_hex_tags = std::any_of(hex_tags.cbegin(), hex_tags.cend(), [=](sv tag) -> bool {return tag == first_two; });
+		if (has_hex_tags)
+		{
+            hex_str = hex_str.substr(2, hex_str.size() - 2);            
+		}
+        auto hex_digits = std::count_if(hex_str.cbegin(), hex_str.cend(), [](char_t c) -> bool
+            {
+                return is_legal_hex_char(c);
+            });
+        if (hex_digits < 1)
+        {
+            throw std::invalid_argument{ "Supplied string contains no valid hexadecimal digits." };
+        }
+        constexpr auto max_hex_digits = std::numeric_limits<uint128>::digits / (CHAR_BIT / 2); //max of 32 hex digits
+        if (hex_digits > max_hex_digits)
+        {
+            throw std::invalid_argument{ "Supplied string contains too many hex digits to store in uint128." };
+        }
+        
+        std::vector<uint8_t> temp;
+        temp.reserve(std::numeric_limits<uint128>::digits / (CHAR_BIT)); //reserve room for 16 bytes
+        while (!hex_str.empty()) //i.e. more bytes to go
+        {
+            //get next byte and the remainder of the string not incl byte we just got
+        	//if no more bytes, new_hex_str will be empty.
+            auto [byte, new_hex_str] = get_value_hex(hex_str); 
+            hex_str = new_hex_str;
+            temp.push_back(byte);
+        }
+		auto arr = (0_u128).to_big_endian_arr();
+        std::copy(temp.cbegin(), temp.cend(), arr.begin());
+        return uint128::make_from_bytes_big_endian(arr);
+	}   
+}
 
 
 /*
