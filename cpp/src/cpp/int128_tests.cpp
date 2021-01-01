@@ -4,6 +4,11 @@ namespace
 {
     using uint128_t = cjm::numerics::uint128;
     using uint128_ctrl = boost::multiprecision::uint128_t;
+    constexpr std::string_view bool_to_yes_no(bool value) noexcept
+    {
+        using namespace std::string_view_literals;
+        return value ? "YES"sv : "NO"sv;
+    }
 }
 
 cjm::uint128_tests::ctrl_uint128_t cjm::uint128_tests::to_ctrl(uint128_t convert) 
@@ -29,11 +34,14 @@ void cjm::uint128_tests::execute_uint128_tests()
     cout << "ENVIRONMENT DATA: " << newl;
     print_constexpr_bitcast_available();
     print_uint128_eval_mode();
+    print_cpp20_bitops_available();
+    print_builtin_uint128_data_if_present();
     cout << "END ENVIRONMENT DATA" << newl << newl;
     execute_test(execute_basic_test_one, "basic_test_one"sv);
     execute_test(execute_string_parse_test, "string_parse_text"sv);
     execute_test(execute_basic_multiplication_test, "basic_multiplication_test"sv);
     execute_test(test_fls, "test_fls"sv);
+    execute_test(execute_builtin_u128fls_test_if_avail, "builtin_u128fls_test_if_avail"sv);
     cout_saver saver{cout};
     cout << "All tests PASSED." << newl;
 }
@@ -205,10 +213,14 @@ void cjm::uint128_tests::execute_basic_multiplication_test()
 void cjm::uint128_tests::test_fls()
 {
     constexpr auto final_test = 0x8000'0000'0000'0000u;
-    constexpr auto final_res = cjm::numerics::internal::fls_slow(final_test);
+    constexpr auto final_res = cjm::numerics::internal::fls_default(final_test);
     constexpr auto numbers = get_pow2_arr();
     constexpr auto results = get_pow2_res_arr();
     static_assert(numbers.size() == results.size());
+    static_assert(cjm::numerics::concepts::can_find_most_significant_set_bitpos<uint128_t>);
+    using namespace cjm::numerics::uint128_literals;
+    static_assert(cjm::numerics::most_sign_set_bit(3_u128) == 1);
+    static_assert(cjm::numerics::most_sign_set_bit(3_u128 << 120) == 121);
     auto saver = cout_saver{ cout };
 	for (auto i = 0_szt; i < numbers.size(); ++i)
 	{
@@ -332,13 +344,61 @@ void cjm::uint128_tests::print_uint128_eval_mode()
     }
     cout << "Arithmetic mode: [" << eval_text << "]." << newl;
 }
-
+void cjm::uint128_tests::print_cpp20_bitops_available()
+{
+    constexpr auto avail_text = bool_to_yes_no(cjm::numerics::has_cpp20_bitops);
+    using namespace numerics;
+    cout_saver o_saver{cout};
+    cout << "Are C++20 bit operations available?: ["sv << avail_text << "]."sv << newl;
+}
 void cjm::uint128_tests::print_constexpr_bitcast_available()
 {
-    constexpr auto avail_text = cjm::numerics::constexpr_bit_casting ? "YES"sv : "NO"sv;
+    constexpr auto avail_text = bool_to_yes_no(cjm::numerics::constexpr_bit_casting);
     using namespace numerics;
     cout_saver o_saver{cout};
     cout << "Is constexpr bitcasting available?: [" << avail_text << "]." << newl;
 }
+
+void cjm::uint128_tests::print_builtin_uint128_data_if_present()
+{
+    if constexpr (cjm::numerics::calculation_mode == numerics::uint128_calc_mode::intrinsic_u128)
+    {
+        constexpr auto arithmetic_text = bool_to_yes_no(std::is_arithmetic_v<cjm::numerics::natuint128_t>);
+        constexpr auto integral_text = bool_to_yes_no(std::is_integral_v<cjm::numerics::natuint128_t>);
+        constexpr auto unsigned_text = bool_to_yes_no(std::is_unsigned_v<cjm::numerics::natuint128_t>);
+
+        cout << "Is unsigned __int128 an arithmetic type?: [" << arithmetic_text << "]." << newl;
+        cout << "Is unsigned __int128 an integral type?: [" << integral_text << "]." << newl;
+        cout << "Is unsigned __int128 an unsigned type?: [" << unsigned_text << "]." << newl;
+        cout << "sizeof(std::uintmax_t): [" << sizeof(std::uintmax_t) << "]." << newl;
+    }
+    else
+    {
+        cout << "No built-in  uint128 data available." << newl;
+    }
+}
+
+
+#ifdef CJM_HAVE_BUILTIN_128
+void cjm::uint128_tests::execute_builtin_u128fls_test_if_avail()
+{
+    static_assert(cjm::numerics::concepts::can_find_most_significant_set_bitpos<unsigned __int128>);
+    unsigned __int128 x = 3;
+    auto most_sign_bit = cjm::numerics::most_sign_set_bit(x);
+    std::cout << "Test for 3 yields bitpos: [" << most_sign_bit << "]." << newl;
+    cjm_assert(most_sign_bit == 1);
+    x <<= 120;
+    most_sign_bit = cjm::numerics::most_sign_set_bit(x);
+    std::cout << "Test for (3 << 120) yields: [" << most_sign_bit << "]." << newl;
+    cjm_assert(most_sign_bit == 121);
+
+}
+#else
+void cjm::uint128_tests::execute_builtin_u128fls_test_if_avail()
+{
+    std::cout << "Will not test builtin_u128_fls because not available in this enviornment." << newl;
+}
+#endif
+
 
 

@@ -39,6 +39,10 @@
 #else
 #define CJM_BIT_CAST_CONST inline
 #endif
+#ifdef __cpp_lib_bitops
+#define CJM_HAS_BITOPS
+#endif
+
 namespace cjm
 {
 	
@@ -57,7 +61,12 @@ namespace cjm
 			extern std::uint64_t cjm_bad_shiftright128(std::uint64_t low, std::uint64_t high, unsigned char shift_amount);
 		}
 		class uint128;
-
+        constexpr bool has_cpp20_bitops =
+#ifdef CJM_HAS_BITOPS
+                true;
+#else
+        false
+#endif
 		constexpr bool constexpr_bit_casting =
 #ifdef __cpp_lib_bit_cast
 			true;
