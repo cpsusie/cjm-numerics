@@ -71,44 +71,61 @@ void cjm::uint128_tests::execute_string_parse_test()
     {
         auto default_strm = make_throwing_sstream<char>();
         auto wide_strm = make_throwing_sstream<wchar_t>();
+        auto default_hex_strm = make_throwing_sstream<char>();
+        auto wide_hex_strm = make_throwing_sstream<wchar_t>();
 //        auto utf8_stream = make_throwing_sstream<char8_t, std::char_traits<char8_t>, std::allocator<char8_t>>();
 //        auto utf16_stream = make_throwing_sstream<char16_t>();
 //        auto utf32_stream = make_throwing_sstream<char32_t>();
 
         default_strm << test_dec;
         wide_strm << test_dec;
-
+        default_hex_strm << test_hex;
+        wide_hex_strm << test_hex;
+    	
         std::string text = default_strm.str();
         std::wstring wtext = wide_strm.str();
+        std::string hex_text = default_hex_strm.str();
+        std::wstring w_hex_text = wide_hex_strm.str();
 
+    	 	    	
         uint128_t x = uint128_t::make_from_string(std::string_view{text});
         uint128_t y = uint128_t::make_from_string(std::wstring_view{wtext});
+        uint128_t z = uint128_t::make_from_string(std::string_view{ hex_text });
+    	uint128_t a = uint128_t::make_from_string(std::wstring_view{ w_hex_text });
 
         cjm_assert(x == test_hex);
-        cjm_assert(y == test_dec);
-        cjm_assert(x == y);
+        cjm_assert(y == test_hex);
+        cjm_assert(z == test_hex);
+        cjm_assert(a == test_hex);
+        cjm_assert(x == y && y == z && z == a);
     }
 #if (defined _MSC_VER)
     {
-        [[maybe_unused]] constexpr std::u8string_view u8as_hex = u8"0xc0ded00dfacecafebabeb00bfea2dad0";
-        constexpr std::u8string_view u8as_dec = u8"256368684942083501355085096987188714192";
-        [[maybe_unused]] constexpr std::u8string_view u16as_hex = u8"0xc0ded00dfacecafebabeb00bfea2dad0";
-        constexpr std::u8string_view u16as_dec = u8"256368684942083501355085096987188714192";
+        [[maybe_unused]] constexpr std::u8string_view u8as_hex = u8"0xc0ded00dfacecafebabeb00bfea2dad0"sv;
+        constexpr std::u8string_view u8as_dec = u8"256368684942083501355085096987188714192"sv;
+        [[maybe_unused]] constexpr std::u8string_view u16as_hex = u8"0xc0ded00dfacecafebabeb00bfea2dad0"sv;
+        constexpr std::u8string_view u16as_dec = u8"256368684942083501355085096987188714192"sv;
         [[maybe_unused]] constexpr std::u8string_view u32as_hex = u8"0xc0ded00dfacecafebabeb00bfea2dad0";
-        constexpr std::u8string_view u32as_dec = u8"256368684942083501355085096987188714192";
+        constexpr std::u8string_view u32as_dec = u8"256368684942083501355085096987188714192"sv;
 
         uint128_t x = test_hex;
             //uint128_t ::make_from_string(u8as_hex);
         uint128_t y = uint128_t ::make_from_string(u8as_dec);
         cjm_assert(x == y && y == test_hex);
+        y = uint128_t::make_from_string(u8as_hex);
+        cjm_assert(y == x);
 
     	//todo fixit add hex parse routines for string conversion ... should not be hard ... the literals already do this.
         x = uint128_t::make_from_string(u16as_dec);
         y = test_hex;
         cjm_assert(x == y && y == test_hex && x == test_dec);
-
+        x = uint128_t::make_from_string(u16as_hex);
+        cjm_assert(x == y && y == test_hex && x == test_dec);
+    	
         x = uint128_t::make_from_string(u32as_dec);
         y = test_hex;
+        cjm_assert(x == y && y == test_hex && x == test_dec);
+        x = uint128_t::make_from_string(u32as_dec);
         cjm_assert(x == y && y == test_hex && x == test_dec);
     }
 #endif
