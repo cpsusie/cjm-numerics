@@ -430,15 +430,15 @@ namespace cjm::numerics
         [[nodiscard]] constexpr int_part low_part() const noexcept;
         [[nodiscard]] constexpr int_part high_part() const noexcept;
 
-        [[nodiscard]] constexpr byte_array to_little_endian_arr() const noexcept;
-        [[nodiscard]] constexpr byte_array to_big_endian_arr() const noexcept;
+        [[nodiscard]] constexpr byte_array to_little_endian_arr() const noexcept; //NOLINT (bugprone-exception-escape)
+        [[nodiscard]] constexpr byte_array to_big_endian_arr() const noexcept; //NOLINT (bugprone-exception-escape)
 
     private:
         
         static constexpr size_t calculate_hash(int_part hi, int_part low) noexcept;
         static constexpr void hash_combine(size_t& seed, size_t newVal) noexcept;
         static constexpr uint128 make_from_bytes_native(byte_array b) noexcept;
-        static constexpr byte_array to_bytes_native(uint128 convert_me) noexcept;
+        static constexpr byte_array to_bytes_native(uint128 convert_me) noexcept; //NOLINT ((bugprone-exception-escape)
         inline static uint128 lshift_msvc_x64(uint128 shift_me, int shift_amount) noexcept;
         inline static uint128 rshift_msvc_x64(uint128 shift_me, int shift_amount) noexcept;
         static void best_safe_div_mod(uint128 dividend, uint128 divisor, uint128 * quotient, uint128 * remainder);
@@ -446,8 +446,6 @@ namespace cjm::numerics
             uint128 * quotient_ret, uint128 * remainder_ret);
         static constexpr void unsafe_constexpr_div_mod_impl(uint128 dividend, uint128 divisor,
             uint128 * quotient_ret, uint128 * remainder_ret) noexcept;
-        template<typename T>
-        static constexpr void step(T& n, int& pos, int shift) noexcept;
         static constexpr int fls(uint128 n) noexcept;
         static void div_mod_msc_x64_impl(uint128 dividend, uint128 divisor,
             uint128 * quotient_ret, uint128 * remainder_ret) noexcept;
@@ -465,15 +463,7 @@ namespace cjm::numerics
 #endif
     };
 
-    [[maybe_unused]] static void fornicate()
-    {
-    	uint128 x = 123;
-        uint128 y = ++x;
-        static_assert(std::is_nothrow_convertible_v<decltype(y=x++), uint128>);
-        //static_assert(std::is_same_v<res_t, uint128> && std::is_nothrow_convertible_v<res_t, uint128>);
-        std::cout << "Here is the answer: [" << y << "]." << std::endl;
-    }
-	
+	//Ensure compliance with concepts
     static_assert(concepts::nothrow_convertible<std::array<unsigned char, sizeof(uint128)>, typename uint128::byte_array>);
     static_assert(concepts::cjm_unsigned_integer<uint128>, "Needs to comply with cjm_unsigned_integer concept.");
     static_assert(concepts::integer<uint128>, "Needs to be an integer.");
