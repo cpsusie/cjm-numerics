@@ -2036,7 +2036,7 @@ constexpr std::uint8_t cjm::numerics::u128_parsing_helper<Chars, CharTraits>::ge
     }
 }
 
-template<typename Chars, typename CharTraits = std::char_traits<Chars>>
+template<typename Chars, typename CharTraits>
 requires cjm::numerics::concepts::char_with_traits<Chars, CharTraits>
 constexpr std::pair<std::uint8_t, typename cjm::numerics::u128_parsing_helper<Chars, CharTraits>::sv> cjm::numerics::u128_parsing_helper<Chars, CharTraits>::get_value_hex(sv text)
 {
@@ -2362,19 +2362,17 @@ parse_hex_str(sv hex_str)
         {
             throw std::invalid_argument{ "Supplied string contains too many hex digits to store in uint128." };
         }
-        //todo fixit .... vector not necessary 
-        std::vector<uint8_t> temp;
-        temp.reserve(std::numeric_limits<uint128>::digits / (CHAR_BIT)); //reserve room for 16 bytes
+        //nb. removed vector and just use array.  not only vector not necessary, but clang can't handle in constexpr context yet
+        auto arr = (0_u128).to_big_endian_arr(); //get an empty zero-filled array
+        size_t idx = 0;
         while (!hex_str.empty()) //i.e. more bytes to go
         {
             //get next byte and the remainder of the string not incl byte we just got
         	//if no more bytes, new_hex_str will be empty.
             auto [byte, new_hex_str] = get_value_hex(hex_str); 
             hex_str = new_hex_str;
-            temp.push_back(byte);
+            arr[idx++] = byte;
         }
-		auto arr = (0_u128).to_big_endian_arr();
-        std::copy(temp.cbegin(), temp.cend(), arr.begin());
         return uint128::make_from_bytes_big_endian(arr);
 	}   
 }
