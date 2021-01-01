@@ -164,7 +164,7 @@ namespace cjm
             constexpr char uint128_lit_helper::to_lower(char c) noexcept
             {
                 return (c >= 65 && c <= 90) ?
-                       c + 0x20 :
+                       static_cast<char>(static_cast<unsigned char>(c + 0x20)) :
                        c;
             }
 
@@ -764,7 +764,7 @@ namespace cjm
 			return m_high;
 		}
 
-		constexpr uint128::byte_array uint128::to_little_endian_arr() const noexcept
+		constexpr uint128::byte_array uint128::to_little_endian_arr() const noexcept //NOLINT (bugprone-exception-escape)
 		{
 			constexpr size_t byte_count = sizeof(byte_array);
 			static_assert(byte_count == sizeof(uint128));
@@ -894,8 +894,8 @@ namespace cjm
 			}
 		}
 
-		constexpr uint128::byte_array uint128::to_bytes_native(uint128 convert_me) noexcept
-		{
+		constexpr uint128::byte_array uint128::to_bytes_native(uint128 convert_me) noexcept //NOLINT (bugprone-exception-escape)
+		{ //there is no reasonable code-logic permitting path where an exception can be thrown.
 			static_assert(std::endian::native == std::endian::little || std::endian::native == std::endian::big,
 				"Mixed endian is not supported.");
 			using namespace cjm::numerics::uint128_literals;
@@ -969,7 +969,7 @@ namespace cjm
 			{
 				ret.m_high = 0;
 				ret.m_low = shift_me.m_high;
-				ret.m_low >>= (shift_amount - 64);
+				ret.m_low = ret.m_low >> (shift_amount - 64);
 			}
 			else
 			{
