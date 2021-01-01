@@ -2362,7 +2362,7 @@ parse_hex_str(sv hex_str)
         {
             throw std::invalid_argument{ "Supplied string contains too many hex digits to store in uint128." };
         }
-        
+        //todo fixit .... vector not necessary 
         std::vector<uint8_t> temp;
         temp.reserve(std::numeric_limits<uint128>::digits / (CHAR_BIT)); //reserve room for 16 bytes
         while (!hex_str.empty()) //i.e. more bytes to go
