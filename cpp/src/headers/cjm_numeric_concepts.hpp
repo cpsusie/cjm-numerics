@@ -185,9 +185,37 @@ namespace cjm::numerics::concepts
     static_assert(std::totally_ordered < divmod_result<std::uint64_t>>);
     template<typename T>
     concept size_evenly_divisible_by_char_bit = (sizeof(T) % CHAR_BIT) == 0;
-	
+
+    namespace internal
+    {
+        template<typename T>
+        concept has_static_fls_mem_func = unsigned_integer<T> && requires (const T value)
+        {
+            {T::most_sign_set_bit(value)} noexcept -> nothrow_convertible<int>;
+        };
+    }
+
+    ///<summary>
+    ///A type complies with this constraint by being a built-in unsigned integer or by being
+    ///a user-defined unsigned integer type that has the following non-throwing static member function
+    ///that accepts a value of that type and returns the bitpos of the most significant set-bit:
+    /// int T::most_sign_set_bit([const] T value).
+    /// If a type fulfills this concept, you can use the following function template to get the bitpos
+    /// of the value's most significant set bit:
+    /// (in namespace cjm::numerics) ---
+    /// template<cjm::numerics::concepts::can_find_most_significant_set_bitpos UI>
+    /// constexpr int most_sign_set_bit(UI value) noexcept;
+    /// </summary>
+    template<typename T>
+    concept can_find_most_significant_set_bitpos = builtin_unsigned_integer<T> || internal::has_static_fls_mem_func<T>;
+
     template<typename T>
     concept cjm_unsigned_integer =
+        //you can find the bitpos of the most significant set bit in the value using ( in namespace cjm numerics)
+        // the following template function:
+        // template<cjm::numerics::concepts::can_find_most_significant_set_bitpos UI>
+        // constexpr int most_sign_set_bit(UI value) noexcept;
+        can_find_most_significant_set_bitpos<T> &&
         //limb tye is half size of type
         (sizeof(typename T::int_part) == sizeof(T) /2) &&
         //has static constexpr member called int_parts_bits equal to number of bits in int_part
@@ -356,6 +384,11 @@ namespace cjm::numerics::concepts
         {T::div_mod(x_const, y_const)}
 													    -> nothrow_convertible<typename T::divmod_result_t>;
     };
+    template<typename Integer>
+    concept builtin_128bit_integer = builtin_integer<Integer> && std::numeric_limits<Integer>::digits == 128;
+
+    template<typename Integer>
+    concept builtin_128bit_unsigned_integer = unsigned_integer<Integer> && builtin_integer<Integer>;
 	
     template<typename T>
     concept character = std::is_nothrow_convertible_v<T, char> ||
