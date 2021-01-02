@@ -1576,10 +1576,12 @@ namespace cjm
             {
 		        if constexpr (calculation_mode == uint128_calc_mode::intrinsic_u128)
                 {
+                    if (rhs == 0) { throw std::domain_error("Division by zero is illegal."); }
                     return static_cast<natuint128_t>(lhs) / static_cast<natuint128_t>(rhs);
                 }
 		        else if constexpr (calculation_mode == uint128_calc_mode::msvc_x64)
 				{
+                    if (rhs == 0) { throw std::domain_error("Division by zero is illegal."); }
 					uint128 quotient = 0;
 					uint128 remainder = 0;
 					uint128::div_mod_msc_x64_impl(lhs, rhs, &quotient, &remainder);
@@ -1613,10 +1615,12 @@ namespace cjm
             {
                 if constexpr (calculation_mode == uint128_calc_mode::intrinsic_u128)
                 {
+                    if (rhs == 0) { throw std::domain_error("Division by zero is illegal."); }
                     return static_cast<natuint128_t>(lhs) % static_cast<natuint128_t>(rhs);
                 }
 				else if constexpr (calculation_mode == uint128_calc_mode::msvc_x64)
 				{
+                    if (rhs == 0) { throw std::domain_error("Division by zero is illegal."); }
 					uint128 quotient = 0;
 					uint128 remainder = 0;
 					uint128::div_mod_msc_x64_impl(lhs, rhs, &quotient, &remainder);

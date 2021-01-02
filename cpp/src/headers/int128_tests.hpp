@@ -195,8 +195,9 @@ namespace cjm::uint128_tests
     	}
         return ret;
     }	
-	
-	
+
+    void execute_div_mod_zero_dividend_nonzero_divisor_tests();
+    void execute_div_mod_by_zero_tests();
     void execute_uint128_tests();
     void execute_basic_test_one();
     void execute_string_parse_test();

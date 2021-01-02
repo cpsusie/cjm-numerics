@@ -21,9 +21,53 @@ cjm::uint128_tests::ctrl_uint128_t cjm::uint128_tests::to_ctrl(uint128_t convert
 
 cjm::uint128_tests::uint128_t cjm::uint128_tests::to_test(const ctrl_uint128_t& convert) 
 {
-    std::uint64_t low_part = static_cast<std::uint64_t>(convert);
-    std::uint64_t high_part = static_cast<std::uint64_t>(convert >> 64);
+	const std::uint64_t low_part = static_cast<std::uint64_t>(convert);
+	const std::uint64_t high_part = static_cast<std::uint64_t>(convert >> 64);
     return uint128_t::make_uint128(high_part, low_part);
+}
+
+void cjm::uint128_tests::execute_div_mod_zero_dividend_nonzero_divisor_tests()
+{
+    constexpr auto dividend = 0_u128;
+    constexpr auto divisor = 0xd00d_u128;
+
+    cjm_assert(dividend / divisor == 0_u128);
+    cjm_assert(dividend % divisor == 0_u128);
+    auto divmod_res = uint128_t::div_mod(dividend, divisor);
+    cjm_assert(divmod_res.quotient == 0 && divmod_res.remainder == 0);
+    auto res = uint128_t::try_div_mod(dividend, divisor);
+    cjm_assert(res.has_value() && res->quotient == 0 && res->remainder == 0);
+}
+
+void cjm::uint128_tests::execute_div_mod_by_zero_tests()
+{
+    using namespace testing;
+	
+    cjm_assert_throws<std::domain_error>([]() -> void
+    {
+	    const auto dividend = 0xd00d_u128;
+	    const auto divisor = 0_u128;
+	    const auto quotient = dividend / divisor;
+       std::cerr << "You should never see this value: [" << quotient << "]." << newl;
+    });
+
+    cjm_assert_throws<std::domain_error>([]() -> void
+    {
+	    const auto dividend = 0xd00d_u128;
+	    const auto divisor = 0_u128;
+	    const auto remainder = dividend % divisor;
+        std::cerr << "You should never see this value: [" << remainder << "]." << newl;
+    });
+
+    cjm_assert_throws<std::domain_error>([]() -> void
+    {
+	    const auto dividend = 0xd00d_u128;
+	    const auto divisor = 0_u128;
+	    const auto result = uint128_t::div_mod(dividend, divisor);
+        std::cerr << "You should never see this value: [Quotient: " << result.quotient << "; remainder: " << result.remainder << "]." << newl;
+    });
+    cjm_assert(uint128_t::try_div_mod(0xd00d_u128, 0_u128) == std::nullopt);
+	
 }
 
 void cjm::uint128_tests::execute_uint128_tests()
@@ -46,6 +90,8 @@ void cjm::uint128_tests::execute_uint128_tests()
     execute_test(test_fls, "test_fls"sv);
     execute_test(execute_builtin_u128fls_test_if_avail, "builtin_u128fls_test_if_avail"sv);
     execute_test(execute_first_bin_op_test, "first_bin_op_test"sv);
+    execute_test(execute_div_mod_by_zero_tests, "div_mod_zero_tests"sv);
+    execute_test(execute_div_mod_zero_dividend_nonzero_divisor_tests, "div_mod_zero_dividend_nonzero_divisor_tests"sv);
     cout_saver saver{cout};
     cout << "All tests PASSED." << newl;
 }
@@ -254,8 +300,8 @@ void cjm::uint128_tests::test_fls()
 
 void cjm::uint128_tests::test_interconversion(const ctrl_uint128_t& control, uint128_t test)
 {
-    uint128_t ctrl_to_test = to_test(control);
-    ctrl_uint128_t test_to_control = to_ctrl(test);
+	const uint128_t ctrl_to_test = to_test(control);
+	const ctrl_uint128_t test_to_control = to_ctrl(test);
     cjm::testing::cjm_assert(test_to_control == control && ctrl_to_test == test);
 }
 
