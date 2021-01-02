@@ -45,6 +45,7 @@ void cjm::uint128_tests::execute_uint128_tests()
     execute_test(execute_basic_multiplication_test, "basic_multiplication_test"sv);
     execute_test(test_fls, "test_fls"sv);
     execute_test(execute_builtin_u128fls_test_if_avail, "builtin_u128fls_test_if_avail"sv);
+    execute_test(execute_first_bin_op_test, "first_bin_op_test"sv);
     cout_saver saver{cout};
     cout << "All tests PASSED." << newl;
 }
@@ -259,18 +260,6 @@ void cjm::uint128_tests::test_interconversion(const ctrl_uint128_t& control, uin
 }
 
 
-
-bool cjm::uint128_tests::binary_operation::do_calculate_result()
-{
-    uint128_t result = perform_calculate_result(m_lhs, m_rhs, m_op);
-    const bool changed_value = (!m_result.has_value() || *m_result != result);
-    m_result = result;
-    return changed_value;
-}
-
-
-
-
 void cjm::uint128_tests::print_uint128_eval_mode()
 {
     using namespace numerics;
@@ -343,6 +332,15 @@ void cjm::uint128_tests::execute_builtin_u128fls_test_if_avail()
 void cjm::uint128_tests::execute_builtin_u128fls_test_if_avail()
 {
     std::cout << "Will not test builtin_u128_fls because not available in this enviornment." << newl;
+}
+
+void cjm::uint128_tests::execute_first_bin_op_test()
+{
+    auto op = binary_operation{ binary_op::add, 1_u128, 2_u128 };
+    op.calculate_result();
+    cjm_assert(op.has_correct_result());
+    const auto& res = op.result();
+    cjm_assert(res.value().first == res.value().second);
 }
 #endif
 
