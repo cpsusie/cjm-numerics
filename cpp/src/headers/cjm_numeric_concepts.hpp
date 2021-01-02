@@ -52,6 +52,9 @@ namespace cjm::numerics::concepts
     /// </summary>
     template<typename T>
     concept builtin_unsigned_integer = builtin_integer<T> && unsigned_integer<T>;
+
+    static_assert(builtin_unsigned_integer <std::uint64_t>);
+    static_assert(builtin_unsigned_integer <std::uint8_t>);
 }
 
 namespace cjm::numerics

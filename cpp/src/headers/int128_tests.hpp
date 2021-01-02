@@ -19,6 +19,7 @@
 #include <utility>
 #include <boost/multiprecision/cpp_int.hpp>
 #include <concepts>
+#include <cstdint>
 #include "int128_tests.hpp"
 
 namespace cjm::uint128_tests
@@ -38,17 +39,26 @@ namespace cjm::uint128_tests
     constexpr size_t binary_op_count = 11;
 
     template<typename TestTypeUi, typename ControlTypeUi>
-    concept test_uint_and_control_set = 
-        std::numeric_limits<TestTypeUi>::digits == std::numeric_limits<ControlTypeUi>::digits && 
+    concept test_uint_and_control_set = cjm::numerics::concepts::cjm_unsigned_integer<TestTypeUi>
+        && cjm::numerics::concepts::unsigned_integer<ControlTypeUi>
+        && std::numeric_limits<TestTypeUi>::digits == std::numeric_limits<ControlTypeUi>::digits;
+
+       /* std::numeric_limits<TestTypeUi>::digits == std::numeric_limits<ControlTypeUi>::digits && 
         (std::numeric_limits<TestTypeUi>::is_integer && !std::numeric_limits<TestTypeUi>::is_signed) && 
-        (std::numeric_limits<ControlTypeUi>::is_integer && !std::numeric_limits<ControlTypeUi>::is_signed);
+        (std::numeric_limits<ControlTypeUi>::is_integer && !std::numeric_limits<ControlTypeUi>::is_signed);*/
     namespace u128_testing_constant_providers
     {
 
         namespace concepts
         {
+        	//Must be a cjm_unsigned_integer or a built-in, unsigned integer that is no larger than 64 bits.
             template<typename T>
-            concept supports_testing_constant_provider =  ((std::numeric_limits<T>::is_integer) && (!std::numeric_limits<T>::is_signed));
+            concept supports_testing_constant_provider =
+                //EITHER: (integer AND unsigned AND size <= 64) OR
+                (std::numeric_limits<T>::is_integer && !std::numeric_limits<T>::is_signed && std::is_fundamental_v<T> && sizeof(T) <= sizeof(std::uint64_t))
+        		//complies with cjm_unsigned_integer<T>
+        	|| cjm::numerics::concepts::cjm_unsigned_integer<T>;
+
         }
 
         template<concepts::supports_testing_constant_provider T>
