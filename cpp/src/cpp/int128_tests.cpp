@@ -312,7 +312,14 @@ void cjm::uint128_tests::print_builtin_uint128_data_if_present()
         cout << "No built-in  uint128 data available." << newl;
     }
 }
-
+void cjm::uint128_tests::execute_first_bin_op_test()
+{
+    auto op = binary_operation{ binary_op::add, 1_u128, 2_u128 };
+    op.calculate_result();
+    cjm_assert(op.has_correct_result());
+    const auto& res = op.result();
+    cjm_assert(res.value().first == res.value().second);
+}
 
 #ifdef CJM_HAVE_BUILTIN_128
 void cjm::uint128_tests::execute_builtin_u128fls_test_if_avail()
@@ -334,14 +341,7 @@ void cjm::uint128_tests::execute_builtin_u128fls_test_if_avail()
     std::cout << "Will not test builtin_u128_fls because not available in this enviornment." << newl;
 }
 
-void cjm::uint128_tests::execute_first_bin_op_test()
-{
-    auto op = binary_operation{ binary_op::add, 1_u128, 2_u128 };
-    op.calculate_result();
-    cjm_assert(op.has_correct_result());
-    const auto& res = op.result();
-    cjm_assert(res.value().first == res.value().second);
-}
+
 #endif
 
 
