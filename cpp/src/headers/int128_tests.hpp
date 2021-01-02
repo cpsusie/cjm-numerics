@@ -43,22 +43,18 @@ namespace cjm::uint128_tests
         && cjm::numerics::concepts::unsigned_integer<ControlTypeUi>
         && std::numeric_limits<TestTypeUi>::digits == std::numeric_limits<ControlTypeUi>::digits;
 
-       /* std::numeric_limits<TestTypeUi>::digits == std::numeric_limits<ControlTypeUi>::digits && 
-        (std::numeric_limits<TestTypeUi>::is_integer && !std::numeric_limits<TestTypeUi>::is_signed) && 
-        (std::numeric_limits<ControlTypeUi>::is_integer && !std::numeric_limits<ControlTypeUi>::is_signed);*/
     namespace u128_testing_constant_providers
     {
-
         namespace concepts
         {
         	//Must be a cjm_unsigned_integer or a built-in, unsigned integer that is no larger than 64 bits.
             template<typename T>
             concept supports_testing_constant_provider =
-                //EITHER: (integer AND unsigned AND size <= 64) OR
-                (std::numeric_limits<T>::is_integer && !std::numeric_limits<T>::is_signed && std::is_fundamental_v<T> && sizeof(T) <= sizeof(std::uint64_t))
+                //EITHER: (integer AND unsigned AND size <= 64)
+                (std::numeric_limits<T>::is_integer && !std::numeric_limits<T>::is_signed && std::is_fundamental_v<T> &&
+                        sizeof(T) <= sizeof(std::uint64_t)) // OR
         		//complies with cjm_unsigned_integer<T>
         	|| cjm::numerics::concepts::cjm_unsigned_integer<T>;
-
         }
 
         template<concepts::supports_testing_constant_provider T>
