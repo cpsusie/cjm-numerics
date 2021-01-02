@@ -58,6 +58,9 @@
     <None Include="..\headers\uint128.inl">
       <Filter>Header Files</Filter>
     </None>
+    <None Include="..\headers\int128_tests.inl">
+      <Filter>Header Files</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Text Include="..\cpp\llvm_int_typedefs.txt">

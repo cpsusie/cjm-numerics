@@ -187,6 +187,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="..\headers\cjm_string.inl" />
+    <None Include="..\headers\int128_tests.inl" />
     <None Include="..\headers\numerics.inl" />
     <None Include="..\headers\uint128.inl" />
   </ItemGroup>

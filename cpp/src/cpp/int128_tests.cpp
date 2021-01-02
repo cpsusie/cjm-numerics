@@ -30,7 +30,7 @@ void cjm::uint128_tests::execute_div_mod_zero_dividend_nonzero_divisor_tests()
 {
     constexpr auto dividend = 0_u128;
     constexpr auto divisor = 0xd00d_u128;
-
+    static_assert(0_u128 <=> 1_u128 == std::strong_ordering::less);
     cjm_assert(dividend / divisor == 0_u128);
     cjm_assert(dividend % divisor == 0_u128);
     auto divmod_res = uint128_t::div_mod(dividend, divisor);
@@ -360,11 +360,17 @@ void cjm::uint128_tests::print_builtin_uint128_data_if_present()
 }
 void cjm::uint128_tests::execute_first_bin_op_test()
 {
-    auto op = binary_operation{ binary_op::add, 1_u128, 2_u128 };
+	//perform statically as well:
+    static_assert(0x1_u128 + 0x2_u128 == 0x3_u128);
+    auto op = binary_operation<uint128_t, uint128_ctrl>{ binary_op::add, 1_u128, 2_u128 };
     op.calculate_result();
     cjm_assert(op.has_correct_result());
     const auto& res = op.result();
     cjm_assert(res.value().first == res.value().second);
+    std::cout << "Here is the first binary operation:" << newl;
+    append_static_assertion(std::cout, op);
+    std::cout << "Done appending the assertion." << newl;
+	
 }
 
 #ifdef CJM_HAVE_BUILTIN_128

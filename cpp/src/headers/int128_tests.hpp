@@ -1,5 +1,6 @@
-#ifndef INT128_INT128_TESTS_HPP
-#define INT128_INT128_TESTS_HPP
+#ifndef INT128_TESTS_HPP_
+#define INT128_TESTS_HPP_
+#include <iostream>
 #include "numerics.hpp"
 #include "uint128.hpp"
 #include "cjm_numeric_concepts.hpp"
@@ -20,7 +21,7 @@
 #include <boost/multiprecision/cpp_int.hpp>
 #include <concepts>
 #include <cstdint>
-#include "int128_tests.hpp"
+
 
 namespace cjm::uint128_tests
 {
@@ -152,14 +153,16 @@ namespace cjm::uint128_tests
 
         compare
     };
-    constexpr std::array<sv_t, binary_op_count> op_name_lookup =
-        std::array<sv_t, binary_op_count>{
-        "LeftShift"sv, "RightShift"sv,
-            "And"sv, "Or"sv,
-            "Xor"sv, "Divide"sv,
-            "Modulus"sv, "Add"sv,
-            "Subtract"sv, "Multiply"sv,
-            "Compare"sv};
+    constexpr auto op_name_lookup = std::array<sv_t, binary_op_count>{
+        "LeftShift"sv, "RightShift"sv,"And"sv, "Or"sv,
+            "Xor"sv, "Divide"sv,"Modulus"sv, "Add"sv,
+            "Subtract"sv, "Multiply"sv,"Compare"sv};
+    constexpr auto op_symbol_lookup = std::array<sv_t, binary_op_count>{
+    	"<<"sv, ">>"sv, "&"sv, "|"sv,
+    	"^"sv, "/"sv, "%"sv, "+"sv,
+    	"-"sv, "*"sv, "<=>"sv};
+		
+	
     template<typename TestType = uint128_t , typename ControlType = ctrl_uint128_t>
             requires (test_uint_and_control_set<TestType, ControlType>)
     struct binary_operation;
@@ -172,29 +175,8 @@ namespace cjm::uint128_tests
     uint128_t to_test(const ctrl_uint128_t& convert);
 
     constexpr size_t pow_2_arr_size = 63;
-    constexpr std::array<std::uint64_t, pow_2_arr_size> get_pow2_arr()
-    {
-        std::uint64_t current = 1;
-        
-        std::array<std::uint64_t, pow_2_arr_size> ret{};
-    	for (size_t idx = 0; idx < ret.size(); ++idx)
-    	{
-            ret[idx] = current;
-            current <<= 1;
-    	}
-        return ret;
-    }
-    constexpr std::array<int, pow_2_arr_size> get_pow2_res_arr()
-    {
-        using namespace cjm::numerics::literals;
-        constexpr std::array<std::uint64_t, pow_2_arr_size> work_on_me = get_pow2_arr();
-        std::array<int, pow_2_arr_size> ret{};
-    	for (auto i = 0_szt; i < work_on_me.size(); ++i)
-    	{
-            ret[i] = cjm::numerics::internal::fls_default(work_on_me[i]);
-    	}
-        return ret;
-    }	
+    constexpr std::array<std::uint64_t, pow_2_arr_size> get_pow2_arr();
+    constexpr std::array<int, pow_2_arr_size> get_pow2_res_arr();
 
     void execute_div_mod_zero_dividend_nonzero_divisor_tests();
     void execute_div_mod_by_zero_tests();
@@ -210,12 +192,17 @@ namespace cjm::uint128_tests
     void test_interconversion(const ctrl_uint128_t& control, uint128_t test);
     void execute_builtin_u128fls_test_if_avail();
     void execute_first_bin_op_test();
+
     template<typename TestType, typename ControlType>
-        requires (test_uint_and_control_set<TestType, ControlType>)
+    requires (test_uint_and_control_set<TestType, ControlType>)
+        std::basic_ostream<char>& append_static_assertion(std::basic_ostream<char>& strm, const binary_operation<TestType, ControlType>& bin_op);
+	
+    template<typename TestType, typename ControlType>
+		requires (test_uint_and_control_set<TestType, ControlType>)
     struct binary_operation final
     {
-        using uint_test_t = TestType;
-        using uint_ctrl_t = ControlType;
+        using uint_test_t = std::remove_const_t<TestType>;
+        using uint_ctrl_t = std::remove_const_t<ControlType>;
         friend std::size_t hash_value(const binary_operation& obj)
         {
 
@@ -273,8 +260,13 @@ namespace cjm::uint128_tests
                 m_result = perform_calculate_result(first_operand, second_operand, m_op);
 	        }
         }
-        binary_operation(binary_op op, const uint_test_t& first_operand, const uint_test_t& second_operand) : binary_operation(op, first_operand, second_operand, false){}
-        binary_operation(binary_op op, const uint_test_t& first_operand, const uint_test_t& second_operand, const uint_test_t& test_result, const uint_test_t& ctrl_result) : m_op(op), m_lhs(first_operand), m_rhs(second_operand), m_result(std::make_pair(test_result, ctrl_result)) {}
+    	
+        binary_operation(binary_op op, const uint_test_t& first_operand, 
+            const uint_test_t& second_operand) : m_op{ op }, m_lhs{ first_operand },
+            m_rhs{ second_operand }, m_result{} {}
+        binary_operation(binary_op op, const uint_test_t& first_operand, 
+            const uint_test_t& second_operand, const uint_test_t& test_result, 
+				const uint_test_t& ctrl_result) : m_op(op), m_lhs(first_operand), m_rhs(second_operand), m_result(std::make_pair(test_result, ctrl_result)) {}
         binary_operation(const binary_operation& other) noexcept = default;
         binary_operation(binary_operation&& other) noexcept = default;
         binary_operation& operator=(const binary_operation& other) noexcept = default;
@@ -285,15 +277,15 @@ namespace cjm::uint128_tests
 
     private:
 
-    	
-        static uint_ctrl_t to_control(const uint_test_t& test)
+        static auto to_control(const uint_test_t& test)-> uint_ctrl_t
         {
             uint_ctrl_t ctrl = test.high_part();
             ctrl <<= std::numeric_limits<typename uint_test_t::int_part>::digits;
             ctrl |= test.low_part();
             return ctrl;
-        	
         }
+
+
         static uint_test_t to_test(const uint_ctrl_t& ctrl)
         {
             uint_test_t high = static_cast<typename uint_test_t::int_part>(ctrl >> std::numeric_limits<typename uint_test_t::int_part>::digits);
@@ -308,7 +300,7 @@ namespace cjm::uint128_tests
             m_result = result;
             return changed_value;
         }
-        static std::pair<uint_test_t, uint_test_t> perform_calculate_result(const uint_test_t& lhs, const uint_test_t& rhs, binary_op op) noexcept
+        static std::pair<uint_test_t, uint_test_t> perform_calculate_result(const uint_test_t& lhs, const uint_test_t& rhs, binary_op op) 
         {
             assert(static_cast<size_t>(op) < op_name_lookup.size());
             uint_test_t ret_tst = 0;
@@ -359,13 +351,13 @@ namespace cjm::uint128_tests
                 ret_ctrl = lhs_ctrl * rhs_ctrl;
                 break;
             case binary_op::compare:
-                if (lhs_ctrl == rhs_ctrl)
+				if (lhs_ctrl == rhs_ctrl)
                 {
                     ret_ctrl = 0;
                 }
             	else
             	{
-                    ret_ctrl = lhs_ctrl > rhs_ctrl ? 1 : std::numeric_limits<uint_ctrl_t>::max();
+					ret_ctrl = lhs_ctrl > rhs_ctrl ? 1 : std::numeric_limits<uint_ctrl_t>::max();
             	}
                 if (lhs == rhs)
                 {
@@ -383,9 +375,50 @@ namespace cjm::uint128_tests
         binary_op m_op;
         uint_test_t m_lhs;
         uint_test_t m_rhs;
-        std::optional<std::pair<uint_test_t, uint_test_t>> m_result;
+        std::optional<std::pair<uint_test_t, uint_test_t>> m_result;   
 
-    };
+};
+	template <typename TestType, typename ControlType>
+	requires (test_uint_and_control_set<TestType, ControlType>)
+	std::basic_ostream<char>& append_static_assertion(
+	    std::basic_ostream<char>& strm, const binary_operation<TestType, ControlType>& bin_op)
+	{
+        using uint_test_t = typename binary_operation<TestType, ControlType>::uint_test_t;
+        auto saver = cout_saver{ strm };
+        strm << "static_assert(0x"
+            << std::hex << std::setfill('0')
+            << bin_op.left_operand() << "_u" << std::dec
+            << std::numeric_limits<uint_test_t>::digits
+            << " " << op_symbol_lookup[static_cast<unsigned>(bin_op.op_code())]
+            << " 0x" << std::hex << std::setfill('0')
+            << bin_op.right_operand() << "_u" << std::dec
+            << std::numeric_limits<uint_test_t>::digits << " == ";
+        if (!bin_op.has_correct_result())
+        {
+            strm << "UNKNOWN OR INCORRECT VALUE"  << newl;
+        }
+        else
+        {
+            auto result = bin_op.result();
+            auto value = result.value().first;
+            if (bin_op.op_code() == binary_op::compare)
+            {
+            	if (value == 0_u128)
+                    strm << "std::strong_ordering::equal";
+                else if (value == 1_u128)
+					strm << "std::strong_ordering::greater";
+                else
+					strm << "std::strong_ordering::less";
+            }
+            else
+            {
+                strm << "0x" << std::hex << std::setfill('0') << value << "_u" << std::dec
+                    << std::numeric_limits<uint_test_t>::digits;
+            }
+        }
+        strm << ");" << newl;
+	    return strm;
+	}
 }
 
 template<typename Invocable>
@@ -409,5 +442,30 @@ void cjm::uint128_tests::execute_test(Invocable test, std::string_view test_name
     }
 }
 
+
+
+constexpr std::array<std::uint64_t, cjm::uint128_tests::pow_2_arr_size> cjm::uint128_tests::get_pow2_arr()
+{
+    std::uint64_t current = 1;
+    std::array<std::uint64_t, cjm::uint128_tests::pow_2_arr_size> ret{};
+    for (size_t idx = 0; idx < ret.size(); ++idx)
+    {
+        ret[idx] = current;
+        current <<= 1;
+    }
+    return ret;
+}
+
+constexpr std::array<int, cjm::uint128_tests::pow_2_arr_size> cjm::uint128_tests::get_pow2_res_arr()
+{
+    using namespace cjm::numerics::literals;
+    constexpr std::array<std::uint64_t, pow_2_arr_size> work_on_me = get_pow2_arr();
+    std::array<int, pow_2_arr_size> ret{};
+    for (auto i = 0_szt; i < work_on_me.size(); ++i)
+    {
+        ret[i] = cjm::numerics::internal::fls_default(work_on_me[i]);
+    }
+    return ret;
+}
 #endif //INT128_INT128_TESTS_HPP
 #include "int128_tests.inl"
