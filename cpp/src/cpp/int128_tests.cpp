@@ -99,7 +99,7 @@ void cjm::uint128_tests::execute_string_parse_test()
         cjm_assert(a == test_hex);
         cjm_assert(x == y && y == z && z == a);
     }
-#if (defined _MSC_VER)
+
     {
         constexpr std::u8string_view u8as_hex = u8"0xc0ded00dfacecafebabeb00bfea2dad0"sv;
         constexpr std::u8string_view u8as_dec = u8"256368684942083501355085096987188714192"sv;
@@ -128,7 +128,7 @@ void cjm::uint128_tests::execute_string_parse_test()
         x = uint128_t::make_from_string(u32as_hex);
         cjm_assert(x == y && y == test_hex && x == test_dec);
     }
-#endif
+
 
 
 }

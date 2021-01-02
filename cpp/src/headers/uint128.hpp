@@ -347,6 +347,13 @@ namespace cjm::numerics
         template<typename Chars, typename CharTraits = std::char_traits<Chars>>
                 requires cjm::numerics::concepts::char_with_traits<Chars, CharTraits>
         static uint128 make_from_string(std::basic_string_view<Chars, CharTraits> parseMe);
+
+        template<typename Chars, typename CharTraits = std::char_traits<Chars>, typename Allocator = std::allocator<Chars>>
+        requires cjm::numerics::concepts::char_with_traits_and_allocator<Chars, CharTraits, Allocator>
+        static uint128 make_from_string(const std::basic_string<Chars, CharTraits, Allocator>& parseMe);
+
+
+
         static constexpr uint128 make_from_bytes_little_endian(byte_array bytes) noexcept;
         static constexpr uint128 make_from_bytes_big_endian(byte_array bytes) noexcept;
         static constexpr uint128 make_uint128(std::uint64_t high, std::uint64_t low) noexcept;
@@ -461,7 +468,10 @@ namespace cjm::numerics
         static void div_mod_msc_x64_impl(uint128 dividend, uint128 divisor,
             uint128 * quotient_ret, uint128 * remainder_ret) noexcept;
         template<typename Char, typename CharTraits = std::char_traits<Char>, typename Allocator = std::allocator<Char>>
-        requires cjm::numerics::concepts::char_with_traits_and_allocator<Char, CharTraits, Allocator>
+        requires (!cjm::numerics::concepts::utf_character<Char>) && (cjm::numerics::concepts::char_with_traits_and_allocator<Char, CharTraits, Allocator>)
+        static std::basic_string<Char, CharTraits, Allocator> to_string(uint128 item, std::ios_base::fmtflags flags);
+        template<typename Char, typename CharTraits = std::char_traits<Char>, typename Allocator = std::allocator<Char>>
+        requires (cjm::numerics::concepts::utf_character<Char>) && (cjm::numerics::concepts::char_with_traits_and_allocator<Char, CharTraits, Allocator>)
         static std::basic_string<Char, CharTraits, Allocator> to_string(uint128 item, std::ios_base::fmtflags flags);
 
 
@@ -606,6 +616,5 @@ namespace cjm
         
 	}
 }
-
-#include "uint128.inl"
 #endif
+#include "uint128.inl"

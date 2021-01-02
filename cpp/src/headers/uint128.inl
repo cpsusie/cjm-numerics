@@ -355,10 +355,66 @@ namespace cjm
 			return os << rep;
 		}
 
-		
+        template<typename Char, typename CharTraits, typename Allocator>
+        requires (cjm::numerics::concepts::utf_character<Char>) && (cjm::numerics::concepts::char_with_traits_and_allocator<Char, CharTraits, Allocator>)
+        std::basic_string<Char, CharTraits, Allocator> uint128::to_string(uint128 item, std::ios_base::fmtflags flags)
+        {
+            if constexpr (has_msc)
+            {
+                constexpr char zero_char_temp = '0';
+                constexpr Char zero_char = static_cast<Char>(zero_char_temp);
+                uint128 div;
+                int div_base_log;
+                switch (flags & std::basic_ios<Char, CharTraits>::basefield)
+                {
+                    case std::basic_ios<Char, CharTraits>::hex:
+                        div = 0x1000000000000000;  // 16^15
+                        div_base_log = 15;
+                        break;
+                    case std::basic_ios<Char, CharTraits>::oct:
+                        div = 01000000000000000000000;  // 8^21
+                        div_base_log = 21;
+                        break;
+                    default:  // std::ios::dec
+                        div = 10000000000000000000u;  // 10^19
+                        div_base_log = 19;
+                        break;
+                }
+                std::basic_stringstream<Char, CharTraits, Allocator> os;
+                std::ios_base::fmtflags copyMask = std::basic_ios<Char, CharTraits>::basefield | std::basic_ios<Char, CharTraits>::showbase | std::basic_ios<Char, CharTraits>::uppercase;
+                os.setf(flags & copyMask, copyMask);
+                uint128 high = item;
+                uint128 low=0;
+                best_safe_div_mod(high, div, &high, &low);
+                uint128 mid=0;
+                best_safe_div_mod(high, div, &high, &mid);
+                if (high.low_part() != 0)
+                {
+                    os << high.low_part();
+                    os << std::noshowbase << std::setfill(zero_char) << std::setw(div_base_log);
+                    os << mid.low_part();
+                    os << std::setw(div_base_log);
+                }
+                else if (mid.low_part() != 0)
+                {
+                    os << mid.low_part();
+                    os << std::noshowbase << std::setfill(zero_char) << std::setw(div_base_log);
+                }
+                os << low.low_part();
+                return os.str();
+            }
+            else //cludge for linux and clang which aren't nice enough to provide facets for the utf strings
+            {
+                std::string converted_narrow = uint128::to_string<char, std::char_traits<char>, std::allocator<char>>(item, flags);
+                std::basic_string<Char, CharTraits, Allocator> ret;
+                ret.reserve(converted_narrow.size());
+                std::transform(converted_narrow.cbegin(), converted_narrow.cend(), std::back_inserter(ret), [](char c) -> Char {return static_cast<Char>(c);} );
+                return ret;
+            }
+        }
 
 		template<typename Char, typename CharTraits, typename Allocator>
-            requires cjm::numerics::concepts::char_with_traits_and_allocator<Char, CharTraits, Allocator>
+        requires (!cjm::numerics::concepts::utf_character<Char>) && (cjm::numerics::concepts::char_with_traits_and_allocator<Char, CharTraits, Allocator>)
 		std::basic_string<Char, CharTraits, Allocator> uint128::to_string(uint128 item, std::ios_base::fmtflags flags)
 		{
 		    constexpr char zero_char_temp = '0';
@@ -567,6 +623,12 @@ namespace cjm
 			m_high = 0;
 			return *this;
 		}
+        template<typename Chars, typename CharTraits, typename Allocator>
+            requires cjm::numerics::concepts::char_with_traits_and_allocator<Chars, CharTraits, Allocator>
+        uint128 uint128::make_from_string(const std::basic_string<Chars, CharTraits, Allocator>& parseMe)
+        {
+            return make_from_string(std::basic_string_view<Chars, CharTraits>{parseMe});
+        }
 
         template<typename Chars, typename CharTraits>
             requires cjm::numerics::concepts::char_with_traits<Chars, CharTraits>

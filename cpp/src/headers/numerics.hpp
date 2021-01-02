@@ -1,5 +1,8 @@
 #ifndef CJM_NUMERICS_HPP_
 #define CJM_NUMERICS_HPP_
+#ifdef _MSC_VER
+#define CJM_MSC
+#endif
 #if defined(_MSC_VER) && defined(_M_X64)
 #include <intrin.h>
 #pragma intrinsic(_umul128)
@@ -78,7 +81,12 @@ namespace cjm
 #else
 	    false;
 #endif
-
+	    constexpr bool has_msc =
+#ifdef CJM_MSC
+    true;
+#else
+	    false;
+#endif
 	    constexpr bool has_intrinsic_u128 =
 #ifdef __SIZEOF_INT128__
         true;

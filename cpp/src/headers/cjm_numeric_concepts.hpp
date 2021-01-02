@@ -391,11 +391,16 @@ namespace cjm::numerics::concepts
     concept builtin_128bit_unsigned_integer = unsigned_integer<Integer> && builtin_integer<Integer>;
 	
     template<typename T>
-    concept character = std::is_nothrow_convertible_v<T, char> ||
-            std::is_nothrow_convertible_v<T, char8_t> ||
-                    std::is_nothrow_convertible_v<T, wchar_t> ||
-                            std::is_nothrow_convertible_v<T, char16_t> ||
-                                    std::is_nothrow_convertible_v<T, char32_t>;
+    concept character = std::is_same_v<T, char> ||
+            std::is_same_v<T, char8_t> ||
+                    std::is_same_v<T, wchar_t> ||
+                            std::is_same_v<T, char16_t> ||
+                                    std::is_same_v<T, char32_t>;
+
+    template<typename T>
+    concept utf_character = character<T> && (std::is_same_v<T, char8_t> ||
+                                             std::is_same_v<T, char16_t> ||
+                                             std::is_same_v<T, char32_t>);
 
     template<typename Char, typename CharTraits>
     concept char_with_traits = character<Char> && std::is_nothrow_convertible_v<CharTraits, std::char_traits<Char>>;

@@ -61,6 +61,41 @@ int cjm::base_test_program::execute_test_program() noexcept
         constexpr auto my_second_literal = 0xc0de'd00d'fea2'cafe'babe'b00b'face'dad0_u128;
         static_assert(cjm::numerics::concepts::unsigned_integer<uint128_t>);
 
+        {
+            auto stream = cjm::string::make_throwing_sstream<char16_t>();
+            stream << my_literal;
+            std::u16string str = stream.str();
+            cjm_assert(!str.empty());
+            auto round_tripped = cjm::numerics::uint128::make_from_string(str);
+            cjm_assert(round_tripped == my_literal);
+        }
+
+        try
+        {
+            constexpr auto number = 123'456'789;
+            auto stream = cjm::string::make_throwing_sstream<char16_t>();
+            stream << number;
+            int round_tripped = 0;
+            stream >> round_tripped;
+            cjm_assert(number == round_tripped);
+            std::cout << "The char16 conversion actually work in this environment." << newl;
+        }
+        catch (const std::bad_cast& ex)
+        {
+            std::cout << "Parsing for REGULAR integers does not exist for utc"
+                      <<  " strings.  Ex msg: " << ex.what() << "." << newl;
+        }
+        catch (const cjm::testing::testing_failure&)
+        {
+            throw;
+        }
+        catch (const std::exception& ex)
+        {
+            std::cerr << "An unexpected exception was thrown while trying"
+                      <<" to insert and extract an int with u16 string stream: ["
+                      << ex.what() << "]." << newl;
+        }
+
         native_test();
 
         print_spec(ui);

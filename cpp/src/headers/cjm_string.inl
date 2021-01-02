@@ -31,7 +31,14 @@ void cjm::string::string_helper::ltrim(std::basic_string<Char, CharTraits, Alloc
 {
 	auto it = std::find_if(toBeLTrimmed.begin(), toBeLTrimmed.end(), [](Char c) -> bool
 	{
-		return !std::isspace<Char>(c, std::locale::classic());
+	    if constexpr (!cjm::numerics::has_msc && cjm::numerics::concepts::utf_character<Char>)
+        {
+	        return !std::isspace<char>(static_cast<char>(c), std::locale(""));
+        }
+        else
+        {
+		    return !std::isspace<Char>(c, std::locale(""));
+        }
 	});
 	toBeLTrimmed.erase(toBeLTrimmed.begin(), it);
 }
@@ -41,7 +48,14 @@ void cjm::string::string_helper::rtrim(std::basic_string<Char, CharTraits, Alloc
 {
 	auto it = std::find_if(toBeRTrimmed.rbegin(), toBeRTrimmed.rend(), [](Char c) -> bool
 	{
-		return !std::isspace<Char>(c, std::locale::classic());
+        if constexpr (!cjm::numerics::has_msc && cjm::numerics::concepts::utf_character<Char>)
+        {
+            return !std::isspace<char>(static_cast<char>(c), std::locale(""));
+        }
+        else
+        {
+            return !std::isspace<Char>(c, std::locale(""));
+        }
 	});
 	toBeRTrimmed.erase(it.base(), toBeRTrimmed.end());
 }
