@@ -15,6 +15,7 @@
 #include <boost/io/ios_state.hpp>
 #include <exception>
 #include <stdexcept>
+#include <utility>
 #include <boost/multiprecision/cpp_int.hpp>
 
 namespace cjm::uint128_tests
@@ -32,6 +33,98 @@ namespace cjm::uint128_tests
     using cout_saver = boost::io::ios_flags_saver;
     using sv_t = std::string_view;
     constexpr size_t binary_op_count = 11;
+
+    template<typename TestTypeUi, typename ControlTypeUi>
+    concept test_uint_and_control_set = cjm::numerics::concepts::cjm_unsigned_integer<TestTypeUi>
+                                        && cjm::numerics::concepts::unsigned_integer<ControlTypeUi>
+                                        && std::numeric_limits<TestTypeUi>::digits == std::numeric_limits<ControlTypeUi>::digits;
+    namespace u128_testing_constant_providers
+    {
+        namespace concepts
+        {
+            template<typename T>
+            concept supports_testing_content_provider =  cjm::numerics::concepts::cjm_unsigned_integer<T> || (std::integral<T>  && std::is_unsigned_v<T> && sizeof(T) <= sizeof(std::uint64_t));
+
+        }
+        template<concepts::supports_testing_content_provider T>
+        struct testing_constant_provider;
+
+        template<>
+        struct testing_constant_provider<std::uint8_t>
+        {
+            using full_uint_t = std::uint8_t;
+            using half_uint_t = std::uint8_t;
+
+            static constexpr full_uint_t maximum = std::numeric_limits<full_uint_t>::max();
+            static constexpr full_uint_t max_less_one = maximum -  full_uint_t{1};
+            static constexpr full_uint_t zero = std::numeric_limits<full_uint_t>::min();
+            static constexpr full_uint_t one = zero +  full_uint_t{1};
+            static constexpr full_uint_t maximum_half = std::numeric_limits<half_uint_t>::max();
+            static constexpr full_uint_t maximum_half_less_one = std::numeric_limits<half_uint_t>::max();
+            using half_provider_t = testing_constant_provider<half_uint_t>;
+        };
+
+        template<>
+        struct testing_constant_provider<std::uint16_t>
+        {
+            using full_uint_t = std::uint16_t;
+            using half_uint_t = std::uint8_t;
+
+            static constexpr full_uint_t maximum = std::numeric_limits<full_uint_t>::max();
+            static constexpr full_uint_t max_less_one = maximum -  full_uint_t{1};
+            static constexpr full_uint_t zero = std::numeric_limits<full_uint_t>::min();
+            static constexpr full_uint_t one = zero +  full_uint_t{1};
+            static constexpr full_uint_t maximum_half = std::numeric_limits<half_uint_t>::max();
+            static constexpr full_uint_t maximum_half_less_one = std::numeric_limits<half_uint_t>::max();
+            using half_provider_t = testing_constant_provider<half_uint_t>;
+        };
+
+        template<>
+        struct testing_constant_provider<std::uint32_t>
+        {
+            using full_uint_t = std::uint32_t;
+            using half_uint_t = std::uint16_t;
+
+            static constexpr full_uint_t maximum = std::numeric_limits<full_uint_t>::max();
+            static constexpr full_uint_t max_less_one = maximum - full_uint_t{1};
+            static constexpr full_uint_t zero = std::numeric_limits<full_uint_t>::min();
+            static constexpr full_uint_t one = zero + full_uint_t{1};
+            static constexpr full_uint_t maximum_half = std::numeric_limits<half_uint_t>::max();
+            static constexpr full_uint_t maximum_half_less_one = std::numeric_limits<half_uint_t>::max();
+            using half_provider_t = testing_constant_provider<half_uint_t>;
+        };
+
+        template<>
+        struct testing_constant_provider<std::uint64_t> final
+        {
+            using full_uint_t = std::uint64_t;
+            using half_uint_t = std::uint32_t;
+
+            static constexpr full_uint_t maximum = std::numeric_limits<full_uint_t>::max();
+            static constexpr full_uint_t max_less_one = maximum -  full_uint_t{1};;
+            static constexpr full_uint_t zero = std::numeric_limits<full_uint_t>::min();
+            static constexpr full_uint_t one = zero +  full_uint_t{1};
+            static constexpr full_uint_t maximum_half = std::numeric_limits<half_uint_t>::max();
+            static constexpr full_uint_t maximum_half_less_one = std::numeric_limits<half_uint_t>::max();
+            using half_provider_t = testing_constant_provider<half_uint_t>;
+        };
+
+        template<concepts::supports_testing_content_provider T>
+        struct testing_constant_provider final
+        {
+            using full_uint_t = std::remove_const_t<T>;
+            using half_uint_t = typename T::int_part;
+
+            static constexpr full_uint_t maximum = std::numeric_limits<full_uint_t>::max();
+            static constexpr full_uint_t max_less_one = maximum - full_uint_t {1};
+            static constexpr full_uint_t zero = std::numeric_limits<full_uint_t>::min();
+            static constexpr full_uint_t one = zero + full_uint_t{1};
+            static constexpr full_uint_t maximum_half = std::numeric_limits<half_uint_t>::max();
+            static constexpr full_uint_t maximum_half_less_one = std::numeric_limits<half_uint_t>::max();
+            using half_provider_t = testing_constant_provider<half_uint_t>;
+        };
+    }
+
     enum class binary_op : unsigned int
     {
         left_shift = 0,
@@ -56,7 +149,8 @@ namespace cjm::uint128_tests
             "Modulus"sv, "Add"sv,
             "Subtract"sv, "Multiply"sv,
             "Compare"sv};
-
+    template<typename TestType = uint128_t , typename ControlType = ctrl_uint128_t>
+            requires (test_uint_and_control_set<TestType, ControlType>)
     struct binary_operation;
     class cjm_helper_rgen;
 	
@@ -104,16 +198,19 @@ namespace cjm::uint128_tests
     void test_interconversion(const ctrl_uint128_t& control, uint128_t test);
     void execute_builtin_u128fls_test_if_avail();
 
+    template<typename TestType, typename ControlType>
+        requires (test_uint_and_control_set<TestType, ControlType>)
     struct binary_operation final
     {
-        using uint128_t = cjm::numerics::uint128;
+        using uint_test_t = TestType;
+        using uint_ctrl_t = ControlType;
         friend std::size_t hash_value(const binary_operation& obj)
         {
 
             std::size_t seed = 0x1FBB0493;
             boost::hash_combine(seed, static_cast<size_t>(obj.m_op));
-            boost::hash_combine(seed, std::hash<uint128_t>{}(obj.m_lhs));
-            boost::hash_combine(seed, std::hash<uint128_t>{}(obj.m_rhs));
+            boost::hash_combine(seed, std::hash<uint_test_t>{}(obj.m_lhs));
+            boost::hash_combine(seed, std::hash<uint_test_t>{}(obj.m_rhs));
             return seed;
         }
 
@@ -146,9 +243,9 @@ namespace cjm::uint128_tests
         friend bool operator!=(const binary_operation& lhs, const binary_operation& rhs) { return !(lhs == rhs); }
 
         [[nodiscard]] binary_op op_code() const noexcept { return m_op; }
-        [[nodiscard]] uint128_t left_operand() const noexcept { return m_lhs; }
-        [[nodiscard]] uint128_t right_operand() const noexcept { return m_rhs; }
-        [[nodiscard]] std::optional<uint128_t> result() const noexcept { return m_result; }
+        [[nodiscard]] const uint_test_t& left_operand() const noexcept { return m_lhs; }
+        [[nodiscard]] const uint_test_t& right_operand() const noexcept { return m_rhs; }
+        [[nodiscard]] std::optional<uint_test_t> result() const noexcept { return m_result; }
         [[nodiscard]] bool has_result() const noexcept { return m_result.has_value(); }
         [[nodiscard]] bool has_correct_result() const
         {
@@ -156,9 +253,9 @@ namespace cjm::uint128_tests
         }
 
         binary_operation() noexcept;
-        binary_operation(binary_op op, uint128_t first_operand, uint128_t second_operand, bool calculate_now);
-        binary_operation(binary_op op, uint128_t first_operand, uint128_t second_operand);
-        binary_operation(binary_op op, uint128_t first_operand, uint128_t second_operand, uint128_t result);
+        binary_operation(binary_op op, const uint_test_t& first_operand, const uint_test_t& second_operand, bool calculate_now);
+        binary_operation(binary_op op, const uint_test_t& first_operand, const uint_test_t& second_operand);
+        binary_operation(binary_op op, const uint_test_t& first_operand, const uint_test_t& second_operand, uint_test_t result);
         binary_operation(const binary_operation& other) noexcept = default;
         binary_operation(binary_operation&& other) noexcept = default;
         binary_operation& operator=(const binary_operation& other) noexcept = default;
@@ -169,13 +266,16 @@ namespace cjm::uint128_tests
 
     private:
 
+        static uint_ctrl_t to_control(const uint_test_t& test);
+        static uint_test_t to_test(const uint_ctrl_t& ctrl);
+
         bool do_calculate_result();
-        static uint128_t perform_calculate_result(uint128_t lhs, uint128_t rhs, binary_op op) noexcept;
+        static std::pair<uint_test_t, uint_test_t> perform_calculate_result(uint_test_t lhs, uint_test_t rhs, binary_op op) noexcept;
 
         binary_op m_op;
-        uint128_t m_lhs;
-        uint128_t m_rhs;
-        std::optional<uint128_t> m_result;
+        uint_test_t m_lhs;
+        uint_test_t m_rhs;
+        std::optional<std::pair<uint_test_t, uint_test_t>> m_result;
 
     };
 }
@@ -200,7 +300,5 @@ void cjm::uint128_tests::execute_test(Invocable test, std::string_view test_name
         throw;
     }
 }
-
-
-
 #endif //INT128_INT128_TESTS_HPP
+#include "int128_tests.inl"

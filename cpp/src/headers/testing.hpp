@@ -6,11 +6,13 @@
 #include <algorithm>
 #include <iostream>
 #include <iomanip>
+#include "numerics.hpp"
+#include "cjm_numeric_concepts.hpp"
 namespace cjm
 {
 	namespace testing
 	{
-		void cjm_deny(bool predicateExpression);
+	    void cjm_deny(bool predicateExpression);
 		void cjm_assert(bool predicateExpression);
 
 		void cjm_assert_throws(const std::function<void()>& func);

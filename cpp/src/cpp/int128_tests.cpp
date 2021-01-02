@@ -28,6 +28,9 @@ cjm::uint128_tests::uint128_t cjm::uint128_tests::to_test(const ctrl_uint128_t& 
 
 void cjm::uint128_tests::execute_uint128_tests()
 {
+    using tconst_prov_t [[maybe_unused]] = u128_testing_constant_providers::testing_constant_provider<uint128_t>;
+    static_assert(tconst_prov_t::maximum + tconst_prov_t::one == tconst_prov_t::zero);
+
     constexpr auto two_fifty_five = 0xff_u128;
 	constexpr auto all_at_ends = 0xff00'0000'0000'0000'0000'0000'0000'0000_u128;
     static_assert(((two_fifty_five << (15 * 8)) == all_at_ends) && ((all_at_ends >> (15 * 8)) == two_fifty_five));
@@ -255,33 +258,7 @@ void cjm::uint128_tests::test_interconversion(const ctrl_uint128_t& control, uin
     cjm::testing::cjm_assert(test_to_control == control && ctrl_to_test == test);
 }
 
-cjm::uint128_tests::binary_operation::binary_operation() noexcept : m_op{cjm::uint128_tests::binary_op::left_shift }, m_lhs{}, m_rhs{} {}
 
-cjm::uint128_tests::binary_operation::binary_operation(binary_op op, uint128_t first_operand, uint128_t second_operand,
-    bool calculate_now) : m_op{ op }, m_lhs{ first_operand }, m_rhs{ second_operand }, m_result{}
-{
-    size_t op_code = static_cast<size_t>(op);
-    if (op_code >= op_name_lookup.size())
-        throw std::invalid_argument{ "The op code is not recognized." };
-    if (calculate_now)
-    {
-        this->calculate_result();
-    }
-}
-
-cjm::uint128_tests::binary_operation::
-binary_operation(binary_op op, uint128_t first_operand, uint128_t second_operand)
-	: binary_operation(op, first_operand, second_operand, false){}
-
-
-cjm::uint128_tests::binary_operation::
-binary_operation(binary_op op, uint128_t first_operand, uint128_t second_operand, uint128_t result) :
-    m_op{ op }, m_lhs{ first_operand }, m_rhs{ second_operand }, m_result{ result }
-{
-    size_t op_code = static_cast<size_t>(op);
-    if (op_code >= op_name_lookup.size())
-        throw std::invalid_argument{ "The op code is not recognized." };
-}
 
 bool cjm::uint128_tests::binary_operation::do_calculate_result()
 {
@@ -291,56 +268,8 @@ bool cjm::uint128_tests::binary_operation::do_calculate_result()
     return changed_value;
 }
 
-uint128_t cjm::uint128_tests::binary_operation::perform_calculate_result(uint128_t lhs, uint128_t rhs, binary_op op) noexcept
-{
-    assert(static_cast<size_t>(op) < op_name_lookup.size());
-    uint128_t ret = 0;
-    switch (op)
-    {
-    case binary_op::left_shift:
-        ret = lhs << static_cast<int>(rhs);
-        break;
-    case binary_op::right_shift:
-        ret = lhs >> static_cast<int>(rhs);
-        break;
-    case binary_op::bw_and:
-        ret = lhs & rhs;
-        break;
-    case binary_op::bw_or:
-        ret = lhs | rhs;
-        break;
-    case binary_op::bw_xor:
-        ret = lhs ^ rhs;
-        break;
-    case binary_op::divide:
-        ret = lhs / rhs;
-        break;
-    case binary_op::modulus:
-        ret = lhs % rhs;
-        break;
-    case binary_op::add:
-        ret = lhs + rhs;
-        break;
-    case binary_op::subtract:
-        ret = lhs - rhs;
-        break;
-    case binary_op::multiply:
-        ret = lhs * rhs;
-        break;
-    case binary_op::compare:
-        if (lhs == rhs)
-        {
-            ret = 0;
-        }
-        else
-        {
-            ret = lhs > rhs ? 1 : -1;
-        }
-        break;
 
-    }
-    return ret;
-}
+
 
 void cjm::uint128_tests::print_uint128_eval_mode()
 {
