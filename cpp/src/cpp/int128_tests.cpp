@@ -101,12 +101,12 @@ void cjm::uint128_tests::execute_string_parse_test()
     }
 #if (defined _MSC_VER)
     {
-        [[maybe_unused]] constexpr std::u8string_view u8as_hex = u8"0xc0ded00dfacecafebabeb00bfea2dad0"sv;
+        constexpr std::u8string_view u8as_hex = u8"0xc0ded00dfacecafebabeb00bfea2dad0"sv;
         constexpr std::u8string_view u8as_dec = u8"256368684942083501355085096987188714192"sv;
-        [[maybe_unused]] constexpr std::u8string_view u16as_hex = u8"0xc0ded00dfacecafebabeb00bfea2dad0"sv;
-        constexpr std::u8string_view u16as_dec = u8"256368684942083501355085096987188714192"sv;
-        [[maybe_unused]] constexpr std::u8string_view u32as_hex = u8"0xc0ded00dfacecafebabeb00bfea2dad0";
-        constexpr std::u8string_view u32as_dec = u8"256368684942083501355085096987188714192"sv;
+        constexpr std::u16string_view u16as_hex = u"0xc0ded00dfacecafebabeb00bfea2dad0"sv;
+        constexpr std::u16string_view u16as_dec = u"256368684942083501355085096987188714192"sv;
+        constexpr std::u32string_view u32as_hex = U"0xc0ded00dfacecafebabeb00bfea2dad0"sv;
+        constexpr std::u32string_view u32as_dec = U"256368684942083501355085096987188714192"sv;
 
         uint128_t x = test_hex;
             //uint128_t ::make_from_string(u8as_hex);
@@ -125,7 +125,7 @@ void cjm::uint128_tests::execute_string_parse_test()
         x = uint128_t::make_from_string(u32as_dec);
         y = test_hex;
         cjm_assert(x == y && y == test_hex && x == test_dec);
-        x = uint128_t::make_from_string(u32as_dec);
+        x = uint128_t::make_from_string(u32as_hex);
         cjm_assert(x == y && y == test_hex && x == test_dec);
     }
 #endif
