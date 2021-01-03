@@ -117,8 +117,20 @@ namespace cjm::numerics
     template <typename Char = char, typename CharTraits=std::char_traits<Char>, typename Allocator = std::allocator<Char>>
             requires cjm::numerics::concepts::char_with_traits_and_allocator<Char, CharTraits, Allocator>
     std::basic_ostream<Char, CharTraits>& operator<<(std::basic_ostream<Char, CharTraits>& os, uint128 v);
+            /// <summary>
+        /// Stream extraction operator for uint128
+        /// </summary>
+        /// <typeparam name="Char">The Character type</typeparam>
+        /// <typeparam name="CharTraits">traits for character</typeparam>
+        /// <typeparam name="Allocator">allocator for character</typeparam>
+        /// <param name="os">the stream to insert</param>
+        /// <param name="v">the value to stringify and insert into the stream</param>
+        /// <returns>the stream with the value inserted.</returns>
+	template <typename Char = char, typename CharTraits = std::char_traits<Char>>
+		requires cjm::numerics::concepts::char_with_traits<Char, CharTraits>
+	std::basic_istream<Char, CharTraits>& operator>>(std::basic_istream<Char, CharTraits>& is, uint128 v);
     //Comparison operators
-    constexpr std::strong_ordering operator <=>(uint128 lhs, uint128 rhs) noexcept; 
+	constexpr std::strong_ordering operator <=>(uint128 lhs, uint128 rhs) noexcept; 
     constexpr bool operator==(uint128 lhs, uint128 rhs) noexcept;
     constexpr bool operator!=(uint128 lhs, uint128 rhs) noexcept;
     constexpr bool operator>(uint128 lhs, uint128 rhs) noexcept;

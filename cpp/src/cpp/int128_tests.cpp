@@ -124,9 +124,12 @@ void cjm::uint128_tests::execute_string_parse_test()
         auto wide_strm = make_throwing_sstream<wchar_t>();
         auto default_hex_strm = make_throwing_sstream<char>();
         auto wide_hex_strm = make_throwing_sstream<wchar_t>();
-//        auto utf8_stream = make_throwing_sstream<char8_t, std::char_traits<char8_t>, std::allocator<char8_t>>();
-//        auto utf16_stream = make_throwing_sstream<char16_t>();
-//        auto utf32_stream = make_throwing_sstream<char32_t>();
+		auto utf8_stream = make_throwing_sstream<char8_t, std::char_traits<char8_t>, std::allocator<char8_t>>();
+        auto utf8_hex_stream = make_throwing_sstream<char8_t, std::char_traits<char8_t>, std::allocator<char8_t>>();
+		auto utf16_stream = make_throwing_sstream<char16_t>();
+        auto utf16_hex_stream = make_throwing_sstream<char16_t>();
+		auto utf32_stream = make_throwing_sstream<char32_t>();
+        auto utf32_hex_stream = make_throwing_sstream<char32_t>();
 
         default_strm << test_dec;
         wide_strm << test_dec;

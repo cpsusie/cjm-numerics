@@ -355,6 +355,41 @@ namespace cjm
 			return os << rep;
 		}
 
+        template <typename Char, typename CharTraits>
+        requires cjm::numerics::concepts::char_with_traits<Char, CharTraits>
+        std::basic_istream<Char, CharTraits>& operator>>(std::basic_istream<Char, CharTraits>& is, uint128 v)
+        {
+        	if (is.bad() || is.fail())
+        	{
+                std::cerr << "Stream already in bad state upon attempt to extract uint128.";
+                is.setstate(std::ios_base::failbit, true);
+                return is;
+        	}
+        	if (is.eof())
+        	{
+                std::cerr << "Failed to extract uint128 from stream: already at eof.\n";
+                is.setstate(std::ios_base::failbit);
+        	}
+            std::basic_string<Char, CharTraits> str;
+            is >> str;
+        	if (is.bad() || is.fail())
+        	{
+                return is;
+        	}
+        	try
+        	{
+                return uint128::make_from_string(str);
+        	}
+        	catch (const std::exception& ex)
+        	{
+                std::cerr << "Error parsing stream to uint128: [" << ex.what() << "].\n";
+                is.setstate(std::ios_base::failbit);
+        	}
+            return is;
+        }
+
+        
+
         template<typename Char, typename CharTraits, typename Allocator>
         requires (cjm::numerics::concepts::utf_character<Char>) && (cjm::numerics::concepts::char_with_traits_and_allocator<Char, CharTraits, Allocator>)
         std::basic_string<Char, CharTraits, Allocator> uint128::to_string(uint128 item, std::ios_base::fmtflags flags)
