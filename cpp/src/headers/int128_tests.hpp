@@ -21,8 +21,12 @@
 #include <boost/multiprecision/cpp_int.hpp>
 #include <concepts>
 #include <cstdint>
-#include "int128_test_gen.hpp"
-
+#include <random>
+#include <algorithm>
+#include <vector>
+#include<functional>
+#include <memory>
+#include <optional>
 
 namespace cjm::uint128_tests
 {
@@ -488,5 +492,163 @@ constexpr std::array<int, cjm::uint128_tests::pow_2_arr_size> cjm::uint128_tests
     }
     return ret;
 }
+
+namespace cjm::uint128_tests::generator
+{
+    static_assert(sizeof(std::uintptr_t) >= 8 || sizeof(std::uintptr_t) == 4,
+        "Only 32 and 64 bit systems are supported.");
+    namespace internal
+    {
+
+        class rgen_impl;
+    }
+    class rgen;
+}
+
+namespace std
+{
+    template<>
+    struct hash<cjm::uint128_tests::generator::rgen>
+    {
+        [[nodiscard]] size_t operator()(const cjm::uint128_tests::generator::rgen& key) const noexcept;
+
+    };
+}
+namespace cjm::uint128_tests
+{
+    template<typename TestType, typename ControlType>
+    requires (test_uint_and_control_set<TestType, ControlType>)
+        struct binary_operation;
+    using uint128_t = cjm::numerics::uint128;
+
+}
+namespace cjm::uint128_tests::generator
+{
+    using uint128_t = numerics::uint128;
+    using ctrl_uint128_t = boost::multiprecision::uint128_t;
+    enum class binary_op_category
+    {
+        any,
+        bitwise,
+        bitshift,
+        add_subtract_multiply,
+        div_mod,
+        compare,
+    };
+
+    namespace concepts
+    {
+        template<typename UnsignedInteger>
+        concept up_to_ui128 = std::numeric_limits<UnsignedInteger>::is_integer &&
+            std::numeric_limits<UnsignedInteger>::digits <= 128 && (!std::numeric_limits<UnsignedInteger>::is_signed);
+
+        template<typename Invocable>
+        concept binary_op_producer = requires (Invocable func, const rgen & gen, binary_operation<uint128_t, ctrl_uint128_t> op)
+        {
+            {op = func(gen) };
+
+        };
+    }
+
+
+	
+    binary_operation<cjm::uint128_tests::uint128_t,
+                     cjm::uint128_tests::ctrl_uint128_t> create_compare_op(const rgen& rgen);
+    binary_operation<uint128_t, ctrl_uint128_t> create_shift_op(const rgen& rgen);
+    binary_operation<uint128_t, ctrl_uint128_t> create_bw_op(const rgen& rgen);
+    binary_operation<uint128_t, ctrl_uint128_t>
+        create_division_op(const rgen& rgen, size_t max_dividend_size, size_t max_divisor_size);
+
+    std::vector<binary_operation<uint128_t, ctrl_uint128_t>>
+        create_division_ops(const rgen& rgen, size_t num_ops, size_t max_dividend_size, size_t max_divisor_size);
+
+    binary_operation<uint128_t, ctrl_uint128_t>
+        create_modulus_op(const rgen& rgen, size_t max_dividend_size, size_t max_divisor_size);
+
+    std::vector<binary_operation<uint128_t, ctrl_uint128_t>>
+        create_modulus_ops(const rgen& rgen, size_t num_ops, size_t max_dividend_size, size_t max_divisor_size);
+
+    template<concepts::up_to_ui128 UnsignedInteger>
+    uint128_t create_random_in_range(const rgen& rgen);
+
+    template<concepts::up_to_ui128 UnsignedInteger>
+    int create_shift_param_for_type(const rgen& rgen);
+
+	template<concepts::binary_op_producer OpFactory>
+    std::vector<binary_operation<uint128_t, ctrl_uint128_t>> create_many_ops(OpFactory factory, const rgen& gen, size_t num_ops);
+
+	
+    uint128_t create_random_in_range(const rgen& rgen, size_t byte_limit);
+
+    class rgen final
+    {
+    public:
+        [[nodiscard]] bool good() const { return static_cast<bool>(m_gen); }
+        rgen();
+        rgen(const rgen& other) = delete;
+        rgen(rgen&& other) noexcept;
+        rgen& operator=(const rgen& other) = delete;
+        rgen& operator=(rgen&& other) noexcept;
+        ~rgen() = default;
+
+        friend bool operator==(const rgen& lhs, const rgen& rhs) noexcept;
+        friend bool operator!=(const rgen& lhs, const rgen& rhs) noexcept;
+        friend struct std::hash<rgen>;
+        explicit operator bool() const { return good(); }
+        bool operator!() const { return !good(); }
+
+        [[nodiscard]] binary_op random_op(binary_op_category category) const;
+        [[nodiscard]] std::vector<std::uint8_t> generate(size_t bytes) const;
+        [[nodiscard]] int generate_shift_param(int binary_digits) const;
+    private:
+        explicit rgen(bool) noexcept;
+        std::unique_ptr<internal::rgen_impl> m_gen;
+    };
+
+
+    template<concepts::up_to_ui128 UnsignedInteger>
+    uint128_t create_random_in_range(const rgen& rgen)
+    {
+        assert(rgen.good());
+        using byte_array = typename uint128_t::byte_array;
+        auto vec = rgen.generate(sizeof(UnsignedInteger));
+        auto arr = byte_array{};
+        assert(vec.size() <= arr.size());
+        std::copy(vec.cbegin(), vec.cend(), arr.begin());
+        return uint128_t::make_from_bytes_little_endian(arr);
+    }
+
+    template <concepts::up_to_ui128 UnsignedInteger>
+    int create_shift_param_for_type(const rgen& rgen)
+    {
+        return rgen.generate_shift_param(std::numeric_limits<UnsignedInteger>::digits);
+    }
+
+    template<concepts::binary_op_producer OpFactory>
+    std::vector<binary_operation<uint128_t, ctrl_uint128_t>> create_many_ops(OpFactory factory, const rgen& gen, size_t num_ops)
+    {
+        auto vec = std::vector<binary_operation<uint128_t, ctrl_uint128_t>>{};
+    	if (num_ops > 0)
+    	{
+            vec.reserve(num_ops);
+    	}
+    	while (vec.size() < num_ops)
+    	{
+            vec.emplace_back(factory(gen));
+    	}
+        return vec;
+    }
+
+    //static_assert(std::is_same_v<twister_t, std::mt19937_64>);
+
+    //inline std::mt19937_64 init_twister()
+    //{
+    //	std::random_device rd;
+    //	auto seed = rd();
+    //	return std::mt19937_64{ seed };
+    //}
+
+}
+
 #endif //INT128_INT128_TESTS_HPP
 #include "int128_tests.inl"
