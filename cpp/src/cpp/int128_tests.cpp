@@ -133,25 +133,47 @@ void cjm::uint128_tests::execute_string_parse_test()
 
         default_strm << test_dec;
         wide_strm << test_dec;
+        utf8_stream << test_dec;
+        utf16_stream << test_dec;
+        utf32_stream << test_dec;
+
         default_hex_strm << test_hex;
         wide_hex_strm << test_hex;
+        utf8_hex_stream << test_hex;
+        utf16_hex_stream << test_hex;
+        utf32_hex_stream << test_hex;
     	
-        std::string text = default_strm.str();
-        std::wstring wtext = wide_strm.str();
-        std::string hex_text = default_hex_strm.str();
-        std::wstring w_hex_text = wide_hex_strm.str();
 
     	 	    	
-        uint128_t x = uint128_t::make_from_string(std::string_view{text});
-        uint128_t y = uint128_t::make_from_string(std::wstring_view{wtext});
-        uint128_t z = uint128_t::make_from_string(std::string_view{ hex_text });
-    	uint128_t a = uint128_t::make_from_string(std::wstring_view{ w_hex_text });
+        uint128_t  v, w, x, y, z,   a, b, c, d, e;
 
-        cjm_assert(x == test_hex);
-        cjm_assert(y == test_hex);
-        cjm_assert(z == test_hex);
+        default_strm >> v;
+        wide_strm >> w;
+        utf8_stream >> x;
+        utf16_stream >> y;
+        utf32_stream >> z;
+
+        default_hex_strm >> a;
+        wide_hex_strm >> b;
+        utf8_hex_stream >> c;
+        utf16_hex_stream >> d;
+        utf32_hex_stream >> e;
+        
+        
+        cjm_assert(v == test_dec);
+        cjm_assert(w == test_dec);
+        cjm_assert(x == test_dec);
+        cjm_assert(y == test_dec);
+        cjm_assert(z == test_dec);
+
         cjm_assert(a == test_hex);
-        cjm_assert(x == y && y == z && z == a);
+        cjm_assert(b == test_hex);
+        cjm_assert(c == test_hex);
+        cjm_assert(d == test_hex);
+        cjm_assert(e == test_hex);
+
+        cjm_assert(test_dec == test_hex);
+
     }
 
     {

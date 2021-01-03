@@ -5,6 +5,7 @@
 #include<cstdint>
 #include<type_traits>
 #include<limits>
+#include <string>
 #include<cassert>
 #include<optional>
 #include<array>
@@ -128,7 +129,7 @@ namespace cjm::numerics
         /// <returns>the stream with the value inserted.</returns>
 	template <typename Char = char, typename CharTraits = std::char_traits<Char>>
 		requires cjm::numerics::concepts::char_with_traits<Char, CharTraits>
-	std::basic_istream<Char, CharTraits>& operator>>(std::basic_istream<Char, CharTraits>& is, uint128 v);
+	std::basic_istream<Char, CharTraits>& operator>>(std::basic_istream<Char, CharTraits>& is, uint128& v);
     //Comparison operators
 	constexpr std::strong_ordering operator <=>(uint128 lhs, uint128 rhs) noexcept; 
     constexpr bool operator==(uint128 lhs, uint128 rhs) noexcept;

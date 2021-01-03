@@ -357,12 +357,13 @@ namespace cjm
 
         template <typename Char, typename CharTraits>
         requires cjm::numerics::concepts::char_with_traits<Char, CharTraits>
-        std::basic_istream<Char, CharTraits>& operator>>(std::basic_istream<Char, CharTraits>& is, uint128 v)
+        std::basic_istream<Char, CharTraits>& operator>>(std::basic_istream<Char, CharTraits>& is, uint128& v)
         {
+            v = 0;
         	if (is.bad() || is.fail())
         	{
                 std::cerr << "Stream already in bad state upon attempt to extract uint128.";
-                is.setstate(std::ios_base::failbit, true);
+                is.setstate(std::ios_base::failbit | std::ios_base::badbit);
                 return is;
         	}
         	if (is.eof())
@@ -371,14 +372,48 @@ namespace cjm
                 is.setstate(std::ios_base::failbit);
         	}
             std::basic_string<Char, CharTraits> str;
-            is >> str;
+        	if constexpr ( (!cjm::numerics::has_msc) && cjm::numerics::concepts::utf_character<Char>)
+            {
+        	    Char c{};
+        	    do
+                {
+        	        if (is.good() && !is.eof() && is.peek() != CharTraits::eof())
+                    {
+                        is.get(c);
+                        if (!is.bad() && !is.fail())
+                        {
+                            if (!std::isspace<char>(static_cast<char>(static_cast<unsigned char>(c)), std::locale("")))
+                                str.push_back(c);
+                            else
+                                break;
+                        }
+                    }
+                    else
+                        break;
+                } while (!is.bad() && !is.fail() && !is.eof());
+                if (is.bad() || is.fail())
+                {
+                    return is;
+                }
+                if (str.empty())
+                {
+                    is.setstate(std::ios_base::failbit);
+                    return is;
+                }
+            }
+            else
+            {
+                is >> str;
+            }
+
         	if (is.bad() || is.fail())
         	{
                 return is;
         	}
         	try
         	{
-                return uint128::make_from_string(str);
+        	    v = uint128::make_from_string(str);
+        	    return is;
         	}
         	catch (const std::exception& ex)
         	{
