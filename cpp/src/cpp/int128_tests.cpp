@@ -373,6 +373,15 @@ void cjm::uint128_tests::execute_first_bin_op_test()
 	
 }
 
+void cjm::uint128_tests::execute_gen_comp_ops_test()
+{
+    auto rgen = cjm::uint128_tests::generator::rgen{};
+    const size_t num_ops = 10;
+	
+    auto v = generator::create_compare_op(rgen);
+    cjm_assert(v.size() == num_ops);
+}
+
 #ifdef CJM_HAVE_BUILTIN_128
 void cjm::uint128_tests::execute_builtin_u128fls_test_if_avail()
 {

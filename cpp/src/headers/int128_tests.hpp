@@ -21,6 +21,7 @@
 #include <boost/multiprecision/cpp_int.hpp>
 #include <concepts>
 #include <cstdint>
+#include "int128_test_gen.hpp"
 
 
 namespace cjm::uint128_tests
@@ -138,21 +139,40 @@ namespace cjm::uint128_tests
     }
 
     enum class binary_op : unsigned int
-    {
+    {   //IF YOU EDIT THIS, MAKE SURE YOU EDIT THE CONSTANTS BELOW AND KEEP RELATED GROUPS CONSECUTIVE!
         left_shift = 0,
-        right_shift,
-        bw_and,
-        bw_or,
-        bw_xor,
+        right_shift = 1,
 
-        divide,
-        modulus,
-        add,
-        subtract,
-        multiply,
+        bw_and = 2,
+        bw_or = 3,
+        bw_xor = 4,
 
-        compare
+        divide = 5,
+        modulus = 6,
+
+        add = 7,
+        subtract = 8,
+        multiply = 9,
+
+        compare = 10
     };
+
+    constexpr binary_op first_op = binary_op::left_shift;
+    constexpr binary_op last_op = binary_op::compare;
+
+    constexpr binary_op first_shift_op = binary_op::left_shift;
+    constexpr binary_op last_shift_op = binary_op::right_shift;
+
+    constexpr binary_op first_bw_op = binary_op::bw_and;
+    constexpr binary_op last_bw_op = binary_op::bw_xor;
+
+    constexpr binary_op first_divmod_op = binary_op::divide;
+    constexpr binary_op last_divmod_op = binary_op::modulus;
+
+    constexpr binary_op first_add_sub_mul_op = binary_op::add;
+    constexpr binary_op last_add_sub_mul_op = binary_op::multiply;
+	
+	
     constexpr auto op_name_lookup = std::array<sv_t, binary_op_count>{
         "LeftShift"sv, "RightShift"sv,"And"sv, "Or"sv,
             "Xor"sv, "Divide"sv,"Modulus"sv, "Add"sv,
@@ -166,7 +186,7 @@ namespace cjm::uint128_tests
     template<typename TestType = uint128_t , typename ControlType = ctrl_uint128_t>
             requires (test_uint_and_control_set<TestType, ControlType>)
     struct binary_operation;
-    class cjm_helper_rgen;
+    
 	
     template<typename Invocable>
     void execute_test(Invocable test, std::string_view test_name);
@@ -192,6 +212,7 @@ namespace cjm::uint128_tests
     void test_interconversion(const ctrl_uint128_t& control, uint128_t test);
     void execute_builtin_u128fls_test_if_avail();
     void execute_first_bin_op_test();
+    void execute_gen_comp_ops_test();
 
     template<typename TestType, typename ControlType>
     requires (test_uint_and_control_set<TestType, ControlType>)
