@@ -376,6 +376,11 @@ void cjm::uint128_tests::execute_first_bin_op_test()
 
 void cjm::uint128_tests::execute_gen_comp_ops_test()
 {
+    constexpr ctrl_uint128_t cmax = std::numeric_limits<ctrl_uint128_t>::max();
+    constexpr uint128_t  tmax = std::numeric_limits<uint128_t>::max();
+
+    cjm_assert(to_test(cmax) == tmax && to_ctrl(tmax) == cmax && u128_testing_constant_providers::testing_constant_provider<uint128_t>::maximum == tmax);
+
     auto gen = generator::rgen{};
     auto factory = [](const generator::rgen& g) -> binary_operation<uint128_t, ctrl_uint128_t>
     {
@@ -403,9 +408,9 @@ void cjm::uint128_tests::execute_gen_comp_ops_test()
             ret = l != r && (l > r) && !(l < r) && !(l <= r) && (l >= r) && !(l == r);
         return ret;
     };
-	
-    auto vec = generator::create_many_ops(factory, gen, 10u);
-    cjm_assert(vec.size() == 10u);
+	constexpr auto ops = 10'000u;
+    auto vec = generator::create_many_ops(factory, gen, ops);
+    cjm_assert(vec.size() == ops);
     cjm_assert(std::all_of(vec.cbegin(), vec.cend(), [](const binary_operation<uint128_t, ctrl_uint128_t>& op) -> bool
         {
             return op.op_code() == binary_op::compare;
@@ -460,7 +465,11 @@ namespace cjm::uint128_tests::generator::internal
         int generate_shift_param(int num_digits);
         template<typename Int> requires(std::integral<Int> &&
             !cjm::numerics::concepts::character<Int> && (!std::is_same_v<std::remove_const_t<Int>, std::uint8_t>))
-            Int random_from_range(const std::uniform_int_distribution<Int>& distrib);
+            Int random_from_range(std::uniform_int_distribution<Int> distrib)
+        {
+            return distrib(m_twister);
+        }
+
     private:
         static twister_t init_twister();
         rgen_impl();
@@ -468,12 +477,7 @@ namespace cjm::uint128_tests::generator::internal
 
     };
 
-    template <typename Int>  requires(std::integral<Int> &&
-        !cjm::numerics::concepts::character<Int> && (!std::is_same_v<std::remove_const_t<Int>, std::uint8_t>))
-        Int rgen_impl::random_from_range(const std::uniform_int_distribution<Int>& distrib)
-    {
-        return distrib(m_twister);
-    }
+
 }
 
 namespace

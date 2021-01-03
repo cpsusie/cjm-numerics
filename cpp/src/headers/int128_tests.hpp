@@ -314,6 +314,7 @@ namespace cjm::uint128_tests
         static uint_test_t to_test(const uint_ctrl_t& ctrl)
         {
             uint_test_t high = static_cast<typename uint_test_t::int_part>(ctrl >> std::numeric_limits<typename uint_test_t::int_part>::digits);
+            high <<= std::numeric_limits<typename uint_test_t::int_part>::digits;
             uint_test_t low = static_cast<typename uint_test_t::int_part>(ctrl);
             return high | low;
         }
@@ -577,7 +578,8 @@ namespace cjm::uint128_tests::generator
 	template<concepts::binary_op_producer OpFactory>
     std::vector<binary_operation<uint128_t, ctrl_uint128_t>> create_many_ops(OpFactory factory, const rgen& gen, size_t num_ops);
 
-	
+    bool operator==(const rgen& lhs, const rgen& rhs) noexcept;
+    bool operator!=(const rgen& lhs, const rgen& rhs) noexcept;
     uint128_t create_random_in_range(const rgen& rgen, size_t byte_limit);
 
     class rgen final
