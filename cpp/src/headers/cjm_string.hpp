@@ -8,6 +8,7 @@
 #include <algorithm>
 #include <locale>
 #include "cjm_numeric_concepts.hpp"
+#include "numerics.hpp"
 namespace cjm::string
 {
 	template<typename Char, typename CharTraits = std::char_traits<Char>, typename Allocator = std::allocator<Char>>

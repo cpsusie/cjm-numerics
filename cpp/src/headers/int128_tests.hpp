@@ -27,6 +27,7 @@
 #include<functional>
 #include <memory>
 #include <optional>
+#include "istream_utils.hpp"
 
 namespace cjm::uint128_tests
 {
@@ -41,18 +42,15 @@ namespace cjm::uint128_tests
     using std::cout;
     constexpr auto newl = '\n';
     using cout_saver = boost::io::ios_flags_saver;
-    using sv_t = std::string_view;
-    using wsv_t = std::wstring_view;
-    using u8sv_t = std::u8string_view;
-    using u16sv_t = std::u16string_view;
-    using u32sv_t = std::u32string_view;
-	
+ 
+    enum class binary_op : unsigned int;
     constexpr size_t binary_op_count = 11;
-
+    class bad_binary_op;
     template<typename TestTypeUi, typename ControlTypeUi>
     concept test_uint_and_control_set = cjm::numerics::concepts::cjm_unsigned_integer<TestTypeUi>
         && cjm::numerics::concepts::unsigned_integer<ControlTypeUi>
         && std::numeric_limits<TestTypeUi>::digits == std::numeric_limits<ControlTypeUi>::digits;
+
 
     namespace u128_testing_constant_providers
     {
@@ -147,14 +145,7 @@ namespace cjm::uint128_tests
         };
     }
 
-    template<cjm::numerics::concepts::character Char>
-    bool is_space(Char c, const std::locale& l);
-
-	template<typename SourceChar, typename TargetChar>
-    requires (!std::is_same_v<std::remove_cvref_t<std::remove_const_t<SourceChar>>, std::remove_cvref_t<std::remove_const_t<TargetChar>>>
-        && cjm::numerics::concepts::character<SourceChar>
-        && cjm::numerics::concepts::character<TargetChar>)
-    TargetChar convert_char(SourceChar c, std::optional<TargetChar> unknown = std::nullopt);
+   
 	
     enum class binary_op : unsigned int
     {   //IF YOU EDIT THIS, MAKE SURE YOU EDIT THE CONSTANTS BELOW AND KEEP RELATED GROUPS CONSECUTIVE!
@@ -174,6 +165,9 @@ namespace cjm::uint128_tests
 
         compare = 10
     };
+
+	
+	
     static_assert(!cjm::numerics::has_msc || std::is_unsigned_v<wchar_t>);
     constexpr binary_op first_op = binary_op::left_shift;
     constexpr binary_op last_op = binary_op::compare;
@@ -190,23 +184,6 @@ namespace cjm::uint128_tests
     constexpr binary_op first_add_sub_mul_op = binary_op::add;
     constexpr binary_op last_add_sub_mul_op = binary_op::multiply;
 	
-    template<cjm::numerics::concepts::utf_character UtfChar>
-    std::basic_string<UtfChar, std::char_traits<UtfChar>> convert_to_utf(sv_t source);
-
-    template<cjm::numerics::concepts::utf_character UtfChar>
-    std::string convert_from_utf(std::basic_string_view<UtfChar> convert_me, char unknown = '?');
-		
-	template<cjm::numerics::concepts::utf_character UtfChar>
-		requires (std::numeric_limits<wchar_t>::is_signed)
-    std::wstring convert_wide_from_utf(std::basic_string_view<UtfChar> convert_me, wchar_t unknown = L'?');
-
-    template<cjm::numerics::concepts::utf_character UtfChar>
-       requires ((!std::numeric_limits<wchar_t>::is_signed))
-    std::wstring convert_wide_from_utf(std::basic_string_view<UtfChar> convert_me, wchar_t unknown = L'?');
-
-    std::wstring widen(std::string_view convert_me);
-    	
-    std::string narrow(std::wstring_view convert_me, char unknown = '?');
 	
     constexpr auto op_name_lookup = std::array<sv_t, binary_op_count>{
         "LeftShift"sv, "RightShift"sv, "And"sv, "Or"sv,
@@ -262,6 +239,40 @@ namespace cjm::uint128_tests
     constexpr u16sv_t get_op_symbol_u16(binary_op op);
     constexpr u32sv_t get_op_symbol_u32(binary_op op);
 
+    template<numerics::concepts::character Char>
+    constexpr auto get_op_symbol(binary_op op)
+    {
+        using char_t = std::remove_cvref_t<std::remove_const_t<Char>>;
+        if constexpr (std::is_same_v<char_t, wchar_t>)
+        {
+            return get_op_symbol_w(op);
+        }
+        else if constexpr (std::is_same_v<char_t, char8_t>)
+        {
+            return get_op_symbol_u8(op);
+        }
+        else if constexpr (std::is_same_v<char_t, char16_t>)
+        {
+            return get_op_symbol_u16(op);
+        }
+        else if constexpr (std::is_same_v<char_t, char32_t>)
+        {
+            return get_op_symbol_u32(op);
+        }
+        return get_op_symbol_n(op);
+    }
+
+    template<numerics::concepts::character Char>
+    std::basic_ostream<Char, std::char_traits<Char>>& operator<<(std::basic_ostream<Char, std::char_traits<Char>>& os, binary_op op)
+    {
+        std::basic_string_view<Char> sv = get_op_symbol<std::remove_cvref_t<std::remove_const_t<Char>>>(op);
+        os << op;
+        return os;
+    }
+
+    template<numerics::concepts::character Char>
+    std::basic_istream<Char, std::char_traits<Char>>& operator>>(std::basic_istream<Char, std::char_traits<Char>>& is, binary_op& op);
+	
 	
     template<typename TestType = uint128_t , typename ControlType = ctrl_uint128_t>
             requires (test_uint_and_control_set<TestType, ControlType>)
@@ -295,6 +306,25 @@ namespace cjm::uint128_tests
     void execute_first_bin_op_test();
     void execute_gen_comp_ops_test();
 
+    class bad_binary_op final : public std::invalid_argument
+    {
+    public:
+        using stream_t = std::stringstream;
+    	bad_binary_op(binary_op op)
+		    : invalid_argument(create_message(op)) {}
+
+        using enum_type_t = std::underlying_type_t<binary_op>;
+    private:
+        static std::string create_message(binary_op op)
+        {
+            stream_t ss;
+            ss  << "The value underlying the binary_op provided ("
+        		<< static_cast<enum_type_t>(op)
+        		<< "), is not a defined member of the binary_op enum class.";
+            return ss.str();
+        }
+    };
+	
     template<typename TestType, typename ControlType>
     requires (test_uint_and_control_set<TestType, ControlType>)
         std::basic_ostream<char>& append_static_assertion(std::basic_ostream<char>& strm, const binary_operation<TestType, ControlType>& bin_op);
@@ -524,125 +554,6 @@ namespace cjm::uint128_tests
 	}
 }
 
-template <cjm::numerics::concepts::character Char>
-bool cjm::uint128_tests::is_space(Char c, const std::locale& l)
-{
-	if constexpr (std::is_same_v<std::remove_const_t<Char>, char> || std::is_same_v<std::remove_const_t<Char>, wchar_t>)
-	{
-        return std::isspace<Char>(c, l);
-	}
-    else 
-    {
-        const wchar_t cast = convert_char(c);
-        return std::isspace(cast, l);    	
-    }
-}
-
-template <typename SourceChar, typename TargetChar>
-requires (!std::is_same_v<std::remove_cvref_t<std::remove_const_t<SourceChar>>, std::remove_cvref_t<std::remove_const_t<TargetChar>>>
-    && cjm::numerics::concepts::character<SourceChar>
-    && cjm::numerics::concepts::character<TargetChar>)
-TargetChar cjm::uint128_tests::convert_char(SourceChar c, std::optional<TargetChar> unknown)
-{
-    TargetChar real_unknown = unknown.value_or(static_cast<TargetChar>('?'));
-    if constexpr (std::is_signed_v<TargetChar> == std::is_signed_v<SourceChar>)
-    {
-        return c >= std::numeric_limits<TargetChar>::min() && c <= std::numeric_limits<TargetChar>::max() ? static_cast<TargetChar>(c) : real_unknown;
-    }
-    else if constexpr (std::is_signed_v<TargetChar>) //target signed source unsigned
-    {
-        return (c <= static_cast<std::int64_t>(std::numeric_limits<TargetChar>::max()) &&
-            (c >= static_cast<std::int64_t>(std::numeric_limits<TargetChar>::min())) ? static_cast<TargetChar>(c) : real_unknown);           
-    }
-	else //source signed target unsigned
-	{
-        using unsigned_source_t = std::make_unsigned_t<SourceChar>;
-		return c > -1 && static_cast<unsigned_source_t>(c) <= std::numeric_limits<TargetChar>::max() ? static_cast<TargetChar>(c) : real_unknown;
-	}	
-}
-
-template <cjm::numerics::concepts::utf_character UtfChar>
-std::basic_string<UtfChar, std::char_traits<UtfChar>> cjm::uint128_tests::convert_to_utf(sv_t source)
-{
-    std::basic_string<UtfChar, std::char_traits<UtfChar>> ret;
-	if (!source.empty())
-	{
-        ret.reserve(source.length());
-        std::transform(source.cbegin(), source.cend(), std::back_inserter(ret), [](char c) -> UtfChar
-        {
-                return static_cast<UtfChar>(static_cast<unsigned char>(c));
-        });
-	}
-    return ret;
-}
-
-template <cjm::numerics::concepts::utf_character UtfChar>
-std::string cjm::uint128_tests::convert_from_utf(std::basic_string_view<UtfChar> convert_me, char unknown)
-{
-    std::string ret;
-	if (!convert_me.empty())
-	{
-        ret.reserve(convert_me.size());
-        std::transform(convert_me.cbegin(), convert_me.cend(), std::back_inserter(ret), [=](UtfChar c) -> char
-        {
-                return c <= std::numeric_limits<char>::max() ? static_cast<char>(static_cast<unsigned char>(c)) : unknown;
-        });
-	}
-    return ret;
-}
-
-template <cjm::numerics::concepts::utf_character UtfChar>
-	requires (std::numeric_limits<wchar_t>::is_signed)
-std::wstring cjm::uint128_tests::convert_wide_from_utf(std::basic_string_view<UtfChar> convert_me, wchar_t unknown)
-{
-	std::wstring ret;
-    using unsigned_wchar_t = std::make_unsigned_t<wchar_t>;
-	if (!convert_me.empty())
-	{
-		ret.reserve(convert_me.size());
-		if constexpr (std::numeric_limits<UtfChar>::max() >= std::numeric_limits<wchar_t>::max()) //widening
-		{
-			std::transform(convert_me.cbegin(), convert_me.cend(), std::back_inserter(ret), [=](UtfChar c) -> wchar_t
-            {
-                    return static_cast<wchar_t>(static_cast<unsigned_wchar_t>(c));
-            });
-		}
-		else
-		{
-            std::transform(convert_me.cbegin(), convert_me.cend(), std::back_inserter(ret), [=](UtfChar c) -> wchar_t
-            {
-                    return c > static_cast<unsigned_wchar_t>(std::numeric_limits<wchar_t>::max()) ? unknown : static_cast<wchar_t>(static_cast<unsigned_wchar_t>(c));
-            });
-		}
-	}
-    return ret;
-}
-
-template<cjm::numerics::concepts::utf_character UtfChar>
-	requires ((!std::numeric_limits<wchar_t>::is_signed))
-std::wstring cjm::uint128_tests::convert_wide_from_utf(std::basic_string_view<UtfChar> convert_me, wchar_t unknown)
-{
-	std::wstring ret;
-	if (!convert_me.empty())
-	{
-        ret.reserve(convert_me.size());
-        if constexpr (sizeof(UtfChar) >= sizeof(wchar_t)) //widening conversion
-        {
-			std::transform(convert_me.cbegin(), convert_me.cend(), std::back_inserter(ret), [](UtfChar c) -> wchar_t
-            {
-				return static_cast<wchar_t>(c);
-            });
-        }
-        else // narrowing
-        {
-            std::transform(convert_me.cbegin(), convert_me.cend(), std::back_inserter(ret), [=](UtfChar c) -> wchar_t
-            {
-                    return c > std::numeric_limits<wchar_t>::max() ? unknown : c;
-            });
-        }
-	}
-    return ret;
-}
 
 template<typename Invocable>
 void cjm::uint128_tests::execute_test(Invocable test, std::string_view test_name)
@@ -668,68 +579,69 @@ void cjm::uint128_tests::execute_test(Invocable test, std::string_view test_name
 
 constexpr cjm::uint128_tests::sv_t cjm::uint128_tests::get_op_text(binary_op op)
 {
-    if (op < first_op || op > last_op) throw std::invalid_argument{ "Supplied op is not a defined value of the binary_op enumeration." };
+    if (op < first_op || op > last_op) throw bad_binary_op{ op };
     return op_name_lookup[static_cast<unsigned>(op)];
 }
 
 constexpr cjm::uint128_tests::wsv_t cjm::uint128_tests::get_op_wtext(binary_op op)
 {
-    if (op < first_op || op > last_op) throw std::invalid_argument{ "Supplied op is not a defined value of the binary_op enumeration." };
+    if (op < first_op || op > last_op) throw bad_binary_op{ op };
     return op_name_lookup_wide[static_cast<unsigned>(op)];
 }
 
 constexpr cjm::uint128_tests::u8sv_t cjm::uint128_tests::get_op_u8text(binary_op op)
 {
-    if (op < first_op || op > last_op) throw std::invalid_argument{ "Supplied op is not a defined value of the binary_op enumeration." };
+    if (op < first_op || op > last_op) throw bad_binary_op{ op };
     return op_name_lookup_u8[static_cast<unsigned>(op)];
 }
 
 constexpr cjm::uint128_tests::u16sv_t cjm::uint128_tests::get_op_u16text(binary_op op)
 {
-    if (op < first_op || op > last_op) throw std::invalid_argument{ "Supplied op is not a defined value of the binary_op enumeration." };
+    if (op < first_op || op > last_op) throw bad_binary_op{ op };
     return op_name_lookup_u16[static_cast<unsigned>(op)];
 }
 
 constexpr cjm::uint128_tests::u32sv_t cjm::uint128_tests::get_op_u32text(binary_op op)
 {
-    if (op < first_op || op > last_op) throw std::invalid_argument{ "Supplied op is not a defined value of the binary_op enumeration." };
+    if (op < first_op || op > last_op) throw bad_binary_op{ op };
     return op_name_lookup_u32[static_cast<unsigned>(op)];
 }
 
 constexpr cjm::uint128_tests::sv_t cjm::uint128_tests::get_op_symbol_n(binary_op op)
 {
-    if (op < first_op || op > last_op) throw std::invalid_argument{ "Supplied op is not a defined value of the binary_op enumeration." };
+    if (op < first_op || op > last_op) throw bad_binary_op{ op };
     return op_symbol_lookup[static_cast<unsigned>(op)];
 }
 
 constexpr cjm::uint128_tests::wsv_t cjm::uint128_tests::get_op_symbol_w(binary_op op)
 {
-    if (op < first_op || op > last_op) throw std::invalid_argument{ "Supplied op is not a defined value of the binary_op enumeration." };
+    if (op < first_op || op > last_op) throw bad_binary_op{ op };
     return op_symbol_lookup_wide[static_cast<unsigned>(op)];
 }
 
 constexpr cjm::uint128_tests::u8sv_t cjm::uint128_tests::get_op_symbol_u8(binary_op op)
 {
-    if (op < first_op || op > last_op) throw std::invalid_argument{ "Supplied op is not a defined value of the binary_op enumeration." };
+    if (op < first_op || op > last_op) throw bad_binary_op{ op };
     return op_symbol_lookup_u8[static_cast<unsigned>(op)];
 }
 
 constexpr cjm::uint128_tests::u16sv_t cjm::uint128_tests::get_op_symbol_u16(binary_op op)
 {
-    if (op < first_op || op > last_op) throw std::invalid_argument{ "Supplied op is not a defined value of the binary_op enumeration." };
+    if (op < first_op || op > last_op) throw bad_binary_op{ op };
     return op_symbol_lookup_u16[static_cast<unsigned>(op)];
 }
 
 constexpr cjm::uint128_tests::u32sv_t cjm::uint128_tests::get_op_symbol_u32(binary_op op)
 {
-    if (op < first_op || op > last_op) throw std::invalid_argument{ "Supplied op is not a defined value of the binary_op enumeration." };
+    if (op < first_op || op > last_op) throw bad_binary_op{ op };
     return op_symbol_lookup_u32[static_cast<unsigned>(op)];
 }
+
 
 constexpr std::array<std::uint64_t, cjm::uint128_tests::pow_2_arr_size> cjm::uint128_tests::get_pow2_arr()
 {
     std::uint64_t current = 1;
-    std::array<std::uint64_t, cjm::uint128_tests::pow_2_arr_size> ret{};
+    std::array<std::uint64_t, pow_2_arr_size> ret{};
     for (size_t idx = 0; idx < ret.size(); ++idx)
     {
         ret[idx] = current;

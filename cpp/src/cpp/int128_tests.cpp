@@ -11,35 +11,6 @@ namespace
     }
 }
 
-std::wstring cjm::uint128_tests::widen(std::string_view convert_me)
-{
-    std::wstring ret;
-	if (!convert_me.empty())
-	{
-        ret.reserve(convert_me.length());
-        std::transform(convert_me.cbegin(), convert_me.cend(), std::back_inserter(ret), [](char c) -> wchar_t
-        {
-                return convert_char<char, wchar_t>(c);
-        });
-	}
-    return ret;
-	
-}
-
-std::string cjm::uint128_tests::narrow(std::wstring_view convert_me, char unknown)
-{
-    std::string ret;
-	if (!convert_me.empty())
-	{
-        using ssize_t = std::make_signed_t<size_t>;
-        ret.reserve(convert_me.length());
-        std::transform(convert_me.cbegin(), convert_me.cend(),
-            std::back_inserter(ret), 
-            [=](wchar_t c) -> char { return convert_char<wchar_t, char>(c, unknown); });
-	}
-    return ret;
-}
-
 cjm::uint128_tests::ctrl_uint128_t cjm::uint128_tests::to_ctrl(uint128_t convert) 
 {
     ctrl_uint128_t ret = convert.high_part();
@@ -464,10 +435,9 @@ void cjm::uint128_tests::execute_gen_comp_ops_test()
     {
         if (c == 0)
             return std::strong_ordering::equal;
-        else if (c == 1)
+        if (c == 1)
             return std::strong_ordering::greater;
-        else
-            return std::strong_ordering::less;
+    	return std::strong_ordering::less;
     };
 
     auto validate_according_to_ordering = [](const uint128_t& l, const uint128_t& r, std::strong_ordering ordering) -> bool
@@ -476,6 +446,7 @@ void cjm::uint128_tests::execute_gen_comp_ops_test()
     	if (ordering == std::strong_ordering::equivalent || ordering == std::strong_ordering::equal)
             ret= l == r && !(l > r) && !(l < r) && (l >= r) && (l <= r) && !(l != r) && (std::hash<uint128_t>{}(l) == std::hash<uint128_t>{}(r));
         else if (ordering == std::strong_ordering::less)
+
             ret= l != r && (l < r) && !(l > r) && !(l >= r) && (l <= r) && !(l == r);
         else // greater
             ret = l != r && (l > r) && !(l < r) && !(l <= r) && (l >= r) && !(l == r);
