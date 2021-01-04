@@ -11,6 +11,35 @@ namespace
     }
 }
 
+std::wstring cjm::uint128_tests::widen(std::string_view convert_me)
+{
+    std::wstring ret;
+	if (!convert_me.empty())
+	{
+        ret.reserve(convert_me.length());
+        std::transform(convert_me.cbegin(), convert_me.cend(), std::back_inserter(ret), [](char c) -> wchar_t
+        {
+                return convert_char<char, wchar_t>(c);
+        });
+	}
+    return ret;
+	
+}
+
+std::string cjm::uint128_tests::narrow(std::wstring_view convert_me, char unknown)
+{
+    std::string ret;
+	if (!convert_me.empty())
+	{
+        using ssize_t = std::make_signed_t<size_t>;
+        ret.reserve(convert_me.length());
+        std::transform(convert_me.cbegin(), convert_me.cend(),
+            std::back_inserter(ret), 
+            [=](wchar_t c) -> char { return convert_char<wchar_t, char>(c, unknown); });
+	}
+    return ret;
+}
+
 cjm::uint128_tests::ctrl_uint128_t cjm::uint128_tests::to_ctrl(uint128_t convert) 
 {
     ctrl_uint128_t ret = convert.high_part();
@@ -24,6 +53,24 @@ cjm::uint128_tests::uint128_t cjm::uint128_tests::to_test(const ctrl_uint128_t& 
 	const std::uint64_t low_part = static_cast<std::uint64_t>(convert);
 	const std::uint64_t high_part = static_cast<std::uint64_t>(convert >> 64);
     return uint128_t::make_uint128(high_part, low_part);
+}
+
+void cjm::uint128_tests::execute_ascii_char_interconversions()
+{
+    for (int i = 0; i <= std::numeric_limits<char>::max(); ++i)
+    {
+        char c = static_cast<char>(i);
+        wchar_t wc = convert_char<char, wchar_t>(c);
+        char8_t u8c = convert_char<char, char8_t>(c);
+        char16_t u16c = convert_char<char, char16_t>(c);
+        char32_t u32c = convert_char<char, char32_t>(c);
+
+        cjm_assert(convert_char<wchar_t, char>(wc) == c);
+        cjm_assert(convert_char<char8_t, char>(u8c) == c);
+        cjm_assert(convert_char<char16_t, char>(u16c) == c);
+        cjm_assert(convert_char<char32_t, char>(u32c) == c);
+
+    }
 }
 
 void cjm::uint128_tests::execute_div_mod_zero_dividend_nonzero_divisor_tests()
@@ -74,7 +121,7 @@ void cjm::uint128_tests::execute_uint128_tests()
 {
     using tconst_prov_t [[maybe_unused]] = u128_testing_constant_providers::testing_constant_provider<uint128_t>;
     static_assert(tconst_prov_t::maximum + tconst_prov_t::one == tconst_prov_t::zero);
-
+        	
     constexpr auto two_fifty_five = 0xff_u128;
 	constexpr auto all_at_ends = 0xff00'0000'0000'0000'0000'0000'0000'0000_u128;
     static_assert(((two_fifty_five << (15 * 8)) == all_at_ends) && ((all_at_ends >> (15 * 8)) == two_fifty_five));
@@ -93,7 +140,8 @@ void cjm::uint128_tests::execute_uint128_tests()
     execute_test(execute_div_mod_by_zero_tests, "div_mod_zero_tests"sv);
     execute_test(execute_div_mod_zero_dividend_nonzero_divisor_tests, "div_mod_zero_dividend_nonzero_divisor_tests"sv);
     execute_test(execute_gen_comp_ops_test, "gen_comp_ops_test"sv);
-    cout_saver saver{cout};
+    execute_test(execute_ascii_char_interconversions, "ascii_char_interconversions"sv);
+	cout_saver saver{cout};
     cout << "All tests PASSED." << newl;
 }
 
