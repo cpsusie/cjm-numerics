@@ -21,7 +21,6 @@ std::string cjm::uint128_tests::narrow(std::wstring_view convert_me, char unknow
     std::string ret;
     if (!convert_me.empty())
     {
-        using ssize_t = std::make_signed_t<size_t>;
         ret.reserve(convert_me.length());
         std::transform(convert_me.cbegin(), convert_me.cend(),
             std::back_inserter(ret),

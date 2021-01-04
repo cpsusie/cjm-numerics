@@ -14,6 +14,7 @@
 #include <functional>
 #include <optional>
 #include <compare>
+#include <climits>
 
 namespace cjm::numerics::concepts
 {
