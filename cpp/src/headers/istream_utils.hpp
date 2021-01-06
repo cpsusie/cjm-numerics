@@ -203,7 +203,7 @@ std::string cjm::uint128_tests::convert_from_utf(std::basic_string_view<UtfChar>
         ret.reserve(convert_me.size());
         std::transform(convert_me.cbegin(), convert_me.cend(), std::back_inserter(ret), [=](UtfChar c) -> char
             {
-                return convert_char<UtfChar, char>(c);
+                return convert_char<UtfChar, char>(c, unknown);
             });
     }
     return ret;
@@ -214,13 +214,12 @@ requires (std::numeric_limits<wchar_t>::is_signed)
 std::wstring cjm::uint128_tests::convert_wide_from_utf(std::basic_string_view<UtfChar> convert_me, wchar_t unknown)
 {
     std::wstring ret;
-    using unsigned_wchar_t = std::make_unsigned_t<wchar_t>;
     if (!convert_me.empty())
     {
         ret.reserve(convert_me.size());
         std::transform(convert_me.cbegin(), convert_me.cend(), std::back_inserter(ret), [=](UtfChar c) -> wchar_t
             {
-                return convert_char<UtfChar, wchar_t>(c);
+                return convert_char<UtfChar, wchar_t>(c, unknown);
             });
     }
     return ret;
@@ -231,13 +230,12 @@ requires ((!std::numeric_limits<wchar_t>::is_signed))
 std::wstring cjm::uint128_tests::convert_wide_from_utf(std::basic_string_view<UtfChar> convert_me, wchar_t unknown)
 {
     std::wstring ret;
-    using unsigned_wchar_t = std::make_unsigned_t<wchar_t>;
     if (!convert_me.empty())
     {
         ret.reserve(convert_me.size());
         std::transform(convert_me.cbegin(), convert_me.cend(), std::back_inserter(ret), [=](UtfChar c) -> wchar_t
             {
-                return convert_char<UtfChar, wchar_t>(c);
+                return convert_char<UtfChar, wchar_t>(c, unknown);
             });
     }
     return ret;
