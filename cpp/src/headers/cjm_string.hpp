@@ -15,7 +15,9 @@ namespace cjm::string
 	template<typename Char, typename CharTraits = std::char_traits<Char>, typename Allocator = std::allocator<Char>>
 	        requires cjm::numerics::concepts::char_with_traits_and_allocator<Char, CharTraits, Allocator>
 	std::basic_string<Char, CharTraits, Allocator> trim(const std::basic_string<Char, CharTraits, Allocator>& trimMe);
-
+    template<typename Char, typename CharTraits>
+		requires cjm::numerics::concepts::char_with_traits<Char, CharTraits>
+	std::basic_string_view<Char, CharTraits> trim_as_sv(std::basic_string_view<Char, CharTraits> trimMe);
 
     template<numerics::concepts::utf8_char_allocator Allocator = std::allocator<char8_t>>
     using u8string_stream_t = std::basic_stringstream<char8_t, std::char_traits<char8_t>, Allocator>;
@@ -40,9 +42,9 @@ namespace cjm::string
 		template<typename Char, typename CharTraits, typename Allocator>
 		    requires cjm::numerics::concepts::char_with_traits_and_allocator<Char, CharTraits, Allocator>
 		friend std::basic_string<Char, CharTraits, Allocator> trim(const std::basic_string<Char, CharTraits, Allocator>& trimMe);
-        template<typename Char, typename CharTraits>
-        requires cjm::numerics::concepts::char_with_traits<Char, CharTraits>
-        friend std::basic_string_view<Char, CharTraits> trim_as_sv(std::basic_string_view<Char, CharTraits> trimMe);
+		template<typename Char, typename CharTraits>
+			requires cjm::numerics::concepts::char_with_traits<Char, CharTraits>
+		friend std::basic_string_view<Char, CharTraits> trim_as_sv(std::basic_string_view<Char, CharTraits> trimMe);
 		string_helper() = delete;
 		~string_helper() = delete;
 		string_helper(const string_helper& other) = delete;

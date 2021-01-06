@@ -15,6 +15,7 @@
 #include "numerics.hpp"
 #include "cjm_numeric_concepts.hpp"
 #include "cjm_string.hpp"
+#include "istream_utils.hpp"
 // Copyright 2018 CJM Screws, LLC
 // 
 // This contents of this file (uint128.hpp) and its inline implementation file (uint128.inl)
