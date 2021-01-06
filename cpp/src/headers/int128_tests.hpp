@@ -262,6 +262,12 @@ namespace cjm::uint128_tests
         return get_op_symbol_n(op);
     }
 
+    binary_op parse_binary_op_symbol(sv_t text);
+    binary_op parse_binary_op_symbol(wsv_t text);
+    binary_op parse_binary_op_symbol(u8sv_t text);
+    binary_op parse_binary_op_symbol(u16sv_t text);
+    binary_op parse_binary_op_symbol(u32sv_t text);
+
     template<numerics::concepts::character Char>
     std::basic_ostream<Char, std::char_traits<Char>>& operator<<(std::basic_ostream<Char, std::char_traits<Char>>& os, binary_op op)
     {
@@ -289,6 +295,7 @@ namespace cjm::uint128_tests
     constexpr std::array<std::uint64_t, pow_2_arr_size> get_pow2_arr();
     constexpr std::array<int, pow_2_arr_size> get_pow2_res_arr();
 
+    void execute_trim_tests();
     void execute_ascii_char_interconversions();
     void execute_div_mod_zero_dividend_nonzero_divisor_tests();
     void execute_div_mod_by_zero_tests();
@@ -661,6 +668,9 @@ constexpr std::array<int, cjm::uint128_tests::pow_2_arr_size> cjm::uint128_tests
     }
     return ret;
 }
+
+
+
 
 namespace cjm::uint128_tests::generator
 {

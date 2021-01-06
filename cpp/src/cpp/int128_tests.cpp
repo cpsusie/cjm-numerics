@@ -112,6 +112,7 @@ void cjm::uint128_tests::execute_uint128_tests()
     execute_test(execute_div_mod_zero_dividend_nonzero_divisor_tests, "div_mod_zero_dividend_nonzero_divisor_tests"sv);
     execute_test(execute_gen_comp_ops_test, "gen_comp_ops_test"sv);
     execute_test(execute_ascii_char_interconversions, "ascii_char_interconversions"sv);
+    execute_test(execute_trim_tests, "trim_tests"sv);
 	cout_saver saver{cout};
     cout << "All tests PASSED." << newl;
 }
@@ -809,6 +810,40 @@ cjm::uint128_tests::generator::uint128_t cjm::uint128_tests::generator::unsafe_c
     std::copy(vec.cbegin(), vec.cend(), arr.begin());
     return uint128_t::make_from_bytes_little_endian(arr);
 }
+
+cjm::uint128_tests::binary_op cjm::uint128_tests::parse_binary_op_symbol(cjm::uint128_tests::sv_t text)
+{
+    auto trimmed = cjm::string::trim_as_sv(text);
+    if (trimmed.empty()) throw std::invalid_argument{"Supplied text is not a binary operation symbol."};
+    for (unsigned idx = 0; idx < op_symbol_lookup.size(); ++idx)
+    {
+        if (op_symbol_lookup[idx] == text)
+        {
+            return static_cast<binary_op>(idx);
+        }
+    }
+    throw std::invalid_argument{"Supplied text is not a binary operation symbol."};
+
+}
+
+void cjm::uint128_tests::execute_trim_tests()
+{
+
+    using namespace std::string_literals;
+    using namespace std::string_view_literals;
+    constexpr std::string_view should_be = "<<"sv;
+    std::string x = " <<   "s;
+    std::string_view xv = x;
+    std::string x_trim = cjm::string::trim(x);
+    cjm_deny(x == x_trim);
+    cjm_assert(x_trim == should_be);
+    x = " <<   "s;
+    xv = x;
+    xv = cjm::string::trim_as_sv(xv);
+    cjm_assert(xv == should_be);
+    cjm_deny(x == should_be);
+}
+
 //void cjm::uint128_tests::execute_gen_comp_ops_test()
 //{
 //    auto rgen = cjm::uint128_tests::generator::rgen{};

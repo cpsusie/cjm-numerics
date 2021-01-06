@@ -249,7 +249,9 @@ namespace cjm::numerics
             requires cjm::numerics::concepts::char_with_traits_and_allocator<Chars, CharTraits, Allocator>
         static str128<Allocator> trim_and_strip(str128<Allocator> trim_and_strip_me)
         {
-            auto trimmed = cjm::string::trim(std::move(trim_and_strip_me));
+            std::basic_string_view<Chars, CharTraits> view = trim_and_strip_me;
+            std::basic_string<Chars, std::char_traits<Chars>, std::allocator<Chars>> trimmed;
+            trimmed = cjm::string::trim_as_sv(view);
             trimmed.erase(std::remove(trimmed.begin(), trimmed.end(), non_decimal_separator()[0]), trimmed.end());
             return trimmed;
         }

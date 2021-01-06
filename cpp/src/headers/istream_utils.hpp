@@ -10,7 +10,6 @@
 #include <algorithm>
 #include <optional>
 #include <locale>
-#include "cjm_string.hpp"
 #include "numerics.hpp"
 #include "cjm_numeric_concepts.hpp"
 #include <utility>
@@ -171,7 +170,7 @@ bool cjm::uint128_tests::istream_utils::is_space(Char c, const std::locale& l)
     }
     else
     {
-        const wchar_t cast = convert_char(c);
+        const wchar_t cast = convert_char<Char, wchar_t>(c);
         return std::isspace(cast, l);
     }
 }
