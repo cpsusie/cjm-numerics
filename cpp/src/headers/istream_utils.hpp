@@ -15,6 +15,47 @@
 #include "cjm_numeric_concepts.hpp"
 #include <utility>
 
+
+namespace cjm::uint128_tests::istream_utils
+{
+    enum class char_classification
+    {
+        error,
+        eof,
+        alphanum,
+        punctuation,
+        space,
+        other,
+    };
+
+    template<cjm::numerics::concepts::character Char>
+    bool is_space(Char c, const std::locale& l);
+
+    template<cjm::numerics::concepts::character Char>
+    std::pair<char_classification, std::optional<Char>> extract_and_classify_next(std::basic_istream<Char, std::char_traits<Char>>& istream);
+
+
+
+
+    /*template<numerics::concepts::utf_character Char>
+    bool advance_next_alpha_numeric_string(std::basic_istringstream<Char, std::char_traits<Char>>& is)
+    {
+        if (is.fail() || is.bad() || is.eof() || is.peek() == std::char_traits<Char>::eof())
+        {
+            return false;
+        }
+
+        Char c;
+        is.get(c);
+        if (!is.good())
+        {
+            return false;
+        }
+        bool is_alpha =
+
+    }*/
+}
+
 namespace cjm::uint128_tests
 {
 	using sv_t = std::string_view;
@@ -56,45 +97,7 @@ namespace cjm::uint128_tests
 
 }
 
-namespace cjm::uint128_tests::istream_utils
-{
-    enum class char_classification
-    {
-	    error,
-    	eof,
-    	alphanum,
-    	punctuation,
-    	space,
-    	other,
-    };
-	
-    template<cjm::numerics::concepts::character Char>
-    bool is_space(Char c, const std::locale& l);
-	
-    template<cjm::numerics::concepts::character Char>
-    std::pair<char_classification, std::optional<Char>> extract_and_classify_next(std::basic_istream<Char, std::char_traits<Char>>& istream);
 
-    
-	
-	
-	/*template<numerics::concepts::utf_character Char>
-	bool advance_next_alpha_numeric_string(std::basic_istringstream<Char, std::char_traits<Char>>& is)
-	{
-		if (is.fail() || is.bad() || is.eof() || is.peek() == std::char_traits<Char>::eof())
-		{
-			return false;
-		}
-
-		Char c;
-		is.get(c);
-		if (!is.good())
-		{
-			return false;
-		}
-		bool is_alpha =
-			
-	}*/
-}
 
 template<cjm::numerics::concepts::character Char>
 std::pair<cjm::uint128_tests::istream_utils::char_classification, std::optional<Char>> cjm::uint128_tests::istream_utils::extract_and_classify_next(std::basic_istream<Char, std::char_traits<Char>>& istream)
@@ -185,7 +188,7 @@ std::basic_string<UtfChar, std::char_traits<UtfChar>> cjm::uint128_tests::conver
         ret.reserve(source.length());
         std::transform(source.cbegin(), source.cend(), std::back_inserter(ret), [](char c) -> UtfChar
             {
-                return static_cast<UtfChar>(static_cast<unsigned char>(c));
+                return convert_char<char, UtfChar>(c);
             });
     }
     return ret;
@@ -200,7 +203,7 @@ std::string cjm::uint128_tests::convert_from_utf(std::basic_string_view<UtfChar>
         ret.reserve(convert_me.size());
         std::transform(convert_me.cbegin(), convert_me.cend(), std::back_inserter(ret), [=](UtfChar c) -> char
             {
-                return c <= std::numeric_limits<char>::max() ? static_cast<char>(static_cast<unsigned char>(c)) : unknown;
+                return convert_char<UtfChar, char>(c);
             });
     }
     return ret;
@@ -215,20 +218,10 @@ std::wstring cjm::uint128_tests::convert_wide_from_utf(std::basic_string_view<Ut
     if (!convert_me.empty())
     {
         ret.reserve(convert_me.size());
-        if constexpr (std::numeric_limits<UtfChar>::max() >= std::numeric_limits<wchar_t>::max()) //widening
-        {
-            std::transform(convert_me.cbegin(), convert_me.cend(), std::back_inserter(ret), [=](UtfChar c) -> wchar_t
-                {
-                    return static_cast<wchar_t>(static_cast<unsigned_wchar_t>(c));
-                });
-        }
-        else
-        {
-            std::transform(convert_me.cbegin(), convert_me.cend(), std::back_inserter(ret), [=](UtfChar c) -> wchar_t
-                {
-                    return c > static_cast<unsigned_wchar_t>(std::numeric_limits<wchar_t>::max()) ? unknown : static_cast<wchar_t>(static_cast<unsigned_wchar_t>(c));
-                });
-        }
+        std::transform(convert_me.cbegin(), convert_me.cend(), std::back_inserter(ret), [=](UtfChar c) -> wchar_t
+            {
+                return convert_char<UtfChar, wchar_t>(c);
+            });
     }
     return ret;
 }
@@ -238,23 +231,14 @@ requires ((!std::numeric_limits<wchar_t>::is_signed))
 std::wstring cjm::uint128_tests::convert_wide_from_utf(std::basic_string_view<UtfChar> convert_me, wchar_t unknown)
 {
     std::wstring ret;
+    using unsigned_wchar_t = std::make_unsigned_t<wchar_t>;
     if (!convert_me.empty())
     {
         ret.reserve(convert_me.size());
-        if constexpr (sizeof(UtfChar) >= sizeof(wchar_t)) //widening conversion
-        {
-            std::transform(convert_me.cbegin(), convert_me.cend(), std::back_inserter(ret), [](UtfChar c) -> wchar_t
-                {
-                    return static_cast<wchar_t>(c);
-                });
-        }
-        else // narrowing
-        {
-            std::transform(convert_me.cbegin(), convert_me.cend(), std::back_inserter(ret), [=](UtfChar c) -> wchar_t
-                {
-                    return c > std::numeric_limits<wchar_t>::max() ? unknown : c;
-                });
-        }
+        std::transform(convert_me.cbegin(), convert_me.cend(), std::back_inserter(ret), [=](UtfChar c) -> wchar_t
+            {
+                return convert_char<UtfChar, wchar_t>(c);
+            });
     }
     return ret;
 }
