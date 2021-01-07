@@ -407,6 +407,7 @@ void cjm::uint128_tests::print_builtin_uint128_data_if_present()
 void cjm::uint128_tests::execute_first_bin_op_test()
 {
     using bin_op_t = binary_operation<uint128_t, uint128_ctrl>;
+    constexpr auto hash_width = std::numeric_limits<size_t>::digits / 4;
 	//perform statically as well:
     static_assert(0x1_u128 + 0x2_u128 == 0x3_u128);
     auto saver = cout_saver {std::cout};
@@ -420,7 +421,7 @@ void cjm::uint128_tests::execute_first_bin_op_test()
     std::cout << "Done appending the assertion." << newl;
     size_t hash = std::hash<binary_operation<uint128_t, uint128_ctrl>>{}(op);
     std::cout   << "hash code for op is: [0x" << std::hex
-                << std::setw(16) << std::setfill('0')
+                << std::setw(hash_width) << std::setfill('0')
                 << hash << "]." << newl;
 }
 
