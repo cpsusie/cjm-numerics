@@ -113,6 +113,7 @@ void cjm::uint128_tests::execute_uint128_tests()
     execute_test(execute_gen_comp_ops_test, "gen_comp_ops_test"sv);
     execute_test(execute_ascii_char_interconversions, "ascii_char_interconversions"sv);
     execute_test(execute_trim_tests, "trim_tests"sv);
+    execute_test(execute_stream_insert_bin_op_test, "stream_insert_bin_op_test"sv);
 	cout_saver saver{cout};
     cout << "All tests PASSED." << newl;
 }
@@ -848,6 +849,39 @@ void cjm::uint128_tests::execute_trim_tests()
     xv = cjm::string::trim_as_sv(xv);
     cjm_assert(xv == should_be);
     cjm_deny(x == should_be);
+}
+
+void cjm::uint128_tests::execute_stream_insert_bin_op_test()
+{
+    for (auto op_int = static_cast<unsigned>(cjm::uint128_tests::first_op);
+        op_int <= static_cast<unsigned>(cjm::uint128_tests::last_op); ++op_int )
+    {
+        auto op = static_cast<binary_op>(op_int);
+
+        auto nstream = cjm::string::make_throwing_sstream<char>();
+        auto wstream = cjm::string::make_throwing_sstream<wchar_t>();
+        auto u8stream = cjm::string::make_throwing_sstream<char8_t>();
+        auto u16stream = cjm::string::make_throwing_sstream<char16_t>();
+        auto u32stream = cjm::string::make_throwing_sstream<char32_t>();
+
+        nstream << op;
+        wstream << op;
+        u8stream << op;
+        u16stream << op;
+        u32stream << op;
+
+        std::string nstr = nstream.str();
+        std::wstring wstr = wstream.str();
+        std::u8string u8str = u8stream.str();
+        std::u16string u16str = u16stream.str();
+        std::u32string u32str = u32stream.str();
+
+        cjm_assert(nstr == get_op_symbol_n(op));
+        cjm_assert(wstr == get_op_symbol_w(op));
+        cjm_assert(u8str == get_op_symbol_u8(op));
+        cjm_assert(u16str == get_op_symbol_u16(op));
+        cjm_assert(u32str == get_op_symbol_u32(op));
+    }
 }
 
 //void cjm::uint128_tests::execute_gen_comp_ops_test()

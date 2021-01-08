@@ -258,27 +258,56 @@ namespace cjm::uint128_tests
     constexpr u32sv_t get_op_symbol_u32(binary_op op);
 
     template<numerics::concepts::character Char>
-    constexpr auto get_op_symbol(binary_op op)
+    constexpr auto get_op_symbol(binary_op op) -> std::basic_string_view<Char>;
+
+    template<>
+    constexpr auto get_op_symbol<char>(binary_op op) -> std::basic_string_view<char>
     {
-        using char_t = std::remove_cvref_t<std::remove_const_t<Char>>;
-        if constexpr (std::is_same_v<char_t, wchar_t>)
-        {
-            return get_op_symbol_w(op);
-        }
-        else if constexpr (std::is_same_v<char_t, char8_t>)
-        {
-            return get_op_symbol_u8(op);
-        }
-        else if constexpr (std::is_same_v<char_t, char16_t>)
-        {
-            return get_op_symbol_u16(op);
-        }
-        else if constexpr (std::is_same_v<char_t, char32_t>)
-        {
-            return get_op_symbol_u32(op);
-        }
         return get_op_symbol_n(op);
     }
+    template<>
+    constexpr auto get_op_symbol<wchar_t>(binary_op op) -> std::basic_string_view<wchar_t>
+    {
+        return get_op_symbol_w(op);
+    }
+
+    template<>
+    constexpr auto get_op_symbol<char8_t>(binary_op op) -> std::basic_string_view<char8_t>
+    {
+        return get_op_symbol_u8(op);
+    }
+
+    template<>
+    constexpr auto get_op_symbol<char16_t>(binary_op op) -> std::basic_string_view<char16_t>
+    {
+        return get_op_symbol_u16(op);
+    }
+
+    template<>
+    constexpr auto get_op_symbol<char32_t>(binary_op op) -> std::basic_string_view<char32_t>
+    {
+        return get_op_symbol_u32(op);
+    }
+//    {
+//        using char_t = std::remove_cvref_t<std::remove_const_t<Char>>;
+//        if constexpr (std::is_same_v<char_t, wchar_t>)
+//        {
+//            return get_op_symbol_w(op);
+//        }
+//        else if constexpr (std::is_same_v<char_t, char8_t>)
+//        {
+//            return get_op_symbol_u8(op);
+//        }
+//        else if constexpr (std::is_same_v<char_t, char16_t>)
+//        {
+//            return get_op_symbol_u16(op);
+//        }
+//        else if constexpr (std::is_same_v<char_t, char32_t>)
+//        {
+//            return get_op_symbol_u32(op);
+//        }
+//        return get_op_symbol_n(op);
+//    }
 
     binary_op parse_binary_op_symbol(sv_t text);
     binary_op parse_binary_op_symbol(wsv_t text);
@@ -290,12 +319,13 @@ namespace cjm::uint128_tests
     std::basic_ostream<Char, std::char_traits<Char>>& operator<<(std::basic_ostream<Char, std::char_traits<Char>>& os, binary_op op)
     {
         std::basic_string_view<Char> sv = get_op_symbol<std::remove_cvref_t<std::remove_const_t<Char>>>(op);
-        os << op;
+        os << sv;
         return os;
     }
 
     template<numerics::concepts::character Char>
-    std::basic_istream<Char, std::char_traits<Char>>& operator>>(std::basic_istream<Char, std::char_traits<Char>>& is, binary_op& op);
+    std::basic_istream<Char, std::char_traits<Char>>& operator>>(std::basic_istream<Char,
+            std::char_traits<Char>>& is, binary_op& op);
 	
 	
 
@@ -328,6 +358,7 @@ namespace cjm::uint128_tests
     void execute_builtin_u128fls_test_if_avail();
     void execute_first_bin_op_test();
     void execute_gen_comp_ops_test();
+    void execute_stream_insert_bin_op_test();
 
     class bad_binary_op final : public std::invalid_argument
     {
