@@ -288,26 +288,6 @@ namespace cjm::uint128_tests
     {
         return get_op_symbol_u32(op);
     }
-//    {
-//        using char_t = std::remove_cvref_t<std::remove_const_t<Char>>;
-//        if constexpr (std::is_same_v<char_t, wchar_t>)
-//        {
-//            return get_op_symbol_w(op);
-//        }
-//        else if constexpr (std::is_same_v<char_t, char8_t>)
-//        {
-//            return get_op_symbol_u8(op);
-//        }
-//        else if constexpr (std::is_same_v<char_t, char16_t>)
-//        {
-//            return get_op_symbol_u16(op);
-//        }
-//        else if constexpr (std::is_same_v<char_t, char32_t>)
-//        {
-//            return get_op_symbol_u32(op);
-//        }
-//        return get_op_symbol_n(op);
-//    }
 
     binary_op parse_binary_op_symbol(sv_t text);
     binary_op parse_binary_op_symbol(wsv_t text);
@@ -329,16 +309,42 @@ namespace cjm::uint128_tests
     {
         using string_t = std::basic_string<Char>;
         using lsv_t = std::basic_string_view<Char>;
+        string_t temp;
         if constexpr (cjm::numerics::has_msc || !cjm::numerics::concepts::utf_character<Char>)
         {
-            string_t temp;
             is >> temp;
-            op = parse_binary_op_symbol(lsv_t{temp});
         }
         else
         {
-            throw std::logic_error{"This part not implemented yet."};
+
+            Char c{};
+            do
+            {
+                if (is.good() && !is.eof() && is.peek() != std::char_traits<Char>::eof())
+                {
+                    is.get(c);
+                    if (!is.bad() && !is.fail())
+                    {
+                        if (!std::isspace<char>(convert_char<Char, char>(c), std::locale("")))
+                            temp.push_back(c);
+                        else
+                            break;
+                    }
+                }
+                else
+                    break;
+            } while (!is.bad() && !is.fail() && !is.eof());
+            if (is.bad() || is.fail())
+            {
+                return is;
+            }
+            if (temp.empty())
+            {
+                is.setstate(std::ios_base::failbit);
+                return is;
+            }
         }
+        op = parse_binary_op_symbol(lsv_t{temp});
         return is;
     }
 	
@@ -730,7 +736,6 @@ constexpr std::array<int, cjm::uint128_tests::pow_2_arr_size> cjm::uint128_tests
     }
     return ret;
 }
-
 
 
 

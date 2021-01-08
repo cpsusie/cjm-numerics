@@ -833,6 +833,62 @@ cjm::uint128_tests::binary_op cjm::uint128_tests::parse_binary_op_symbol(cjm::ui
 
 }
 
+cjm::uint128_tests::binary_op cjm::uint128_tests::parse_binary_op_symbol(cjm::uint128_tests::wsv_t text)
+{
+    auto trimmed = cjm::string::trim_as_sv(text);
+    if (trimmed.empty()) throw std::invalid_argument{"Supplied text is not a binary operation symbol."};
+    for (unsigned idx = 0; idx < op_symbol_lookup.size(); ++idx)
+    {
+        if (op_symbol_lookup_wide[idx] == text)
+        {
+            return static_cast<binary_op>(idx);
+        }
+    }
+    throw std::invalid_argument{"Supplied text is not a binary operation symbol."};
+}
+
+cjm::uint128_tests::binary_op cjm::uint128_tests::parse_binary_op_symbol(cjm::uint128_tests::u8sv_t text)
+{
+    auto trimmed = cjm::string::trim_as_sv(text);
+    if (trimmed.empty()) throw std::invalid_argument{"Supplied text is not a binary operation symbol."};
+    for (unsigned idx = 0; idx < op_symbol_lookup.size(); ++idx)
+    {
+        if (op_symbol_lookup_u8[idx] == text)
+        {
+            return static_cast<binary_op>(idx);
+        }
+    }
+    throw std::invalid_argument{"Supplied text is not a binary operation symbol."};
+}
+
+cjm::uint128_tests::binary_op cjm::uint128_tests::parse_binary_op_symbol(cjm::uint128_tests::u16sv_t text)
+{
+    auto trimmed = cjm::string::trim_as_sv(text);
+    if (trimmed.empty()) throw std::invalid_argument{"Supplied text is not a binary operation symbol."};
+    for (unsigned idx = 0; idx < op_symbol_lookup.size(); ++idx)
+    {
+        if (op_symbol_lookup_u16[idx] == text)
+        {
+            return static_cast<binary_op>(idx);
+        }
+    }
+    throw std::invalid_argument{"Supplied text is not a binary operation symbol."};
+}
+
+cjm::uint128_tests::binary_op cjm::uint128_tests::parse_binary_op_symbol(cjm::uint128_tests::u32sv_t text)
+{
+    auto trimmed = cjm::string::trim_as_sv(text);
+    if (trimmed.empty()) throw std::invalid_argument{"Supplied text is not a binary operation symbol."};
+    for (unsigned idx = 0; idx < op_symbol_lookup.size(); ++idx)
+    {
+        if (op_symbol_lookup_u32[idx] == text)
+        {
+            return static_cast<binary_op>(idx);
+        }
+    }
+    throw std::invalid_argument{"Supplied text is not a binary operation symbol."};
+}
+
 void cjm::uint128_tests::execute_trim_tests()
 {
 
@@ -853,11 +909,20 @@ void cjm::uint128_tests::execute_trim_tests()
 
 void cjm::uint128_tests::execute_stream_insert_bin_op_test()
 {
+    auto default_init_wrong_val = [](binary_op o) -> binary_op
+    {
+        constexpr unsigned biggest = static_cast<unsigned>(last_op);
+        constexpr unsigned modulo = biggest + 1;
+        auto unsigned_val = (static_cast<unsigned>(o) + 1) % modulo;
+        auto ret = static_cast<binary_op>(unsigned_val);
+        assert(ret >= first_op && ret <= last_op && ret != o);
+        return ret;
+    };
     for (auto op_int = static_cast<unsigned>(cjm::uint128_tests::first_op);
         op_int <= static_cast<unsigned>(cjm::uint128_tests::last_op); ++op_int )
     {
         auto op = static_cast<binary_op>(op_int);
-
+        const auto wrong_op = default_init_wrong_val(op);
         auto nstream = cjm::string::make_throwing_sstream<char>();
         auto wstream = cjm::string::make_throwing_sstream<wchar_t>();
         auto u8stream = cjm::string::make_throwing_sstream<char8_t>();
@@ -874,21 +939,22 @@ void cjm::uint128_tests::execute_stream_insert_bin_op_test()
         nstream >> rt_op_n;
         cjm_assert(rt_op_n == op);
 
-//        binary_op rt_op_w;
-//        wstream >> rt_op_w;
-//        cjm_assert(rt_op_w == op);
+        binary_op rt_op_w;
+        wstream >> rt_op_w;
+        cjm_assert(rt_op_w == op);
 
-//        std::string nstr = nstream.str();
-//        std::wstring wstr = wstream.str();
-        std::u8string u8str = u8stream.str();
-        std::u16string u16str = u16stream.str();
-        std::u32string u32str = u32stream.str();
+        binary_op rt_op_u8 = wrong_op;
+        cjm_assert(rt_op_u8 != op);
+        u8stream >> rt_op_u8;
+        cjm_assert(rt_op_u8 == op);
 
-//        cjm_assert(nstr == get_op_symbol_n(op));
-//        cjm_assert(wstr == get_op_symbol_w(op));
-        cjm_assert(u8str == get_op_symbol_u8(op));
-        cjm_assert(u16str == get_op_symbol_u16(op));
-        cjm_assert(u32str == get_op_symbol_u32(op));
+        binary_op rt_op_u16 = wrong_op;
+        u16stream >> rt_op_u16;
+        cjm_assert(rt_op_u16 == op);
+
+        binary_op rt_op_u32 = wrong_op;
+        u32stream >> rt_op_u32;
+        cjm_assert(rt_op_u32 == op);
     }
 }
 
