@@ -460,7 +460,6 @@ void cjm::uint128_tests::execute_gen_comp_ops_test()
     	if (ordering == std::strong_ordering::equivalent || ordering == std::strong_ordering::equal)
             ret= l == r && !(l > r) && !(l < r) && (l >= r) && (l <= r) && !(l != r) && (std::hash<uint128_t>{}(l) == std::hash<uint128_t>{}(r));
         else if (ordering == std::strong_ordering::less)
-
             ret= l != r && (l < r) && !(l > r) && !(l >= r) && (l <= r) && !(l == r);
         else // greater
             ret = l != r && (l > r) && !(l < r) && !(l <= r) && (l >= r) && !(l == r);
