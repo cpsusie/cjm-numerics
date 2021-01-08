@@ -57,7 +57,35 @@ namespace cjm::uint128_tests
     template<typename TestType = uint128_t , typename ControlType = ctrl_uint128_t>
         requires (test_uint_and_control_set<TestType, ControlType>)
     struct binary_operation;
+	
+    template<typename Invocable>
+    void execute_test(Invocable test, std::string_view test_name);
 
+    ctrl_uint128_t to_ctrl(uint128_t convert);
+    uint128_t to_test(const ctrl_uint128_t& convert);
+
+    constexpr size_t pow_2_arr_size = 63;
+    constexpr std::array<std::uint64_t, pow_2_arr_size> get_pow2_arr();
+    constexpr std::array<int, pow_2_arr_size> get_pow2_res_arr();
+
+    void execute_trim_tests();
+    void execute_ascii_char_interconversions();
+    void execute_div_mod_zero_dividend_nonzero_divisor_tests();
+    void execute_div_mod_by_zero_tests();
+    void execute_uint128_tests();
+    void execute_basic_test_one();
+    void execute_string_parse_test();
+    void execute_basic_multiplication_test();
+    void test_fls();
+    void print_uint128_eval_mode();
+    void print_constexpr_bitcast_available();
+    void print_cpp20_bitops_available();
+    void print_builtin_uint128_data_if_present();
+    void test_interconversion(const ctrl_uint128_t& control, uint128_t test);
+    void execute_builtin_u128fls_test_if_avail();
+    void execute_first_bin_op_test();
+    void execute_gen_comp_ops_test();
+    void execute_stream_insert_bin_op_test();
     namespace u128_testing_constant_providers
     {
         namespace concepts
@@ -352,34 +380,7 @@ namespace cjm::uint128_tests
 
     
 	
-    template<typename Invocable>
-    void execute_test(Invocable test, std::string_view test_name);
-
-    ctrl_uint128_t to_ctrl(uint128_t convert);
-    uint128_t to_test(const ctrl_uint128_t& convert);
-
-    constexpr size_t pow_2_arr_size = 63;
-    constexpr std::array<std::uint64_t, pow_2_arr_size> get_pow2_arr();
-    constexpr std::array<int, pow_2_arr_size> get_pow2_res_arr();
-
-    void execute_trim_tests();
-    void execute_ascii_char_interconversions();
-    void execute_div_mod_zero_dividend_nonzero_divisor_tests();
-    void execute_div_mod_by_zero_tests();
-    void execute_uint128_tests();
-    void execute_basic_test_one();
-    void execute_string_parse_test();
-    void execute_basic_multiplication_test();
-    void test_fls();
-    void print_uint128_eval_mode();
-    void print_constexpr_bitcast_available();
-    void print_cpp20_bitops_available();
-    void print_builtin_uint128_data_if_present();
-    void test_interconversion(const ctrl_uint128_t& control, uint128_t test);
-    void execute_builtin_u128fls_test_if_avail();
-    void execute_first_bin_op_test();
-    void execute_gen_comp_ops_test();
-    void execute_stream_insert_bin_op_test();
+ 
 
     class bad_binary_op final : public std::invalid_argument
     {
