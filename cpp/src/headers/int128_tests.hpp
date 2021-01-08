@@ -325,7 +325,22 @@ namespace cjm::uint128_tests
 
     template<numerics::concepts::character Char>
     std::basic_istream<Char, std::char_traits<Char>>& operator>>(std::basic_istream<Char,
-            std::char_traits<Char>>& is, binary_op& op);
+            std::char_traits<Char>>& is, binary_op& op)
+    {
+        using string_t = std::basic_string<Char>;
+        using lsv_t = std::basic_string_view<Char>;
+        if constexpr (cjm::numerics::has_msc || !cjm::numerics::concepts::utf_character<Char>)
+        {
+            string_t temp;
+            is >> temp;
+            op = parse_binary_op_symbol(lsv_t{temp});
+        }
+        else
+        {
+            throw std::logic_error{"This part not implemented yet."};
+        }
+        return is;
+    }
 	
 	
 
@@ -715,6 +730,7 @@ constexpr std::array<int, cjm::uint128_tests::pow_2_arr_size> cjm::uint128_tests
     }
     return ret;
 }
+
 
 
 

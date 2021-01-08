@@ -870,14 +870,22 @@ void cjm::uint128_tests::execute_stream_insert_bin_op_test()
         u16stream << op;
         u32stream << op;
 
-        std::string nstr = nstream.str();
-        std::wstring wstr = wstream.str();
+        binary_op rt_op_n;
+        nstream >> rt_op_n;
+        cjm_assert(rt_op_n == op);
+
+//        binary_op rt_op_w;
+//        wstream >> rt_op_w;
+//        cjm_assert(rt_op_w == op);
+
+//        std::string nstr = nstream.str();
+//        std::wstring wstr = wstream.str();
         std::u8string u8str = u8stream.str();
         std::u16string u16str = u16stream.str();
         std::u32string u32str = u32stream.str();
 
-        cjm_assert(nstr == get_op_symbol_n(op));
-        cjm_assert(wstr == get_op_symbol_w(op));
+//        cjm_assert(nstr == get_op_symbol_n(op));
+//        cjm_assert(wstr == get_op_symbol_w(op));
         cjm_assert(u8str == get_op_symbol_u8(op));
         cjm_assert(u16str == get_op_symbol_u16(op));
         cjm_assert(u32str == get_op_symbol_u32(op));
