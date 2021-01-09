@@ -104,6 +104,7 @@ void cjm::uint128_tests::execute_uint128_tests()
     print_builtin_uint128_data_if_present();
     cout << "END ENVIRONMENT DATA" << newl << newl;
     execute_test(execute_basic_test_one, "basic_test_one"sv);
+    execute_binary_operation_rt_ser_tests();
     execute_test(execute_string_parse_test, "string_parse_text"sv);
     execute_test(execute_basic_multiplication_test, "basic_multiplication_test"sv);
     execute_test(test_fls, "test_fls"sv);
@@ -931,6 +932,47 @@ cjm::uint128_tests::binary_op cjm::uint128_tests::parse_binary_op_symbol(cjm::ui
         }
     }
     throw std::invalid_argument{"Supplied text is not a binary operation symbol."};
+}
+
+void cjm::uint128_tests::execute_binary_operation_rt_ser_tests()
+{
+    auto n_stream = string::make_throwing_sstream<char>();
+    auto w_stream = string::make_throwing_sstream<wchar_t>();
+    auto u8_stream = string::make_throwing_sstream<char8_t>();
+    auto u16_stream = string::make_throwing_sstream<char16_t>();
+    auto u32_stream = string::make_throwing_sstream<char32_t>();
+
+    const auto binary_operation = binary_op_u128_t{ binary_op::subtract,
+    	0xcafe'babe'fea2'dead'beef'badd'f00d'dadd_u128,
+    	0xc0de'd00d'fea2'cafe'babe'b00b'600d'f00d_u128, };
+    const auto bad_rt_val = binary_op_u128_t{ binary_op::add, 0, 0 };
+    auto rt_val = bad_rt_val;
+
+    n_stream << binary_operation;
+    n_stream >> rt_val;
+    cjm_assert(rt_val == binary_operation);
+    rt_val = bad_rt_val;
+
+    w_stream << binary_operation;
+    w_stream >> rt_val;
+    cjm_assert(rt_val == binary_operation);
+    rt_val = bad_rt_val;
+	
+    u8_stream << binary_operation;
+    u8_stream >> rt_val;
+    cjm_assert(rt_val == binary_operation);
+    rt_val = bad_rt_val;
+
+    u16_stream << binary_operation;
+    u16_stream >> rt_val;
+    cjm_assert(rt_val == binary_operation);
+    rt_val = bad_rt_val;
+	
+    u32_stream << binary_operation;
+    u32_stream >> rt_val;
+    cjm_assert(rt_val == binary_operation);
+    rt_val = bad_rt_val;
+	
 }
 
 void cjm::uint128_tests::execute_trim_tests()

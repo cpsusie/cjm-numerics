@@ -59,31 +59,23 @@ namespace cjm::uint128_tests
     struct binary_operation;
     using binary_op_u128_t = binary_operation<uint128_t, ctrl_uint128_t>;
     using binary_op_u128_vect_t = std::vector<binary_op_u128_t>;
-
-	template<numerics::concepts::character Char>
-    std::basic_ostream<Char, std::char_traits<Char>>& operator<<(std::basic_ostream<Char, 
-        std::char_traits<Char>>& os, const binary_op_u128_t& op);
-
-    template<numerics::concepts::character Char>
-    std::basic_istream<Char, std::char_traits<Char>>& operator>>(std::basic_istream<Char,
-        std::char_traits<Char>>& is, binary_op_u128_t& op);
-
-	
+    	
     template<typename Invocable>
     void execute_test(Invocable test, std::string_view test_name);
 
     ctrl_uint128_t to_ctrl(uint128_t convert);
     uint128_t to_test(const ctrl_uint128_t& convert);
 
+    void execute_uint128_tests();
     constexpr size_t pow_2_arr_size = 63;
     constexpr std::array<std::uint64_t, pow_2_arr_size> get_pow2_arr();
     constexpr std::array<int, pow_2_arr_size> get_pow2_res_arr();
 
+    void execute_binary_operation_rt_ser_tests();
     void execute_trim_tests();
     void execute_ascii_char_interconversions();
     void execute_div_mod_zero_dividend_nonzero_divisor_tests();
     void execute_div_mod_by_zero_tests();
-    void execute_uint128_tests();
     void execute_basic_test_one();
     void execute_string_parse_test();
     void execute_basic_multiplication_test();
@@ -96,7 +88,17 @@ namespace cjm::uint128_tests
     void execute_builtin_u128fls_test_if_avail();
     void execute_first_bin_op_test();
     void execute_gen_comp_ops_test();
-    void execute_stream_insert_bin_op_test();
+    void execute_stream_insert_bin_op_test(); 
+
+
+    template<numerics::concepts::character Char>
+    std::basic_ostream<Char, std::char_traits<Char>>& operator<<(std::basic_ostream<Char,
+        std::char_traits<Char>>&os, const binary_op_u128_t& op);
+
+    template<numerics::concepts::character Char>
+    std::basic_istream<Char, std::char_traits<Char>>& operator>>(std::basic_istream<Char,
+        std::char_traits<Char>>&is, binary_op_u128_t& op);
+	
     namespace u128_testing_constant_providers
     {
         namespace concepts
