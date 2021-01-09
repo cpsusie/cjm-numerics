@@ -4,6 +4,7 @@ namespace
 {
     using uint128_t = cjm::numerics::uint128;
     using uint128_ctrl = boost::multiprecision::uint128_t;
+    using cjm::testing::cjm_assert_throws;
     constexpr std::string_view bool_to_yes_no(bool value) noexcept
     {
         using namespace std::string_view_literals;
@@ -430,6 +431,44 @@ void cjm::uint128_tests::execute_first_bin_op_test()
     bin_op_t round_tripped;
     ss >> round_tripped;
     cjm_assert(round_tripped == op);
+    auto nothrow_op_1 = bin_op_t{binary_op::left_shift, 0, 127};
+    auto nothrow_op_2 = bin_op_t{binary_op::right_shift, 0, 127 };
+    auto nothrow_op_3 = bin_op_t{binary_op::divide, 0, 1};
+    auto nothrow_op_4 = bin_op_t{binary_op::modulus, 0, 1};
+    cjm_deny(nothrow_op_1.has_result());
+    cjm_deny(nothrow_op_2.has_result());
+    cjm_deny(nothrow_op_3.has_result());
+    cjm_deny(nothrow_op_4.has_result());
+    cjm_assert_throws<std::invalid_argument>([]() -> void
+    {
+        auto never_see_me = bin_op_t{binary_op::left_shift, 0, 128};
+        std::cerr << "You should never see this: [" << never_see_me << "]." << newl;
+    });
+    cjm_assert_throws<std::invalid_argument>([]() -> void
+    {
+        auto never_see_me = bin_op_t{binary_op::right_shift, 0, 128};
+        std::cerr << "You should never see this: [" << never_see_me << "]." << newl;
+    });
+    cjm_assert_throws<std::invalid_argument>([]() -> void
+    {
+        auto never_see_me = bin_op_t{binary_op::divide, 0, 0};
+        std::cerr << "You should never see this: [" << never_see_me << "]." << newl;
+    });
+    cjm_assert_throws<std::invalid_argument>([]() -> void
+    {
+         auto never_see_me = bin_op_t{binary_op::divide, 1, 0};
+         std::cerr << "You should never see this: [" << never_see_me << "]." << newl;
+    });
+    cjm_assert_throws<std::invalid_argument>([]() -> void
+    {
+        auto never_see_me = bin_op_t{binary_op::modulus, 0, 0};
+        std::cerr << "You should never see this: [" << never_see_me << "]." << newl;
+    });
+    cjm_assert_throws<std::invalid_argument>([]() -> void
+    {
+        auto never_see_me = bin_op_t{binary_op::modulus, 1, 0};
+        std::cerr << "You should never see this: [" << never_see_me << "]." << newl;
+    });
 }
 
 void cjm::uint128_tests::execute_gen_comp_ops_test()

@@ -473,6 +473,7 @@ namespace cjm::uint128_tests
         binary_operation() noexcept : m_op(), m_lhs(), m_rhs(), m_result() {}
         binary_operation(binary_op op, const uint_test_t& first_operand, const uint_test_t& second_operand, bool calculate_now) : m_op(op), m_lhs(first_operand), m_rhs(second_operand), m_result()
         {
+            validate(op, first_operand, second_operand);
 	        if (calculate_now)
 	        {
                 m_result = perform_calculate_result(first_operand, second_operand, m_op);
@@ -481,10 +482,17 @@ namespace cjm::uint128_tests
     	
         binary_operation(binary_op op, const uint_test_t& first_operand, 
             const uint_test_t& second_operand) : m_op{ op }, m_lhs{ first_operand },
-            m_rhs{ second_operand }, m_result{} {}
+            m_rhs{ second_operand }, m_result{}
+        {
+           validate(op, first_operand, second_operand);
+        }
         binary_operation(binary_op op, const uint_test_t& first_operand, 
             const uint_test_t& second_operand, const uint_test_t& test_result, 
-				const uint_test_t& ctrl_result) : m_op(op), m_lhs(first_operand), m_rhs(second_operand), m_result(std::make_pair(test_result, ctrl_result)) {}
+				const uint_test_t& ctrl_result) : m_op(op), m_lhs(first_operand), m_rhs(second_operand),
+				m_result(std::make_pair(test_result, ctrl_result))
+        {
+            validate(op, first_operand, second_operand);
+        }
         binary_operation(const binary_operation& other) noexcept = default;
         binary_operation(binary_operation&& other) noexcept = default;
         binary_operation& operator=(const binary_operation& other) noexcept = default;
@@ -530,8 +538,6 @@ namespace cjm::uint128_tests
             switch (op)
             {
             case binary_op::left_shift:
-                if (rhs > std::numeric_limits<uint128_t>::digits )
-                auto shift_amount = static_cast<int>(rhs);
 
                 ret_tst = lhs << static_cast<int>(rhs);
                 ret_ctrl = lhs_ctrl << static_cast<int>(rhs);
@@ -592,6 +598,30 @@ namespace cjm::uint128_tests
                 break;
             }
             return std::make_pair(ret_tst, to_test(ret_ctrl));
+        }
+
+        static void validate(binary_op op, [[maybe_unused]] const uint_test_t& lhs, const uint_test_t& rhs)
+        {
+            if (op == binary_op::divide || op == binary_op::modulus)
+            {
+                if (rhs == 0) throw std::invalid_argument{"Zero is not a permissible divisor for a division or modulus operation and may cause undefined behavior with the control type."};
+            }
+            if (op == binary_op::left_shift || op == binary_op::right_shift)
+            {
+                size_t test_digits = std::numeric_limits<uint_test_t >::digits;
+                size_t ctrl_digits = std::numeric_limits<uint_ctrl_t>::digits;
+                uint_ctrl_t rhs_ctrl = to_control(rhs);
+                if (rhs_ctrl >= ctrl_digits || rhs >= test_digits)
+                {
+                    auto ss = cjm::string::make_throwing_sstream<char>();
+                    ss  << "The second operand: [" << rhs << "] is not a valid right hand "
+                        << "operand for a shift operation: shifting by an amount greater than or "
+                        << "equal to [" << test_digits << "] for test value or ["
+                        << ctrl_digits << "] for the control value may cause undefined behavior." << newl;
+                    throw std::invalid_argument{ss.str()};
+                }
+
+            }
         }
 
         binary_op m_op;
