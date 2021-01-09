@@ -424,6 +424,12 @@ void cjm::uint128_tests::execute_first_bin_op_test()
     std::cout   << "hash code for op is: [0x" << std::hex
                 << std::setw(hash_width) << std::setfill('0')
                 << hash << "]." << newl;
+    std::cout << "serialized operation: [" << op << "]" << newl;
+    auto ss = string::make_throwing_sstream<char>();
+    ss << op;
+    bin_op_t round_tripped;
+    ss >> round_tripped;
+    cjm_assert(round_tripped == op);
 }
 
 void cjm::uint128_tests::execute_gen_comp_ops_test()
@@ -454,7 +460,6 @@ void cjm::uint128_tests::execute_gen_comp_ops_test()
     	if (ordering == std::strong_ordering::equivalent || ordering == std::strong_ordering::equal)
             ret= l == r && !(l > r) && !(l < r) && (l >= r) && (l <= r) && !(l != r) && (std::hash<uint128_t>{}(l) == std::hash<uint128_t>{}(r));
         else if (ordering == std::strong_ordering::less)
-
             ret= l != r && (l < r) && !(l > r) && !(l >= r) && (l <= r) && !(l == r);
         else // greater
             ret = l != r && (l > r) && !(l < r) && !(l <= r) && (l >= r) && !(l == r);
