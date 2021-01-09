@@ -519,6 +519,9 @@ namespace cjm::uint128_tests
             switch (op)
             {
             case binary_op::left_shift:
+                if (rhs > std::numeric_limits<uint128_t>::digits )
+                auto shift_amount = static_cast<int>(rhs);
+
                 ret_tst = lhs << static_cast<int>(rhs);
                 ret_ctrl = lhs_ctrl << static_cast<int>(rhs);
                 break;
