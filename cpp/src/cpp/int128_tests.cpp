@@ -10,6 +10,22 @@ namespace
         using namespace std::string_view_literals;
         return value ? "YES"sv : "NO"sv;
     }
+
+	std::string to_lower(std::string_view sv)
+    {
+        std::string ret;
+    	if (!sv.empty())
+    	{
+            ret.reserve(sv.size());
+            std::transform(sv.cbegin(), sv.cend(),
+                std::back_inserter(ret),
+                [](unsigned char c) {return std::tolower(c); });
+    	}
+        return ret;
+    }
+	
+	
+	
 }
 
 cjm::uint128_tests::ctrl_uint128_t cjm::uint128_tests::to_ctrl(uint128_t convert) 
@@ -104,7 +120,8 @@ void cjm::uint128_tests::execute_uint128_tests()
     print_builtin_uint128_data_if_present();
     cout << "END ENVIRONMENT DATA" << newl << newl;
     execute_test(execute_basic_test_one, "basic_test_one"sv);
-    execute_binary_operation_rt_ser_tests();
+    execute_test(execute_binary_operation_rt_ser_tests, "binary_operation_rt_ser_tests"sv);
+    execute_test(execute_print_generated_filename_test, "print_generated_filename_test"sv);
     execute_test(execute_string_parse_test, "string_parse_text"sv);
     execute_test(execute_basic_multiplication_test, "basic_multiplication_test"sv);
     execute_test(test_fls, "test_fls"sv);
@@ -470,7 +487,7 @@ void cjm::uint128_tests::execute_first_bin_op_test()
         auto never_see_me = bin_op_t{binary_op::modulus, 1, 0};
         std::cerr << "You should never see this: [" << never_see_me << "]." << newl;
     });
-}
+ }
 
 void cjm::uint128_tests::execute_gen_comp_ops_test()
 {
@@ -1042,6 +1059,34 @@ void cjm::uint128_tests::execute_stream_insert_bin_op_test()
         u32stream >> rt_op_u32;
         cjm_assert(rt_op_u32 == op);
     }
+}
+
+void cjm::uint128_tests::execute_print_generated_filename_test()
+{
+    std::string file_name_addition = create_generated_bin_op_filename(binary_op::add);
+    cjm_deny(file_name_addition.empty());
+    std::cout << "GENERATED FILENAME FOR ADDITION: [" << file_name_addition << "]." << newl;
+}
+
+std::string cjm::uint128_tests::create_generated_bin_op_filename(binary_op op)
+{
+    using namespace date;
+    auto stamp = std::chrono::system_clock::now();
+    auto date_part = std::chrono::floor<days>(stamp);
+    auto time_part = make_time(stamp - date_part);
+    auto ymd = year_month_day{ date_part };
+    auto hms = hh_mm_ss{ time_part };
+    auto op_name = to_lower(get_op_text(op));
+	
+    auto ss = string::make_throwing_sstream<char>();
+    ss << base_bin_op_filename << "_" << op_name << "_"
+        << bin_op_generated_tag << "_" << ymd.year() << "_" << std::setw(2)
+        << std::setfill('0') << ymd.month() << "_"
+		<< ymd.day() << "_" << std::setw(2) << std::setfill('0')
+        << hms.hours().count() << "_" << std::setw(2) << std::setfill('0')
+        << hms.minutes().count() << "_" << std::setw(2) << std::setfill('0')
+        << hms.seconds().count() << "Z." << bin_op_extension;
+    return ss.str();
 }
 
 //void cjm::uint128_tests::execute_gen_comp_ops_test()

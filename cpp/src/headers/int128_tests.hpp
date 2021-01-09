@@ -27,6 +27,9 @@
 #include<functional>
 #include <memory>
 #include <optional>
+#include <chrono>
+#include <date/date.h>
+
 #include "istream_utils.hpp"
 
 namespace cjm::uint128_tests
@@ -88,9 +91,15 @@ namespace cjm::uint128_tests
     void execute_builtin_u128fls_test_if_avail();
     void execute_first_bin_op_test();
     void execute_gen_comp_ops_test();
-    void execute_stream_insert_bin_op_test(); 
+    void execute_stream_insert_bin_op_test();
+    void execute_print_generated_filename_test();
 
-
+    constexpr auto base_bin_op_filename = "binary_ops"sv;
+    constexpr auto bin_op_failed_test_tag = "failed_test"sv;
+    constexpr auto bin_op_generated_tag = "generated"sv;
+    constexpr auto bin_op_extension = "txt"sv;
+    std::string create_generated_bin_op_filename(binary_op op);
+	
     template<numerics::concepts::character Char>
     std::basic_ostream<Char, std::char_traits<Char>>& operator<<(std::basic_ostream<Char,
         std::char_traits<Char>>&os, const binary_op_u128_t& op);
@@ -98,6 +107,14 @@ namespace cjm::uint128_tests
     template<numerics::concepts::character Char>
     std::basic_istream<Char, std::char_traits<Char>>& operator>>(std::basic_istream<Char,
         std::char_traits<Char>>&is, binary_op_u128_t& op);
+
+    template<numerics::concepts::character Char>
+    std::basic_ostream<Char, std::char_traits<Char>>& operator<<(std::basic_ostream<Char,
+        std::char_traits<Char>>&os, const binary_op_u128_vect_t& op);
+
+    template<numerics::concepts::character Char>
+    std::basic_istream<Char, std::char_traits<Char>>& operator>>(std::basic_istream<Char,
+        std::char_traits<Char>>&is, binary_op_u128_vect_t& op);
 	
     namespace u128_testing_constant_providers
     {
@@ -654,6 +671,35 @@ namespace cjm::uint128_tests
         os << op.right_operand() << item_separator;
         return os;            
 	}
+
+    template<numerics::concepts::character Char>
+    std::basic_ostream<Char, std::char_traits<Char>>& operator<<(std::basic_ostream<Char,
+        std::char_traits<Char>>&os, const binary_op_u128_vect_t& op)
+	{
+        if (op.empty())
+            return os;
+        using char_t = std::remove_const_t<Char>;
+        char_t item_separator;
+        if constexpr (std::is_same_v<char_t, char>)
+        {
+            item_separator = '\n';
+        }
+        else
+        {
+            item_separator = convert_char<char, char_t>('\n');
+        }
+
+		for (const auto& itm : op)
+		{
+            os << itm << item_separator;
+		}
+        return os;
+	}
+	
+
+    template<numerics::concepts::character Char>
+    std::basic_istream<Char, std::char_traits<Char>>& operator>>(std::basic_istream<Char,
+        std::char_traits<Char>>&is, binary_op_u128_vect_t& op);
 
 	template<numerics::concepts::character Char>
 	std::basic_istream<Char, std::char_traits<Char>>& operator>>(std::basic_istream<Char,
