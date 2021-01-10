@@ -25,6 +25,10 @@ namespace cjm::string
     using u16_ofstream_t = std::basic_ofstream<char16_t, std::char_traits<char16_t>>;
     using u32_ofstream_t = std::basic_ofstream<char32_t, std::char_traits<char32_t>>;
 
+    using u8_ifstream_t = std::basic_ifstream<char8_t, std::char_traits<char8_t>>;
+    using u16_ifstream_t = std::basic_ifstream<char16_t, std::char_traits<char16_t>>;
+    using u32_ifstream_t = std::basic_ifstream<char32_t, std::char_traits<char32_t>>;
+
     template<numerics::concepts::utf8_char_allocator Allocator = std::allocator<char8_t>>
     using u8string_stream_t = std::basic_stringstream<char8_t, std::char_traits<char8_t>, Allocator>;
     template<numerics::concepts::utf16_char_allocator Allocator = std::allocator<char16_t>>
@@ -47,6 +51,16 @@ namespace cjm::string
         std::basic_ofstream<Char, CharTraits> make_throwing_ofstream(std::string_view file_name)
     {
         using stream_t = std::basic_ofstream<Char, CharTraits>;
+        auto stream = stream_t{ file_name.data() };
+        stream.exceptions(stream_t::failbit | stream_t::badbit);
+        return stream;
+    }
+
+    template<typename Char, typename CharTraits = std::char_traits<Char>>
+    requires numerics::concepts::char_with_traits<Char, CharTraits>
+    std::basic_ifstream<Char, CharTraits> make_throwing_ifstream(std::string_view file_name)
+    {
+        using stream_t = std::basic_ifstream<Char, CharTraits>;
         auto stream = stream_t{ file_name.data() };
         stream.exceptions(stream_t::failbit | stream_t::badbit);
         return stream;

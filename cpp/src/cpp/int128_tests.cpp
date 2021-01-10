@@ -118,8 +118,16 @@ void cjm::uint128_tests::execute_uint128_tests()
     print_uint128_eval_mode();
     print_cpp20_bitops_available();
     print_builtin_uint128_data_if_present();
+
+    auto parse_file_test = []() -> void
+    {
+        execute_parse_file_test("binary_ops_add_generated_2021_Jan_10_14_42_55Z.txt"sv, 1028);
+    };
+
+
     cout << "END ENVIRONMENT DATA" << newl << newl;
-    execute_test(execute_generate_addition_ops_test, "generate_addition_ops_test"sv);
+    //execute_test(execute_generate_addition_ops_test, "generate_addition_ops_test"sv);
+    execute_test(parse_file_test, "parse_file_test"sv);
     execute_test(execute_basic_test_one, "basic_test_one"sv);
     execute_test(execute_binary_operation_rt_ser_tests, "binary_operation_rt_ser_tests"sv);
     execute_test(execute_print_generated_filename_test, "print_generated_filename_test"sv);
@@ -137,6 +145,24 @@ void cjm::uint128_tests::execute_uint128_tests()
 	cout_saver saver{cout};
     cout << "All tests PASSED." << newl;
 }
+
+void cjm::uint128_tests::execute_parse_file_test(std::string_view path, size_t expected_ops)
+{
+    auto op_vec = binary_op_u128_vect_t{};
+    try
+    {
+        auto stream = string::make_throwing_ifstream<char>(path);
+        stream >> op_vec;
+    }
+    catch (const std::exception& ex)
+    {
+        std::cerr << "Error opening reading or parsing file: [" << path << "]. Msg: [" << ex.what() << "]." << newl;
+        throw;
+    }
+    std::cout << "Read: " << op_vec.size() << " operations from [" << path << "]." << newl;
+    cjm_assert(expected_ops == op_vec.size());
+}
+
 
 void cjm::uint128_tests::execute_basic_test_one()
 {

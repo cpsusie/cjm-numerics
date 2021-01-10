@@ -29,6 +29,7 @@
 #include <optional>
 #include <chrono>
 #include <date/date.h>
+#include <filesystem>
 
 #include "istream_utils.hpp"
 
@@ -94,6 +95,7 @@ namespace cjm::uint128_tests
     void execute_stream_insert_bin_op_test();
     void execute_print_generated_filename_test();
     void execute_generate_addition_ops_test();
+    void execute_parse_file_test(std::string_view path, size_t expected_ops);
 
     constexpr auto base_bin_op_filename = "binary_ops"sv;
     constexpr auto bin_op_failed_test_tag = "failed_test"sv;
@@ -740,9 +742,10 @@ namespace cjm::uint128_tests
     std::basic_istream<Char, std::char_traits<Char>>& operator>>(std::basic_istream<Char,
         std::char_traits<Char>>&is, binary_op_u128_vect_t& op)
 	{
-        using string_t = std::basic_string<Char, std::char_traits<Char>>;
+
         using char_t = std::remove_const_t<Char>;
-        op = binary_op_u128_vect_t{};
+        using string_t = std::basic_string<char_t, std::char_traits<char_t>>;
+        using lsv_t = std::basic_string_view<char_t, std::char_traits<char_t>>;
 
         char_t item_separator;
         if constexpr (std::is_same_v<char_t, char>)
@@ -754,18 +757,35 @@ namespace cjm::uint128_tests
             item_separator = convert_char<char, char_t>('\n');
         }
         string_t temp;
-		
-        if (!is.good() || is.bad() || is.fail() || is.eof() || is.peek() == std::char_traits<char_t>::eof())
-        {
-            if (is.fail() && !is.bad())
-                is.setstate(std::ios_base::failbit | std::ios_base::badbit);
-            else
-                is.setstate(std::ios_base::failbit);
-            return is;
-        }
 
-		
-		
+        while (is.good() && !is.bad() && !is.fail() && !is.eof() && is.peek() != std::char_traits<char_t>::eof())
+        {
+            temp.clear();
+            std::getline(is, temp, item_separator);
+            if (is.eof() || is.bad() || is.fail())
+            {
+                return is;
+            }
+            lsv_t temp_view = temp;
+            temp_view = cjm::string::trim_as_sv(temp_view);
+            if (temp_view.empty())
+            {
+                is.setstate(std::ios_base::failbit);
+                return is;
+            }
+
+            try
+            {
+                op.template emplace_back(parse<char_t>(temp_view));
+            }
+            catch (const std::exception& ex)
+            {
+                std::cerr << "Failure to parse string.  Msg: [" << ex.what() << "].";
+                is.setstate(std::ios_base::failbit);
+                throw;
+            }
+        }
+        return is;
 	}
 
 	template<numerics::concepts::character Char>
@@ -806,7 +826,6 @@ namespace cjm::uint128_tests
             return is;
 		}
 
-        std::string error_msg;
         try
         {
             lsv_t txt = str;
@@ -1046,7 +1065,6 @@ constexpr std::array<int, cjm::uint128_tests::pow_2_arr_size> cjm::uint128_tests
     }
     return ret;
 }
-
 
 
 
