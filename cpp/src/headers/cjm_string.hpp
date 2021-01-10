@@ -5,6 +5,7 @@
 #include <string>
 #include <string_view>
 #include <sstream>
+#include <fstream>
 #include <algorithm>
 #include <locale>
 #include "cjm_numeric_concepts.hpp"
@@ -18,6 +19,11 @@ namespace cjm::string
     template<typename Char, typename CharTraits>
 		requires cjm::numerics::concepts::char_with_traits<Char, CharTraits>
 	std::basic_string_view<Char, CharTraits> trim_as_sv(std::basic_string_view<Char, CharTraits> trimMe);
+
+    
+    using u8_ofstream_t = std::basic_ofstream<char8_t, std::char_traits<char8_t>>;
+    using u16_ofstream_t = std::basic_ofstream<char16_t, std::char_traits<char16_t>>;
+    using u32_ofstream_t = std::basic_ofstream<char32_t, std::char_traits<char32_t>>;
 
     template<numerics::concepts::utf8_char_allocator Allocator = std::allocator<char8_t>>
     using u8string_stream_t = std::basic_stringstream<char8_t, std::char_traits<char8_t>, Allocator>;
@@ -34,6 +40,16 @@ namespace cjm::string
         stream_t ret;
         ret.exceptions(stream_t::failbit | stream_t::badbit);
         return ret;
+    }
+
+    template<typename Char, typename CharTraits = std::char_traits<Char>>
+    requires numerics::concepts::char_with_traits<Char, CharTraits>
+        std::basic_ofstream<Char, CharTraits> make_throwing_ofstream(std::string_view file_name)
+    {
+        using stream_t = std::basic_ofstream<Char, CharTraits>;
+        auto stream = stream_t{ file_name.data() };
+        stream.exceptions(stream_t::failbit | stream_t::badbit);
+        return stream;
     }
 
 	class string_helper

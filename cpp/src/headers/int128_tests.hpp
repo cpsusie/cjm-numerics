@@ -93,6 +93,7 @@ namespace cjm::uint128_tests
     void execute_gen_comp_ops_test();
     void execute_stream_insert_bin_op_test();
     void execute_print_generated_filename_test();
+    void execute_generate_addition_ops_test();
 
     constexpr auto base_bin_op_filename = "binary_ops"sv;
     constexpr auto bin_op_failed_test_tag = "failed_test"sv;
@@ -115,6 +116,8 @@ namespace cjm::uint128_tests
     template<numerics::concepts::character Char>
     std::basic_istream<Char, std::char_traits<Char>>& operator>>(std::basic_istream<Char,
         std::char_traits<Char>>&is, binary_op_u128_vect_t& op);
+
+    binary_op_u128_vect_t generate_easy_ops(size_t num_ops, binary_op op, bool include_standard_tests);
 	
     namespace u128_testing_constant_providers
     {
@@ -143,9 +146,16 @@ namespace cjm::uint128_tests
             static constexpr full_uint_t max_less_one = maximum - full_uint_t{1};
             static constexpr full_uint_t zero = std::numeric_limits<full_uint_t>::min();
             static constexpr full_uint_t one = zero + full_uint_t{1};
-            static constexpr full_uint_t maximum_half = std::numeric_limits<half_uint_t>::max();
-            static constexpr full_uint_t maximum_half_less_one = std::numeric_limits<half_uint_t>::max();
-            using half_provider_t = testing_constant_provider<half_uint_t>;
+            static constexpr full_uint_t maximum_half = std::numeric_limits<half_uint_t>::max() >> (std::numeric_limits<half_uint_t>::digits / 2);
+            static constexpr full_uint_t maximum_half_less_one = maximum_half - 1;
+            static constexpr full_uint_t maximum_half_plus_one = maximum_half + 1;
+
+            static constexpr std::array<full_uint_t, 7> all_values =
+            { maximum, max_less_one, zero,
+                one, maximum_half, max_less_one,
+                maximum_half_plus_one };
+
+        	using half_provider_t = testing_constant_provider<half_uint_t>;
         };
 
         template<>
@@ -159,7 +169,13 @@ namespace cjm::uint128_tests
             static constexpr full_uint_t zero = std::numeric_limits<full_uint_t>::min();
             static constexpr full_uint_t one = zero + full_uint_t{1};
             static constexpr full_uint_t maximum_half = std::numeric_limits<half_uint_t>::max();
-            static constexpr full_uint_t maximum_half_less_one = std::numeric_limits<half_uint_t>::max();
+            static constexpr full_uint_t maximum_half_less_one = maximum_half - 1;
+            static constexpr full_uint_t maximum_half_plus_one = maximum_half + 1;
+
+            static constexpr std::array<full_uint_t, 7> all_values =
+            { maximum, max_less_one, zero,
+                one, maximum_half, max_less_one,
+                maximum_half_plus_one };
             using half_provider_t = testing_constant_provider<half_uint_t>;
         };
 
@@ -174,7 +190,13 @@ namespace cjm::uint128_tests
             static constexpr full_uint_t zero = std::numeric_limits<full_uint_t>::min();
             static constexpr full_uint_t one = zero + full_uint_t{1};
             static constexpr full_uint_t maximum_half = std::numeric_limits<half_uint_t>::max();
-            static constexpr full_uint_t maximum_half_less_one = std::numeric_limits<half_uint_t>::max();
+            static constexpr full_uint_t maximum_half_less_one = maximum_half - 1;
+            static constexpr full_uint_t maximum_half_plus_one = maximum_half + 1;
+
+            static constexpr std::array<full_uint_t, 7> all_values =
+            { maximum, max_less_one, zero,
+                one, maximum_half, max_less_one,
+                maximum_half_plus_one };
             using half_provider_t = testing_constant_provider<half_uint_t>;
         };
 
@@ -189,7 +211,13 @@ namespace cjm::uint128_tests
             static constexpr full_uint_t zero = std::numeric_limits<full_uint_t>::min();
             static constexpr full_uint_t one = zero + full_uint_t{1};
             static constexpr full_uint_t maximum_half = std::numeric_limits<half_uint_t>::max();
-            static constexpr full_uint_t maximum_half_less_one = std::numeric_limits<half_uint_t>::max();
+            static constexpr full_uint_t maximum_half_less_one = maximum_half - 1;
+            static constexpr full_uint_t maximum_half_plus_one = maximum_half + 1;
+
+            static constexpr std::array<full_uint_t, 7> all_values =
+            { maximum, max_less_one, zero,
+                one, maximum_half, max_less_one,
+                maximum_half_plus_one };
             using half_provider_t = testing_constant_provider<half_uint_t>;
         };
 
@@ -199,13 +227,21 @@ namespace cjm::uint128_tests
             using full_uint_t = std::remove_const_t<T>;
             using half_uint_t = typename T::int_part;
 
+                  	
             static constexpr full_uint_t maximum = std::numeric_limits<full_uint_t>::max();
             static constexpr full_uint_t max_less_one = maximum - full_uint_t{1};
             static constexpr full_uint_t zero = std::numeric_limits<full_uint_t>::min();
             static constexpr full_uint_t one = zero + full_uint_t{1};
             static constexpr full_uint_t maximum_half = std::numeric_limits<half_uint_t>::max();
-            static constexpr full_uint_t maximum_half_less_one = std::numeric_limits<half_uint_t>::max();
-            using half_provider_t = testing_constant_provider<half_uint_t>;
+            static constexpr full_uint_t maximum_half_less_one = maximum_half -1;
+            static constexpr full_uint_t maximum_half_plus_one = maximum_half + 1;
+
+            static constexpr std::array<full_uint_t, 7> all_values = 
+				{   maximum, max_less_one, zero,
+            		one, maximum_half, max_less_one,
+            		maximum_half_plus_one };
+        	
+        	using half_provider_t = testing_constant_provider<half_uint_t>;
         };
     }
 }

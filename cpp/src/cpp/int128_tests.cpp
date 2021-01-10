@@ -119,6 +119,7 @@ void cjm::uint128_tests::execute_uint128_tests()
     print_cpp20_bitops_available();
     print_builtin_uint128_data_if_present();
     cout << "END ENVIRONMENT DATA" << newl << newl;
+    execute_test(execute_generate_addition_ops_test, "generate_addition_ops_test"sv);
     execute_test(execute_basic_test_one, "basic_test_one"sv);
     execute_test(execute_binary_operation_rt_ser_tests, "binary_operation_rt_ser_tests"sv);
     execute_test(execute_print_generated_filename_test, "print_generated_filename_test"sv);
@@ -1068,6 +1069,24 @@ void cjm::uint128_tests::execute_print_generated_filename_test()
     std::cout << "GENERATED FILENAME FOR ADDITION: [" << file_name_addition << "]." << newl;
 }
 
+void cjm::uint128_tests::execute_generate_addition_ops_test()
+{
+    constexpr binary_op operation = binary_op::add;
+    constexpr size_t ops = 1'000;
+    constexpr size_t num_standard_values = u128_testing_constant_providers::testing_constant_provider<uint128_t>::all_values.size();
+    constexpr size_t num_standard_ops = ((num_standard_values * num_standard_values) + num_standard_values) / 2;
+    constexpr size_t num_expected = ops + num_standard_ops;
+	
+    auto op_vect = generate_easy_ops(ops, operation, true);
+    cjm_assert(op_vect.size() == num_expected);
+	auto file_name = create_generated_bin_op_filename(operation);
+    {
+        auto ofstream = string::make_throwing_ofstream<char>(file_name);
+        ofstream << op_vect;
+    }
+    std::cout << "Wrote " << op_vect.size() << " operations to [" << file_name << "]." << newl;
+}
+
 std::string cjm::uint128_tests::create_generated_bin_op_filename(binary_op op)
 {
     using namespace date;
@@ -1087,6 +1106,37 @@ std::string cjm::uint128_tests::create_generated_bin_op_filename(binary_op op)
         << hms.minutes().count() << "_" << std::setw(2) << std::setfill('0')
         << hms.seconds().count() << "Z." << bin_op_extension;
     return ss.str();
+}
+
+cjm::uint128_tests::binary_op_u128_vect_t cjm::uint128_tests::generate_easy_ops(size_t num_ops, binary_op op,
+	bool include_standard_tests)
+{
+    if (op == binary_op::divide || op == binary_op::modulus || op == binary_op::left_shift || op == binary_op::right_shift)
+        throw std::invalid_argument{ "This function cannot be used for division, modulus or bit shifting: those operations may cause undefined behavior if the right operand is improper." };
+    using provider_t = u128_testing_constant_providers::testing_constant_provider<uint128_t>;
+    binary_op_u128_vect_t ret;
+	if (include_standard_tests)
+	{
+        for (size_t i = 0; i < provider_t::all_values.size(); ++i)
+            for (size_t j = i; j < provider_t::all_values.size(); ++j)
+                ret.emplace_back(binary_op::add, provider_t::all_values[i], provider_t::all_values[j]);
+	}
+    if (num_ops > 0)
+    {
+        if (ret.capacity() < ret.size() + num_ops)
+        {
+            ret.reserve(num_ops);
+        }
+        size_t added = 0;
+        auto gen = generator::rgen{};
+    	while (added < num_ops)
+    	{
+            ret.emplace_back(binary_op::add, generator::create_random_in_range<uint128_t>(gen), generator::create_random_in_range<uint128_t>(gen));
+            ++added;
+    	}       
+    }
+    return ret;
+	
 }
 
 //void cjm::uint128_tests::execute_gen_comp_ops_test()
