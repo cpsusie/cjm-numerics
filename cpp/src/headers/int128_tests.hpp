@@ -776,7 +776,7 @@ namespace cjm::uint128_tests
 
             try
             {
-                op.template emplace_back(parse<char_t>(temp_view));
+                op.emplace_back(parse<char_t>(temp_view));
             }
             catch (const std::exception& ex)
             {

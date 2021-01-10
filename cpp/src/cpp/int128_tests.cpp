@@ -1138,7 +1138,7 @@ void cjm::uint128_tests::execute_generate_addition_ops_rt_ser_deser_test()
         }
         catch (const std::exception& ex2)
         {
-            std::cerr << "Exception throw deleting file [" << file_name << "]. Msg: [" << ex.what() << "]." << newl;
+            std::cerr << "Exception throw deleting file [" << file_name << "]. Msg: [" << ex2.what() << "]." << newl;
         }
         throw;
     }
