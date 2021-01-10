@@ -119,15 +119,15 @@ void cjm::uint128_tests::execute_uint128_tests()
     print_cpp20_bitops_available();
     print_builtin_uint128_data_if_present();
 
-    auto parse_file_test = []() -> void
-    {
-        execute_parse_file_test("binary_ops_add_generated_2021_Jan_10_14_42_55Z.txt"sv, 1028);
-    };
+//    auto parse_file_test = []() -> void
+//    {
+//        execute_parse_file_test("binary_ops_add_generated_2021_Jan_10_14_42_55Z.txt"sv, 1028);
+//    };
 
 
     cout << "END ENVIRONMENT DATA" << newl << newl;
-    //execute_test(execute_generate_addition_ops_test, "generate_addition_ops_test"sv);
-    execute_test(parse_file_test, "parse_file_test"sv);
+    execute_test(execute_generate_addition_ops_rt_ser_deser_test, "generate_addition_ops_rt_ser_deser_test"sv);
+    //execute_test(parse_file_test, "parse_file_test"sv);
     execute_test(execute_basic_test_one, "basic_test_one"sv);
     execute_test(execute_binary_operation_rt_ser_tests, "binary_operation_rt_ser_tests"sv);
     execute_test(execute_print_generated_filename_test, "print_generated_filename_test"sv);
@@ -1095,7 +1095,7 @@ void cjm::uint128_tests::execute_print_generated_filename_test()
     std::cout << "GENERATED FILENAME FOR ADDITION: [" << file_name_addition << "]." << newl;
 }
 
-void cjm::uint128_tests::execute_generate_addition_ops_test()
+void cjm::uint128_tests::execute_generate_addition_ops_rt_ser_deser_test()
 {
     constexpr binary_op operation = binary_op::add;
     constexpr size_t ops = 1'000;
@@ -1111,6 +1111,51 @@ void cjm::uint128_tests::execute_generate_addition_ops_test()
         ofstream << op_vect;
     }
     std::cout << "Wrote " << op_vect.size() << " operations to [" << file_name << "]." << newl;
+    std::filesystem::path file = file_name;
+    auto rt_op_vec = binary_op_u128_vect_t{};
+    try
+    {
+        cjm_assert(std::filesystem::exists(file));
+
+        if (!op_vect.empty())
+        {
+            rt_op_vec.reserve(op_vect.size());
+        }
+        {
+            auto ifstream = string::make_throwing_ifstream<char>(file_name);
+            ifstream >> rt_op_vec;
+        }
+    }
+    catch (const std::exception& ex)
+    {
+        std::cerr << "Exception thrown after writing to file [" << file_name << "]. Msg: [" << ex.what() << "]." << newl;
+        try
+        {
+            if (std::filesystem::exists(file_name))
+            {
+                std::filesystem::remove(file_name);
+            }
+        }
+        catch (const std::exception& ex2)
+        {
+            std::cerr << "Exception throw deleting file [" << file_name << "]. Msg: [" << ex.what() << "]." << newl;
+        }
+        throw;
+    }
+
+    try
+    {
+        if (std::filesystem::exists(file_name))
+        {
+            std::filesystem::remove(file_name);
+        }
+    }
+    catch (const std::exception& ex)
+    {
+        std::cerr << "Exception throw deleting file [" << file_name << "]. Msg: [" << ex.what() << "]." << newl;
+    }
+    cjm_assert(rt_op_vec == op_vect);
+    std::cout << "The round tripped vector is identical to the source vector.";
 }
 
 std::string cjm::uint128_tests::create_generated_bin_op_filename(binary_op op)

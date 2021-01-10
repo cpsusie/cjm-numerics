@@ -94,7 +94,7 @@ namespace cjm::uint128_tests
     void execute_gen_comp_ops_test();
     void execute_stream_insert_bin_op_test();
     void execute_print_generated_filename_test();
-    void execute_generate_addition_ops_test();
+    void execute_generate_addition_ops_rt_ser_deser_test();
     void execute_parse_file_test(std::string_view path, size_t expected_ops);
 
     constexpr auto base_bin_op_filename = "binary_ops"sv;
