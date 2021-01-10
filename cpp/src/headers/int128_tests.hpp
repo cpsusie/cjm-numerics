@@ -117,6 +117,9 @@ namespace cjm::uint128_tests
     std::basic_istream<Char, std::char_traits<Char>>& operator>>(std::basic_istream<Char,
         std::char_traits<Char>>&is, binary_op_u128_vect_t& op);
 
+	template<numerics::concepts::character Char>
+    binary_op_u128_t parse(std::basic_string_view<Char> sv);
+
     binary_op_u128_vect_t generate_easy_ops(size_t num_ops, binary_op op, bool include_standard_tests);
 	
     namespace u128_testing_constant_providers
@@ -735,7 +738,36 @@ namespace cjm::uint128_tests
 
     template<numerics::concepts::character Char>
     std::basic_istream<Char, std::char_traits<Char>>& operator>>(std::basic_istream<Char,
-        std::char_traits<Char>>&is, binary_op_u128_vect_t& op);
+        std::char_traits<Char>>&is, binary_op_u128_vect_t& op)
+	{
+        using string_t = std::basic_string<Char, std::char_traits<Char>>;
+        using lsv_t = std::basic_string_view<Char, std::char_traits<Char>>;
+        using char_t = std::remove_const_t<Char>;
+        op = binary_op_u128_vect_t{};
+
+        char_t item_separator;
+        if constexpr (std::is_same_v<char_t, char>)
+        {
+            item_separator = '\n';
+        }
+        else
+        {
+            item_separator = convert_char<char, char_t>('\n');
+        }
+        string_t temp;
+		
+        if (!is.good() || is.bad() || is.fail() || is.eof() || is.peek() == std::char_traits<char_t>::eof())
+        {
+            if (is.fail() && !is.bad())
+                is.setstate(std::ios_base::failbit | std::ios_base::badbit);
+            else
+                is.setstate(std::ios_base::failbit);
+            return is;
+        }
+
+		
+		
+	}
 
 	template<numerics::concepts::character Char>
 	std::basic_istream<Char, std::char_traits<Char>>& operator>>(std::basic_istream<Char,
@@ -834,6 +866,81 @@ namespace cjm::uint128_tests
         }
         is.setstate(std::ios_base::failbit);
         return is;		
+	}
+
+    template<numerics::concepts::character Char>
+    binary_op_u128_t parse(std::basic_string_view<Char> sv)
+	{
+        if (sv.empty()) throw std::invalid_argument{ "The string is empty." };
+        using char_t = std::remove_const_t<Char>;
+        using lsv_t = std::basic_string_view<char_t>;
+        char_t item_separator;
+        if constexpr (std::is_same_v<char_t, char>)
+        {
+            item_separator = ';';            
+        }
+        else
+        {
+            item_separator = convert_char<char, char_t>(';');            
+        }
+				
+        auto get_up_to_delim = [](lsv_t txt, char_t delim) -> std::pair<lsv_t, lsv_t>
+        {
+            if (txt.empty())
+                return std::make_pair(lsv_t{}, lsv_t{});
+
+            std::size_t first_delim_idx = 0;
+            for (char_t c : txt)
+            {
+                if (c == delim)
+                {
+                    break;
+                }
+                ++first_delim_idx;
+            }
+            if (first_delim_idx >= txt.size())
+            {
+                return std::make_pair(lsv_t{}, lsv_t{});
+            }
+            else if (first_delim_idx == 0)
+            {
+                return std::make_pair(lsv_t{}, txt.substr(1));
+            }
+            else
+            {   //"2,4"  
+                //"<<;1;2"
+                lsv_t first = txt.substr(0, first_delim_idx);
+                lsv_t second = first_delim_idx + 1 < txt.size() ? txt.substr(first_delim_idx + 1) : lsv_t{};
+                return std::make_pair(first, second);
+            }
+        };
+
+        auto temp = std::array<lsv_t, 3>{};
+        lsv_t line = sv;
+        lsv_t remainder = line;
+        int added = 0;
+        while (added < 3 && !remainder.empty())
+        {
+            auto [symbol, remainder_temp] = get_up_to_delim(remainder, item_separator);
+            if (symbol.empty())
+            {
+                is.setstate(std::ios_base::failbit);
+                return is;
+            }
+            temp[added++] = symbol;
+            remainder = remainder_temp;
+        }
+        if (added == 3 && std::all_of(temp.cbegin(), temp.cend(), [](const lsv_t& t) -> bool {return !t.empty(); }))
+        {
+            auto op_text = string::trim_as_sv<char_t, std::char_traits<char_t>>(temp[0]);
+            auto lhs_text = string::trim_as_sv<char_t, std::char_traits<char_t>>(temp[1]);
+            auto rhs_text = string::trim_as_sv<char_t, std::char_traits<char_t>>(temp[2]);
+            binary_op op_code = parse_binary_op_symbol(op_text);
+            uint128_t lhs = uint128_t::make_from_string(lhs_text);
+            uint128_t rhs = uint128_t::make_from_string(rhs_text);
+            return binary_op_u128_t{ op_code, lhs, rhs };
+        }
+        throw std::runtime_error{ "Unable to parse supplied text into a binary operation." };
 	}
 	
 	template <typename TestType, typename ControlType>
