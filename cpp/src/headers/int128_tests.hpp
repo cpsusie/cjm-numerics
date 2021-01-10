@@ -741,7 +741,6 @@ namespace cjm::uint128_tests
         std::char_traits<Char>>&is, binary_op_u128_vect_t& op)
 	{
         using string_t = std::basic_string<Char, std::char_traits<Char>>;
-        using lsv_t = std::basic_string_view<Char, std::char_traits<Char>>;
         using char_t = std::remove_const_t<Char>;
         op = binary_op_u128_vect_t{};
 
