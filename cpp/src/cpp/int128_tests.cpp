@@ -23,6 +23,27 @@ namespace
     	}
         return ret;
     }
+
+    std::filesystem::path construct_bin_op_filename(cjm::uint128_tests::binary_op op,  std::string_view op_tag)
+    {
+        using namespace date;
+        auto stamp = std::chrono::system_clock::now();
+        auto date_part = std::chrono::floor<days>(stamp);
+        auto time_part = make_time(stamp - date_part);
+        auto ymd = year_month_day{ date_part };
+        auto hms = hh_mm_ss{ time_part };
+        auto op_name = to_lower(get_op_text(op));
+
+        auto ss = cjm::string::make_throwing_sstream<char>();
+        ss << cjm::uint128_tests::base_bin_op_filename << "_" << op_name << "_"
+            << op_tag << "_" << ymd.year() << "_" << std::setw(2)
+            << std::setfill('0') << ymd.month() << "_"
+            << ymd.day() << "_" << std::setw(2) << std::setfill('0')
+            << hms.hours().count() << "_" << std::setw(2) << std::setfill('0')
+            << hms.minutes().count() << "_" << std::setw(2) << std::setfill('0')
+            << hms.seconds().count() << "Z." << cjm::uint128_tests::bin_op_extension;
+        return std::filesystem::path{ ss.str() };
+    }
 	
 	
 	
@@ -142,6 +163,7 @@ void cjm::uint128_tests::execute_uint128_tests()
     execute_test(execute_ascii_char_interconversions, "ascii_char_interconversions"sv);
     execute_test(execute_trim_tests, "trim_tests"sv);
     execute_test(execute_stream_insert_bin_op_test, "stream_insert_bin_op_test"sv);
+    execute_test(execute_addition_tests, "addition_tests"sv);
 	cout_saver saver{cout};
     cout << "All tests PASSED." << newl;
 }
@@ -161,6 +183,28 @@ void cjm::uint128_tests::execute_parse_file_test(std::string_view path, size_t e
     }
     std::cout << "Read: " << op_vec.size() << " operations from [" << path << "]." << newl;
     cjm_assert(expected_ops == op_vec.size());
+}
+
+void cjm::uint128_tests::print_n_static_assertions(const binary_op_u128_vect_t& op_vec, size_t n)
+{
+	if (op_vec.empty())
+	{
+        std::cerr << "Cannot print " << n << " static assertions: vector contains no operations." << newl;
+	}
+    else
+    {
+		if (op_vec.size() < n)
+		{
+            std::cerr << "Cannot print " << n << " static assertions: vector contains only " << op_vec.size() << " operations.  Will print " << op_vec.size() << " assertions instead." << newl;
+			n = op_vec.size();			
+		}
+        std::cout << " Printing " << n << " static assertions: " << newl;
+    	for (size_t i = 0; i < n; ++i)
+    	{
+            append_static_assertion(std::cout, op_vec[i]) << newl;
+    	}
+    	std::cout << "DONE printing " << n << " static assertions: " << newl;
+    }    
 }
 
 
@@ -1090,7 +1134,7 @@ void cjm::uint128_tests::execute_stream_insert_bin_op_test()
 
 void cjm::uint128_tests::execute_print_generated_filename_test()
 {
-    std::string file_name_addition = create_generated_bin_op_filename(binary_op::add);
+    auto file_name_addition = create_generated_bin_op_filename(binary_op::add);
     cjm_deny(file_name_addition.empty());
     std::cout << "GENERATED FILENAME FOR ADDITION: [" << file_name_addition << "]." << newl;
 }
@@ -1158,25 +1202,34 @@ void cjm::uint128_tests::execute_generate_addition_ops_rt_ser_deser_test()
     std::cout << "The round tripped vector is identical to the source vector.";
 }
 
-std::string cjm::uint128_tests::create_generated_bin_op_filename(binary_op op)
+void cjm::uint128_tests::execute_addition_tests()
 {
-    using namespace date;
-    auto stamp = std::chrono::system_clock::now();
-    auto date_part = std::chrono::floor<days>(stamp);
-    auto time_part = make_time(stamp - date_part);
-    auto ymd = year_month_day{ date_part };
-    auto hms = hh_mm_ss{ time_part };
-    auto op_name = to_lower(get_op_text(op));
-	
-    auto ss = string::make_throwing_sstream<char>();
-    ss << base_bin_op_filename << "_" << op_name << "_"
-        << bin_op_generated_tag << "_" << ymd.year() << "_" << std::setw(2)
-        << std::setfill('0') << ymd.month() << "_"
-		<< ymd.day() << "_" << std::setw(2) << std::setfill('0')
-        << hms.hours().count() << "_" << std::setw(2) << std::setfill('0')
-        << hms.minutes().count() << "_" << std::setw(2) << std::setfill('0')
-        << hms.seconds().count() << "Z." << bin_op_extension;
-    return ss.str();
+    constexpr auto test_name = "addition_tests"sv;
+    constexpr binary_op operation = binary_op::add;
+    constexpr size_t ops = 1'000;
+    constexpr size_t num_standard_values = u128_testing_constant_providers::testing_constant_provider<uint128_t>::all_values.size();
+    constexpr size_t num_standard_ops = ((num_standard_values * num_standard_values) + num_standard_values) / 2;
+    constexpr size_t num_expected = ops + num_standard_ops;
+
+    auto op_vect = generate_easy_ops(ops, operation, true);
+    cjm_assert(op_vect.size() == num_expected);
+    std::cout << "  Executing " << op_vect.size() << " addition tests: " << newl;
+	for (auto& binary_operation : op_vect)
+	{
+        test_binary_operation(binary_operation, test_name);
+	}
+    std::cout << "All " << op_vect.size() << " tests PASS." << newl;
+    //print_n_static_assertions(op_vect, num_standard_ops);
+}
+
+std::filesystem::path cjm::uint128_tests::create_generated_bin_op_filename(binary_op op)
+{
+    return construct_bin_op_filename(op, bin_op_generated_tag);
+}
+
+std::filesystem::path cjm::uint128_tests::create_failing_op_pathname(binary_op op)
+{
+    return construct_bin_op_filename(op, bin_op_failed_test_tag);
 }
 
 cjm::uint128_tests::binary_op_u128_vect_t cjm::uint128_tests::generate_easy_ops(size_t num_ops, binary_op op,
@@ -1208,6 +1261,54 @@ cjm::uint128_tests::binary_op_u128_vect_t cjm::uint128_tests::generate_easy_ops(
     }
     return ret;
 	
+}
+
+void cjm::uint128_tests::test_binary_operation(binary_op_u128_t& op, std::string_view test_name)
+{
+    std::optional<std::pair<binary_op_u128_t::uint_test_t,
+        binary_op_u128_t::uint_test_t>> result = std::nullopt;
+	try
+	{
+        op.calculate_result();
+        result = op.result();
+        cjm_assert(result.has_value() && op.has_correct_result() && result->first == result->second);
+	}
+	catch (const testing::testing_failure& ex)
+	{
+        auto saver = cout_saver{ std::cerr };
+        std::cerr << "Test: [" << test_name << "], failed -- exception (" << ex.what() << ") thrown." << newl;
+        std::cerr << "Operation: [" << op.op_code() << "]; Left operand: [" << std::dec << op.left_operand() << "]; Right operand: [" << op.right_operand() << "]." << newl;
+		if (result.has_value())
+		{
+            std::cerr << "Result of operation.  Actual: [" << std::dec << result->first << "]; Expected by control: [" << std::dec << result->second << "]." << newl;			
+		}
+		else
+		{
+            std::cerr << "No result available." << newl;
+		}
+        auto path = create_failing_op_pathname(op.op_code());
+        std::cerr << "Going to write failing operation to [" << path << "]: " << newl;
+        bool except_file_write = false;
+		try
+		{
+            auto fstrm = string::make_throwing_ofstream<char>(path);
+            fstrm << op;		
+		}
+		catch (const std::exception& ex2)
+		{
+            except_file_write = true;
+            std::cerr << "Unable to write failing operation to file [" << path << "]: exception thrown with msg: [" << ex2.what() << "]." << newl;
+		}
+		if (except_file_write)
+		{
+            std::cerr << "Logging failing operation to stderr instead (between square brackets): [" << op << "]." << newl;
+		}
+        else
+        {
+            std::cerr << "Successfully wrote failing operation to: [" << path << "]." << newl;
+        }
+        throw;
+	}
 }
 
 //void cjm::uint128_tests::execute_gen_comp_ops_test()

@@ -52,6 +52,12 @@ namespace cjm::uint128_tests
 
     class bad_binary_op;
 
+    template<typename Invocable>
+    concept invocable = requires (Invocable i)
+    {
+        {i()} -> std::convertible_to<void>;
+    };
+	
     template<typename TestTypeUi, typename ControlTypeUi>
     concept test_uint_and_control_set = cjm::numerics::concepts::cjm_unsigned_integer<TestTypeUi>
                                         && cjm::numerics::concepts::unsigned_integer<ControlTypeUi>
@@ -64,7 +70,7 @@ namespace cjm::uint128_tests
     using binary_op_u128_t = binary_operation<uint128_t, ctrl_uint128_t>;
     using binary_op_u128_vect_t = std::vector<binary_op_u128_t>;
     	
-    template<typename Invocable>
+    template<invocable Invocable>
     void execute_test(Invocable test, std::string_view test_name);
 
     ctrl_uint128_t to_ctrl(uint128_t convert);
@@ -95,13 +101,17 @@ namespace cjm::uint128_tests
     void execute_stream_insert_bin_op_test();
     void execute_print_generated_filename_test();
     void execute_generate_addition_ops_rt_ser_deser_test();
+    void execute_addition_tests();
     void execute_parse_file_test(std::string_view path, size_t expected_ops);
+    void print_n_static_assertions(const binary_op_u128_vect_t& op_vec, size_t n);
 
     constexpr auto base_bin_op_filename = "binary_ops"sv;
     constexpr auto bin_op_failed_test_tag = "failed_test"sv;
     constexpr auto bin_op_generated_tag = "generated"sv;
     constexpr auto bin_op_extension = "txt"sv;
-    std::string create_generated_bin_op_filename(binary_op op);
+    std::filesystem::path create_generated_bin_op_filename(binary_op op);
+
+    std::filesystem::path create_failing_op_pathname(binary_op op);
 	
     template<numerics::concepts::character Char>
     std::basic_ostream<Char, std::char_traits<Char>>& operator<<(std::basic_ostream<Char,
@@ -123,6 +133,8 @@ namespace cjm::uint128_tests
     binary_op_u128_t parse(std::basic_string_view<Char> sv);
 
     binary_op_u128_vect_t generate_easy_ops(size_t num_ops, binary_op op, bool include_standard_tests);
+
+    void test_binary_operation(binary_op_u128_t& op, std::string_view test_name);
 	
     namespace u128_testing_constant_providers
     {
@@ -249,6 +261,59 @@ namespace cjm::uint128_tests
         	using half_provider_t = testing_constant_provider<half_uint_t>;
         };
     }
+    template<invocable Invocable>
+    void execute_test(Invocable test, std::string_view test_name)
+    {
+        cout_saver o_saver{ cout };
+        cout_saver e_saver{ std::cerr };
+
+        cout << "Beginning test: [" << test_name << "]:" << newl;
+        try
+        {
+            test();
+            cout << "Test [" << test_name << "] PASSED" << newl << newl;
+        }
+        catch (const std::exception& ex)
+        {
+            std::stringstream ss;
+            ss << "Test [" << test_name << "] failed with exception message: [" << ex.what() << "]." << newl;
+            std::cerr << ss.str();
+            throw;
+        }
+    }
+
+	[[maybe_unused]] inline void compile_time_addition_test() noexcept
+    {
+        static_assert(340282366920938463463374607431768211455_u128 + 340282366920938463463374607431768211455_u128 == 340282366920938463463374607431768211454_u128);
+        static_assert(340282366920938463463374607431768211455_u128 + 340282366920938463463374607431768211454_u128 == 340282366920938463463374607431768211453_u128);
+        static_assert(340282366920938463463374607431768211455_u128 + 0_u128 == 340282366920938463463374607431768211455_u128);
+        static_assert(340282366920938463463374607431768211455_u128 + 1_u128 == 0_u128);
+        static_assert(340282366920938463463374607431768211455_u128 + 18446744073709551615_u128 == 18446744073709551614_u128);
+        static_assert(340282366920938463463374607431768211455_u128 + 340282366920938463463374607431768211454_u128 == 340282366920938463463374607431768211453_u128);
+        static_assert(340282366920938463463374607431768211455_u128 + 18446744073709551616_u128 == 18446744073709551615_u128);
+        static_assert(340282366920938463463374607431768211454_u128 + 340282366920938463463374607431768211454_u128 == 340282366920938463463374607431768211452_u128);
+        static_assert(340282366920938463463374607431768211454_u128 + 0_u128 == 340282366920938463463374607431768211454_u128);
+        static_assert(340282366920938463463374607431768211454_u128 + 1_u128 == 340282366920938463463374607431768211455_u128);
+        static_assert(340282366920938463463374607431768211454_u128 + 18446744073709551615_u128 == 18446744073709551613_u128);
+        static_assert(340282366920938463463374607431768211454_u128 + 340282366920938463463374607431768211454_u128 == 340282366920938463463374607431768211452_u128);
+        static_assert(340282366920938463463374607431768211454_u128 + 18446744073709551616_u128 == 18446744073709551614_u128);
+        static_assert(0_u128 + 0_u128 == 0_u128);
+        static_assert(0_u128 + 1_u128 == 1_u128);
+        static_assert(0_u128 + 18446744073709551615_u128 == 18446744073709551615_u128);
+        static_assert(0_u128 + 340282366920938463463374607431768211454_u128 == 340282366920938463463374607431768211454_u128);
+        static_assert(0_u128 + 18446744073709551616_u128 == 18446744073709551616_u128);
+        static_assert(1_u128 + 1_u128 == 2_u128);
+        static_assert(1_u128 + 18446744073709551615_u128 == 18446744073709551616_u128);
+        static_assert(1_u128 + 340282366920938463463374607431768211454_u128 == 340282366920938463463374607431768211455_u128);
+        static_assert(1_u128 + 18446744073709551616_u128 == 18446744073709551617_u128);
+        static_assert(18446744073709551615_u128 + 18446744073709551615_u128 == 36893488147419103230_u128);
+        static_assert(18446744073709551615_u128 + 340282366920938463463374607431768211454_u128 == 18446744073709551613_u128);
+        static_assert(18446744073709551615_u128 + 18446744073709551616_u128 == 36893488147419103231_u128);
+        static_assert(340282366920938463463374607431768211454_u128 + 340282366920938463463374607431768211454_u128 == 340282366920938463463374607431768211452_u128);
+        static_assert(340282366920938463463374607431768211454_u128 + 18446744073709551616_u128 == 18446744073709551614_u128);
+        static_assert(18446744073709551616_u128 + 18446744073709551616_u128 == 36893488147419103232_u128);
+    }
+	
 }
 
 namespace std
@@ -690,7 +755,7 @@ namespace cjm::uint128_tests
         std::optional<std::pair<uint_test_t, uint_test_t>> m_result;   
 
 };
-
+	
 	template<numerics::concepts::character Char>
 	std::basic_ostream<Char, std::char_traits<Char>>& operator<<(std::basic_ostream<Char,
     std::char_traits<Char>>&os, const binary_op_u128_t& op)
@@ -922,13 +987,11 @@ namespace cjm::uint128_tests
 	{
         using uint_test_t = typename binary_operation<TestType, ControlType>::uint_test_t;
         auto saver = cout_saver{ strm };
-        strm << "static_assert(0x"
-            << std::hex << std::setfill('0')
-            << bin_op.left_operand() << "_u" << std::dec
+        strm << "static_assert("
+            << std::dec << bin_op.left_operand() << "_u" << std::dec
             << std::numeric_limits<uint_test_t>::digits
             << " " << op_symbol_lookup[static_cast<unsigned>(bin_op.op_code())]
-            << " 0x" << std::hex << std::setfill('0')
-            << bin_op.right_operand() << "_u" << std::dec
+            << " " << std::dec << bin_op.right_operand() << "_u" << std::dec
             << std::numeric_limits<uint_test_t>::digits << " == ";
         if (!bin_op.has_correct_result())
         {
@@ -949,36 +1012,20 @@ namespace cjm::uint128_tests
             }
             else
             {
-                strm << "0x" << std::hex << std::setfill('0') << value << "_u" << std::dec
+                strm << std::dec << value << "_u" << std::dec
                     << std::numeric_limits<uint_test_t>::digits;
             }
         }
         strm << ");" << newl;
 	    return strm;
 	}
+
+
+	
 }
 
 
-template<typename Invocable>
-void cjm::uint128_tests::execute_test(Invocable test, std::string_view test_name)
-{
-    cout_saver o_saver{cout};
-    cout_saver e_saver{std::cerr};
 
-    cout << "Beginning test: [" << test_name << "]:" << newl;
-    try
-    {
-        test();
-        cout << "Test [" << test_name << "] PASSED" << newl << newl;
-    }
-    catch (const std::exception& ex)
-    {
-        std::stringstream ss;
-        ss << "Test [" << test_name << "] failed with exception message: [" << ex.what() << "]." << newl;
-        std::cerr << ss.str();
-        throw;
-    }
-}
 
 
 constexpr cjm::uint128_tests::sv_t cjm::uint128_tests::get_op_text(binary_op op)

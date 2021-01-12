@@ -2,6 +2,7 @@
 #define CJM_STRING_HPP_
 #include <iostream>
 #include <iomanip>
+#include <filesystem>
 #include <string>
 #include <string_view>
 #include <sstream>
@@ -36,6 +37,12 @@ namespace cjm::string
     template<numerics::concepts::utf32_char_allocator Allocator = std::allocator<char32_t>>
     using u32string_stream_t = std::basic_stringstream<char32_t, std::char_traits<char32_t>, Allocator>;
 
+    using path_t = std::filesystem::path;
+    using path_char_t = std::filesystem::path::value_type;
+    using path_str_t = std::filesystem::path::string_type;
+    using path_sv_t = std::basic_string_view<path_char_t>;
+    using path_format_t = std::filesystem::path::format;
+	
     template<typename Char, typename CharTraits = std::char_traits<Char>, typename Allocator = std::allocator<Char>>
     requires numerics::concepts::char_with_traits_and_allocator<Char, CharTraits, Allocator>
     std::basic_stringstream<Char, CharTraits, Allocator> make_throwing_sstream()
@@ -62,6 +69,26 @@ namespace cjm::string
     {
         using stream_t = std::basic_ifstream<Char, CharTraits>;
         auto stream = stream_t{ file_name.data() };
+        stream.exceptions(stream_t::failbit | stream_t::badbit);
+        return stream;
+    }
+
+    template<typename Char, typename CharTraits = std::char_traits<Char>>
+    requires numerics::concepts::char_with_traits<Char, CharTraits>
+        std::basic_ofstream<Char, CharTraits> make_throwing_ofstream(path_t file_name)
+    {
+        using stream_t = std::basic_ofstream<Char, CharTraits>;
+        auto stream = stream_t{ file_name };
+        stream.exceptions(stream_t::failbit | stream_t::badbit);
+        return stream;
+    }
+
+    template<typename Char, typename CharTraits = std::char_traits<Char>>
+    requires numerics::concepts::char_with_traits<Char, CharTraits>
+        std::basic_ifstream<Char, CharTraits> make_throwing_ifstream(path_t file_name)
+    {
+        using stream_t = std::basic_ifstream<Char, CharTraits>;
+        auto stream = stream_t{ file_name };
         stream.exceptions(stream_t::failbit | stream_t::badbit);
         return stream;
     }
