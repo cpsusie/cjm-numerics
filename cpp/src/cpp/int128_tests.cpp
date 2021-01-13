@@ -176,6 +176,7 @@ void cjm::uint128_tests::execute_uint128_tests()
     execute_test(execute_stream_insert_bin_op_test, "stream_insert_bin_op_test"sv);
     execute_test(execute_addition_tests, "addition_tests"sv);
     execute_test(execute_shift_tests, "shift_tests"sv);
+    execute_test(execute_bw_tests, "bw_tests"sv);
 	
     cout << "All tests PASSED." << newl;
 }
@@ -382,7 +383,8 @@ void cjm::uint128_tests::execute_basic_multiplication_test()
 
     cjm_assert(test_zero_times_one / one == zero);
     cjm_assert(test_one_times_one / one == one);
-    cjm_assert(test_max64_times_max64_less_one / max64_less_one == max64 && test_max64_times_max64_less_one / max64 == max64_less_one);
+    cjm_assert(test_max64_times_max64_less_one / max64_less_one == 
+        max64 && test_max64_times_max64_less_one / max64 == max64_less_one);
 
 
     ctrl_uint128_t ctrl_fit_times_big_one = to_ctrl(test_fit_times_big_one);
@@ -651,6 +653,7 @@ namespace cjm::uint128_tests::generator::internal
     class rgen_impl final
     {
     public:
+        friend class rgen;
         static std::unique_ptr<rgen_impl> make_rgen();
         ~rgen_impl() = default;
         rgen_impl(const rgen_impl& other) = delete;
@@ -852,6 +855,9 @@ cjm::uint128_tests::generator::rgen& cjm::uint128_tests::generator::rgen::operat
     }
     return *this;
 }
+
+
+
 
 cjm::uint128_tests::binary_op cjm::uint128_tests::generator::rgen::
 random_op(binary_op_category category) const
@@ -1253,6 +1259,28 @@ void cjm::uint128_tests::execute_shift_tests()
     //print_n_static_assertions(op_vec, expected_standard_ops);
 }
 
+void cjm::uint128_tests::execute_bw_tests()
+{
+    constexpr auto test_name = "bw_tests"sv;
+    constexpr size_t rand_ops = 102;
+    static_assert(rand_ops > 0 && rand_ops % 3 == 0, "Need a positive number divisible by three.");
+    constexpr size_t num_standard_values = u128_testing_constant_providers::testing_constant_provider<uint128_t>::all_values.size();
+    constexpr size_t expected_standard_ops = (((num_standard_values * num_standard_values) + num_standard_values) / 2) * 3;
+    constexpr size_t expected_random_ops = rand_ops;
+    constexpr size_t expected_total = expected_random_ops + expected_standard_ops;
+    auto op_vec = generate_bw_ops(rand_ops, true);
+    cjm_assert(op_vec.size() == expected_total);
+    std::cout << "  Executing " << op_vec.size() << " shifting tests: " << newl;
+    for (auto& binary_operation : op_vec)
+    {
+        test_binary_operation(binary_operation, test_name);
+    }
+    std::cout << "All " << op_vec.size() << " tests PASS." << newl;
+    auto rgen = generator::rgen{};
+    rgen.shuffle(op_vec, expected_standard_ops);
+    //print_n_static_assertions(op_vec, expected_standard_ops / 3);
+}
+
 std::filesystem::path cjm::uint128_tests::create_generated_bin_op_filename(binary_op op)
 {
     return construct_bin_op_filename(op, bin_op_generated_tag);
@@ -1332,6 +1360,57 @@ cjm::uint128_tests::binary_op_u128_vect_t cjm::uint128_tests::generate_shift_ops
             ret.emplace_back(binary_op::left_shift, lhs, rhs);
             ret.emplace_back(binary_op::right_shift, lhs, rhs);
             added += 2;
+        }
+    }
+    return ret;
+}
+
+cjm::uint128_tests::binary_op_u128_vect_t cjm::uint128_tests::generate_bw_ops(size_t num_ops,
+	bool include_standard_tests)
+{
+    using provider_t = u128_testing_constant_providers::testing_constant_provider<uint128_t>;
+    binary_op_u128_vect_t ret;
+    if (include_standard_tests)
+    {
+        for (size_t i = 0; i < provider_t::all_values.size(); ++i)
+        for (size_t j = i; j < provider_t::all_values.size(); ++j)
+        {
+			const auto& lhs = provider_t::all_values[i];
+            const auto& rhs = provider_t::all_values[j];
+            ret.emplace_back(binary_op::bw_and, lhs, rhs);
+            ret.emplace_back(binary_op::bw_or, lhs, rhs);
+            ret.emplace_back(binary_op::bw_xor, lhs, rhs);
+        }                
+    }
+    if (num_ops > 0)
+    {
+        auto mod = num_ops % 3;
+    	if (mod != 0)
+    	{
+            auto saver = cout_saver{ std::cerr };
+            auto old = num_ops;
+            num_ops += (3 - mod);
+            assert(num_ops % 3 == 0);
+            std::cerr   << "Unable to produce " << std::dec << old
+    					<< " bitwise operations: the number is not divisible by 3."
+    					<< "  Will produce " << num_ops
+    					<< " bitwise operations instead." << newl;    		
+    	}
+    	
+        if (ret.capacity() < ret.size() + num_ops)
+        {
+            ret.reserve(num_ops);
+        }
+        size_t added = 0;
+        auto gen = generator::rgen{};
+        while (added < num_ops)
+        {
+            auto lhs = generator::create_random_in_range<uint128_t>(gen);
+            auto rhs = generator::create_random_in_range<uint128_t>(gen);
+            ret.emplace_back(binary_op::bw_and, lhs, rhs);
+            ret.emplace_back(binary_op::bw_or, lhs, rhs);
+            ret.emplace_back(binary_op::bw_xor, lhs, rhs);
+            added += 3;
         }
     }
     return ret;
@@ -1479,6 +1558,38 @@ void cjm::uint128_tests::compile_time_shift_test() noexcept
     static_assert((18446744073709551615_u128 >> 16_u128) == 281474976710655_u128);
     static_assert((18446744073709551615_u128 << 17_u128) == 2417851639229258349281280_u128);
 }
+
+void cjm::uint128_tests::compile_time_bw_test() noexcept
+{
+    static_assert((340282366920938463463374607431768211454_u128 ^ 18446744073709551616_u128) == 340282366920938463444927863358058659838_u128);
+    static_assert((340282366920938463463374607431768211454_u128 | 18446744073709551616_u128) == 340282366920938463463374607431768211454_u128);
+    static_assert((340282366920938463463374607431768211455_u128 ^ 340282366920938463463374607431768211454_u128) == 1_u128);
+    static_assert((340282366920938463463374607431768211454_u128 | 1_u128) == 340282366920938463463374607431768211455_u128);
+    static_assert((340282366920938463463374607431768211455_u128 & 18446744073709551615_u128) == 18446744073709551615_u128);
+    static_assert((340282366920938463463374607431768211454_u128 | 340282366920938463463374607431768211454_u128) == 340282366920938463463374607431768211454_u128);
+    static_assert((340282366920938463463374607431768211454_u128 ^ 340282366920938463463374607431768211454_u128) == 0_u128);
+    static_assert((340282366920938463463374607431768211454_u128 & 0_u128) == 0_u128);
+    static_assert((340282366920938463463374607431768211455_u128 ^ 340282366920938463463374607431768211454_u128) == 1_u128);
+    static_assert((1_u128 ^ 18446744073709551616_u128) == 18446744073709551617_u128);
+    static_assert((1_u128 ^ 1_u128) == 0_u128);
+    static_assert((340282366920938463463374607431768211454_u128 & 340282366920938463463374607431768211454_u128) == 340282366920938463463374607431768211454_u128);
+    static_assert((340282366920938463463374607431768211455_u128 ^ 340282366920938463463374607431768211455_u128) == 0_u128);
+    static_assert((340282366920938463463374607431768211454_u128 ^ 18446744073709551616_u128) == 340282366920938463444927863358058659838_u128);
+    static_assert((1_u128 | 1_u128) == 1_u128);
+    static_assert((1_u128 & 1_u128) == 1_u128);
+    static_assert((340282366920938463463374607431768211454_u128 & 1_u128) == 0_u128);
+    static_assert((340282366920938463463374607431768211455_u128 | 1_u128) == 340282366920938463463374607431768211455_u128);
+    static_assert((340282366920938463463374607431768211455_u128 & 18446744073709551616_u128) == 18446744073709551616_u128);
+    static_assert((340282366920938463463374607431768211454_u128 & 340282366920938463463374607431768211454_u128) == 340282366920938463463374607431768211454_u128);
+    static_assert((0_u128 ^ 1_u128) == 1_u128);
+    static_assert((340282366920938463463374607431768211455_u128 | 18446744073709551616_u128) == 340282366920938463463374607431768211455_u128);
+    static_assert((18446744073709551615_u128 | 340282366920938463463374607431768211454_u128) == 340282366920938463463374607431768211455_u128);
+    static_assert((340282366920938463463374607431768211454_u128 ^ 0_u128) == 340282366920938463463374607431768211454_u128);
+    static_assert((340282366920938463463374607431768211454_u128 ^ 1_u128) == 340282366920938463463374607431768211455_u128);
+    static_assert((18446744073709551615_u128 ^ 340282366920938463463374607431768211454_u128) == 340282366920938463444927863358058659841_u128);
+    static_assert((340282366920938463463374607431768211455_u128 ^ 18446744073709551616_u128) == 340282366920938463444927863358058659839_u128);
+    static_assert((0_u128 | 18446744073709551616_u128) == 18446744073709551616_u128);
+}
 //void cjm::uint128_tests::execute_gen_comp_ops_test()
 //{
 //    auto rgen = cjm::uint128_tests::generator::rgen{};
@@ -1487,6 +1598,19 @@ void cjm::uint128_tests::compile_time_shift_test() noexcept
 //    auto v = generator::create_compare_op(rgen);
 //    cjm_assert(v.size() == num_ops);
 //}
+void cjm::uint128_tests::generator::rgen::shuffle(binary_op_u128_vect_t& vec, size_t shuffle_depth)
+{
+    if (shuffle_depth > vec.size())
+    {
+        auto strm = string::make_throwing_sstream<char>();
+        strm << "shuffle_deck parameter (value: " << shuffle_depth << ") is greater than size of vector (size: " << vec.size() << ").";
+        throw std::invalid_argument{ strm.str() };
+    }
+    auto begin = vec.begin();
+    auto end = begin + shuffle_depth;
+    assert(end <= vec.end());
+    std::shuffle(begin, end, m_gen->m_twister);        
+}
 
 #ifdef CJM_HAVE_BUILTIN_128
 void cjm::uint128_tests::execute_builtin_u128fls_test_if_avail()

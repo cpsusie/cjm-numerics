@@ -528,13 +528,7 @@ namespace cjm
 {
 	namespace numerics
 	{
-		namespace literals
-		{
-			constexpr size_t operator"" _szt(unsigned long long val)
-			{
-                return static_cast<size_t>(val);
-			}
-		}
+		
 		namespace fixed_uint_literals
 		{
 			class fixed_uint_lit_helper;

@@ -40,11 +40,11 @@ namespace cjm
 		class testing_failure : public std::domain_error 
 		{
 		public:
-			explicit testing_failure(const std::string& _Message)
-				: domain_error(_Message) {}
+			explicit testing_failure(const std::string& msg)
+				: domain_error(msg) {}
 
-			explicit testing_failure(const char* _Message)
-				: domain_error(_Message) {}
+			explicit testing_failure(const char* msg)
+				: domain_error(msg) {}
 		};
 
 		template<typename Predicate>

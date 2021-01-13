@@ -145,6 +145,15 @@ namespace cjm
 		template<typename To, typename From>
 		requires cjm::numerics::concepts::bit_castable<To, From>
 		CJM_BIT_CAST_CONST To bit_cast(const From& f) noexcept;
+
+		namespace literals
+		{
+			
+			constexpr size_t operator"" _szt(unsigned long long u) noexcept 
+			{
+				return static_cast<size_t>(u);
+			}		
+		}
 		
 		namespace math_functions
 		{

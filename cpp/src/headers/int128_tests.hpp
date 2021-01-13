@@ -103,6 +103,7 @@ namespace cjm::uint128_tests
     void execute_generate_addition_ops_rt_ser_deser_test();
     void execute_addition_tests();
     void execute_shift_tests();
+    void execute_bw_tests();
     void execute_parse_file_test(std::string_view path, size_t expected_ops);
     [[maybe_unused]] void print_n_static_assertions(const binary_op_u128_vect_t& op_vec, size_t n);
 
@@ -134,8 +135,9 @@ namespace cjm::uint128_tests
     binary_op_u128_t parse(std::basic_string_view<Char> sv);
 
     binary_op_u128_vect_t generate_easy_ops(size_t num_ops, binary_op op, bool include_standard_tests);
-
     binary_op_u128_vect_t generate_shift_ops(size_t num_ops, bool include_standard_tests);
+    binary_op_u128_vect_t generate_bw_ops(size_t num_ops, bool include_standard_tests);
+	
 
     void test_binary_operation(binary_op_u128_t& op, std::string_view test_name);
 	
@@ -287,6 +289,7 @@ namespace cjm::uint128_tests
 
     [[maybe_unused]] void compile_time_addition_test() noexcept;
     [[maybe_unused]] void compile_time_shift_test() noexcept;
+    [[maybe_unused]] void compile_time_bw_test() noexcept;
 	
 }
 
@@ -1188,6 +1191,8 @@ namespace cjm::uint128_tests::generator
         rgen& operator=(rgen&& other) noexcept;
         ~rgen() = default;
 
+        void shuffle(binary_op_u128_vect_t& vec, size_t shuffle_depth);
+    	
         friend bool operator==(const rgen& lhs, const rgen& rhs) noexcept;
         friend bool operator!=(const rgen& lhs, const rgen& rhs) noexcept;
         friend struct std::hash<rgen>;
