@@ -102,6 +102,7 @@ namespace cjm::uint128_tests
     void execute_print_generated_filename_test();
     void execute_generate_addition_ops_rt_ser_deser_test();
     void execute_addition_tests();
+    void execute_subtraction_tests();
     void execute_shift_tests();
     void execute_bw_tests();
     void execute_parse_file_test(std::string_view path, size_t expected_ops);
@@ -290,6 +291,7 @@ namespace cjm::uint128_tests
     [[maybe_unused]] void compile_time_addition_test() noexcept;
     [[maybe_unused]] void compile_time_shift_test() noexcept;
     [[maybe_unused]] void compile_time_bw_test() noexcept;
+    [[maybe_unused]] void compile_time_subtraction_test() noexcept;
 	
 }
 

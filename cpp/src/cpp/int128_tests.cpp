@@ -177,6 +177,7 @@ void cjm::uint128_tests::execute_uint128_tests()
     execute_test(execute_addition_tests, "addition_tests"sv);
     execute_test(execute_shift_tests, "shift_tests"sv);
     execute_test(execute_bw_tests, "bw_tests"sv);
+    execute_test(execute_subtraction_tests, "subtraction_tests"sv);
 	
     cout << "All tests PASSED." << newl;
 }
@@ -1240,6 +1241,26 @@ void cjm::uint128_tests::execute_addition_tests()
     //print_n_static_assertions(op_vect, num_standard_ops);
 }
 
+void cjm::uint128_tests::execute_subtraction_tests()
+{
+    constexpr auto test_name = "subtraction_tests"sv;
+    constexpr binary_op operation = binary_op::subtract;
+    constexpr size_t ops = 1'000;
+    constexpr size_t num_standard_values = u128_testing_constant_providers::testing_constant_provider<uint128_t>::all_values.size();
+    constexpr size_t num_standard_ops = ((num_standard_values * num_standard_values) + num_standard_values) / 2;
+    constexpr size_t num_expected = ops + num_standard_ops;
+
+    auto op_vect = generate_easy_ops(ops, operation, true);
+    cjm_assert(op_vect.size() == num_expected);
+    std::cout << "  Executing " << op_vect.size() << " subtraction tests: " << newl;
+    for (auto& binary_operation : op_vect)
+    {
+        test_binary_operation(binary_operation, test_name);
+    }
+    std::cout << "All " << op_vect.size() << " tests PASS." << newl;
+    //print_n_static_assertions(op_vect, num_standard_ops);
+}
+
 void cjm::uint128_tests::execute_shift_tests()
 {
     constexpr auto test_name = "shift_tests"sv;
@@ -1302,7 +1323,7 @@ cjm::uint128_tests::binary_op_u128_vect_t cjm::uint128_tests::generate_easy_ops(
 	{
         for (size_t i = 0; i < provider_t::all_values.size(); ++i)
             for (size_t j = i; j < provider_t::all_values.size(); ++j)
-                ret.emplace_back(binary_op::add, provider_t::all_values[i], provider_t::all_values[j]);
+                ret.emplace_back(op, provider_t::all_values[i], provider_t::all_values[j]);
 	}
     if (num_ops > 0)
     {
@@ -1314,7 +1335,7 @@ cjm::uint128_tests::binary_op_u128_vect_t cjm::uint128_tests::generate_easy_ops(
         auto gen = generator::rgen{};
     	while (added < num_ops)
     	{
-            ret.emplace_back(binary_op::add, generator::create_random_in_range<uint128_t>(gen), generator::create_random_in_range<uint128_t>(gen));
+            ret.emplace_back(op, generator::create_random_in_range<uint128_t>(gen), generator::create_random_in_range<uint128_t>(gen));
             ++added;
     	}       
     }
@@ -1589,6 +1610,38 @@ void cjm::uint128_tests::compile_time_bw_test() noexcept
     static_assert((18446744073709551615_u128 ^ 340282366920938463463374607431768211454_u128) == 340282366920938463444927863358058659841_u128);
     static_assert((340282366920938463463374607431768211455_u128 ^ 18446744073709551616_u128) == 340282366920938463444927863358058659839_u128);
     static_assert((0_u128 | 18446744073709551616_u128) == 18446744073709551616_u128);
+}
+
+void cjm::uint128_tests::compile_time_subtraction_test() noexcept
+{
+    static_assert(340282366920938463463374607431768211455_u128 - 340282366920938463463374607431768211455_u128 == 0_u128);
+    static_assert(340282366920938463463374607431768211455_u128 - 340282366920938463463374607431768211454_u128 == 1_u128);
+    static_assert(340282366920938463463374607431768211455_u128 - 0_u128 == 340282366920938463463374607431768211455_u128);
+    static_assert(340282366920938463463374607431768211455_u128 - 1_u128 == 340282366920938463463374607431768211454_u128);
+    static_assert(340282366920938463463374607431768211455_u128 - 18446744073709551615_u128 == 340282366920938463444927863358058659840_u128);
+    static_assert(340282366920938463463374607431768211455_u128 - 340282366920938463463374607431768211454_u128 == 1_u128);
+    static_assert(340282366920938463463374607431768211455_u128 - 18446744073709551616_u128 == 340282366920938463444927863358058659839_u128);
+    static_assert(340282366920938463463374607431768211454_u128 - 340282366920938463463374607431768211454_u128 == 0_u128);
+    static_assert(340282366920938463463374607431768211454_u128 - 0_u128 == 340282366920938463463374607431768211454_u128);
+    static_assert(340282366920938463463374607431768211454_u128 - 1_u128 == 340282366920938463463374607431768211453_u128);
+    static_assert(340282366920938463463374607431768211454_u128 - 18446744073709551615_u128 == 340282366920938463444927863358058659839_u128);
+    static_assert(340282366920938463463374607431768211454_u128 - 340282366920938463463374607431768211454_u128 == 0_u128);
+    static_assert(340282366920938463463374607431768211454_u128 - 18446744073709551616_u128 == 340282366920938463444927863358058659838_u128);
+    static_assert(0_u128 - 0_u128 == 0_u128);
+    static_assert(0_u128 - 1_u128 == 340282366920938463463374607431768211455_u128);
+    static_assert(0_u128 - 18446744073709551615_u128 == 340282366920938463444927863358058659841_u128);
+    static_assert(0_u128 - 340282366920938463463374607431768211454_u128 == 2_u128);
+    static_assert(0_u128 - 18446744073709551616_u128 == 340282366920938463444927863358058659840_u128);
+    static_assert(1_u128 - 1_u128 == 0_u128);
+    static_assert(1_u128 - 18446744073709551615_u128 == 340282366920938463444927863358058659842_u128);
+    static_assert(1_u128 - 340282366920938463463374607431768211454_u128 == 3_u128);
+    static_assert(1_u128 - 18446744073709551616_u128 == 340282366920938463444927863358058659841_u128);
+    static_assert(18446744073709551615_u128 - 18446744073709551615_u128 == 0_u128);
+    static_assert(18446744073709551615_u128 - 340282366920938463463374607431768211454_u128 == 18446744073709551617_u128);
+    static_assert(18446744073709551615_u128 - 18446744073709551616_u128 == 340282366920938463463374607431768211455_u128);
+    static_assert(340282366920938463463374607431768211454_u128 - 340282366920938463463374607431768211454_u128 == 0_u128);
+    static_assert(340282366920938463463374607431768211454_u128 - 18446744073709551616_u128 == 340282366920938463444927863358058659838_u128);
+    static_assert(18446744073709551616_u128 - 18446744073709551616_u128 == 0_u128);
 }
 //void cjm::uint128_tests::execute_gen_comp_ops_test()
 //{
