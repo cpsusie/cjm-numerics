@@ -653,7 +653,7 @@ namespace cjm::uint128_tests::generator::internal
     class rgen_impl final
     {
     public:
-        friend class rgen;
+        friend class cjm::uint128_tests::generator::rgen;
         static std::unique_ptr<rgen_impl> make_rgen();
         ~rgen_impl() = default;
         rgen_impl(const rgen_impl& other) = delete;
