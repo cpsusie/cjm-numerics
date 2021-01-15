@@ -178,7 +178,7 @@ void cjm::uint128_tests::execute_uint128_tests()
     execute_test(execute_shift_tests, "shift_tests"sv);
     execute_test(execute_bw_tests, "bw_tests"sv);
     execute_test(execute_subtraction_tests, "subtraction_tests"sv);
-	
+    execute_test(execute_comparison_tests, "comparison_tests"sv);
     cout << "All tests PASSED." << newl;
 }
 
@@ -201,23 +201,24 @@ void cjm::uint128_tests::execute_parse_file_test(std::string_view path, size_t e
 
 void cjm::uint128_tests::print_n_static_assertions(const binary_op_u128_vect_t& op_vec, size_t n)
 {
+    auto saver = cout_saver{ cout };
 	if (op_vec.empty())
 	{
-        std::cerr << "Cannot print " << n << " static assertions: vector contains no operations." << newl;
+        std::cerr << "Cannot print " << std::dec << n << " static assertions: vector contains no operations." << newl;
 	}
     else
     {
 		if (op_vec.size() < n)
 		{
-            std::cerr << "Cannot print " << n << " static assertions: vector contains only " << op_vec.size() << " operations.  Will print " << op_vec.size() << " assertions instead." << newl;
+            std::cerr << "Cannot print " << std::dec << n << " static assertions: vector contains only " << op_vec.size() << " operations.  Will print " << op_vec.size() << " assertions instead." << newl;
 			n = op_vec.size();			
 		}
-        std::cout << " Printing " << n << " static assertions: " << newl;
+        std::cout << " Printing " << std::dec << n << " static assertions: " << newl;
     	for (size_t i = 0; i < n; ++i)
     	{
             append_static_assertion(std::cout, op_vec[i]) << newl;
     	}
-    	std::cout << "DONE printing " << n << " static assertions: " << newl;
+    	std::cout << "DONE printing " << std::dec << n << " static assertions: " << newl;
     }    
 }
 
@@ -1302,6 +1303,26 @@ void cjm::uint128_tests::execute_bw_tests()
     //print_n_static_assertions(op_vec, expected_standard_ops / 3);
 }
 
+void cjm::uint128_tests::execute_comparison_tests()
+{
+    constexpr auto test_name = "comparison_tests"sv;
+    constexpr binary_op operation = binary_op::compare;
+    constexpr size_t ops = 1'000;
+    constexpr size_t num_standard_values = u128_testing_constant_providers::testing_constant_provider<uint128_t>::all_values.size();
+    constexpr size_t num_standard_ops = ((num_standard_values * num_standard_values) + num_standard_values) / 2;
+    constexpr size_t num_expected = ops + num_standard_ops;
+
+    auto op_vect = generate_easy_ops(ops, operation, true);
+    cjm_assert(op_vect.size() == num_expected);
+    std::cout << "  Executing " << op_vect.size() << " comparison tests: " << newl;
+    for (auto& binary_operation : op_vect)
+    {
+        test_binary_operation(binary_operation, test_name);
+    }
+    std::cout << "All " << op_vect.size() << " tests PASS." << newl;
+    //print_n_static_assertions(op_vect, num_standard_ops);
+}
+
 std::filesystem::path cjm::uint128_tests::create_generated_bin_op_filename(binary_op op)
 {
     return construct_bin_op_filename(op, bin_op_generated_tag);
@@ -1335,7 +1356,8 @@ cjm::uint128_tests::binary_op_u128_vect_t cjm::uint128_tests::generate_easy_ops(
         auto gen = generator::rgen{};
     	while (added < num_ops)
     	{
-            ret.emplace_back(op, generator::create_random_in_range<uint128_t>(gen), generator::create_random_in_range<uint128_t>(gen));
+            ret.emplace_back(op, generator::create_random_in_range<uint128_t>(gen),
+                generator::create_random_in_range<uint128_t>(gen));
             ++added;
     	}       
     }
@@ -1643,6 +1665,41 @@ void cjm::uint128_tests::compile_time_subtraction_test() noexcept
     static_assert(340282366920938463463374607431768211454_u128 - 18446744073709551616_u128 == 340282366920938463444927863358058659838_u128);
     static_assert(18446744073709551616_u128 - 18446744073709551616_u128 == 0_u128);
 }
+
+void cjm::uint128_tests::compile_time_comparison_test() noexcept
+{
+    // ReSharper disable CppIdenticalOperandsInBinaryExpression
+    static_assert((340282366920938463463374607431768211455_u128 <=> 340282366920938463463374607431768211455_u128) == std::strong_ordering::equal);
+    static_assert((340282366920938463463374607431768211455_u128 <=> 340282366920938463463374607431768211454_u128) == std::strong_ordering::greater);
+    static_assert((340282366920938463463374607431768211455_u128 <=> 0_u128) == std::strong_ordering::greater);
+    static_assert((340282366920938463463374607431768211455_u128 <=> 1_u128) == std::strong_ordering::greater);
+    static_assert((340282366920938463463374607431768211455_u128 <=> 18446744073709551615_u128) == std::strong_ordering::greater);
+    static_assert((340282366920938463463374607431768211455_u128 <=> 340282366920938463463374607431768211454_u128) == std::strong_ordering::greater);
+    static_assert((340282366920938463463374607431768211455_u128 <=> 18446744073709551616_u128) == std::strong_ordering::greater);
+    static_assert((340282366920938463463374607431768211454_u128 <=> 340282366920938463463374607431768211454_u128) == std::strong_ordering::equal);
+    static_assert((340282366920938463463374607431768211454_u128 <=> 0_u128) == std::strong_ordering::greater);
+    static_assert((340282366920938463463374607431768211454_u128 <=> 1_u128) == std::strong_ordering::greater);
+    static_assert((340282366920938463463374607431768211454_u128 <=> 18446744073709551615_u128) == std::strong_ordering::greater);
+    static_assert((340282366920938463463374607431768211454_u128 <=> 340282366920938463463374607431768211454_u128) == std::strong_ordering::equal);
+    static_assert((340282366920938463463374607431768211454_u128 <=> 18446744073709551616_u128) == std::strong_ordering::greater);
+    static_assert((0_u128 <=> 0_u128) == std::strong_ordering::equal);
+    static_assert((0_u128 <=> 1_u128) == std::strong_ordering::less);
+    static_assert((0_u128 <=> 18446744073709551615_u128) == std::strong_ordering::less);
+    static_assert((0_u128 <=> 340282366920938463463374607431768211454_u128) == std::strong_ordering::less);
+    static_assert((0_u128 <=> 18446744073709551616_u128) == std::strong_ordering::less);
+    static_assert((1_u128 <=> 1_u128) == std::strong_ordering::equal);
+    static_assert((1_u128 <=> 18446744073709551615_u128) == std::strong_ordering::less);
+    static_assert((1_u128 <=> 340282366920938463463374607431768211454_u128) == std::strong_ordering::less);
+    static_assert((1_u128 <=> 18446744073709551616_u128) == std::strong_ordering::less);
+    static_assert((18446744073709551615_u128 <=> 18446744073709551615_u128) == std::strong_ordering::equal);
+    static_assert((18446744073709551615_u128 <=> 340282366920938463463374607431768211454_u128) == std::strong_ordering::less);
+    static_assert((18446744073709551615_u128 <=> 18446744073709551616_u128) == std::strong_ordering::less);
+    static_assert((340282366920938463463374607431768211454_u128 <=> 340282366920938463463374607431768211454_u128) == std::strong_ordering::equal);
+    static_assert((340282366920938463463374607431768211454_u128 <=> 18446744073709551616_u128) == std::strong_ordering::greater);
+    static_assert((18446744073709551616_u128 <=> 18446744073709551616_u128) == std::strong_ordering::equal);
+    // ReSharper restore CppIdenticalOperandsInBinaryExpression
+}
+
 //void cjm::uint128_tests::execute_gen_comp_ops_test()
 //{
 //    auto rgen = cjm::uint128_tests::generator::rgen{};

@@ -105,6 +105,7 @@ namespace cjm::uint128_tests
     void execute_subtraction_tests();
     void execute_shift_tests();
     void execute_bw_tests();
+    void execute_comparison_tests();
     void execute_parse_file_test(std::string_view path, size_t expected_ops);
     [[maybe_unused]] void print_n_static_assertions(const binary_op_u128_vect_t& op_vec, size_t n);
 
@@ -292,7 +293,7 @@ namespace cjm::uint128_tests
     [[maybe_unused]] void compile_time_shift_test() noexcept;
     [[maybe_unused]] void compile_time_bw_test() noexcept;
     [[maybe_unused]] void compile_time_subtraction_test() noexcept;
-	
+    [[maybe_unused]] void compile_time_comparison_test() noexcept;
 }
 
 namespace std
@@ -966,12 +967,12 @@ namespace cjm::uint128_tests
 	{
         using uint_test_t = typename binary_operation<TestType, ControlType>::uint_test_t;
         auto saver = cout_saver{ strm };
-        strm << "static_assert("
+        strm << "static_assert(("
             << std::dec << bin_op.left_operand() << "_u" << std::dec
             << std::numeric_limits<uint_test_t>::digits
             << " " << op_symbol_lookup[static_cast<unsigned>(bin_op.op_code())]
             << " " << std::dec << bin_op.right_operand() << "_u" << std::dec
-            << std::numeric_limits<uint_test_t>::digits << " == ";
+            << std::numeric_limits<uint_test_t>::digits << ") == ";
         if (!bin_op.has_correct_result())
         {
             strm << "UNKNOWN OR INCORRECT VALUE"  << newl;

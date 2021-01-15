@@ -28,7 +28,7 @@ namespace cjm::base_test_program
     }
 
     template<typename T>
-    void print_spec(T val)
+    void print_spec(T val) 
     {
         auto saver = cout_saver{std::cout};
         std::cout << "Thing that isn't unsigned integer: [" << std::dec << val << "]." << newl;
