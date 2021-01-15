@@ -106,6 +106,7 @@ namespace cjm::uint128_tests
     void execute_shift_tests();
     void execute_bw_tests();
     void execute_comparison_tests();
+    void execute_multiplication_tests();
     void execute_parse_file_test(std::string_view path, size_t expected_ops);
     [[maybe_unused]] void print_n_static_assertions(const binary_op_u128_vect_t& op_vec, size_t n);
 
@@ -139,7 +140,7 @@ namespace cjm::uint128_tests
     binary_op_u128_vect_t generate_easy_ops(size_t num_ops, binary_op op, bool include_standard_tests);
     binary_op_u128_vect_t generate_shift_ops(size_t num_ops, bool include_standard_tests);
     binary_op_u128_vect_t generate_bw_ops(size_t num_ops, bool include_standard_tests);
-	
+    binary_op_u128_vect_t generate_mult_ops(size_t num_each_range, bool include_standard_tests);
 
     void test_binary_operation(binary_op_u128_t& op, std::string_view test_name);
 	
@@ -294,6 +295,7 @@ namespace cjm::uint128_tests
     [[maybe_unused]] void compile_time_bw_test() noexcept;
     [[maybe_unused]] void compile_time_subtraction_test() noexcept;
     [[maybe_unused]] void compile_time_comparison_test() noexcept;
+    [[maybe_unused]] void compile_time_multiplication_test() noexcept;
 }
 
 namespace std
@@ -1179,6 +1181,8 @@ namespace cjm::uint128_tests::generator
 	template<concepts::binary_op_producer OpFactory>
     std::vector<binary_operation<uint128_t, ctrl_uint128_t>> create_many_ops(OpFactory factory, const rgen& gen, size_t num_ops);
 
+    binary_op_u128_t create_multiplication_op(rgen& rgen, size_t max_l_factor_size, size_t max_r_factor_size);
+	
     bool operator==(const rgen& lhs, const rgen& rhs) noexcept;
     bool operator!=(const rgen& lhs, const rgen& rhs) noexcept;
     uint128_t create_random_in_range(const rgen& rgen, size_t byte_limit);

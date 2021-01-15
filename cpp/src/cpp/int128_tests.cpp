@@ -179,6 +179,7 @@ void cjm::uint128_tests::execute_uint128_tests()
     execute_test(execute_bw_tests, "bw_tests"sv);
     execute_test(execute_subtraction_tests, "subtraction_tests"sv);
     execute_test(execute_comparison_tests, "comparison_tests"sv);
+    execute_test(execute_multiplication_tests, "multiplication_tests"sv);
     cout << "All tests PASSED." << newl;
 }
 
@@ -738,7 +739,21 @@ cjm::uint128_tests::generator::internal::rgen_impl::rgen_impl() : m_twister{ ini
 
 }
 
-
+cjm::uint128_tests::binary_op_u128_t cjm::uint128_tests::generator::create_multiplication_op(rgen& rgen, size_t max_l_factor_size, size_t max_r_factor_size)
+{
+    if (std::popcount(max_l_factor_size) != 1 || std::popcount(max_r_factor_size) != 1) throw std::invalid_argument{ "factor sizes must greater than zero be power of two" };
+    constexpr auto max_factor_size = std::numeric_limits<uint128_t>::digits / CHAR_BIT;
+    if (max_l_factor_size > max_factor_size || max_r_factor_size > max_factor_size )
+    {
+        auto ss = string::make_throwing_sstream<char>();
+        ss << "factor size may be no greater than [" << max_factor_size << "].";
+        throw std::invalid_argument{ ss.str() };
+    }
+    uint128_t lhs = create_random_in_range(rgen, max_l_factor_size);
+    uint128_t rhs = create_random_in_range(rgen, max_r_factor_size);
+    return binary_op_u128_t{ binary_op::multiply, lhs, rhs };
+	
+}
 cjm::uint128_tests::binary_operation<cjm::uint128_tests::generator::uint128_t,
     cjm::uint128_tests::ctrl_uint128_t> cjm::uint128_tests::generator::create_modulus_op(const rgen& rgen,
         size_t max_dividend_size, size_t max_divisor_size)
@@ -1323,6 +1338,28 @@ void cjm::uint128_tests::execute_comparison_tests()
     //print_n_static_assertions(op_vect, num_standard_ops);
 }
 
+void cjm::uint128_tests::execute_multiplication_tests()
+{
+    constexpr auto test_name = "multiplication_tests"sv;
+    constexpr size_t ops_per_range = 250;
+    constexpr size_t num_ranges = 4;
+    constexpr size_t ops = num_ranges * ops_per_range;
+    constexpr size_t num_standard_values = u128_testing_constant_providers
+		::testing_constant_provider<uint128_t>::all_values.size();
+    constexpr size_t num_standard_ops = ((num_standard_values * num_standard_values)
+        + num_standard_values) / 2;
+    constexpr size_t num_expected = ops + num_standard_ops;
+
+    auto op_vec = generate_mult_ops(ops_per_range, true);
+    cjm_assert(num_expected == op_vec.size());
+	for (auto& binary_operation : op_vec)
+	{
+        test_binary_operation(binary_operation, test_name);
+	}
+    std::cout << "All " << op_vec.size() << " tests PASS." << newl;
+    //print_n_static_assertions(op_vec, num_standard_ops);
+}
+
 std::filesystem::path cjm::uint128_tests::create_generated_bin_op_filename(binary_op op)
 {
     return construct_bin_op_filename(op, bin_op_generated_tag);
@@ -1457,6 +1494,69 @@ cjm::uint128_tests::binary_op_u128_vect_t cjm::uint128_tests::generate_bw_ops(si
         }
     }
     return ret;
+}
+
+cjm::uint128_tests::binary_op_u128_vect_t cjm::uint128_tests::generate_mult_ops(size_t num_each_range,
+	bool include_standard_tests)
+{
+    using provider_t = u128_testing_constant_providers::testing_constant_provider<uint128_t>;
+    binary_op_u128_vect_t ret;
+    if (include_standard_tests)
+    {
+        for (size_t i = 0; i < provider_t::all_values.size(); ++i)
+        for (size_t j = i; j < provider_t::all_values.size(); ++j)
+        {
+            const auto& lhs = provider_t::all_values[i];
+            const auto& rhs = provider_t::all_values[j];
+            ret.emplace_back(binary_op::multiply, lhs, rhs);            
+        }
+    }
+
+	if (num_each_range > 0)
+	{
+
+        constexpr auto num_ranges = 4_szt;
+        auto total_ops = num_each_range * num_ranges;
+		if (ret.capacity() < ret.size() + total_ops)
+		{
+            ret.reserve(ret.size() + total_ops);
+		}
+        auto rgen = generator::rgen{};
+        
+        constexpr size_t size_x64 = std::numeric_limits<std::uint64_t>::digits / CHAR_BIT;
+        constexpr size_t size_x128 = std::numeric_limits<uint128_t>::digits / CHAR_BIT;
+        constexpr size_t size_x32 = std::numeric_limits<std::uint32_t>::digits / CHAR_BIT;
+
+        //first range-- x64 * x64
+		auto num_this_range = 0_szt;
+        while (num_this_range < num_each_range)
+        {
+            ret.emplace_back(generator::create_multiplication_op(rgen, size_x64, size_x64));
+            ++num_this_range;
+        }
+        //second range x128 * x64
+        num_this_range = 0;
+        while (num_this_range < num_each_range)
+        {
+            ret.emplace_back(generator::create_multiplication_op(rgen, size_x128, size_x64));
+            ++num_this_range;
+        }
+        //third range x128 * x32
+        num_this_range = 0;
+        while (num_this_range < num_each_range)
+        {
+            ret.emplace_back(generator::create_multiplication_op(rgen, size_x128, size_x32));
+            ++num_this_range;
+        }
+		//fourth range x128 * x128
+        num_this_range = 0;
+        while (num_this_range < num_each_range)
+        {
+            ret.emplace_back(generator::create_multiplication_op(rgen, size_x128, size_x128));
+            ++num_this_range;
+        }
+	}
+	return ret;
 }
 
 void cjm::uint128_tests::test_binary_operation(binary_op_u128_t& op, std::string_view test_name)
@@ -1664,6 +1764,39 @@ void cjm::uint128_tests::compile_time_subtraction_test() noexcept
     static_assert(340282366920938463463374607431768211454_u128 - 340282366920938463463374607431768211454_u128 == 0_u128);
     static_assert(340282366920938463463374607431768211454_u128 - 18446744073709551616_u128 == 340282366920938463444927863358058659838_u128);
     static_assert(18446744073709551616_u128 - 18446744073709551616_u128 == 0_u128);
+}
+
+void cjm::uint128_tests::compile_time_multiplication_test() noexcept
+{
+    static_assert((340282366920938463463374607431768211455_u128 * 340282366920938463463374607431768211455_u128) == 1_u128);
+    static_assert((340282366920938463463374607431768211455_u128 * 340282366920938463463374607431768211454_u128) == 2_u128);
+    static_assert((340282366920938463463374607431768211455_u128 * 0_u128) == 0_u128);
+    static_assert((340282366920938463463374607431768211455_u128 * 1_u128) == 340282366920938463463374607431768211455_u128);
+    static_assert((340282366920938463463374607431768211455_u128 * 18446744073709551615_u128) == 340282366920938463444927863358058659841_u128);
+    static_assert((340282366920938463463374607431768211455_u128 * 340282366920938463463374607431768211454_u128) == 2_u128);
+    static_assert((340282366920938463463374607431768211455_u128 * 18446744073709551616_u128) == 340282366920938463444927863358058659840_u128);
+    static_assert((340282366920938463463374607431768211454_u128 * 340282366920938463463374607431768211454_u128) == 4_u128);
+    static_assert((340282366920938463463374607431768211454_u128 * 0_u128) == 0_u128);
+    static_assert((340282366920938463463374607431768211454_u128 * 1_u128) == 340282366920938463463374607431768211454_u128);
+    static_assert((340282366920938463463374607431768211454_u128 * 18446744073709551615_u128) == 340282366920938463426481119284349108226_u128);
+    static_assert((340282366920938463463374607431768211454_u128 * 340282366920938463463374607431768211454_u128) == 4_u128);
+    static_assert((340282366920938463463374607431768211454_u128 * 18446744073709551616_u128) == 340282366920938463426481119284349108224_u128);
+    static_assert((0_u128 * 0_u128) == 0_u128);
+    static_assert((0_u128 * 1_u128) == 0_u128);
+    static_assert((0_u128 * 18446744073709551615_u128) == 0_u128);
+    static_assert((0_u128 * 340282366920938463463374607431768211454_u128) == 0_u128);
+    static_assert((0_u128 * 18446744073709551616_u128) == 0_u128);
+    static_assert((1_u128 * 1_u128) == 1_u128);
+    static_assert((1_u128 * 18446744073709551615_u128) == 18446744073709551615_u128);
+    static_assert((1_u128 * 340282366920938463463374607431768211454_u128) == 340282366920938463463374607431768211454_u128);
+    static_assert((1_u128 * 18446744073709551616_u128) == 18446744073709551616_u128);
+    static_assert((18446744073709551615_u128 * 18446744073709551615_u128) == 340282366920938463426481119284349108225_u128);
+    static_assert((18446744073709551615_u128 * 340282366920938463463374607431768211454_u128) == 340282366920938463426481119284349108226_u128);
+    static_assert((18446744073709551615_u128 * 18446744073709551616_u128) == 340282366920938463444927863358058659840_u128);
+    static_assert((340282366920938463463374607431768211454_u128 * 340282366920938463463374607431768211454_u128) == 4_u128);
+    static_assert((340282366920938463463374607431768211454_u128 * 18446744073709551616_u128) == 340282366920938463426481119284349108224_u128);
+    static_assert((18446744073709551616_u128 * 18446744073709551616_u128) == 0_u128);
+    static_assert((std::numeric_limits<std::uint64_t>::max() * std::numeric_limits<std::uint64_t>::max()) == 1);
 }
 
 void cjm::uint128_tests::compile_time_comparison_test() noexcept
