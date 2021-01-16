@@ -1437,11 +1437,12 @@ void cjm::uint128_tests::execute_failing_division_test_2()
     std::cout << "About to test deserialization:..." << newl;
     cjm_assert(lhs == temp.left_operand() && rhs == temp.right_operand());
     cjm_assert(temp.op_code() == binary_op::divide);
+    std::cout << "Deserialization succeeded." << newl;
 
-    auto res = temp.left_operand() / temp.right_operand();
+	auto res = temp.left_operand() / temp.right_operand();
     cjm_assert(to_ctrl(res) == control_res);
     std::cout << "Result: [" << res << "]" << newl;
-    std::cout << "Deserialization succeeded." << newl;
+    
     std::cout << "Printing static assertions from " << test_name << ": " << newl;
     append_static_assertion(cout, temp) << newl;
     test_binary_operation(temp, test_name);
@@ -1918,12 +1919,17 @@ void cjm::uint128_tests::insert_standard_divmod_ops(binary_op_u128_vect_t& op_ve
 
 void cjm::uint128_tests::test_binary_operation(binary_op_u128_t& op, std::string_view test_name)
 {
-     
-	
+    using result_t = typename binary_op_u128_t::result_t;
+    result_t result = std::nullopt;
 	try
 	{
+        bool no_result_now = !op.has_result();
         op.calculate_result();
-        auto result = op.result();
+		if (no_result_now)
+		{
+            cjm_assert(op.has_result());
+		}
+        result = op.result();
         bool has_correct = op.has_correct_result();
         bool result_equals = result.value().first == result.value().second;
 		if (!has_correct || !result_equals)

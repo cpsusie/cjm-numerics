@@ -548,7 +548,7 @@ namespace cjm::uint128_tests
     {
         using uint_test_t = std::remove_const_t<TestType>;
         using uint_ctrl_t = std::remove_const_t<ControlType>;
-
+        using result_t = std::optional<std::pair<uint_test_t, uint_test_t>>;
         [[nodiscard]] std::size_t hash_value() const noexcept
         {
             std::size_t seed = 0x1FBB0493;
@@ -590,22 +590,11 @@ namespace cjm::uint128_tests
         [[nodiscard]] binary_op op_code() const noexcept { return m_op; }
         [[nodiscard]] const uint_test_t& left_operand() const noexcept { return m_lhs; }
         [[nodiscard]] const uint_test_t& right_operand() const noexcept { return m_rhs; }
-        [[nodiscard]] std::optional<std::pair<uint_test_t, uint_test_t>> result() const noexcept { return m_result; }
+        [[nodiscard]] const result_t& result() const noexcept { return m_result; }
         [[nodiscard]] bool has_result() const noexcept { return m_result.has_value(); }
         [[nodiscard]] bool has_correct_result() const
         {
-        	if (!m_result.has_value())
-        	{
-                return false;
-        	}
-            auto res = perform_calculate_result(m_lhs, m_rhs, m_op);
-            bool equal = res.first == m_result.value().first && res.second == m_result.value().second && res.first == res.second;
-        	if (!equal)
-        	{
-                std::cerr << "Results not equal!" << newl;
-                return false;
-        	}
-            return true;
+            return m_result.has_value() && m_result->first == m_result->second;
         }
 
         binary_operation() noexcept : m_op(), m_lhs(), m_rhs(), m_result() {}
@@ -765,7 +754,7 @@ namespace cjm::uint128_tests
         binary_op m_op;
         uint_test_t m_lhs;
         uint_test_t m_rhs;
-        std::optional<std::pair<uint_test_t, uint_test_t>> m_result;   
+        result_t m_result;   
 
 };
 	
