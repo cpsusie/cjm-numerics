@@ -60,6 +60,29 @@ namespace
 	
 }
 
+void cjm::uint128_tests::validate_divmod_op(const binary_op_u128_t& op)
+{
+    const auto& result = op.result().value();
+    if (!op.has_correct_result()) throw std::invalid_argument{ "Does not have correct result to begin with." };
+    if (op.op_code() != binary_op::divide && op.op_code() != binary_op::modulus)
+    {
+        throw std::invalid_argument{ "Operation is not division or modulus." };
+    }
+
+	if (op.op_code() != binary_op::divide)
+	{
+		auto res = uint128_t::div_mod(op.left_operand(), op.right_operand());
+        if (res.remainder != result.first)
+            throw divmod_fail_match{ op };
+	}
+	else
+	{
+		auto res = uint128_t::div_mod(op.left_operand(), op.right_operand());
+		if(res.quotient != result.first)
+            throw divmod_fail_match{ op };
+	}	
+}
+
 cjm::uint128_tests::ctrl_uint128_t cjm::uint128_tests::to_ctrl(uint128_t convert) 
 {
     ctrl_uint128_t ret = convert.high_part();
@@ -180,6 +203,10 @@ void cjm::uint128_tests::execute_uint128_tests()
     execute_test(execute_subtraction_tests, "subtraction_tests"sv);
     execute_test(execute_comparison_tests, "comparison_tests"sv);
     execute_test(execute_multiplication_tests, "multiplication_tests"sv);
+    execute_test(execute_failing_division_test_1, "failing_division_test_1"sv);
+    execute_test(execute_failing_division_test_2, "failing_division_test_2"sv);
+    execute_test(execute_failing_modulus_test_1, "failing_modulus_test_1"sv);
+    execute_test(execute_division_modulus_tests, "division_modulus_tests"sv);
     cout << "All tests PASSED." << newl;
 }
 
@@ -1360,6 +1387,71 @@ void cjm::uint128_tests::execute_multiplication_tests()
     //print_n_static_assertions(op_vec, num_standard_ops);
 }
 
+void cjm::uint128_tests::execute_failing_division_test_1()
+{
+    uint128_t dividend = 0;
+    uint128_t divisor = 1;
+
+    uint128_t test_result = dividend / divisor;
+
+	ctrl_uint128_t ctrl_dividend = to_ctrl(dividend);
+    ctrl_uint128_t ctrl_divisor = to_ctrl(divisor);
+    ctrl_uint128_t ctrl_result = ctrl_dividend / ctrl_divisor;
+    cjm_assert(ctrl_result == 0);
+
+    uint128_t ctrl_res_to_test = to_test(ctrl_result);
+
+    auto divmod_res = uint128_t::div_mod(dividend, divisor);
+	cjm_assert(test_result == 0 && ctrl_res_to_test == test_result);
+    cjm_assert(test_result == divmod_res.quotient);
+
+    auto op = binary_op_u128_t{ binary_op::divide, dividend, divisor };
+	auto mod_ver = binary_op_u128_t{ binary_op::modulus, dividend, divisor };
+    test_binary_operation(op, "failing_division_test_1"sv);
+    test_binary_operation(mod_ver, "failing_division_test_1_modulus_ver"sv);
+    cjm_assert(op.has_correct_result());
+}
+
+void cjm::uint128_tests::execute_failing_division_test_2()
+{
+    constexpr auto test_name = "failing_division_test_2"sv;
+    auto op_text = "/;256368684943268248658307433575740207117;16109687965047641490155963133754044755;"sv;
+    auto stream = string::make_throwing_sstream<char>();
+    stream << op_text;
+    binary_op_u128_t temp;
+    stream >> temp;
+    test_binary_operation(temp, test_name);	
+}
+
+void cjm::uint128_tests::execute_failing_modulus_test_1()
+{
+    constexpr auto test_name = "failing_modulus_test_1"sv;
+    auto op_text = "%;295990755071965901746234089551998857227;168021802658398834664238297099768481736;"sv;
+    auto stream = string::make_throwing_sstream<char>();
+    stream << op_text;
+    binary_op_u128_t temp;
+    stream >> temp;
+    test_binary_operation(temp, test_name);
+}
+
+void cjm::uint128_tests::execute_division_modulus_tests()
+{
+    constexpr auto test_name = "division_modulus_tests"sv;
+    constexpr size_t ops_per_range = 50;
+    constexpr size_t num_ranges = 4;
+    constexpr size_t num_standard_values = 172;
+    constexpr size_t num_rnd_ops = ops_per_range * num_ranges;
+    constexpr size_t num_expected = num_rnd_ops + num_standard_values;
+
+    auto op_vec = generate_divmod_ops(ops_per_range, true);
+    cjm_assert(num_expected == op_vec.size());
+	for (auto& binary_operation : op_vec)
+	{
+        test_binary_operation(binary_operation, test_name);
+	}
+    std::cout << "All " << std::dec << op_vec.size() << " tests PASS." << newl;	
+}
+
 std::filesystem::path cjm::uint128_tests::create_generated_bin_op_filename(binary_op op)
 {
     return construct_bin_op_filename(op, bin_op_generated_tag);
@@ -1559,50 +1651,296 @@ cjm::uint128_tests::binary_op_u128_vect_t cjm::uint128_tests::generate_mult_ops(
 	return ret;
 }
 
+cjm::uint128_tests::binary_op_u128_vect_t cjm::uint128_tests::generate_divmod_ops(size_t num_each_range,
+	bool include_standard_tests)
+{
+    auto saver = cout_saver{ std::cerr };
+    constexpr auto num_ranges = 4;
+    binary_op_u128_vect_t ret;
+	if (include_standard_tests)
+	{
+        ret.reserve(172);
+        insert_standard_divmod_ops(ret);
+	}
+	if (num_each_range > 0)
+	{
+        if (num_each_range % 2 != 0)
+        {
+            auto old = num_each_range++;
+			std::cerr   << "Cannot add " << std::dec << old
+        				<< " operations per range -- not even.  Will add "
+        				<< std::dec << num_each_range << " ops instead." << newl;
+        }
+
+        const auto to_add = num_each_range * num_ranges;
+        if (ret.capacity() - ret.size() < to_add)
+            ret.reserve(ret.size() + to_add);
+        auto added_this_range = 0_szt;
+        auto rgen = generator::rgen{};
+
+		//range: full / full
+		while (added_this_range < num_each_range)
+		{
+            auto first = generator::create_random_in_range<uint128_t>(rgen);
+            auto second = generator::create_random_in_range<uint128_t>(rgen);
+            auto* dividend = first >= second ? &first : &second;
+            auto* divisor = dividend == &first ? &second : &first;
+            assert(dividend != divisor);
+            ret.emplace_back(binary_op::divide, *dividend, *divisor);
+            ret.emplace_back(binary_op::modulus, *dividend, *divisor);
+            added_this_range += 2;
+		}
+
+        added_this_range = 0;
+		//range full, x64
+        while (added_this_range < num_each_range)
+        {
+            auto first = generator::create_random_in_range<uint128_t>(rgen);
+            uint128_t second = generator::create_random_in_range<std::uint64_t>(rgen);
+            auto* dividend = first >= second ? &first : &second;
+            auto* divisor = dividend == &first ? &second : &first;
+            assert(dividend != divisor);
+            ret.emplace_back(binary_op::divide, *dividend, *divisor);
+            ret.emplace_back(binary_op::modulus, *dividend, *divisor);
+            added_this_range += 2;
+        }
+
+        added_this_range = 0;
+		//range x64 + x32, x64
+        while (added_this_range < num_each_range)
+        {
+            const uint128_t first_low = generator::create_random_in_range<std::uint64_t>(rgen);
+            uint128_t first_high = generator::create_random_in_range<std::uint32_t>(rgen);
+            first_high <<= 64;
+            uint128_t first = first_high | first_low;
+            const uint128_t second = generator::create_random_in_range<std::uint64_t>(rgen);
+
+            const uint128_t* dividend = first >= second ? &first : &second;
+            const uint128_t* divisor = dividend == &first ? &second : &first;
+            assert(dividend != divisor);
+
+            ret.emplace_back(binary_op::divide, *dividend, *divisor);
+            ret.emplace_back(binary_op::modulus, *dividend, *divisor);
+            added_this_range += 2;        	
+        }
+
+        added_this_range = 0;
+        //range x64 + x32, x16
+        while (added_this_range < num_each_range)
+        {
+            const uint128_t first_low = generator::create_random_in_range<std::uint64_t>(rgen);
+            uint128_t first_high = generator::create_random_in_range<std::uint32_t>(rgen);
+            first_high <<= 64;
+            uint128_t first = first_high | first_low;
+            const uint128_t second = generator::create_random_in_range<std::uint16_t>(rgen);
+
+            const uint128_t* dividend = first >= second ? &first : &second;
+            const uint128_t* divisor = dividend == &first ? &second : &first;
+            assert(dividend != divisor);
+
+            ret.emplace_back(binary_op::divide, *dividend, *divisor);
+            ret.emplace_back(binary_op::modulus, *dividend, *divisor);
+            added_this_range += 2;
+        }
+	}
+    return ret;
+}
+
+void cjm::uint128_tests::insert_standard_divmod_ops(binary_op_u128_vect_t& op_vec)
+{
+    using arr_t = std::array<uint128_t, 4_szt>;
+	constexpr arr_t full_128_arr=     
+	{
+		0xc0de'd00d'fea2'cafe'babe'b00b'600d'f00d_u128,
+		0xdead'beef'badd'f00d'cafe'babe'600d'b00b_u128,
+		0x8000'0000'0000'0000'0000'0000'0000'0000_u128,
+		0x7fff'ffff'ffff'ffff'ffff'ffff'ffff'ffff_u128
+	};
+
+    constexpr arr_t half_128_arr =
+    {
+        0x0000'0000'fea2'cafe'babe'b00b'600d'f00d_u128,
+        0x0000'0000'badd'f00d'cafe'babe'600d'b00b_u128,
+        0x0000'0000'8000'0000'0000'0000'0000'0000_u128,
+        0x0000'0000'7fff'ffff'ffff'ffff'ffff'ffff_u128
+    };
+
+    /*constexpr arr_t byte_over_x64_arr =
+    {
+        0x0000'0000'0000'00fe'babe'b00b'600d'f00d_u128,
+        0x0000'0000'0000'000d'cafe'babe'600d'b00b_u128,
+        0x0000'0000'0000'0071'8000'0000'0000'0000_u128,
+        0x0000'0000'0000'00a0'7fff'ffff'ffff'ffff_u128
+    };
+
+    constexpr arr_t nibble_over_x64_arr =
+    {
+        0x0000'0000'0000'000e'babe'b00b'600d'f00d_u128,
+        0x0000'0000'0000'000d'cafe'babe'600d'b00b_u128,
+        0x0000'0000'0000'0001'8000'0000'0000'0000_u128,
+        0x0000'0000'0000'0003'7fff'ffff'ffff'ffff_u128
+    };*/
+
+    constexpr arr_t x64_arr =
+    {
+        0xcafe'babe'dead'beef_u128,
+        0x0110'a11a'abba'0084_u128,
+    	0x0400'0000'0000'0000_u128,
+    	0xcafe'babe'600d'b00b_u128
+    };
+
+    constexpr arr_t x32_arr =
+    {
+        0xcafe'babe_u128,
+    	0xc0de'd00d_u128,
+    	0xdead'beef_u128,
+    	0x600d'f00d_u128,
+    };
+
+    constexpr arr_t byte_arr =
+    {
+        0x04,
+        0xef,
+        0xa2,
+        0x64,
+    };
+
+
+    constexpr arr_t nibble_arr =
+    {
+    	0x02,
+    	0x03,
+    	0x0A,
+    	0x0C
+    };
+    
+	//four operations added this segment
+	// FOUR OPS ADDED SO FAR
+	//add 0/1 and x/1
+    op_vec.emplace_back(binary_op::divide, 0_u128, 1_u128);
+    op_vec.emplace_back(binary_op::modulus, 0_u128, 1_u128);
+    op_vec.emplace_back(binary_op::divide, full_128_arr[2], 1_u128);
+    op_vec.emplace_back(binary_op::modulus, full_128_arr[2], 1_u128);
+
+	//EIGHT operations added this segment
+	//TWELVE OPS ADDED SO FAR
+	//add full / random full
+    auto rgen = generator::rgen{};
+	for (const auto& dividend : full_128_arr)
+	{
+        auto rnd = generator::create_random_in_range<uint128_t>(rgen);
+        op_vec.emplace_back(binary_op::divide, dividend, rnd);
+        op_vec.emplace_back(binary_op::modulus, dividend, rnd);
+	}
+
+	//32 ops added this segment
+	//44 OPS ADDED SO FAR
+	//case: divisor x64 > top half of dividend
+	for (const auto& dividend : half_128_arr)
+	for (const auto& divisor : x64_arr)
+	{
+        op_vec.emplace_back(binary_op::divide, dividend, divisor);
+        op_vec.emplace_back(binary_op::modulus, dividend, divisor);
+	}
+
+    //32 ops added this segment
+	//76 OPS ADDED SO FAR
+	//case divisor x64 < top half of dividend
+    for (const auto& dividend : full_128_arr)
+	for (const auto& divisor : x32_arr)
+    {
+        op_vec.emplace_back(binary_op::divide, dividend, divisor);
+        op_vec.emplace_back(binary_op::modulus, dividend, divisor);
+    }
+
+    //32 ops added this segment
+	//108 OPS ADDED SO FAR
+	//case dividend fit x64 divisor fit x32
+    for (const auto& dividend : x64_arr)
+    for (const auto& divisor : x32_arr)
+    {
+        op_vec.emplace_back(binary_op::divide, dividend, divisor);
+        op_vec.emplace_back(binary_op::modulus, dividend, divisor);
+    }
+
+    //32 ops added this segment
+	//140 OPS ADDED SO FAR
+	//case dividend fit x32 divisor fit x08
+    for (const auto& dividend : x32_arr)
+    for (const auto& divisor : byte_arr)
+    {
+		op_vec.emplace_back(binary_op::divide, dividend, divisor);
+		op_vec.emplace_back(binary_op::modulus, dividend, divisor);
+	}
+
+    //32 ops added this segment
+	//172 OPS ADDED SO FAR
+	//case dividend fit x08 divisor fit nibble
+    for (const auto& dividend : byte_arr)
+    for (const auto& divisor : nibble_arr)
+	{
+		op_vec.emplace_back(binary_op::divide, dividend, divisor);
+		op_vec.emplace_back(binary_op::modulus, dividend, divisor);
+	}
+
+	//172 operations total.
+}
+
 void cjm::uint128_tests::test_binary_operation(binary_op_u128_t& op, std::string_view test_name)
 {
     std::optional<std::pair<binary_op_u128_t::uint_test_t,
         binary_op_u128_t::uint_test_t>> result = std::nullopt;
+
+	auto log_gen_fail = [=, &op](const testing::testing_failure& ex) -> void
+    {
+        auto saver = cout_saver{ std::cerr };
+        std::cerr << "Test: [" << test_name << "], failed -- exception (" << ex.what() << ") thrown." << newl;
+        std::cerr << "Operation: [" << op.op_code() << "]; Left operand: [" << std::dec << op.left_operand() << "]; Right operand: [" << op.right_operand() << "]." << newl;
+        if (result.has_value())
+        {
+            std::cerr << "Result of operation.  Actual: [" << std::dec << result->first << "]; Expected by control: [" << std::dec << result->second << "]." << newl;
+        }
+        else
+        {
+            std::cerr << "No result available." << newl;
+        }
+        auto path = create_failing_op_pathname(op.op_code());
+        std::cerr << "Going to write failing operation to [" << path << "]: " << newl;
+        bool except_file_write = false;
+        try
+        {
+            auto fstrm = string::make_throwing_ofstream<char>(path);
+            fstrm << op;
+        }
+        catch (const std::exception& ex2)
+        {
+            except_file_write = true;
+            std::cerr << "Unable to write failing operation to file [" << path << "]: exception thrown with msg: [" << ex2.what() << "]." << newl;
+        }
+        if (except_file_write)
+        {
+            std::cerr << "Logging failing operation to stderr instead (between square brackets): [" << op << "]." << newl;
+        }
+        else
+        {
+            std::cerr << "Successfully wrote failing operation to: [" << path << "]." << newl;
+        }
+    };
+    
+	
 	try
 	{
         op.calculate_result();
         result = op.result();
         cjm_assert(result.has_value() && op.has_correct_result() && result->first == result->second);
+		if (op.op_code() == binary_op::divide || op.op_code() == binary_op::modulus)
+		{
+            validate_divmod_op(op);
+		}
 	}
 	catch (const testing::testing_failure& ex)
 	{
-        auto saver = cout_saver{ std::cerr };
-        std::cerr << "Test: [" << test_name << "], failed -- exception (" << ex.what() << ") thrown." << newl;
-        std::cerr << "Operation: [" << op.op_code() << "]; Left operand: [" << std::dec << op.left_operand() << "]; Right operand: [" << op.right_operand() << "]." << newl;
-		if (result.has_value())
-		{
-            std::cerr << "Result of operation.  Actual: [" << std::dec << result->first << "]; Expected by control: [" << std::dec << result->second << "]." << newl;			
-		}
-		else
-		{
-            std::cerr << "No result available." << newl;
-		}
-        auto path = create_failing_op_pathname(op.op_code());
-        std::cerr << "Going to write failing operation to [" << path << "]: " << newl;
-        bool except_file_write = false;
-		try
-		{
-            auto fstrm = string::make_throwing_ofstream<char>(path);
-            fstrm << op;		
-		}
-		catch (const std::exception& ex2)
-		{
-            except_file_write = true;
-            std::cerr << "Unable to write failing operation to file [" << path << "]: exception thrown with msg: [" << ex2.what() << "]." << newl;
-		}
-		if (except_file_write)
-		{
-            std::cerr << "Logging failing operation to stderr instead (between square brackets): [" << op << "]." << newl;
-		}
-        else
-        {
-            std::cerr << "Successfully wrote failing operation to: [" << path << "]." << newl;
-        }
+        log_gen_fail(ex);
         throw;
 	}
 }

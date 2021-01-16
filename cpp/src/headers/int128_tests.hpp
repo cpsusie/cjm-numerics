@@ -52,6 +52,8 @@ namespace cjm::uint128_tests
 
     class bad_binary_op;
 
+    class divmod_fail_match;
+
     template<typename Invocable>
     concept invocable = requires (Invocable i)
     {
@@ -69,6 +71,13 @@ namespace cjm::uint128_tests
     struct binary_operation;
     using binary_op_u128_t = binary_operation<uint128_t, ctrl_uint128_t>;
     using binary_op_u128_vect_t = std::vector<binary_op_u128_t>;
+
+    /// <summary>
+    /// hascorrectresult() must be true or throws
+    /// must be divide or modulus or throws
+    /// </summary>
+    /// <param name="op">the result</param>
+    void validate_divmod_op(const binary_op_u128_t& op);
     	
     template<invocable Invocable>
     void execute_test(Invocable test, std::string_view test_name);
@@ -107,6 +116,10 @@ namespace cjm::uint128_tests
     void execute_bw_tests();
     void execute_comparison_tests();
     void execute_multiplication_tests();
+    void execute_failing_division_test_1();
+    void execute_failing_division_test_2();
+    void execute_failing_modulus_test_1();
+    void execute_division_modulus_tests();
     void execute_parse_file_test(std::string_view path, size_t expected_ops);
     [[maybe_unused]] void print_n_static_assertions(const binary_op_u128_vect_t& op_vec, size_t n);
 
@@ -141,6 +154,9 @@ namespace cjm::uint128_tests
     binary_op_u128_vect_t generate_shift_ops(size_t num_ops, bool include_standard_tests);
     binary_op_u128_vect_t generate_bw_ops(size_t num_ops, bool include_standard_tests);
     binary_op_u128_vect_t generate_mult_ops(size_t num_each_range, bool include_standard_tests);
+    binary_op_u128_vect_t generate_divmod_ops(size_t num_each_range, bool include_standard_tests);
+    void insert_standard_divmod_ops(binary_op_u128_vect_t& op_vec);
+	
 
     void test_binary_operation(binary_op_u128_t& op, std::string_view test_name);
 	
@@ -518,6 +534,8 @@ namespace cjm::uint128_tests
             return ss.str();
         }
     };
+
+    
 	
     template<typename TestType, typename ControlType>
         requires (test_uint_and_control_set<TestType, ControlType>)
@@ -529,7 +547,8 @@ namespace cjm::uint128_tests
     {
         using uint_test_t = std::remove_const_t<TestType>;
         using uint_ctrl_t = std::remove_const_t<ControlType>;
-        std::size_t hash_value() const noexcept
+
+        [[nodiscard]] std::size_t hash_value() const noexcept
         {
             std::size_t seed = 0x1FBB0493;
             boost::hash_combine(seed, static_cast<size_t>(m_op));
@@ -1002,7 +1021,23 @@ namespace cjm::uint128_tests
 	    return strm;
 	}
 
+    class divmod_fail_match final : public testing::testing_failure
+    {
+        using enum_type_t = std::underlying_type_t<binary_op>;
+        using stream_t = std::stringstream;
 
+	public:
+        divmod_fail_match(const binary_op_u128_t& failed) : testing_failure(create_message(failed)) {}
+	
+    private:
+        static std::string create_message(const binary_op_u128_t& bin_op)
+        {
+            stream_t ss;
+            ss << "The result of the " << get_op_text(bin_op.op_code()) << " operation is different when using divmod."
+                << "Dividend: [" << bin_op.left_operand() << "]; Divisor: [" << bin_op.right_operand() << "].";                
+            return ss.str();
+        }
+    };
 	
 }
 

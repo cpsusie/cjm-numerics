@@ -216,7 +216,7 @@ void uint128::div_mod_msc_x64_impl(uint128 dividend, uint128 divisor, uint128* q
 	}
 	// 0 <= shift <= 63.
 	auto high_shift = CJM_LZCNT_64(divisor.m_high);
-	auto low_shift = CJM_LZCNT_64(divisor.m_low);
+	auto low_shift = CJM_LZCNT_64(dividend.m_high);
 	auto shift = static_cast<long>(high_shift) - static_cast<long>(low_shift);
 	//auto shift =
 	//	__builtin_clzll(divisor.s.high) - __builtin_clzll(dividend.s.high);

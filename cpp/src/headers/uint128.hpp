@@ -119,19 +119,20 @@ namespace cjm::numerics
     template <typename Char = char, typename CharTraits=std::char_traits<Char>, typename Allocator = std::allocator<Char>>
             requires cjm::numerics::concepts::char_with_traits_and_allocator<Char, CharTraits, Allocator>
     std::basic_ostream<Char, CharTraits>& operator<<(std::basic_ostream<Char, CharTraits>& os, uint128 v);
-            /// <summary>
-        /// Stream extraction operator for uint128
-        /// </summary>
-        /// <typeparam name="Char">The Character type</typeparam>
-        /// <typeparam name="CharTraits">traits for character</typeparam>
-        /// <typeparam name="Allocator">allocator for character</typeparam>
-        /// <param name="os">the stream to insert</param>
-        /// <param name="v">the value to stringify and insert into the stream</param>
-        /// <returns>the stream with the value inserted.</returns>
+	/// <summary>
+	/// Stream extraction operator for uint128
+	/// </summary>
+	/// <typeparam name="Char">The Character type</typeparam>
+	/// <typeparam name="CharTraits">traits for character</typeparam>
+	/// <typeparam name="Allocator">allocator for character</typeparam>
+	/// <param name="is">the stream to insert</param>
+	/// <param name="v">the value to stringify and insert into the stream</param>
+	/// <returns>the stream with the value inserted.</returns>
 	template <typename Char = char, typename CharTraits = std::char_traits<Char>>
 		requires cjm::numerics::concepts::char_with_traits<Char, CharTraits>
 	std::basic_istream<Char, CharTraits>& operator>>(std::basic_istream<Char, CharTraits>& is, uint128& v);
-    //Comparison operators
+
+	//Comparison operators
 	constexpr std::strong_ordering operator <=>(uint128 lhs, uint128 rhs) noexcept; 
     constexpr bool operator==(uint128 lhs, uint128 rhs) noexcept;
     constexpr bool operator!=(uint128 lhs, uint128 rhs) noexcept;
@@ -352,7 +353,7 @@ namespace cjm::numerics
     class alignas(uint128_align) uint128 final
     {
     public:
-        static constexpr size_t byte_array_size{ (128 / CHAR_BIT) / sizeof(unsigned char) };
+        static constexpr size_t byte_array_size = 16;
 
     	friend class fixed_uint<uint128>;
             	
@@ -365,7 +366,7 @@ namespace cjm::numerics
         static uint128 make_from_string(std::basic_string_view<Chars, CharTraits> parseMe);
 
         template<typename Chars, typename CharTraits = std::char_traits<Chars>, typename Allocator = std::allocator<Chars>>
-        requires cjm::numerics::concepts::char_with_traits_and_allocator<Chars, CharTraits, Allocator>
+			requires cjm::numerics::concepts::char_with_traits_and_allocator<Chars, CharTraits, Allocator>
         static uint128 make_from_string(const std::basic_string<Chars, CharTraits, Allocator>& parseMe);
 
 
@@ -458,7 +459,7 @@ namespace cjm::numerics
         friend constexpr uint128 operator<<(uint128 lhs, uint128 amount) noexcept;
         template<typename Char, typename CharTraits, typename Allocator>
             requires cjm::numerics::concepts::char_with_traits_and_allocator<Char, CharTraits, Allocator>
-        friend std::basic_ostream<Char, CharTraits>& operator<<(std::basic_ostream<Char, CharTraits>& os, uint128 v);
+        friend std::basic_ostream<Char, CharTraits>& operator<< (std::basic_ostream<Char, CharTraits>& os, uint128 v);
 
         //Accessor for sub-components
         [[nodiscard]] constexpr int_part low_part() const noexcept;
