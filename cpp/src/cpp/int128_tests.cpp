@@ -1410,6 +1410,10 @@ void cjm::uint128_tests::execute_failing_division_test_1()
     test_binary_operation(op, "failing_division_test_1"sv);
     test_binary_operation(mod_ver, "failing_division_test_1_modulus_ver"sv);
     cjm_assert(op.has_correct_result());
+//    std::cout << "Printing static assertions from failing_division_test_1:" << newl;
+//    append_static_assertion(cout, op) << newl;
+//    append_static_assertion(cout, mod_ver) << newl;
+//    std::cout << "Done printing static assertions." << newl;
 }
 
 void cjm::uint128_tests::execute_failing_division_test_2()
@@ -1420,7 +1424,9 @@ void cjm::uint128_tests::execute_failing_division_test_2()
     stream << op_text;
     binary_op_u128_t temp;
     stream >> temp;
-    test_binary_operation(temp, test_name);	
+    test_binary_operation(temp, test_name);
+//    std::cout << "Printing static assertions from " << test_name << ": " << newl;
+//    append_static_assertion(cout, temp) << newl;
 }
 
 void cjm::uint128_tests::execute_failing_modulus_test_1()
@@ -1449,7 +1455,12 @@ void cjm::uint128_tests::execute_division_modulus_tests()
 	{
         test_binary_operation(binary_operation, test_name);
 	}
-    std::cout << "All " << std::dec << op_vec.size() << " tests PASS." << newl;	
+    std::cout << "All " << std::dec << op_vec.size() << " tests PASS." << newl;
+	auto rgen = generator::rgen{};
+	rgen.shuffle(op_vec, op_vec.size());
+	std::cout << "Going to print static assertions: " << newl;
+	print_n_static_assertions(op_vec, 25);
+	std::cout << newl << "Done printing static assertions." << newl;
 }
 
 std::filesystem::path cjm::uint128_tests::create_generated_bin_op_filename(binary_op op)
@@ -2136,7 +2147,39 @@ void cjm::uint128_tests::compile_time_multiplication_test() noexcept
     static_assert((18446744073709551616_u128 * 18446744073709551616_u128) == 0_u128);
     static_assert((std::numeric_limits<std::uint64_t>::max() * std::numeric_limits<std::uint64_t>::max()) == 1);
 }
-
+void cjm::uint128_tests::compile_time_divmod_test() noexcept
+{
+    using div_mod_t = typename uint128_t::divmod_result_t;
+    static_assert((0_u128 / 1_u128) == 0_u128);
+    static_assert((0_u128 % 1_u128) == 0_u128);
+    static_assert((256368684943268248658307433575740207117_u128 / 16109687965047641490155963133754044755_u128) == 15_u128);
+    static_assert(uint128_t::div_mod(0_u128, 1_u128) == div_mod_t{0, 0} );
+    static_assert((295990755071965901746234089551998857227_u128 % 3235827725_u128) == 528850702_u128);
+    static_assert((66246630108973215241078608754070084718_u128 / 7228281917011328983_u128) == 9164920636682104939_u128);
+    static_assert((169936322178785030769376827207061232478_u128 % 7485361222267715344_u128) == 1976567201599658414_u128);
+    static_assert((162_u128 / 2_u128) == 81_u128);
+    static_assert((3235827725_u128 / 239_u128) == 13539028_u128);
+    static_assert((8182809076109218472715192048_u128 / 12557_u128) == 651653187553493547241792_u128);
+    static_assert((4_u128 % 10_u128) == 4_u128);
+    static_assert((100_u128 % 10_u128) == 0_u128);
+    static_assert((100_u128 / 2_u128) == 50_u128);
+    static_assert((162_u128 % 3_u128) == 0_u128);
+    static_assert((66117130356006657980658724180676477157_u128 % 7040797564508260637_u128) == 1834637398707570814_u128);
+    static_assert((45218132496652697143700923240_u128 % 12667277179734853258_u128) == 8050870141438615144_u128);
+    static_assert((1719979875970173947856030633_u128 / 13997_u128) == 122882037291574905183684_u128);
+    static_assert((99258391579393355963748093012485398259_u128 / 16142001743698741087_u128) == 6149075756241958924_u128);
+    static_assert((278450506667225178906488378352345708296_u128 % 5075200850161858457344756897931454770_u128) == 4389660758484822209871505864047150716_u128);
+    static_assert((21109970526253136708242979755_u128 % 4043335572065853082_u128) == 1674839464675535439_u128);
+    static_assert((16727536748470929772034052482_u128 / 13493369733211533381_u128) == 1239685644_u128);
+    static_assert((208107056245992793703414435121683787583_u128 / 114544293650285138706008225025185245976_u128) == 1_u128);
+    static_assert((300696748791043635522420816731213971065_u128 / 169820733485858017784125137622069351450_u128) == 1_u128);
+    static_assert((69383047239906130264878645357_u128 % 15911982665839184726_u128) == 14634106630390292755_u128);
+    static_assert((3280109385190515152272861871_u128 / 44978_u128) == 72926972857630733964890_u128);
+    static_assert((295990755071965901746234089551998857227_u128 / 3735928559_u128) == 79228162529744429662214557768_u128);
+    static_assert((55091963802398102628743599743_u128 % 784184839698078258_u128) == 449994647493900105_u128);
+    static_assert((170141183460469231731687303715884105728_u128 / 3735928559_u128) == 45541872863332029185006506896_u128);
+    static_assert((308818922083941790200970218656780137342_u128 % 3924503981542839365105580788109277489_u128) == 2707611523600319722734917184256493200_u128);
+}
 void cjm::uint128_tests::compile_time_comparison_test() noexcept
 {
     // ReSharper disable CppIdenticalOperandsInBinaryExpression

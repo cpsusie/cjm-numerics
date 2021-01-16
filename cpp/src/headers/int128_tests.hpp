@@ -312,6 +312,7 @@ namespace cjm::uint128_tests
     [[maybe_unused]] void compile_time_subtraction_test() noexcept;
     [[maybe_unused]] void compile_time_comparison_test() noexcept;
     [[maybe_unused]] void compile_time_multiplication_test() noexcept;
+    [[maybe_unused]] void compile_time_divmod_test() noexcept;
 }
 
 namespace std
