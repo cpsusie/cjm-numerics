@@ -590,11 +590,22 @@ namespace cjm::uint128_tests
         [[nodiscard]] binary_op op_code() const noexcept { return m_op; }
         [[nodiscard]] const uint_test_t& left_operand() const noexcept { return m_lhs; }
         [[nodiscard]] const uint_test_t& right_operand() const noexcept { return m_rhs; }
-        [[nodiscard]] const std::optional<std::pair<uint_test_t, uint_test_t>>& result() const noexcept { return m_result; }
+        [[nodiscard]] std::optional<std::pair<uint_test_t, uint_test_t>> result() const noexcept { return m_result; }
         [[nodiscard]] bool has_result() const noexcept { return m_result.has_value(); }
         [[nodiscard]] bool has_correct_result() const
         {
-            return m_result.has_value() && binary_operation::perform_calculate_result(m_lhs, m_rhs, m_op) == m_result.value() && m_result->first == m_result->second;
+        	if (!m_result.has_value())
+        	{
+                return false;
+        	}
+            auto res = perform_calculate_result(m_lhs, m_rhs, m_op);
+            bool equal = res.first == m_result.value().first && res.second == m_result.value().second && res.first == res.second;
+        	if (!equal)
+        	{
+                std::cerr << "Results not equal!" << newl;
+                return false;
+        	}
+            return true;
         }
 
         binary_operation() noexcept : m_op(), m_lhs(), m_rhs(), m_result() {}
@@ -650,7 +661,7 @@ namespace cjm::uint128_tests
         bool do_calculate_result()
         {
             auto result = perform_calculate_result(m_lhs, m_rhs, m_op);
-            const bool changed_value = (!m_result.has_value() || *m_result != result);
+            const bool changed_value = m_result != result;
             m_result = result;
             return changed_value;
         }

@@ -1420,13 +1420,32 @@ void cjm::uint128_tests::execute_failing_division_test_2()
 {
     constexpr auto test_name = "failing_division_test_2"sv;
     auto op_text = "/;256368684943268248658307433575740207117;16109687965047641490155963133754044755;"sv;
-    auto stream = string::make_throwing_sstream<char>();
+    constexpr auto lhs = 256368684943268248658307433575740207117_u128;
+    constexpr auto rhs = 16109687965047641490155963133754044755_u128;
+    auto control_lhs = to_ctrl(lhs);
+    auto control_rhs = to_ctrl(rhs);
+    auto control_res = control_lhs / control_rhs;
+    std::cout << "This operation should indicate: [" << control_lhs << " / " << control_rhs << " == " << control_res << "]." << newl;
+
+	static_assert((lhs / rhs) == 15_u128);
+	
+	auto stream = string::make_throwing_sstream<char>();
+	
     stream << op_text;
     binary_op_u128_t temp;
     stream >> temp;
+    std::cout << "About to test deserialization:..." << newl;
+    cjm_assert(lhs == temp.left_operand() && rhs == temp.right_operand());
+    cjm_assert(temp.op_code() == binary_op::divide);
+
+    auto res = temp.left_operand() / temp.right_operand();
+    cjm_assert(to_ctrl(res) == control_res);
+    std::cout << "Result: [" << res << "]" << newl;
+    std::cout << "Deserialization succeeded." << newl;
+    std::cout << "Printing static assertions from " << test_name << ": " << newl;
+    append_static_assertion(cout, temp) << newl;
     test_binary_operation(temp, test_name);
-//    std::cout << "Printing static assertions from " << test_name << ": " << newl;
-//    append_static_assertion(cout, temp) << newl;
+    
 }
 
 void cjm::uint128_tests::execute_failing_modulus_test_1()
@@ -1899,11 +1918,26 @@ void cjm::uint128_tests::insert_standard_divmod_ops(binary_op_u128_vect_t& op_ve
 
 void cjm::uint128_tests::test_binary_operation(binary_op_u128_t& op, std::string_view test_name)
 {
-    std::optional<std::pair<binary_op_u128_t::uint_test_t,
-        binary_op_u128_t::uint_test_t>> result = std::nullopt;
-
-	auto log_gen_fail = [=, &op](const testing::testing_failure& ex) -> void
-    {
+     
+	
+	try
+	{
+        op.calculate_result();
+        auto result = op.result();
+        bool has_correct = op.has_correct_result();
+        bool result_equals = result.value().first == result.value().second;
+		if (!has_correct || !result_equals)
+		{
+            std::cerr << "Error ... has_correct: [" << std::boolalpha << has_correct << "]; result_equals: [" << result_equals << "]." << newl;
+		}
+        cjm_assert( has_correct && result_equals);
+		if (op.op_code() == binary_op::divide || op.op_code() == binary_op::modulus)
+		{
+            validate_divmod_op(op);
+		}
+	}
+	catch (const testing::testing_failure& ex)
+	{
         auto saver = cout_saver{ std::cerr };
         std::cerr << "Test: [" << test_name << "], failed -- exception (" << ex.what() << ") thrown." << newl;
         std::cerr << "Operation: [" << op.op_code() << "]; Left operand: [" << std::dec << op.left_operand() << "]; Right operand: [" << op.right_operand() << "]." << newl;
@@ -1936,22 +1970,6 @@ void cjm::uint128_tests::test_binary_operation(binary_op_u128_t& op, std::string
         {
             std::cerr << "Successfully wrote failing operation to: [" << path << "]." << newl;
         }
-    };
-    
-	
-	try
-	{
-        op.calculate_result();
-        result = op.result();
-        cjm_assert(result.has_value() && op.has_correct_result() && result->first == result->second);
-		if (op.op_code() == binary_op::divide || op.op_code() == binary_op::modulus)
-		{
-            validate_divmod_op(op);
-		}
-	}
-	catch (const testing::testing_failure& ex)
-	{
-        log_gen_fail(ex);
         throw;
 	}
 }
