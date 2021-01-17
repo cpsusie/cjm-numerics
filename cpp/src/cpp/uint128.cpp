@@ -214,36 +214,7 @@ void uint128::div_mod_msc_x64_impl(uint128 dividend, uint128 divisor, uint128* q
 		*quotient_ret = quotient;
 		return;		
 	}
-	// 0 <= shift <= 63.
-	auto high_shift = CJM_LZCNT_64(divisor.m_high);
-	auto low_shift = CJM_LZCNT_64(dividend.m_high);
-	auto shift = static_cast<long>(high_shift) - static_cast<long>(low_shift);
-	//auto shift =
-	//	__builtin_clzll(divisor.s.high) - __builtin_clzll(dividend.s.high);
-	divisor <<= shift;
-	quotient.m_high = 0;
-	quotient.m_low = 0;
-	using namespace cjm::numerics::uint128_literals;
-	
-	for (; shift >= 0; --shift) 
-	{
-		quotient.m_low <<= 1;
-		auto to_right_shift = divisor - dividend - 1;
-		auto right_shift_amount = static_cast<long>(n_utword_bits) - 1;
-		assert(right_shift_amount <= 128 && right_shift_amount >= 0);
-		auto s =
-			to_right_shift >> right_shift_amount;
-		//if signed, would be negative, so or in ones to the left
-		if (to_right_shift & 0x8000'0000'0000'0000'0000'0000'0000'0000_u128 != 0)
-		{
-			s |= ones_lookup[right_shift_amount];
-		}
-		quotient.m_low |= static_cast<std::uint64_t>(s & 1);
-		dividend -= divisor & s;
-		divisor >>= 1;
-	}
-	*remainder_ret = remainder;
-	*quotient_ret = quotient;
+	unsafe_constexpr_div_mod_impl(dividend, divisor, quotient_ret, remainder_ret);
 	return;
 }
 #else

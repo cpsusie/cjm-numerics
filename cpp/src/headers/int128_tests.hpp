@@ -103,6 +103,7 @@ namespace cjm::uint128_tests
     void print_constexpr_bitcast_available();
     void print_cpp20_bitops_available();
     void print_builtin_uint128_data_if_present();
+    void print_alignments();
     void test_interconversion(const ctrl_uint128_t& control, uint128_t test);
     void execute_builtin_u128fls_test_if_avail();
     void execute_first_bin_op_test();
@@ -119,6 +120,7 @@ namespace cjm::uint128_tests
     void execute_failing_division_test_1();
     void execute_failing_division_test_2();
     void execute_failing_modulus_test_1();
+    void execute_failing_deser_x86_rel_test();
     void execute_division_modulus_tests();
     void execute_parse_file_test(std::string_view path, size_t expected_ops);
     [[maybe_unused]] void print_n_static_assertions(const binary_op_u128_vect_t& op_vec, size_t n);
@@ -597,7 +599,7 @@ namespace cjm::uint128_tests
             return m_result.has_value() && m_result->first == m_result->second;
         }
 
-        binary_operation() noexcept : m_op(), m_lhs(), m_rhs(), m_result() {}
+        binary_operation() noexcept : m_op(), m_lhs{ 0 }, m_rhs{ 0 }, m_result{} {}
         binary_operation(binary_op op, const uint_test_t& first_operand, const uint_test_t& second_operand, bool calculate_now) : m_op(op), m_lhs(first_operand), m_rhs(second_operand), m_result()
         {
             validate(op, first_operand, second_operand);
@@ -649,7 +651,9 @@ namespace cjm::uint128_tests
 
         bool do_calculate_result()
         {
-            auto result = perform_calculate_result(m_lhs, m_rhs, m_op);
+            auto left_copy = m_lhs;
+            auto right_copy = m_rhs;
+            auto result = perform_calculate_result(left_copy, right_copy, m_op);
             const bool changed_value = m_result != result;
             m_result = result;
             return changed_value;

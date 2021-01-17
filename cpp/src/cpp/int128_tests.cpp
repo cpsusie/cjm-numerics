@@ -1442,7 +1442,8 @@ void cjm::uint128_tests::execute_failing_division_test_2()
 	auto res = temp.left_operand() / temp.right_operand();
     cjm_assert(to_ctrl(res) == control_res);
     std::cout << "Result: [" << res << "]" << newl;
-    
+
+    temp.calculate_result();
     std::cout << "Printing static assertions from " << test_name << ": " << newl;
     append_static_assertion(cout, temp) << newl;
     test_binary_operation(temp, test_name);
@@ -1463,7 +1464,7 @@ void cjm::uint128_tests::execute_failing_modulus_test_1()
 void cjm::uint128_tests::execute_division_modulus_tests()
 {
     constexpr auto test_name = "division_modulus_tests"sv;
-    constexpr size_t ops_per_range = 50;
+    constexpr size_t ops_per_range = 250;
     constexpr size_t num_ranges = 4;
     constexpr size_t num_standard_values = 172;
     constexpr size_t num_rnd_ops = ops_per_range * num_ranges;
@@ -1476,11 +1477,11 @@ void cjm::uint128_tests::execute_division_modulus_tests()
         test_binary_operation(binary_operation, test_name);
 	}
     std::cout << "All " << std::dec << op_vec.size() << " tests PASS." << newl;
-	auto rgen = generator::rgen{};
+	/*auto rgen = generator::rgen{};
 	rgen.shuffle(op_vec, op_vec.size());
 	std::cout << "Going to print static assertions: " << newl;
 	print_n_static_assertions(op_vec, 25);
-	std::cout << newl << "Done printing static assertions." << newl;
+	std::cout << newl << "Done printing static assertions." << newl;*/
 }
 
 std::filesystem::path cjm::uint128_tests::create_generated_bin_op_filename(binary_op op)
