@@ -1132,7 +1132,7 @@ void cjm::uint128_tests::execute_trim_tests()
     using namespace std::string_view_literals;
     constexpr std::string_view should_be = "<<"sv;
     std::string x = " <<   "s;
-    std::string_view xv = x;
+    std::string_view xv;
     std::string x_trim = cjm::string::trim(x);
     cjm_deny(x == x_trim);
     cjm_assert(x_trim == should_be);

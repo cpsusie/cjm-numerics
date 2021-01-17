@@ -103,7 +103,6 @@ namespace cjm::uint128_tests
     void print_constexpr_bitcast_available();
     void print_cpp20_bitops_available();
     void print_builtin_uint128_data_if_present();
-    void print_alignments();
     void test_interconversion(const ctrl_uint128_t& control, uint128_t test);
     void execute_builtin_u128fls_test_if_avail();
     void execute_first_bin_op_test();
@@ -120,7 +119,6 @@ namespace cjm::uint128_tests
     void execute_failing_division_test_1();
     void execute_failing_division_test_2();
     void execute_failing_modulus_test_1();
-    void execute_failing_deser_x86_rel_test();
     void execute_division_modulus_tests();
     void execute_parse_file_test(std::string_view path, size_t expected_ops);
     [[maybe_unused]] void print_n_static_assertions(const binary_op_u128_vect_t& op_vec, size_t n);
