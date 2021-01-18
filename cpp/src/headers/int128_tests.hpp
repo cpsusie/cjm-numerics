@@ -1064,7 +1064,39 @@ U"UnaryPlus"sv, U"UnaryMinus"sv, U"BitwiseNot"sv, U"BoolCast"sv, U"LogicalNegati
             return false;
         }
 
+        bool calculate_result()
+        {
+            if (has_correct_result())
+            {
+                return true;
+            }
+            if (do_calculation())
+            {
+                const bool should_have_post_res = m_op == unary_op::post_increment
+                                                  || m_op == unary_op::post_decrement;
+                return      m_result.has_value()
+                        &&  m_result->first == m_result->second
+                        &&  should_have_post_res == m_post_result.has_value()
+                        && (    !m_post_result.has_value() ||
+                                m_post_result.value().first == m_post_result->second);
+            }
+            return false;
+
+        }
+
     private:
+
+        bool do_calculation()
+        {
+            auto operand = m_operand;
+            auto op = m_op;
+            auto [res, post_res] = perform_calculate_result(op, operand);
+            const bool changed = m_result != res || m_post_result != post_res;
+            m_result = res;
+            m_post_result = post_res;
+            return changed;
+        }
+
         static auto to_control(const uint_test_t& test)-> uint_ctrl_t
         {
             uint_ctrl_t ctrl = test.high_part();
@@ -1081,6 +1113,7 @@ U"UnaryPlus"sv, U"UnaryMinus"sv, U"BitwiseNot"sv, U"BoolCast"sv, U"LogicalNegati
             uint_test_t low = static_cast<typename uint_test_t::int_part>(ctrl);
             return high | low;
         }
+
         static std::pair<result_t, result_t> perform_calculate_result(unary_op op, uint_test_t test_operand)
         {
             uint_ctrl_t ctrl_operand = to_control(test_operand);
