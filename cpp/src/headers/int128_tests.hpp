@@ -72,9 +72,13 @@ namespace cjm::uint128_tests
     template<typename TestType = uint128_t , typename ControlType = ctrl_uint128_t>
         requires (test_uint_and_control_set<TestType, ControlType>)
     struct binary_operation;
+    template<typename TestType, typename ControlType>
+    requires (test_uint_and_control_set<TestType, ControlType>)
+    struct unary_operation;
     using binary_op_u128_t = binary_operation<uint128_t, ctrl_uint128_t>;
     using binary_op_u128_vect_t = std::vector<binary_op_u128_t>;
-
+    using unary_op_u128_t = unary_operation<uint128_t, ctrl_uint128_t>;
+    using unary_op_u128_vect_t = std::vector<unary_op_u128_t>;
     /// <summary>
     /// hascorrectresult() must be true or throws
     /// must be divide or modulus or throws
@@ -797,7 +801,9 @@ U"UnaryPlus"sv, U"UnaryMinus"sv, U"BitwiseNot"sv, U"BoolCast"sv, U"LogicalNegati
             {
                 if (m_result->first == m_result->second)
                 {
-                    return m_op == binary_op::compare || (m_compound_result.has_value() && *m_compound_result == m_result->first);
+                    return m_op == binary_op::compare ||
+                        (m_compound_result.has_value() &&
+                        *m_compound_result == m_result->first);
                 }
                 return false;
             }
@@ -990,8 +996,172 @@ U"UnaryPlus"sv, U"UnaryMinus"sv, U"BitwiseNot"sv, U"BoolCast"sv, U"LogicalNegati
         uint_test_t m_rhs;
         result_t m_result;   
         compound_result_t m_compound_result;
-};
-	
+    };
+
+    template<typename TestType, typename ControlType>
+    requires (test_uint_and_control_set<TestType, ControlType>)
+    struct unary_operation final
+    {
+       using uint_test_t = std::remove_const_t<TestType>;
+       using uint_ctrl_t = std::remove_const_t<ControlType>;
+       using result_t = std::optional<std::pair<uint_test_t, uint_test_t>>;
+
+        [[nodiscard]] std::size_t hash_value() const noexcept
+        {
+            std::size_t seed = 0x1FBB0493;
+            boost::hash_combine(seed, static_cast<size_t>(m_op));
+            boost::hash_combine(seed, std::hash<uint_test_t>{}(m_operand));
+            return seed;
+        }
+
+        friend bool operator==(const unary_operation& lhs, const unary_operation& rhs)
+        {
+            return lhs.m_op == rhs.m_op && lhs.m_operand == rhs.m_operand;
+        }
+
+        friend bool operator<(const unary_operation &lhs, const unary_operation &rhs)
+        {
+            if (lhs.m_op < rhs.m_op)
+                return true;
+            if (rhs.m_op < lhs.m_op)
+                return false;
+            return lhs.m_operand < rhs.m_operand;
+        }
+
+        friend bool operator>(const unary_operation& lhs,
+            const unary_operation& rhs) { return rhs < lhs; }
+        friend bool operator<=(const unary_operation& lhs,
+            const unary_operation& rhs) {return !(rhs < lhs);}
+        friend bool operator>=(const unary_operation& lhs,
+            const unary_operation& rhs)  {return !(lhs < rhs);}
+        friend bool operator!=(const unary_operation& lhs,
+            const unary_operation& rhs) { return !(rhs == lhs); }
+        friend std::weak_ordering operator <=>(const unary_operation& lhs,
+            const unary_operation& rhs) = default;
+
+        [[nodiscard]] unary_op op_code() const noexcept { return m_op; }
+        [[nodiscard]] const uint_test_t& operand() const noexcept { return m_operand; }
+        [[nodiscard]] const result_t& result() const noexcept { return m_result; }
+        [[nodiscard]] const result_t& post_result() const noexcept {return m_post_result;}
+        [[nodiscard]] bool has_result() const noexcept { return m_result.has_value(); }
+        [[nodiscard]] bool has_post_result() const noexcept {return m_post_result.has_value();}
+        [[nodiscard]] bool has_correct_result() const
+        {
+            if (m_result.has_value())
+            {
+                if (m_result->first == m_result->second)
+                {
+                    const bool should_have_post_res = m_op == unary_op::post_increment
+                            || m_op == unary_op::post_decrement;
+                    if (should_have_post_res == m_post_result.has_value())
+                    {
+                        return !should_have_post_res || m_post_result.value().first == m_post_result->second;
+                    }
+                    return false;
+                }
+                return false;
+            }
+            return false;
+        }
+
+    private:
+        static auto to_control(const uint_test_t& test)-> uint_ctrl_t
+        {
+            uint_ctrl_t ctrl = test.high_part();
+            ctrl <<= std::numeric_limits<typename uint_test_t::int_part>::digits;
+            ctrl |= test.low_part();
+            return ctrl;
+        }
+
+
+        static uint_test_t to_test(const uint_ctrl_t& ctrl)
+        {
+            uint_test_t high = static_cast<typename uint_test_t::int_part>(ctrl >> std::numeric_limits<typename uint_test_t::int_part>::digits);
+            high <<= std::numeric_limits<typename uint_test_t::int_part>::digits;
+            uint_test_t low = static_cast<typename uint_test_t::int_part>(ctrl);
+            return high | low;
+        }
+        static std::pair<result_t, result_t> perform_calculate_result(unary_op op, uint_test_t test_operand)
+        {
+            uint_ctrl_t ctrl_operand = to_control(test_operand);
+            uint_test_t test_result;
+            uint_ctrl_t ctrl_result;
+            std::optional<uint_test_t> test_post_result;
+            std::optional<uint_ctrl_t> ctrl_post_result;
+            switch (op)
+            {
+
+                case unary_op::pre_increment:
+                    ctrl_result = ++ctrl_operand;
+                    test_result = ++test_operand;
+                    test_post_result = std::nullopt;
+                    ctrl_post_result = std::nullopt;
+                    break;
+                case unary_op::pre_decrement:
+                    ctrl_result = --ctrl_operand;
+                    test_result = --test_operand;
+                    test_post_result = std::nullopt;
+                    ctrl_post_result = std::nullopt;
+                    break;
+                case unary_op::post_increment:
+                    ctrl_result = ctrl_operand++;
+                    ctrl_post_result = ctrl_operand;
+                    test_result = test_operand++;
+                    test_post_result = test_operand;
+                    break;
+                case unary_op::post_decrement:
+                    ctrl_result = ctrl_operand--;
+                    ctrl_post_result = ctrl_operand;
+                    test_result = test_operand--;
+                    test_post_result = test_operand;
+                    break;
+                case unary_op::unary_plus:
+                    ctrl_result = +ctrl_operand;
+                    test_result = +test_operand;
+                    test_post_result = std::nullopt;
+                    ctrl_post_result = std::nullopt;
+                    break;
+                case unary_op::unary_minus:
+                    ctrl_result = -ctrl_operand;
+                    test_result = -test_operand;
+                    test_post_result = std::nullopt;
+                    ctrl_post_result = std::nullopt;
+                    break;
+                case unary_op::bitwise_not:
+                    ctrl_result = ~ctrl_operand;
+                    test_result = ~test_operand;
+                    test_post_result = std::nullopt;
+                    ctrl_post_result = std::nullopt;
+                    break;
+                case unary_op::bool_cast:
+                    ctrl_result = static_cast<uint_ctrl_t>(static_cast<bool>(ctrl_operand) ? 1 : 0);
+                    test_result = static_cast<uint_test_t>(static_cast<bool>(test_operand) ? 1 : 0);
+                    test_post_result = std::nullopt;
+                    ctrl_post_result = std::nullopt;
+                    break;
+                case unary_op::logical_negation:
+                    ctrl_result = static_cast<uint_ctrl_t>((!ctrl_operand) ? 1 : 0);
+                    test_result = static_cast<uint_test_t>((!test_operand) ? 1 : 0);
+                    test_post_result = std::nullopt;
+                    ctrl_post_result = std::nullopt;
+                    break;
+            }
+            assert(test_post_result.has_value() == ctrl_post_result.has_value());
+            if (test_post_result.has_value())
+            {
+                auto post_res = std::make_pair(test_post_result.value(), to_test(ctrl_post_result.value()));
+                auto res = std::make_pair(test_result, to_test(ctrl_result));
+                return std::make_pair(res, post_res);
+            }
+            return std::make_pair(std::make_pair(test_result, to_test(ctrl_result)), std::nullopt);
+        }
+
+        unary_op m_op;
+        uint_test_t m_operand;
+        result_t m_result;
+        result_t m_post_result;
+    };
+
 	template<numerics::concepts::character Char>
 	std::basic_ostream<Char, std::char_traits<Char>>& operator<<(std::basic_ostream<Char,
     std::char_traits<Char>>&os, const binary_op_u128_t& op)
