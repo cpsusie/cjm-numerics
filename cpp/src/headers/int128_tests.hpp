@@ -30,6 +30,7 @@
 #include <chrono>
 #include <date/date.h>
 #include <filesystem>
+#include <tuple>
 
 #include "istream_utils.hpp"
 
@@ -47,11 +48,13 @@ namespace cjm::uint128_tests
     constexpr auto newl = '\n';
     using cout_saver = boost::io::ios_flags_saver;
 
+    enum class unary_op : unsigned int;
     enum class binary_op : unsigned int;
     constexpr size_t binary_op_count = 11;
+    constexpr size_t unary_op_count = 9;
 
     class bad_binary_op;
-
+    class bad_unary_op;
     class divmod_fail_match;
 
     template<typename Invocable>
@@ -120,6 +123,7 @@ namespace cjm::uint128_tests
     void execute_failing_division_test_2();
     void execute_failing_modulus_test_1();
     void execute_division_modulus_tests();
+    void execute_unary_op_code_rt_serialization_tests();
     void execute_parse_file_test(std::string_view path, size_t expected_ops);
     [[maybe_unused]] void print_n_static_assertions(const binary_op_u128_vect_t& op_vec, size_t n);
 
@@ -346,8 +350,19 @@ namespace cjm::uint128_tests
 
         compare = 10
     };
-
-	
+    
+    enum class unary_op : unsigned int
+    {
+        pre_increment = 0,
+        pre_decrement = 1,
+        post_increment = 2,
+        post_decrement = 3,
+        unary_plus = 4,
+        unary_minus=5,
+        bitwise_not = 6,
+        bool_cast = 7,
+        logical_negation = 8,
+    };	
 	
     static_assert(!cjm::numerics::has_msc || std::is_unsigned_v<wchar_t>);
     constexpr binary_op first_op = binary_op::left_shift;
@@ -365,7 +380,69 @@ namespace cjm::uint128_tests
     constexpr binary_op first_add_sub_mul_op = binary_op::add;
     constexpr binary_op last_add_sub_mul_op = binary_op::multiply;
 	
-	
+    constexpr unary_op first_unary_op = unary_op::pre_increment;
+    constexpr unary_op last_unary_op = unary_op::logical_negation;
+    
+    constexpr unary_op first_inc_dec_op = unary_op::pre_increment;
+    constexpr unary_op last_inc_dec_op = unary_op::post_decrement;
+    
+    constexpr unary_op first_plus_minus_op = unary_op::unary_plus;
+    constexpr unary_op last_plus_minus_op = unary_op::unary_minus;
+    
+    constexpr unary_op first_boolean_op = unary_op::bool_cast;
+    constexpr unary_op last_boolean_op = unary_op::logical_negation;
+
+
+    constexpr auto un_op_name_lookup = std::array<sv_t, unary_op_count>
+    {
+"PreIncrement"sv, "PreDecrement"sv, "PostIncrement"sv, "PostDecrement"sv,
+"UnaryPlus"sv, "UnaryMinus"sv, "BitwiseNot"sv, "BoolCast"sv, "LogicalNegation"sv
+    };
+    constexpr auto un_op_name_lookup_wide = std::array<wsv_t, unary_op_count>
+    {
+L"PreIncrement"sv, L"PreDecrement"sv, L"PostIncrement"sv, L"PostDecrement"sv,
+L"UnaryPlus"sv, L"UnaryMinus"sv, L"BitwiseNot"sv, L"BoolCast"sv, L"LogicalNegation"sv
+    };
+    constexpr auto un_op_name_lookup_u8 = std::array<u8sv_t, unary_op_count>
+    {
+u8"PreIncrement"sv, u8"PreDecrement"sv, u8"PostIncrement"sv, u8"PostDecrement"sv,
+u8"UnaryPlus"sv, u8"UnaryMinus"sv, u8"BitwiseNot"sv, u8"BoolCast"sv, u8"LogicalNegation"sv
+    };
+    constexpr auto un_op_name_lookup_u16 = std::array<u16sv_t, unary_op_count>
+    {
+u"PreIncrement"sv, u"PreDecrement"sv, u"PostIncrement"sv, u"PostDecrement"sv,
+u"UnaryPlus"sv, u"UnaryMinus"sv, u"BitwiseNot"sv, u"BoolCast"sv, u"LogicalNegation"sv
+    };
+    constexpr auto un_op_name_lookup_u32 = std::array<u32sv_t, unary_op_count>
+    {
+U"PreIncrement"sv, U"PreDecrement"sv, U"PostIncrement"sv, U"PostDecrement"sv,
+U"UnaryPlus"sv, U"UnaryMinus"sv, U"BitwiseNot"sv, U"BoolCast"sv, U"LogicalNegation"sv
+    };
+    constexpr auto un_op_symbol_lookup = std::array<sv_t, unary_op_count>
+    {
+        "++x"sv, "--x"sv, "x++"sv, "x--"sv,
+        "+x"sv, "-x"sv, "~x"sv, "static_cast<bool>(x)"sv, "!x"sv
+    };
+    constexpr auto un_op_symbol_lookup_wide = std::array<wsv_t, unary_op_count>
+    {
+    L"++x"sv, L"--x"sv, L"x++"sv, L"x--"sv,
+    L"+x"sv, L"-x"sv, L"~x"sv, L"static_cast<bool>(x)"sv, L"!x"sv
+    };
+    constexpr auto un_op_symbol_lookup_u8 = std::array<u8sv_t, unary_op_count>
+    {
+    u8"++x"sv, u8"--x"sv, u8"x++"sv, u8"x--"sv,
+    u8"+x"sv, u8"-x"sv, u8"~x"sv, u8"static_cast<bool>(x)"sv, u8"!x"sv
+    };
+    constexpr auto un_op_symbol_lookup_u16 = std::array<u16sv_t, unary_op_count>
+    {
+    u"++x"sv, u"--x"sv, u"x++"sv, u"x--"sv,
+    u"+x"sv, u"-x"sv, u"~x"sv, u"static_cast<bool>(x)"sv, u"!x"sv
+    };
+    constexpr auto un_op_symbol_lookup_u32 = std::array<u32sv_t, unary_op_count>
+    {
+    U"++x"sv, U"--x"sv, U"x++"sv, U"x--"sv,
+    U"+x"sv, U"-x"sv, U"~x"sv, U"static_cast<bool>(x)"sv, U"!x"sv
+    };
     constexpr auto op_name_lookup = std::array<sv_t, binary_op_count>{
         "LeftShift"sv, "RightShift"sv, "And"sv, "Or"sv,
             "Xor"sv, "Divide"sv, "Modulus"sv, "Add"sv,
@@ -414,6 +491,18 @@ namespace cjm::uint128_tests
     constexpr u16sv_t get_op_u16text(binary_op op);
     constexpr u32sv_t get_op_u32text(binary_op op);
 
+    constexpr sv_t get_un_op_text(unary_op op);
+    constexpr wsv_t get_un_op_wtext(unary_op op);
+    constexpr u8sv_t get_un_op_u8text(unary_op op);
+    constexpr u16sv_t get_un_op_u16text(unary_op op);
+    constexpr u32sv_t get_un_op_u32text(unary_op op);
+
+    constexpr sv_t get_un_op_symbol_n(unary_op op);
+    constexpr wsv_t get_un_op_symbol_w(unary_op op);
+    constexpr u8sv_t get_un_op_symbol_u8(unary_op op);
+    constexpr u16sv_t get_un_op_symbol_u16(unary_op op);
+    constexpr u32sv_t get_un_op_symbol_u32(unary_op op);
+
     constexpr sv_t get_op_symbol_n(binary_op op);
     constexpr wsv_t get_op_symbol_w(binary_op op);
     constexpr u8sv_t get_op_symbol_u8(binary_op op);
@@ -452,11 +541,50 @@ namespace cjm::uint128_tests
         return get_op_symbol_u32(op);
     }
 
+    template<numerics::concepts::character Char>
+    constexpr auto get_un_op_symbol(unary_op op) -> std::basic_string_view<Char>;
+
+    template<>
+    constexpr auto get_un_op_symbol<char>(unary_op op) -> std::basic_string_view<char>
+    {
+        return get_un_op_symbol_n(op);
+    }
+    template<>
+    constexpr auto get_un_op_symbol<wchar_t>(unary_op op) -> std::basic_string_view<wchar_t>
+    {
+        return get_un_op_symbol_w(op);
+    }
+
+    template<>
+    constexpr auto get_un_op_symbol<char8_t>(unary_op op) -> std::basic_string_view<char8_t>
+    {
+        return get_un_op_symbol_u8(op);
+    }
+
+    template<>
+    constexpr auto get_un_op_symbol<char16_t>(unary_op op) -> std::basic_string_view<char16_t>
+    {
+        return get_un_op_symbol_u16(op);
+    }
+
+    template<>
+    constexpr auto get_un_op_symbol<char32_t>(unary_op op) -> std::basic_string_view<char32_t>
+    {
+        return get_un_op_symbol_u32(op);
+    }
+
+    unary_op parse_unary_op_symbol(sv_t text);
+    unary_op parse_unary_op_symbol(wsv_t text);
+    unary_op parse_unary_op_symbol(u8sv_t text);
+    unary_op parse_unary_op_symbol(u16sv_t text);
+    unary_op parse_unary_op_symbol(u32sv_t text);
+
     binary_op parse_binary_op_symbol(sv_t text);
     binary_op parse_binary_op_symbol(wsv_t text);
     binary_op parse_binary_op_symbol(u8sv_t text);
     binary_op parse_binary_op_symbol(u16sv_t text);
     binary_op parse_binary_op_symbol(u32sv_t text);
+
 
     template<numerics::concepts::character Char>
     std::basic_ostream<Char, std::char_traits<Char>>& operator<<(std::basic_ostream<Char, std::char_traits<Char>>& os, binary_op op)
@@ -510,8 +638,59 @@ namespace cjm::uint128_tests
         op = parse_binary_op_symbol(lsv_t{temp});
         return is;
     }
-	
-	
+
+    template<numerics::concepts::character Char>
+    std::basic_ostream<Char, std::char_traits<Char>>& operator<<(std::basic_ostream<Char, std::char_traits<Char>>& os, unary_op op)
+    {
+        std::basic_string_view<Char> sv = get_un_op_symbol<std::remove_cvref_t<std::remove_const_t<Char>>>(op);
+        os << sv;
+        return os;
+    }
+
+    template<numerics::concepts::character Char>
+    std::basic_istream<Char, std::char_traits<Char>>& operator>>(std::basic_istream<Char,
+            std::char_traits<Char>>& is, unary_op& op)
+    {
+        using string_t = std::basic_string<Char>;
+        using lsv_t = std::basic_string_view<Char>;
+        string_t temp;
+        if constexpr (cjm::numerics::has_msc || !cjm::numerics::concepts::utf_character<Char>)
+        {
+            is >> temp;
+        }
+        else
+        {
+
+            Char c{};
+            do
+            {
+                if (is.good() && !is.eof() && is.peek() != std::char_traits<Char>::eof())
+                {
+                    is.get(c);
+                    if (!is.bad() && !is.fail())
+                    {
+                        if (!std::isspace<char>(convert_char<Char, char>(c), std::locale("")))
+                            temp.push_back(c);
+                        else
+                            break;
+                    }
+                }
+                else
+                    break;
+            } while (!is.bad() && !is.fail() && !is.eof());
+            if (is.bad() || is.fail())
+            {
+                return is;
+            }
+            if (temp.empty())
+            {
+                is.setstate(std::ios_base::failbit);
+                return is;
+            }
+        }
+        op = parse_unary_op_symbol(lsv_t{temp});
+        return is;
+    }
 
     
 	
@@ -536,7 +715,25 @@ namespace cjm::uint128_tests
         }
     };
 
-    
+    class bad_unary_op final : public std::invalid_argument
+    {
+    public:
+        using stream_t = std::stringstream;
+        bad_unary_op(unary_op op)
+            : invalid_argument(create_message(op)) {}
+
+        using enum_type_t = std::underlying_type_t<unary_op>;
+    private:
+        static std::string create_message(unary_op op)
+        {
+            stream_t ss;
+            ss  << "The value underlying the unary_op provided ("
+                << static_cast<enum_type_t>(op)
+                << "), is not a defined member of the unary_op enum class.";
+            return ss.str();
+        }
+    };
+
 	
     template<typename TestType, typename ControlType>
         requires (test_uint_and_control_set<TestType, ControlType>)
@@ -549,6 +746,7 @@ namespace cjm::uint128_tests
         using uint_test_t = std::remove_const_t<TestType>;
         using uint_ctrl_t = std::remove_const_t<ControlType>;
         using result_t = std::optional<std::pair<uint_test_t, uint_test_t>>;
+        using compound_result_t = std::optional<uint_test_t>;
         [[nodiscard]] std::size_t hash_value() const noexcept
         {
             std::size_t seed = 0x1FBB0493;
@@ -586,7 +784,8 @@ namespace cjm::uint128_tests
 
         friend bool operator!=(const binary_operation& lhs, const binary_operation& rhs) { return !(lhs == rhs); }
         friend std::weak_ordering operator <=>(const binary_operation& lhs, const binary_operation& rhs) = default;
-    	
+
+        [[nodiscard]] const compound_result_t& compound_result() const noexcept {return m_compound_result;}
         [[nodiscard]] binary_op op_code() const noexcept { return m_op; }
         [[nodiscard]] const uint_test_t& left_operand() const noexcept { return m_lhs; }
         [[nodiscard]] const uint_test_t& right_operand() const noexcept { return m_rhs; }
@@ -594,29 +793,40 @@ namespace cjm::uint128_tests
         [[nodiscard]] bool has_result() const noexcept { return m_result.has_value(); }
         [[nodiscard]] bool has_correct_result() const
         {
-            return m_result.has_value() && m_result->first == m_result->second;
+            if (m_result.has_value())
+            {
+                if (m_result->first == m_result->second)
+                {
+                    return m_op == binary_op::compare || (m_compound_result.has_value() && *m_compound_result == m_result->first);
+                }
+                return false;
+            }
+            return false;
         }
 
-        binary_operation() noexcept : m_op(), m_lhs{ 0 }, m_rhs{ 0 }, m_result{} {}
-        binary_operation(binary_op op, const uint_test_t& first_operand, const uint_test_t& second_operand, bool calculate_now) : m_op(op), m_lhs(first_operand), m_rhs(second_operand), m_result()
+        binary_operation() noexcept : m_op(), m_lhs{ 0 }, m_rhs{ 0 }, m_result{}, m_compound_result{} {}
+
+        binary_operation(binary_op op, const uint_test_t& first_operand, const uint_test_t& second_operand, bool calculate_now) : m_op(op), m_lhs(first_operand), m_rhs(second_operand), m_result{}, m_compound_result{}
         {
             validate(op, first_operand, second_operand);
 	        if (calculate_now)
 	        {
-                m_result = perform_calculate_result(first_operand, second_operand, m_op);
+                auto [result, comp_res] = perform_calculate_result(first_operand, second_operand, m_op);
+                m_result = result;
+                m_compound_result = comp_res;
 	        }
         }
     	
         binary_operation(binary_op op, const uint_test_t& first_operand, 
             const uint_test_t& second_operand) : m_op{ op }, m_lhs{ first_operand },
-            m_rhs{ second_operand }, m_result{}
+            m_rhs{ second_operand }, m_result{}, m_compound_result{}
         {
            validate(op, first_operand, second_operand);
         }
         binary_operation(binary_op op, const uint_test_t& first_operand, 
             const uint_test_t& second_operand, const uint_test_t& test_result, 
-				const uint_test_t& ctrl_result) : m_op(op), m_lhs(first_operand), m_rhs(second_operand),
-				m_result(std::make_pair(test_result, ctrl_result))
+				const uint_test_t& ctrl_result, std::optional<uint_test_t> compound_res) : m_op(op), m_lhs(first_operand), m_rhs(second_operand),
+				m_result(std::make_pair(test_result, ctrl_result)), m_compound_result{compound_res}
         {
             validate(op, first_operand, second_operand);
         }
@@ -651,60 +861,82 @@ namespace cjm::uint128_tests
         {
             auto left_copy = m_lhs;
             auto right_copy = m_rhs;
-            auto result = perform_calculate_result(left_copy, right_copy, m_op);
-            const bool changed_value = m_result != result;
+            auto [test_res, ctrl_res, comp_res] = perform_calculate_result(left_copy, right_copy, m_op);
+            auto result = std::make_pair(test_res, ctrl_res);
+            const bool changed_value = m_result != result || comp_res != m_compound_result;
             m_result = result;
+            m_compound_result = comp_res;
             return changed_value;
         }
-        static std::pair<uint_test_t, uint_test_t> perform_calculate_result(const uint_test_t& lhs, const uint_test_t& rhs, binary_op op) 
+        static std::tuple<uint_test_t, uint_test_t, std::optional<uint_test_t>> perform_calculate_result(const uint_test_t& lhs, const uint_test_t& rhs, binary_op op)
         {
             assert(static_cast<size_t>(op) < op_name_lookup.size());
             uint_test_t ret_tst = 0;
             uint_ctrl_t ret_ctrl = 0;
             uint_ctrl_t lhs_ctrl = to_control(lhs);
             uint_ctrl_t rhs_ctrl = to_control(rhs);
-        	
+        	uint_test_t lhs_copy = lhs;
+        	std::optional<uint_test_t> compound_res = std::nullopt;
             switch (op)
             {
             case binary_op::left_shift:
-
                 ret_tst = lhs << static_cast<int>(rhs);
+                lhs_copy <<= static_cast<int>(rhs);
+                compound_res = lhs_copy;
                 ret_ctrl = lhs_ctrl << static_cast<int>(rhs);
                 break;
             case binary_op::right_shift:
                 ret_tst = lhs >> static_cast<int>(rhs_ctrl);
+                lhs_copy >>= static_cast<int>(rhs);
+                compound_res = lhs_copy;
                 ret_ctrl = lhs_ctrl >> static_cast<int>(rhs_ctrl);
                 break;
             case binary_op::bw_and:
                 ret_tst = lhs & rhs;
+                lhs_copy &= rhs;
+                compound_res = lhs_copy;
                 ret_ctrl = lhs_ctrl & rhs_ctrl;
                 break;
             case binary_op::bw_or:
                 ret_tst = lhs | rhs;
+                lhs_copy |= rhs;
+                compound_res = lhs_copy;
                 ret_ctrl = lhs_ctrl | rhs_ctrl;
             	break;
             case binary_op::bw_xor:
                 ret_tst = lhs ^ rhs;
+                lhs_copy ^= rhs;
+                compound_res = lhs_copy;
                 ret_ctrl = lhs_ctrl ^ rhs_ctrl;
                 break;
             case binary_op::divide:
                 ret_tst = lhs / rhs;
+                lhs_copy /= rhs;
+                compound_res = lhs_copy;
                 ret_ctrl = lhs_ctrl / rhs_ctrl;
                 break;
             case binary_op::modulus:
                 ret_tst = lhs % rhs;
+                lhs_copy %= rhs;
+                compound_res = lhs_copy;
                 ret_ctrl = lhs_ctrl % rhs_ctrl;
                 break;
             case binary_op::add:
                 ret_tst = lhs + rhs;
+                lhs_copy += rhs;
+                compound_res = lhs_copy;
                 ret_ctrl = lhs_ctrl + rhs_ctrl;
                 break;
             case binary_op::subtract:
                 ret_tst = lhs - rhs;
+                lhs_copy -= rhs;
+                compound_res = lhs_copy;
                 ret_ctrl = lhs_ctrl - rhs_ctrl;
                 break;
             case binary_op::multiply:
                 ret_tst = lhs * rhs;
+                lhs_copy *= rhs;
+                compound_res = lhs_copy;
                 ret_ctrl = lhs_ctrl * rhs_ctrl;
                 break;
             case binary_op::compare:
@@ -726,7 +958,7 @@ namespace cjm::uint128_tests
                 }
                 break;
             }
-            return std::make_pair(ret_tst, to_test(ret_ctrl));
+            return std::make_tuple(ret_tst, to_test(ret_ctrl), compound_res);
         }
 
         static void validate(binary_op op, [[maybe_unused]] const uint_test_t& lhs, const uint_test_t& rhs)
@@ -757,7 +989,7 @@ namespace cjm::uint128_tests
         uint_test_t m_lhs;
         uint_test_t m_rhs;
         result_t m_result;   
-
+        compound_result_t m_compound_result;
 };
 	
 	template<numerics::concepts::character Char>
@@ -1029,24 +1261,50 @@ namespace cjm::uint128_tests
         using enum_type_t = std::underlying_type_t<binary_op>;
         using stream_t = std::stringstream;
 
-	public:
+    public:
         divmod_fail_match(const binary_op_u128_t& failed) : testing_failure(create_message(failed)) {}
-	
+
     private:
         static std::string create_message(const binary_op_u128_t& bin_op)
         {
             stream_t ss;
             ss << "The result of the " << get_op_text(bin_op.op_code()) << " operation is different when using divmod."
-                << "Dividend: [" << bin_op.left_operand() << "]; Divisor: [" << bin_op.right_operand() << "].";                
+               << "Dividend: [" << bin_op.left_operand() << "]; Divisor: [" << bin_op.right_operand() << "].";
             return ss.str();
         }
     };
 	
 }
 
+constexpr cjm::uint128_tests::sv_t cjm::uint128_tests::get_un_op_text(unary_op op)
+{
+    if (op < first_unary_op || op > last_unary_op) throw bad_unary_op{ op };
+    return un_op_name_lookup[static_cast<unsigned>(op)];
+}
 
+constexpr cjm::uint128_tests::wsv_t cjm::uint128_tests::get_un_op_wtext(unary_op op)
+{
+    if (op < first_unary_op || op > last_unary_op) throw bad_unary_op{ op };
+    return un_op_name_lookup_wide[static_cast<unsigned>(op)];
+}
 
+constexpr cjm::uint128_tests::u8sv_t cjm::uint128_tests::get_un_op_u8text(unary_op op)
+{
+    if (op < first_unary_op || op > last_unary_op) throw bad_unary_op{ op };
+    return un_op_name_lookup_u8[static_cast<unsigned>(op)];
+}
 
+constexpr cjm::uint128_tests::u16sv_t cjm::uint128_tests::get_un_op_u16text(unary_op op)
+{
+    if (op < first_unary_op || op > last_unary_op) throw bad_unary_op{ op };
+    return un_op_name_lookup_u16[static_cast<unsigned>(op)];;
+}
+
+constexpr cjm::uint128_tests::u32sv_t cjm::uint128_tests::get_un_op_u32text(unary_op op)
+{
+    if (op < first_unary_op || op > last_unary_op) throw bad_unary_op{ op };
+    return un_op_name_lookup_u32[static_cast<unsigned>(op)];
+}
 
 constexpr cjm::uint128_tests::sv_t cjm::uint128_tests::get_op_text(binary_op op)
 {
@@ -1108,7 +1366,36 @@ constexpr cjm::uint128_tests::u32sv_t cjm::uint128_tests::get_op_symbol_u32(bina
     return op_symbol_lookup_u32[static_cast<unsigned>(op)];
 }
 
+///////////
+constexpr cjm::uint128_tests::sv_t cjm::uint128_tests::get_un_op_symbol_n(unary_op op)
+{
+    if (op < first_unary_op || op > last_unary_op) throw bad_unary_op{ op };
+    return un_op_symbol_lookup[static_cast<unsigned>(op)];
+}
 
+constexpr cjm::uint128_tests::wsv_t cjm::uint128_tests::get_un_op_symbol_w(unary_op op)
+{
+    if (op < first_unary_op || op > last_unary_op) throw bad_unary_op{ op };
+    return un_op_symbol_lookup_wide[static_cast<unsigned>(op)];
+}
+
+constexpr cjm::uint128_tests::u8sv_t cjm::uint128_tests::get_un_op_symbol_u8(unary_op op)
+{
+    if (op < first_unary_op || op > last_unary_op) throw bad_unary_op{ op };
+    return un_op_symbol_lookup_u8[static_cast<unsigned>(op)];
+}
+
+constexpr cjm::uint128_tests::u16sv_t cjm::uint128_tests::get_un_op_symbol_u16(unary_op op)
+{
+    if (op < first_unary_op || op > last_unary_op) throw bad_unary_op{ op };
+    return un_op_symbol_lookup_u16[static_cast<unsigned>(op)];;
+}
+
+constexpr cjm::uint128_tests::u32sv_t cjm::uint128_tests::get_un_op_symbol_u32(unary_op op)
+{
+    if (op < first_unary_op || op > last_unary_op) throw bad_unary_op{ op };
+    return un_op_symbol_lookup_u32[static_cast<unsigned>(op)];
+}
 constexpr std::array<std::uint64_t, cjm::uint128_tests::pow_2_arr_size> cjm::uint128_tests::get_pow2_arr()
 {
     std::uint64_t current = 1;
