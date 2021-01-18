@@ -123,6 +123,7 @@ namespace cjm::uint128_tests
     void execute_failing_division_test_2();
     void execute_failing_modulus_test_1();
     void execute_division_modulus_tests();
+    void execute_unary_op_code_rt_serialization_tests();
     void execute_parse_file_test(std::string_view path, size_t expected_ops);
     [[maybe_unused]] void print_n_static_assertions(const binary_op_u128_vect_t& op_vec, size_t n);
 
@@ -637,8 +638,59 @@ U"UnaryPlus"sv, U"UnaryMinus"sv, U"BitwiseNot"sv, U"BoolCast"sv, U"LogicalNegati
         op = parse_binary_op_symbol(lsv_t{temp});
         return is;
     }
-	
-	
+
+    template<numerics::concepts::character Char>
+    std::basic_ostream<Char, std::char_traits<Char>>& operator<<(std::basic_ostream<Char, std::char_traits<Char>>& os, unary_op op)
+    {
+        std::basic_string_view<Char> sv = get_un_op_symbol<std::remove_cvref_t<std::remove_const_t<Char>>>(op);
+        os << sv;
+        return os;
+    }
+
+    template<numerics::concepts::character Char>
+    std::basic_istream<Char, std::char_traits<Char>>& operator>>(std::basic_istream<Char,
+            std::char_traits<Char>>& is, unary_op& op)
+    {
+        using string_t = std::basic_string<Char>;
+        using lsv_t = std::basic_string_view<Char>;
+        string_t temp;
+        if constexpr (cjm::numerics::has_msc || !cjm::numerics::concepts::utf_character<Char>)
+        {
+            is >> temp;
+        }
+        else
+        {
+
+            Char c{};
+            do
+            {
+                if (is.good() && !is.eof() && is.peek() != std::char_traits<Char>::eof())
+                {
+                    is.get(c);
+                    if (!is.bad() && !is.fail())
+                    {
+                        if (!std::isspace<char>(convert_char<Char, char>(c), std::locale("")))
+                            temp.push_back(c);
+                        else
+                            break;
+                    }
+                }
+                else
+                    break;
+            } while (!is.bad() && !is.fail() && !is.eof());
+            if (is.bad() || is.fail())
+            {
+                return is;
+            }
+            if (temp.empty())
+            {
+                is.setstate(std::ios_base::failbit);
+                return is;
+            }
+        }
+        op = parse_unary_op_symbol(lsv_t{temp});
+        return is;
+    }
 
     
 	
