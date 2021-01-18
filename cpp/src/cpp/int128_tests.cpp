@@ -207,6 +207,7 @@ void cjm::uint128_tests::execute_uint128_tests()
     execute_test(execute_failing_division_test_2, "failing_division_test_2"sv);
     execute_test(execute_failing_modulus_test_1, "failing_modulus_test_1"sv);
     execute_test(execute_division_modulus_tests, "division_modulus_tests"sv);
+    execute_test(execute_unary_op_code_rt_serialization_tests, "unary_op_code_rt_serialization_tests"sv);
     cout << "All tests PASSED." << newl;
 }
 
@@ -1013,6 +1014,78 @@ cjm::uint128_tests::generator::uint128_t cjm::uint128_tests::generator::unsafe_c
     return uint128_t::make_from_bytes_little_endian(arr);
 }
 
+cjm::uint128_tests::unary_op cjm::uint128_tests::parse_unary_op_symbol(cjm::uint128_tests::sv_t text)
+{
+    auto trimmed = cjm::string::trim_as_sv(text);
+    if (trimmed.empty()) throw std::invalid_argument{"Supplied text is not a unary operation symbol."};
+    for (unsigned idx = 0; idx < un_op_symbol_lookup.size(); ++idx)
+    {
+        if (un_op_symbol_lookup[idx] == text)
+        {
+            return static_cast<unary_op>(idx);
+        }
+    }
+    throw std::invalid_argument{"Supplied text is not a unary operation symbol."};
+
+}
+
+cjm::uint128_tests::unary_op cjm::uint128_tests::parse_unary_op_symbol(cjm::uint128_tests::wsv_t text)
+{
+    auto trimmed = cjm::string::trim_as_sv(text);
+    if (trimmed.empty()) throw std::invalid_argument{"Supplied text is not a unary operation symbol."};
+    for (unsigned idx = 0; idx < un_op_symbol_lookup_wide.size(); ++idx)
+    {
+        if (un_op_symbol_lookup_wide[idx] == text)
+        {
+            return static_cast<unary_op>(idx);
+        }
+    }
+    throw std::invalid_argument{"Supplied text is not a unary operation symbol."};
+}
+
+cjm::uint128_tests::unary_op cjm::uint128_tests::parse_unary_op_symbol(cjm::uint128_tests::u8sv_t text)
+{
+    auto trimmed = cjm::string::trim_as_sv(text);
+    if (trimmed.empty()) throw std::invalid_argument{"Supplied text is not a unary operation symbol."};
+    for (unsigned idx = 0; idx < un_op_symbol_lookup_u8.size(); ++idx)
+    {
+        if (un_op_symbol_lookup_u8[idx] == text)
+        {
+            return static_cast<unary_op>(idx);
+        }
+    }
+    throw std::invalid_argument{"Supplied text is not a unary operation symbol."};
+}
+
+cjm::uint128_tests::unary_op cjm::uint128_tests::parse_unary_op_symbol(cjm::uint128_tests::u16sv_t text)
+{
+    auto trimmed = cjm::string::trim_as_sv(text);
+    if (trimmed.empty()) throw std::invalid_argument{"Supplied text is not a unary operation symbol."};
+    for (unsigned idx = 0; idx < un_op_symbol_lookup_u16.size(); ++idx)
+    {
+        if (un_op_symbol_lookup_u16[idx] == text)
+        {
+            return static_cast<unary_op>(idx);
+        }
+    }
+    throw std::invalid_argument{"Supplied text is not a unary operation symbol."};
+}
+
+cjm::uint128_tests::unary_op cjm::uint128_tests::parse_unary_op_symbol(cjm::uint128_tests::u32sv_t text)
+{
+    auto trimmed = cjm::string::trim_as_sv(text);
+    if (trimmed.empty()) throw std::invalid_argument{"Supplied text is not a unary operation symbol."};
+    for (unsigned idx = 0; idx < un_op_symbol_lookup_u32.size(); ++idx)
+    {
+        if (un_op_symbol_lookup_u32[idx] == text)
+        {
+            return static_cast<unary_op>(idx);
+        }
+    }
+    throw std::invalid_argument{"Supplied text is not a unary operation symbol."};
+}
+
+
 cjm::uint128_tests::binary_op cjm::uint128_tests::parse_binary_op_symbol(cjm::uint128_tests::sv_t text)
 {
     auto trimmed = cjm::string::trim_as_sv(text);
@@ -1027,7 +1100,6 @@ cjm::uint128_tests::binary_op cjm::uint128_tests::parse_binary_op_symbol(cjm::ui
     throw std::invalid_argument{"Supplied text is not a binary operation symbol."};
 
 }
-
 cjm::uint128_tests::binary_op cjm::uint128_tests::parse_binary_op_symbol(cjm::uint128_tests::wsv_t text)
 {
     auto trimmed = cjm::string::trim_as_sv(text);
@@ -1482,6 +1554,60 @@ void cjm::uint128_tests::execute_division_modulus_tests()
 	std::cout << "Going to print static assertions: " << newl;
 	print_n_static_assertions(op_vec, 25);
 	std::cout << newl << "Done printing static assertions." << newl;*/
+}
+
+
+void cjm::uint128_tests::execute_unary_op_code_rt_serialization_tests()
+{
+    auto test_rt_ser = [] (unary_op code) -> void
+    {
+        auto n_stream = string::make_throwing_sstream<char>();
+        auto w_stream = string::make_throwing_sstream<wchar_t>();
+        auto u8_stream = string::make_throwing_sstream<char8_t>();
+        auto u16_stream = string::make_throwing_sstream<char16_t>();
+        auto u32_stream = string::make_throwing_sstream<char32_t>();
+
+        const auto wrong_code = static_cast<unary_op>((static_cast<unsigned>(code) + 1) % unary_op_count);
+        cjm_assert(wrong_code != code && wrong_code >= first_unary_op && wrong_code <= last_unary_op);
+        cjm_assert(code >= first_unary_op && code <= last_unary_op);
+
+        auto rtd_code = wrong_code;
+        n_stream << code;
+        n_stream >> rtd_code;
+        cjm_assert(rtd_code == code);
+
+        rtd_code = wrong_code;
+        w_stream << code;
+        w_stream >> rtd_code;
+        cjm_assert(rtd_code == code);
+
+        rtd_code = wrong_code;
+        u8_stream << code;
+        u8_stream >> rtd_code;
+        cjm_assert(rtd_code == code);
+
+        rtd_code = wrong_code;
+        u16_stream << code;
+        u16_stream >> rtd_code;
+        cjm_assert(rtd_code == code);
+
+        rtd_code = wrong_code;
+        u32_stream << code;
+        u32_stream >> rtd_code;
+        cjm_assert(rtd_code == code);
+    };
+
+    test_rt_ser(unary_op::pre_increment);
+    test_rt_ser(unary_op::pre_decrement);
+    test_rt_ser(unary_op::post_increment);
+    test_rt_ser(unary_op::post_decrement);
+
+    test_rt_ser(unary_op::unary_plus);
+    test_rt_ser(unary_op::unary_minus);
+    test_rt_ser(unary_op::bitwise_not);
+    test_rt_ser(unary_op::bool_cast);
+
+    test_rt_ser(unary_op::logical_negation);
 }
 
 std::filesystem::path cjm::uint128_tests::create_generated_bin_op_filename(binary_op op)
