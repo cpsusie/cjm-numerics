@@ -30,6 +30,7 @@
 #include <chrono>
 #include <date/date.h>
 #include <filesystem>
+#include <tuple>
 
 #include "istream_utils.hpp"
 
@@ -549,6 +550,7 @@ namespace cjm::uint128_tests
         using uint_test_t = std::remove_const_t<TestType>;
         using uint_ctrl_t = std::remove_const_t<ControlType>;
         using result_t = std::optional<std::pair<uint_test_t, uint_test_t>>;
+        using compound_result_t = std::optional<uint_test_t>;
         [[nodiscard]] std::size_t hash_value() const noexcept
         {
             std::size_t seed = 0x1FBB0493;
@@ -586,7 +588,8 @@ namespace cjm::uint128_tests
 
         friend bool operator!=(const binary_operation& lhs, const binary_operation& rhs) { return !(lhs == rhs); }
         friend std::weak_ordering operator <=>(const binary_operation& lhs, const binary_operation& rhs) = default;
-    	
+
+        [[nodiscard]] const compound_result_t& compound_result() const noexcept {return m_compound_result;}
         [[nodiscard]] binary_op op_code() const noexcept { return m_op; }
         [[nodiscard]] const uint_test_t& left_operand() const noexcept { return m_lhs; }
         [[nodiscard]] const uint_test_t& right_operand() const noexcept { return m_rhs; }
@@ -594,29 +597,40 @@ namespace cjm::uint128_tests
         [[nodiscard]] bool has_result() const noexcept { return m_result.has_value(); }
         [[nodiscard]] bool has_correct_result() const
         {
-            return m_result.has_value() && m_result->first == m_result->second;
+            if (m_result.has_value())
+            {
+                if (m_result->first == m_result->second)
+                {
+                    return m_op == binary_op::compare || (m_compound_result.has_value() && *m_compound_result == m_result->first);
+                }
+                return false;
+            }
+            return false;
         }
 
-        binary_operation() noexcept : m_op(), m_lhs{ 0 }, m_rhs{ 0 }, m_result{} {}
-        binary_operation(binary_op op, const uint_test_t& first_operand, const uint_test_t& second_operand, bool calculate_now) : m_op(op), m_lhs(first_operand), m_rhs(second_operand), m_result()
+        binary_operation() noexcept : m_op(), m_lhs{ 0 }, m_rhs{ 0 }, m_result{}, m_compound_result{} {}
+
+        binary_operation(binary_op op, const uint_test_t& first_operand, const uint_test_t& second_operand, bool calculate_now) : m_op(op), m_lhs(first_operand), m_rhs(second_operand), m_result{}, m_compound_result{}
         {
             validate(op, first_operand, second_operand);
 	        if (calculate_now)
 	        {
-                m_result = perform_calculate_result(first_operand, second_operand, m_op);
+                auto [result, comp_res] = perform_calculate_result(first_operand, second_operand, m_op);
+                m_result = result;
+                m_compound_result = comp_res;
 	        }
         }
     	
         binary_operation(binary_op op, const uint_test_t& first_operand, 
             const uint_test_t& second_operand) : m_op{ op }, m_lhs{ first_operand },
-            m_rhs{ second_operand }, m_result{}
+            m_rhs{ second_operand }, m_result{}, m_compound_result{}
         {
            validate(op, first_operand, second_operand);
         }
         binary_operation(binary_op op, const uint_test_t& first_operand, 
             const uint_test_t& second_operand, const uint_test_t& test_result, 
-				const uint_test_t& ctrl_result) : m_op(op), m_lhs(first_operand), m_rhs(second_operand),
-				m_result(std::make_pair(test_result, ctrl_result))
+				const uint_test_t& ctrl_result, std::optional<uint_test_t> compound_res) : m_op(op), m_lhs(first_operand), m_rhs(second_operand),
+				m_result(std::make_pair(test_result, ctrl_result)), m_compound_result{compound_res}
         {
             validate(op, first_operand, second_operand);
         }
@@ -651,60 +665,82 @@ namespace cjm::uint128_tests
         {
             auto left_copy = m_lhs;
             auto right_copy = m_rhs;
-            auto result = perform_calculate_result(left_copy, right_copy, m_op);
-            const bool changed_value = m_result != result;
+            auto [test_res, ctrl_res, comp_res] = perform_calculate_result(left_copy, right_copy, m_op);
+            auto result = std::make_pair(test_res, ctrl_res);
+            const bool changed_value = m_result != result || comp_res != m_compound_result;
             m_result = result;
+            m_compound_result = comp_res;
             return changed_value;
         }
-        static std::pair<uint_test_t, uint_test_t> perform_calculate_result(const uint_test_t& lhs, const uint_test_t& rhs, binary_op op) 
+        static std::tuple<uint_test_t, uint_test_t, std::optional<uint_test_t>> perform_calculate_result(const uint_test_t& lhs, const uint_test_t& rhs, binary_op op)
         {
             assert(static_cast<size_t>(op) < op_name_lookup.size());
             uint_test_t ret_tst = 0;
             uint_ctrl_t ret_ctrl = 0;
             uint_ctrl_t lhs_ctrl = to_control(lhs);
             uint_ctrl_t rhs_ctrl = to_control(rhs);
-        	
+        	uint_test_t lhs_copy = lhs;
+        	std::optional<uint_test_t> compound_res = std::nullopt;
             switch (op)
             {
             case binary_op::left_shift:
-
                 ret_tst = lhs << static_cast<int>(rhs);
+                lhs_copy <<= static_cast<int>(rhs);
+                compound_res = lhs_copy;
                 ret_ctrl = lhs_ctrl << static_cast<int>(rhs);
                 break;
             case binary_op::right_shift:
                 ret_tst = lhs >> static_cast<int>(rhs_ctrl);
+                lhs_copy >>= static_cast<int>(rhs);
+                compound_res = lhs_copy;
                 ret_ctrl = lhs_ctrl >> static_cast<int>(rhs_ctrl);
                 break;
             case binary_op::bw_and:
                 ret_tst = lhs & rhs;
+                lhs_copy &= rhs;
+                compound_res = lhs_copy;
                 ret_ctrl = lhs_ctrl & rhs_ctrl;
                 break;
             case binary_op::bw_or:
                 ret_tst = lhs | rhs;
+                lhs_copy |= rhs;
+                compound_res = lhs_copy;
                 ret_ctrl = lhs_ctrl | rhs_ctrl;
             	break;
             case binary_op::bw_xor:
                 ret_tst = lhs ^ rhs;
+                lhs_copy ^= rhs;
+                compound_res = lhs_copy;
                 ret_ctrl = lhs_ctrl ^ rhs_ctrl;
                 break;
             case binary_op::divide:
                 ret_tst = lhs / rhs;
+                lhs_copy /= rhs;
+                compound_res = lhs_copy;
                 ret_ctrl = lhs_ctrl / rhs_ctrl;
                 break;
             case binary_op::modulus:
                 ret_tst = lhs % rhs;
+                lhs_copy %= rhs;
+                compound_res = lhs_copy;
                 ret_ctrl = lhs_ctrl % rhs_ctrl;
                 break;
             case binary_op::add:
                 ret_tst = lhs + rhs;
+                lhs_copy += rhs;
+                compound_res = lhs_copy;
                 ret_ctrl = lhs_ctrl + rhs_ctrl;
                 break;
             case binary_op::subtract:
                 ret_tst = lhs - rhs;
+                lhs_copy -= rhs;
+                compound_res = lhs_copy;
                 ret_ctrl = lhs_ctrl - rhs_ctrl;
                 break;
             case binary_op::multiply:
                 ret_tst = lhs * rhs;
+                lhs_copy *= rhs;
+                compound_res = lhs_copy;
                 ret_ctrl = lhs_ctrl * rhs_ctrl;
                 break;
             case binary_op::compare:
@@ -726,7 +762,7 @@ namespace cjm::uint128_tests
                 }
                 break;
             }
-            return std::make_pair(ret_tst, to_test(ret_ctrl));
+            return std::make_tuple(ret_tst, to_test(ret_ctrl), compound_res);
         }
 
         static void validate(binary_op op, [[maybe_unused]] const uint_test_t& lhs, const uint_test_t& rhs)
@@ -757,7 +793,7 @@ namespace cjm::uint128_tests
         uint_test_t m_lhs;
         uint_test_t m_rhs;
         result_t m_result;   
-
+        compound_result_t m_compound_result;
 };
 	
 	template<numerics::concepts::character Char>
