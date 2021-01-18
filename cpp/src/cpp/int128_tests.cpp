@@ -1013,6 +1013,78 @@ cjm::uint128_tests::generator::uint128_t cjm::uint128_tests::generator::unsafe_c
     return uint128_t::make_from_bytes_little_endian(arr);
 }
 
+cjm::uint128_tests::unary_op cjm::uint128_tests::parse_unary_op_symbol(cjm::uint128_tests::sv_t text)
+{
+    auto trimmed = cjm::string::trim_as_sv(text);
+    if (trimmed.empty()) throw std::invalid_argument{"Supplied text is not a unary operation symbol."};
+    for (unsigned idx = 0; idx < un_op_symbol_lookup.size(); ++idx)
+    {
+        if (un_op_symbol_lookup[idx] == text)
+        {
+            return static_cast<unary_op>(idx);
+        }
+    }
+    throw std::invalid_argument{"Supplied text is not a unary operation symbol."};
+
+}
+
+cjm::uint128_tests::unary_op cjm::uint128_tests::parse_unary_op_symbol(cjm::uint128_tests::wsv_t text)
+{
+    auto trimmed = cjm::string::trim_as_sv(text);
+    if (trimmed.empty()) throw std::invalid_argument{"Supplied text is not a unary operation symbol."};
+    for (unsigned idx = 0; idx < un_op_symbol_lookup_wide.size(); ++idx)
+    {
+        if (un_op_symbol_lookup_wide[idx] == text)
+        {
+            return static_cast<unary_op>(idx);
+        }
+    }
+    throw std::invalid_argument{"Supplied text is not a unary operation symbol."};
+}
+
+cjm::uint128_tests::unary_op cjm::uint128_tests::parse_unary_op_symbol(cjm::uint128_tests::u8sv_t text)
+{
+    auto trimmed = cjm::string::trim_as_sv(text);
+    if (trimmed.empty()) throw std::invalid_argument{"Supplied text is not a unary operation symbol."};
+    for (unsigned idx = 0; idx < un_op_symbol_lookup_u8.size(); ++idx)
+    {
+        if (un_op_symbol_lookup_u8[idx] == text)
+        {
+            return static_cast<unary_op>(idx);
+        }
+    }
+    throw std::invalid_argument{"Supplied text is not a unary operation symbol."};
+}
+
+cjm::uint128_tests::unary_op cjm::uint128_tests::parse_unary_op_symbol(cjm::uint128_tests::u16sv_t text)
+{
+    auto trimmed = cjm::string::trim_as_sv(text);
+    if (trimmed.empty()) throw std::invalid_argument{"Supplied text is not a unary operation symbol."};
+    for (unsigned idx = 0; idx < un_op_symbol_lookup_u16.size(); ++idx)
+    {
+        if (un_op_symbol_lookup_u16[idx] == text)
+        {
+            return static_cast<unary_op>(idx);
+        }
+    }
+    throw std::invalid_argument{"Supplied text is not a unary operation symbol."};
+}
+
+cjm::uint128_tests::unary_op cjm::uint128_tests::parse_unary_op_symbol(cjm::uint128_tests::u32sv_t text)
+{
+    auto trimmed = cjm::string::trim_as_sv(text);
+    if (trimmed.empty()) throw std::invalid_argument{"Supplied text is not a unary operation symbol."};
+    for (unsigned idx = 0; idx < un_op_symbol_lookup_u32.size(); ++idx)
+    {
+        if (un_op_symbol_lookup_u32[idx] == text)
+        {
+            return static_cast<unary_op>(idx);
+        }
+    }
+    throw std::invalid_argument{"Supplied text is not a unary operation symbol."};
+}
+
+
 cjm::uint128_tests::binary_op cjm::uint128_tests::parse_binary_op_symbol(cjm::uint128_tests::sv_t text)
 {
     auto trimmed = cjm::string::trim_as_sv(text);
@@ -1027,7 +1099,6 @@ cjm::uint128_tests::binary_op cjm::uint128_tests::parse_binary_op_symbol(cjm::ui
     throw std::invalid_argument{"Supplied text is not a binary operation symbol."};
 
 }
-
 cjm::uint128_tests::binary_op cjm::uint128_tests::parse_binary_op_symbol(cjm::uint128_tests::wsv_t text)
 {
     auto trimmed = cjm::string::trim_as_sv(text);

@@ -584,6 +584,7 @@ U"UnaryPlus"sv, U"UnaryMinus"sv, U"BitwiseNot"sv, U"BoolCast"sv, U"LogicalNegati
     binary_op parse_binary_op_symbol(u16sv_t text);
     binary_op parse_binary_op_symbol(u32sv_t text);
 
+
     template<numerics::concepts::character Char>
     std::basic_ostream<Char, std::char_traits<Char>>& operator<<(std::basic_ostream<Char, std::char_traits<Char>>& os, binary_op op)
     {
