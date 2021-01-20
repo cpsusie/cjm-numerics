@@ -294,7 +294,22 @@ namespace cjm::uint128_tests
         	using half_provider_t = testing_constant_provider<half_uint_t>;
         };
     }
-    template<invocable Invocable>
+
+    template<numerics::concepts::unsigned_integer UnsignedInt>
+	constexpr std::pair<UnsignedInt, UnsignedInt> test_post_increment(UnsignedInt inc_me) noexcept
+    {
+        auto first_res = inc_me++;
+        return std::make_pair(first_res, inc_me);
+    }
+
+    template<numerics::concepts::unsigned_integer UnsignedInt>
+    constexpr std::pair<UnsignedInt, UnsignedInt> test_post_decrement(UnsignedInt dec_me) noexcept
+    {
+        auto first_res = dec_me--;
+        return std::make_pair(first_res, dec_me);
+    }
+	
+	template<invocable Invocable>
     void execute_test(Invocable test, std::string_view test_name)
     {
         cout_saver o_saver{ cout };
@@ -397,6 +412,20 @@ namespace cjm::uint128_tests
     constexpr unary_op first_boolean_op = unary_op::bool_cast;
     constexpr unary_op last_boolean_op = unary_op::logical_negation;
 
+    constexpr auto un_op_plus_plus = "++"sv;
+    constexpr auto un_op_minus_minus = "--"sv;
+    constexpr auto un_op_plus = "+"sv;
+    constexpr auto un_op_minus = "-"sv;
+    constexpr auto un_op_bw_not = "~"sv;
+    constexpr auto un_op_static_cast_bool = "static_cast<bool>"sv;
+    constexpr auto un_op_open_parens = "("sv;
+    constexpr auto un_op_close_parens = ")"sv;
+    constexpr auto un_op_logical_negate = "!"sv;
+    constexpr auto un_op_semicolon = ";"sv;
+    constexpr auto un_op_equals = "=="sv;
+    constexpr auto un_on_not_equal = "!="sv;
+    constexpr auto un_op_u128_literal_suffix = "_u128"sv;
+	
 
     constexpr auto un_op_name_lookup = std::array<sv_t, unary_op_count>
     {
@@ -742,7 +771,8 @@ U"UnaryPlus"sv, U"UnaryMinus"sv, U"BitwiseNot"sv, U"BoolCast"sv, U"LogicalNegati
 	
     template<typename TestType, typename ControlType>
         requires (test_uint_and_control_set<TestType, ControlType>)
-    std::basic_ostream<char>& append_static_assertion(std::basic_ostream<char>& strm, const binary_operation<TestType, ControlType>& bin_op);
+    std::basic_ostream<char>& append_static_assertion(std::basic_ostream<char>& strm,
+        const binary_operation<TestType, ControlType>& bin_op);
 
     template<typename TestType, typename ControlType>
 		requires (test_uint_and_control_set<TestType, ControlType>)
@@ -998,6 +1028,11 @@ U"UnaryPlus"sv, U"UnaryMinus"sv, U"BitwiseNot"sv, U"BoolCast"sv, U"LogicalNegati
         result_t m_result;   
         compound_result_t m_compound_result;
     };
+
+    template<typename TestType, typename ControlType>
+    requires (test_uint_and_control_set<TestType, ControlType>)
+        std::basic_ostream<char>& append_static_assertion(std::basic_ostream<char>& strm,
+            const unary_operation<TestType, ControlType>& bin_op);
 
     template<typename TestType, typename ControlType>
     requires (test_uint_and_control_set<TestType, ControlType>)
@@ -1467,6 +1502,60 @@ U"UnaryPlus"sv, U"UnaryMinus"sv, U"BitwiseNot"sv, U"BoolCast"sv, U"LogicalNegati
         }
         strm << ");";
 	    return strm;
+	}
+
+    template<typename TestType, typename ControlType>
+		requires (test_uint_and_control_set<TestType, ControlType>)
+    std::basic_ostream<char>& append_static_assertion(std::basic_ostream<char>& strm, 
+        const unary_operation<TestType, ControlType>& un_op)
+	{
+        auto saver = cout_saver{ strm };
+        strm << std::dec;
+		using uint_test_t = typename unary_operation<TestType, ControlType>::uint_test_t;
+        auto op = un_op.op_code();
+
+		std::string operand;
+        {
+            auto temp = string::make_throwing_sstream<char>();
+            temp << un_op.operand();
+            operand = string::trim(temp.str());			
+		}
+
+		std::string result;
+        auto res = un_op.has_correct_result();
+		if (res)
+		{
+            auto temp = string::make_throwing_sstream<char>();
+            temp << un_op.result().value().first;
+            result = string::trim(temp.str());
+		}
+		else
+		{
+            res = "UNKNOWN OR INCORRECT RESULT";
+		}
+        //todo fixit resume here
+        std::string post_result;
+        auto post_res = un_op.has_post_result() && un_op.post_result().value().first == un_op.post_result().value().second;
+        if (post_res)
+        {
+            auto temp = string::make_throwing_sstream<char>();
+            temp << un_op.post_result().value().first;
+            post_result = string::trim(temp.str());
+        }
+        else
+        {
+            post_result = "NO, UNKNOWN, OR INCORRECT POST-RESULT";
+        }
+
+        constexpr size_t digits = std::numeric_limits<uint_test_t>::digits;
+		switch (op)
+		{
+        case unary_op::pre_decrement:
+            strm << "static_assert((++" << operand << "_u" << std::dec << digits << ") == " << result << "_u" << digits << ");";
+            break;
+			
+		}
+        return strm;
 	}
 
     class divmod_fail_match final : public testing::testing_failure

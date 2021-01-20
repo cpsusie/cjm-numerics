@@ -16,6 +16,19 @@ cjm::string::trim(const std::basic_string<Char, CharTraits, Allocator>& trim_me)
 }
 
 
+template<typename Char, typename CharTraits, typename Allocator>
+	requires cjm::numerics::concepts::char_with_traits_and_allocator<Char, CharTraits, Allocator>
+std::basic_string<Char, CharTraits, Allocator> cjm::string::trim(std::basic_string<Char, CharTraits, Allocator>&& trim_me)
+{
+    using sv = std::basic_string_view<Char, CharTraits>;
+    std::string here = std::move(trim_me);
+    sv ret = here;
+    string_helper::ltrim(ret);
+    string_helper::rtrim(ret);
+    auto return_me = std::string{ ret };
+    return return_me;
+}
+
 
 template<typename Char, typename CharTraits>
 requires cjm::numerics::concepts::char_with_traits<Char, CharTraits>

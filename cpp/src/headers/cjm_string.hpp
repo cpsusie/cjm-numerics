@@ -17,6 +17,11 @@ namespace cjm::string
 	template<typename Char, typename CharTraits = std::char_traits<Char>, typename Allocator = std::allocator<Char>>
 	        requires cjm::numerics::concepts::char_with_traits_and_allocator<Char, CharTraits, Allocator>
 	std::basic_string<Char, CharTraits, Allocator> trim(const std::basic_string<Char, CharTraits, Allocator>& trimMe);
+
+	template<typename Char, typename CharTraits = std::char_traits<Char>, typename Allocator = std::allocator<Char>>
+		requires cjm::numerics::concepts::char_with_traits_and_allocator<Char, CharTraits, Allocator>
+	std::basic_string<Char, CharTraits, Allocator> trim(std::basic_string<Char, CharTraits, Allocator>&& trim_me);
+	
     template<typename Char, typename CharTraits>
 		requires cjm::numerics::concepts::char_with_traits<Char, CharTraits>
 	std::basic_string_view<Char, CharTraits> trim_as_sv(std::basic_string_view<Char, CharTraits> trimMe);
