@@ -208,6 +208,7 @@ void cjm::uint128_tests::execute_uint128_tests()
     execute_test(execute_failing_modulus_test_1, "failing_modulus_test_1"sv);
     execute_test(execute_division_modulus_tests, "division_modulus_tests"sv);
     execute_test(execute_unary_op_code_rt_serialization_tests, "unary_op_code_rt_serialization_tests"sv);
+    execute_test(execute_unary_op_basic_test, "unary_op_basic_test"sv);
     cout << "All tests PASSED." << newl;
 }
 
@@ -1608,6 +1609,25 @@ void cjm::uint128_tests::execute_unary_op_code_rt_serialization_tests()
     test_rt_ser(unary_op::bool_cast);
 
     test_rt_ser(unary_op::logical_negation);
+}
+
+void cjm::uint128_tests::execute_unary_op_basic_test()
+{
+    constexpr auto first_operand = 0xdead'beef'badd'f00d_u128;
+    constexpr auto second_operand = 0xcafe'babe'600d'b00b_u128;
+    constexpr auto first_op_expected_res = first_operand + 1;
+    constexpr auto second_op_expected_res = -second_operand;
+    auto unary_op_1 = unary_op_u128_t{unary_op::pre_increment, first_operand};
+    auto unary_op_2 = unary_op_u128_t { unary_op::unary_minus, second_operand};
+    cjm_assert(unary_op_1.calculate_result());
+    cjm_assert(unary_op_2.calculate_result());
+    auto first_res = unary_op_1.result();
+    auto second_res = unary_op_2.result();
+
+    cjm_assert(first_res.has_value() && first_res.value().first == first_res->second && !unary_op_1.has_post_result() && first_res->first == first_op_expected_res);
+    cjm_assert(second_res.has_value() && second_res.value().first == second_res->second && !unary_op_2.has_post_result() && second_res->first == second_op_expected_res);
+    cjm_deny(unary_op_1 == unary_op_2);
+
 }
 
 std::filesystem::path cjm::uint128_tests::create_generated_bin_op_filename(binary_op op)

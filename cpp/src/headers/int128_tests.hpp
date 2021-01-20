@@ -128,6 +128,7 @@ namespace cjm::uint128_tests
     void execute_failing_modulus_test_1();
     void execute_division_modulus_tests();
     void execute_unary_op_code_rt_serialization_tests();
+    void execute_unary_op_basic_test();
     void execute_parse_file_test(std::string_view path, size_t expected_ops);
     [[maybe_unused]] void print_n_static_assertions(const binary_op_u128_vect_t& op_vec, size_t n);
 
@@ -1064,6 +1065,15 @@ U"UnaryPlus"sv, U"UnaryMinus"sv, U"BitwiseNot"sv, U"BoolCast"sv, U"LogicalNegati
             return false;
         }
 
+        unary_operation(unary_op op_code, const uint_test_t& operand) noexcept
+            : m_op{op_code}, m_operand{operand}, m_result{}, m_post_result{} {}
+        unary_operation() : unary_operation(unary_op::pre_increment, 0_u128) {}
+        unary_operation(const unary_operation& other) noexcept = default;
+        unary_operation(unary_operation&& other) noexcept = default;
+        unary_operation& operator=(const unary_operation& other) noexcept = default;
+        unary_operation& operator=(unary_operation&& other) noexcept = default;
+        ~unary_operation() = default;
+
         bool calculate_result()
         {
             if (has_correct_result())
@@ -1155,7 +1165,7 @@ U"UnaryPlus"sv, U"UnaryMinus"sv, U"BitwiseNot"sv, U"BoolCast"sv, U"LogicalNegati
                     ctrl_post_result = std::nullopt;
                     break;
                 case unary_op::unary_minus:
-                    ctrl_result = -ctrl_operand;
+                    ctrl_result = ((~ctrl_operand)+1);
                     test_result = -test_operand;
                     test_post_result = std::nullopt;
                     ctrl_post_result = std::nullopt;
@@ -1622,6 +1632,7 @@ constexpr std::array<int, cjm::uint128_tests::pow_2_arr_size> cjm::uint128_tests
     }
     return ret;
 }
+
 
 
 
