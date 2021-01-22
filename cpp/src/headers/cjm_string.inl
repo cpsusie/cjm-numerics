@@ -43,6 +43,7 @@ void cjm::string::string_helper::ltrim(std::basic_string_view<Char, CharTraits>&
         for (char_t c : l_trim_me)
         {
             bool is_space;
+        	
             if constexpr (!cjm::numerics::has_msc && cjm::numerics::concepts::utf_character<char_t>)
             {
                  is_space = cjm::uint128_tests::istream_utils::is_space<char_t>(c, locale);

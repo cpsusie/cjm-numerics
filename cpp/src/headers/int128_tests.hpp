@@ -133,13 +133,15 @@ namespace cjm::uint128_tests
     void execute_unary_op_post_stat_assert_test();
     [[maybe_unused]] void print_n_static_assertions(const binary_op_u128_vect_t& op_vec, size_t n);
     [[maybe_unused]] void print_n_static_assertions(const unary_op_u128_vect_t& op_vec, size_t n);
-    constexpr auto base_bin_op_filename = "binary_ops"sv;
-    constexpr auto bin_op_failed_test_tag = "failed_test"sv;
-    constexpr auto bin_op_generated_tag = "generated"sv;
-    constexpr auto bin_op_extension = "txt"sv;
-    std::filesystem::path create_generated_bin_op_filename(binary_op op);
-
+    constexpr auto base_un_op_filename = "unary_ops"sv;
+	constexpr auto base_bin_op_filename = "binary_ops"sv;
+    constexpr auto op_failed_test_tag = "failed_test"sv;
+    constexpr auto op_generated_tag = "generated"sv;
+    constexpr auto op_extension = "txt"sv;
+    std::filesystem::path create_generated_op_filename(binary_op op);
     std::filesystem::path create_failing_op_pathname(binary_op op);
+    std::filesystem::path create_generated_op_filename(unary_op op);
+    std::filesystem::path create_failing_op_pathname(unary_op op);
 	
     template<numerics::concepts::character Char>
     std::basic_ostream<Char, std::char_traits<Char>>& operator<<(std::basic_ostream<Char,
@@ -160,6 +162,9 @@ namespace cjm::uint128_tests
 	template<numerics::concepts::character Char>
     binary_op_u128_t parse(std::basic_string_view<Char> sv);
 
+    unary_op_u128_vect_t generate_post_inc_dec_ops(size_t num_ops_each_type, bool include_standard_tests);
+    unary_op_u128_vect_t generate_pre_inc_dec_ops(size_t num_ops_each_type, bool include_standard_tests);
+	
     binary_op_u128_vect_t generate_easy_ops(size_t num_ops, binary_op op, bool include_standard_tests);
     binary_op_u128_vect_t generate_shift_ops(size_t num_ops, bool include_standard_tests);
     binary_op_u128_vect_t generate_bw_ops(size_t num_ops, bool include_standard_tests);
@@ -169,7 +174,7 @@ namespace cjm::uint128_tests
 	
 
     void test_binary_operation(binary_op_u128_t& op, std::string_view test_name);
-	
+    void test_unary_operation(unary_op_u128_t& op, std::string_view test_name);
     namespace u128_testing_constant_providers
     {
         namespace concepts
@@ -258,7 +263,7 @@ namespace cjm::uint128_tests
             using half_uint_t = std::uint32_t;
 
             static constexpr full_uint_t maximum = std::numeric_limits<full_uint_t>::max();
-            static constexpr full_uint_t max_less_one = maximum - full_uint_t{1};;
+            static constexpr full_uint_t max_less_one = maximum - full_uint_t{1};
             static constexpr full_uint_t zero = std::numeric_limits<full_uint_t>::min();
             static constexpr full_uint_t one = zero + full_uint_t{1};
             static constexpr full_uint_t maximum_half = std::numeric_limits<half_uint_t>::max();
@@ -277,20 +282,26 @@ namespace cjm::uint128_tests
         {
             using full_uint_t = std::remove_const_t<T>;
             using half_uint_t = typename T::int_part;
-
+            static constexpr size_t full_digits = std::numeric_limits<full_uint_t>::digits;
+            static constexpr size_t half_digits = std::numeric_limits<half_uint_t>::digits;
                   	
             static constexpr full_uint_t maximum = std::numeric_limits<full_uint_t>::max();
             static constexpr full_uint_t max_less_one = maximum - full_uint_t{1};
             static constexpr full_uint_t zero = std::numeric_limits<full_uint_t>::min();
             static constexpr full_uint_t one = zero + full_uint_t{1};
+            static constexpr full_uint_t signed_version_min_bit_pattern_full = 1_u128 << (full_digits - 1);
+            static constexpr full_uint_t signed_version_min_bit_pattern_half = half_uint_t{ 1 } << (half_digits - 1);
             static constexpr full_uint_t maximum_half = std::numeric_limits<half_uint_t>::max();
             static constexpr full_uint_t maximum_half_less_one = maximum_half -1;
             static constexpr full_uint_t maximum_half_plus_one = maximum_half + 1;
 
-            static constexpr std::array<full_uint_t, 7> all_values = 
-				{   maximum, max_less_one, zero,
-            		one, maximum_half, max_less_one,
-            		maximum_half_plus_one };
+            static constexpr std::array<full_uint_t, 9> all_values = 
+			{
+            	maximum, max_less_one, zero,
+				one, signed_version_min_bit_pattern_full,
+            	signed_version_min_bit_pattern_half, maximum_half,
+            	max_less_one, maximum_half_plus_one
+			};
         	
         	using half_provider_t = testing_constant_provider<half_uint_t>;
         };
