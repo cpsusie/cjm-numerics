@@ -1533,27 +1533,49 @@ U"UnaryPlus"sv, U"UnaryMinus"sv, U"BitwiseNot"sv, U"BoolCast"sv, U"LogicalNegati
 		{
             res = "UNKNOWN OR INCORRECT RESULT";
 		}
-        //todo fixit resume here
-        std::string post_result;
-        auto post_res = un_op.has_post_result() && un_op.post_result().value().first == un_op.post_result().value().second;
-        if (post_res)
-        {
-            auto temp = string::make_throwing_sstream<char>();
-            temp << un_op.post_result().value().first;
-            post_result = string::trim(temp.str());
-        }
-        else
-        {
-            post_result = "NO, UNKNOWN, OR INCORRECT POST-RESULT";
-        }
+        
 
         constexpr size_t digits = std::numeric_limits<uint_test_t>::digits;
 		switch (op)
 		{
         case unary_op::pre_decrement:
-            strm << "static_assert((++" << operand << "_u" << std::dec << digits << ") == " << result << "_u" << digits << ");";
+            strm    << "static_assert((--" << operand << "_u" << std::dec << digits
+					<< ") == " << result << "_u" << digits << ");";			
             break;
-			
+            //test_post_decrement(operand);
+        case unary_op::post_decrement:
+            //static_assert((test_post_decrement(0xc0de'd00d_u128)) == std::make_pair(0xc0de'd00d_u128, 0xc0de'd00d_u128 - 1));
+			strm    << "static_assert((test_post_decrement(" << std::dec << operand
+					<< "_u" << digits << ")) == std::make_pair(" << operand << "_u"
+					<< digits << ", (" << operand << "_u" << digits << " - 1));";
+            break;
+        case unary_op::pre_increment:
+            strm << "static_assert((--" << operand << "_u" << std::dec << digits
+                << ") == " << result << "_u" << digits << ");";
+            break;
+        case unary_op::post_increment:            
+            strm << "static_assert((test_post_increment(" << std::dec << operand
+                << "_u" << digits << ")) == std::make_pair(" << operand << "_u"
+                << digits << ", (" << operand << "_u" << digits << " + 1));";
+            break;
+        case unary_op::unary_plus:
+            strm << "static_assert((" << std::dec << operand << "_u" << digits << ") == " << operand << "_u" << digits << ");";
+            break;
+        case unary_op::unary_minus:
+            strm << "static_assert((-" << std::dec << operand << "_u" << digits << ") == " << result << "_u" << digits << ");";
+            break;
+        case unary_op::bitwise_not:
+            strm << "static_assert((~" << std::dec << operand << "_u" << digits << ") == " << result << "_u" << digits << ");";
+            break;
+        case unary_op::bool_cast:
+            strm << "static_assert(static_cast<bool>(" << std::dec << operand << "_u" << digits << ") == static_cast<bool>(" << result << "_u" << digits << "));";
+            break;
+        case unary_op::logical_negation:
+            strm << "static_assert(static_cast<bool>(!" << std::dec << operand << "_u" << digits << ") == static_cast<bool>(" << result << "_u" << digits << "));";
+            break;
+        default:
+            throw bad_unary_op{ op };
+            break;
 		}
         return strm;
 	}
