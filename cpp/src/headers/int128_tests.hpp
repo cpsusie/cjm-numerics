@@ -130,8 +130,9 @@ namespace cjm::uint128_tests
     void execute_unary_op_code_rt_serialization_tests();
     void execute_unary_op_basic_test();
     void execute_parse_file_test(std::string_view path, size_t expected_ops);
+    void execute_unary_op_post_stat_assert_test();
     [[maybe_unused]] void print_n_static_assertions(const binary_op_u128_vect_t& op_vec, size_t n);
-
+    [[maybe_unused]] void print_n_static_assertions(const unary_op_u128_vect_t& op_vec, size_t n);
     constexpr auto base_bin_op_filename = "binary_ops"sv;
     constexpr auto bin_op_failed_test_tag = "failed_test"sv;
     constexpr auto bin_op_generated_tag = "generated"sv;
@@ -337,6 +338,7 @@ namespace cjm::uint128_tests
     [[maybe_unused]] void compile_time_comparison_test() noexcept;
     [[maybe_unused]] void compile_time_multiplication_test() noexcept;
     [[maybe_unused]] void compile_time_divmod_test() noexcept;
+    [[maybe_unused]] void compile_time_postfix_un_op_test() noexcept;
 }
 
 namespace std
@@ -1547,7 +1549,7 @@ U"UnaryPlus"sv, U"UnaryMinus"sv, U"BitwiseNot"sv, U"BoolCast"sv, U"LogicalNegati
             //static_assert((test_post_decrement(0xc0de'd00d_u128)) == std::make_pair(0xc0de'd00d_u128, 0xc0de'd00d_u128 - 1));
 			strm    << "static_assert((test_post_decrement(" << std::dec << operand
 					<< "_u" << digits << ")) == std::make_pair(" << operand << "_u"
-					<< digits << ", (" << operand << "_u" << digits << " - 1));";
+					<< digits << ", (" << operand << "_u" << digits << " - 1)));";
             break;
         case unary_op::pre_increment:
             strm << "static_assert((--" << operand << "_u" << std::dec << digits
@@ -1556,7 +1558,7 @@ U"UnaryPlus"sv, U"UnaryMinus"sv, U"BitwiseNot"sv, U"BoolCast"sv, U"LogicalNegati
         case unary_op::post_increment:            
             strm << "static_assert((test_post_increment(" << std::dec << operand
                 << "_u" << digits << ")) == std::make_pair(" << operand << "_u"
-                << digits << ", (" << operand << "_u" << digits << " + 1));";
+                << digits << ", (" << operand << "_u" << digits << " + 1)));";
             break;
         case unary_op::unary_plus:
             strm << "static_assert((" << std::dec << operand << "_u" << digits << ") == " << operand << "_u" << digits << ");";

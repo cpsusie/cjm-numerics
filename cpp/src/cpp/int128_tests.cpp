@@ -209,6 +209,7 @@ void cjm::uint128_tests::execute_uint128_tests()
     execute_test(execute_division_modulus_tests, "division_modulus_tests"sv);
     execute_test(execute_unary_op_code_rt_serialization_tests, "unary_op_code_rt_serialization_tests"sv);
     execute_test(execute_unary_op_basic_test, "unary_op_basic_test"sv);
+    execute_test(execute_unary_op_post_stat_assert_test, "unary_op_post_stat_assert_test"sv);
     cout << "All tests PASSED." << newl;
 }
 
@@ -228,7 +229,13 @@ void cjm::uint128_tests::execute_parse_file_test(std::string_view path, size_t e
     std::cout << "Read: " << op_vec.size() << " operations from [" << path << "]." << newl;
     cjm_assert(expected_ops == op_vec.size());
 }
-
+void cjm::uint128_tests::execute_unary_op_post_stat_assert_test()
+{
+    auto post_inc = unary_op_u128_t{unary_op::post_increment, 1_u128};
+    auto post_dec = unary_op_u128_t{unary_op::post_decrement, 1_u128};
+    append_static_assertion(std::cout, post_inc) << newl;
+    append_static_assertion(std::cout, post_dec) << newl;
+}
 void cjm::uint128_tests::print_n_static_assertions(const binary_op_u128_vect_t& op_vec, size_t n)
 {
     auto saver = cout_saver{ cout };
@@ -250,6 +257,29 @@ void cjm::uint128_tests::print_n_static_assertions(const binary_op_u128_vect_t& 
     	}
     	std::cout << "DONE printing " << std::dec << n << " static assertions: " << newl;
     }    
+}
+
+void cjm::uint128_tests::print_n_static_assertions(const cjm::uint128_tests::unary_op_u128_vect_t& op_vec, size_t n)
+{
+    auto saver = cout_saver{cout};
+    if (op_vec.empty())
+    {
+        std::cerr << "Cannot print " << std::dec << n << " static assertions: vector contains no operations." << newl;
+    }
+    else
+    {
+        if (op_vec.size() < n)
+        {
+            std::cerr << "Cannot print " << std::dec << n << " static assertions: vector contains only " << op_vec.size() << " operations.  Will print " << op_vec.size() << " assertions instead." << newl;
+            n = op_vec.size();
+        }
+        std::cout << " Printing " << std::dec << n << " static assertions: " << newl;
+        for (size_t i = 0; i < n; ++i)
+        {
+            append_static_assertion(std::cout, op_vec[i]) << newl;
+        }
+        std::cout << "DONE printing " << std::dec << n << " static assertions: " << newl;
+    }
 }
 
 
@@ -2350,6 +2380,11 @@ void cjm::uint128_tests::compile_time_divmod_test() noexcept
     static_assert((55091963802398102628743599743_u128 % 784184839698078258_u128) == 449994647493900105_u128);
     static_assert((170141183460469231731687303715884105728_u128 / 3735928559_u128) == 45541872863332029185006506896_u128);
     static_assert((308818922083941790200970218656780137342_u128 % 3924503981542839365105580788109277489_u128) == 2707611523600319722734917184256493200_u128);
+}
+void cjm::uint128_tests::compile_time_postfix_un_op_test() noexcept
+{
+    static_assert((test_post_increment(1_u128)) == std::make_pair(1_u128, (1_u128 + 1)));
+    static_assert((test_post_decrement(1_u128)) == std::make_pair(1_u128, (1_u128 - 1)));
 }
 void cjm::uint128_tests::compile_time_comparison_test() noexcept
 {
