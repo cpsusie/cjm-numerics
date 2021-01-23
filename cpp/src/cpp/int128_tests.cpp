@@ -230,6 +230,7 @@ void cjm::uint128_tests::execute_uint128_tests()
     execute_test(execute_unary_op_code_rt_serialization_tests, "unary_op_code_rt_serialization_tests"sv);
     execute_test(execute_unary_op_basic_test, "unary_op_basic_test"sv);
     execute_test(execute_unary_op_post_stat_assert_test, "unary_op_post_stat_assert_test"sv);
+    execute_test(execute_unary_operation_rt_serialization_tests, "unary_operation_rt_serialization_tests"sv);
     cout << "All tests PASSED." << newl;
 }
 
@@ -1246,6 +1247,45 @@ void cjm::uint128_tests::execute_binary_operation_rt_ser_tests()
     cjm_assert(rt_val == binary_operation);
     rt_val = bad_rt_val;
 	
+}
+
+void cjm::uint128_tests::execute_unary_operation_rt_serialization_tests()
+{
+	auto n_stream = string::make_throwing_sstream<char>();
+    auto w_stream = string::make_throwing_sstream<wchar_t>();
+    auto u8_stream = string::make_throwing_sstream<char8_t>();
+    auto u16_stream = string::make_throwing_sstream<char16_t>();
+    auto u32_stream = string::make_throwing_sstream<char32_t>();
+
+    const auto unary_operation = unary_op_u128_t{ unary_op::post_increment,
+    	0xcafe'babe'fea2'dead'beef'badd'f00d'dadd_u128};
+    const auto bad_rt_val = unary_op_u128_t{ unary_op::pre_increment, 0_u128 };
+    auto rt_val = bad_rt_val;
+
+    n_stream << unary_operation;
+    n_stream >> rt_val;
+    cjm_assert(rt_val == unary_operation);
+    rt_val = bad_rt_val;
+
+    w_stream << unary_operation;
+    w_stream >> rt_val;
+    cjm_assert(rt_val == unary_operation);
+    rt_val = bad_rt_val;
+	
+    u8_stream << unary_operation;
+    u8_stream >> rt_val;
+    cjm_assert(rt_val == unary_operation);
+    rt_val = bad_rt_val;
+
+    u16_stream << unary_operation;
+    u16_stream >> rt_val;
+    cjm_assert(rt_val == unary_operation);
+    rt_val = bad_rt_val;
+	
+    u32_stream << unary_operation;
+    u32_stream >> rt_val;
+    cjm_assert(rt_val == unary_operation);
+    rt_val = bad_rt_val;
 }
 
 void cjm::uint128_tests::execute_trim_tests()

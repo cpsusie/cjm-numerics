@@ -128,6 +128,7 @@ namespace cjm::uint128_tests
     void execute_failing_modulus_test_1();
     void execute_division_modulus_tests();
     void execute_unary_op_code_rt_serialization_tests();
+    void execute_unary_operation_rt_serialization_tests();
     void execute_unary_op_basic_test();
     void execute_parse_file_test(std::string_view path, size_t expected_ops);
     void execute_unary_op_post_stat_assert_test();
@@ -163,6 +164,10 @@ namespace cjm::uint128_tests
     std::basic_ostream<Char, std::char_traits<Char>>& operator<<(std::basic_ostream<Char,
         std::char_traits<Char>>&os, const unary_op_u128_t& op);
 
+    template<numerics::concepts::character Char>
+    std::basic_istream<Char, std::char_traits<Char>>& operator>>(std::basic_istream<Char,
+        std::char_traits<Char>>&is, unary_op_u128_t& op);
+	
     template<numerics::concepts::character Char>
     std::basic_istream<Char, std::char_traits<Char>>& operator>>(std::basic_istream<Char,
         std::char_traits<Char>>&is, binary_op_u128_t& op);
@@ -1434,6 +1439,59 @@ U"UnaryPlus"sv, U"UnaryMinus"sv, U"BitwiseNot"sv, U"BoolCast"sv, U"LogicalNegati
         /*is.setstate(std::ios_base::failbit);*/
         return is;		
 	}
+
+    template<numerics::concepts::character Char>
+    std::basic_istream<Char, std::char_traits<Char>>& operator>>(std::basic_istream<Char,
+        std::char_traits<Char>>&is, unary_op_u128_t& op)
+    {
+        using char_t = std::remove_const_t<Char>;
+        using lstr_t = std::basic_string<Char>;
+        using lsv_t = std::basic_string<Char>;
+        op = unary_op_u128_t{};
+        char_t item_separator;
+        char_t line_separator;
+        if constexpr (std::is_same_v<char_t, char>)
+        {
+            item_separator = ';';
+            line_separator = '\n';
+        }
+        else
+        {
+            item_separator = convert_char<char, char_t>(';');
+            line_separator = convert_char<char, char_t>('\n');
+        }
+
+        if (!is.good() || is.bad() || is.fail() || is.eof() || is.peek() == std::char_traits<char_t>::eof())
+        {
+            if (is.fail() && !is.bad())
+                is.setstate(std::ios_base::failbit | std::ios_base::badbit);
+            else
+                is.setstate(std::ios_base::failbit);
+            return is;
+        }
+
+        auto str = lstr_t{};
+        std::getline(is, str, line_separator);
+        if (str.empty() || is.bad() || is.fail())
+        {
+            is.setstate(std::ios_base::failbit);
+            return is;
+        }
+
+        try
+        {
+            lsv_t txt = str;
+            op = parse_unary<char_t>(txt);
+        }
+        catch (const std::exception& ex)
+        {
+            std::cerr << "Failure to parse string.  Msg: [" << ex.what() << "].";
+            is.setstate(std::ios_base::failbit);
+            throw;
+        }
+        /*is.setstate(std::ios_base::failbit);*/
+        return is;
+    }
 
     template<numerics::concepts::character Char>
     unary_op_u128_t parse_unary(std::basic_string_view<Char> sv)
