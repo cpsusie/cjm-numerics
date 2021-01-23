@@ -2228,8 +2228,7 @@ void cjm::uint128_tests::test_binary_operation(binary_op_u128_t& op, std::string
 void cjm::uint128_tests::test_unary_operation(unary_op_u128_t& op, std::string_view test_name)
 {
     using result_t = typename binary_op_u128_t::result_t;
-    result_t result = std::nullopt;
-	try
+    try
 	{
         bool has_result = op.has_result();
 		if (!has_result)
