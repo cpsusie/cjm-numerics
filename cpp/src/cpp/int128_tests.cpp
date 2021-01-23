@@ -1436,7 +1436,7 @@ void cjm::uint128_tests::execute_generate_addition_ops_rt_ser_deser_test()
         std::cerr << "Exception throw deleting file [" << file_name << "]. Msg: [" << ex.what() << "]." << newl;
     }
     cjm_assert(rt_op_vec == op_vect);
-    std::cout << "The round tripped vector is identical to the source vector.";
+    std::cout << "The round tripped vector is identical to the source vector." << newl;
 }
 
 void cjm::uint128_tests::execute_unary_operation_vec_rt_serialization_tests()
@@ -1507,7 +1507,7 @@ void cjm::uint128_tests::execute_unary_operation_vec_rt_serialization_tests()
         std::cerr << "Exception throw deleting file [" << file_name << "]. Msg: [" << ex.what() << "]." << newl;
     }
     cjm_assert(rt_op_vec == op_vect);
-    std::cout << "The round tripped vector is identical to the source vector.";
+    std::cout << "The round tripped vector is identical to the source vector." << newl;
 }
 
 void cjm::uint128_tests::execute_addition_tests()
