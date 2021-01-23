@@ -169,8 +169,12 @@ namespace cjm::uint128_tests
         std::char_traits<Char>>&is, unary_op_u128_t& op);
 	
     template<numerics::concepts::character Char>
+    std::basic_ostream<Char, std::char_traits<Char>>& operator<<(std::basic_ostream<Char,
+        std::char_traits<Char>>&os, const unary_op_u128_vect_t& op);
+
+    template<numerics::concepts::character Char>
     std::basic_istream<Char, std::char_traits<Char>>& operator>>(std::basic_istream<Char,
-        std::char_traits<Char>>&is, binary_op_u128_t& op);
+        std::char_traits<Char>>&is, unary_op_u128_vect_t& op);
 	
 	template<numerics::concepts::character Char>
     binary_op_u128_t parse(std::basic_string_view<Char> sv);
@@ -1335,6 +1339,30 @@ U"UnaryPlus"sv, U"UnaryMinus"sv, U"BitwiseNot"sv, U"BoolCast"sv, U"LogicalNegati
 		}
         return os;
 	}
+
+    template<numerics::concepts::character Char>
+    std::basic_ostream<Char, std::char_traits<Char>>& operator<<(std::basic_ostream<Char,
+        std::char_traits<Char>>&os, const unary_op_u128_vect_t& op)
+    {
+        if (op.empty())
+            return os;
+        using char_t = std::remove_const_t<Char>;
+        char_t item_separator;
+        if constexpr (std::is_same_v<char_t, char>)
+        {
+            item_separator = '\n';
+        }
+        else
+        {
+            item_separator = convert_char<char, char_t>('\n');
+        }
+
+        for (const auto& itm : op)
+        {
+            os << itm << item_separator;
+        }
+        return os;
+    }
 	
 
     template<numerics::concepts::character Char>
@@ -1387,6 +1415,56 @@ U"UnaryPlus"sv, U"UnaryMinus"sv, U"BitwiseNot"sv, U"BoolCast"sv, U"LogicalNegati
         return is;
 	}
 
+    template<numerics::concepts::character Char>
+    std::basic_istream<Char, std::char_traits<Char>>& operator>>(std::basic_istream<Char,
+        std::char_traits<Char>>&is, unary_op_u128_vect_t& op)
+    {
+
+        using char_t = std::remove_const_t<Char>;
+        using string_t = std::basic_string<char_t, std::char_traits<char_t>>;
+        using lsv_t = std::basic_string_view<char_t, std::char_traits<char_t>>;
+
+        char_t item_separator;
+        if constexpr (std::is_same_v<char_t, char>)
+        {
+            item_separator = '\n';
+        }
+        else
+        {
+            item_separator = convert_char<char, char_t>('\n');
+        }
+        string_t temp;
+
+        while (is.good() && !is.bad() && !is.fail() && !is.eof() && is.peek() != std::char_traits<char_t>::eof())
+        {
+            temp.clear();
+            std::getline(is, temp, item_separator);
+            if (is.eof() || is.bad() || is.fail())
+            {
+                return is;
+            }
+            lsv_t temp_view = temp;
+            temp_view = cjm::string::trim_as_sv(temp_view);
+            if (temp_view.empty())
+            {
+                is.setstate(std::ios_base::failbit);
+                return is;
+            }
+
+            try
+            {
+                op.emplace_back(parse_unary<char_t>(temp_view));
+            }
+            catch (const std::exception& ex)
+            {
+                std::cerr << "Failure to parse string.  Msg: [" << ex.what() << "].";
+                is.setstate(std::ios_base::failbit);
+                throw;
+            }
+        }
+        return is;
+    } 
+	
 	template<numerics::concepts::character Char>
 	std::basic_istream<Char, std::char_traits<Char>>& operator>>(std::basic_istream<Char,
     std::char_traits<Char>>&is, binary_op_u128_t& op)
