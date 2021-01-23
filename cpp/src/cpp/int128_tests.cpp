@@ -231,6 +231,7 @@ void cjm::uint128_tests::execute_uint128_tests()
     execute_test(execute_unary_op_basic_test, "unary_op_basic_test"sv);
     execute_test(execute_unary_op_post_stat_assert_test, "unary_op_post_stat_assert_test"sv);
     execute_test(execute_unary_operation_rt_serialization_tests, "unary_operation_rt_serialization_tests"sv);
+    execute_test(execute_unary_operation_vec_rt_serialization_tests, "unary_operation_vec_rt_serialization_tests"sv);
     cout << "All tests PASSED." << newl;
 }
 
@@ -865,8 +866,19 @@ std::vector<cjm::uint128_tests::binary_operation<cjm::uint128_tests::uint128_t,
     return vector;
 }
 
+cjm::uint128_tests::unary_op cjm::uint128_tests::generator::create_random_unary_opcode(const rgen& rgen)
+{
+    using enum_t = std::underlying_type_t<unary_op>;
+    constexpr auto min = static_cast<enum_t>(first_unary_op);
+    constexpr auto max = static_cast<enum_t>(last_unary_op);
+
+    enum_t val = (static_cast<enum_t>(generator::create_random_in_range<enum_t>(rgen)) + min) % (max + enum_t{1});
+    cjm_assert(val >= min && val <= max && val < un_op_name_lookup.size());
+    return static_cast<unary_op>(val);
+}
+
 cjm::uint128_tests::binary_operation<cjm::uint128_tests::uint128_t,
-    cjm::uint128_tests::ctrl_uint128_t> cjm::uint128_tests::generator::create_compare_op(const rgen& rgen)
+                                     cjm::uint128_tests::ctrl_uint128_t> cjm::uint128_tests::generator::create_compare_op(const rgen& rgen)
 {
     const auto op = binary_op::compare;
     const uint128_t left = create_random_in_range<uint128_t>(rgen);
@@ -1427,6 +1439,77 @@ void cjm::uint128_tests::execute_generate_addition_ops_rt_ser_deser_test()
     std::cout << "The round tripped vector is identical to the source vector.";
 }
 
+void cjm::uint128_tests::execute_unary_operation_vec_rt_serialization_tests()
+{
+    constexpr auto& arr = u128_testing_constant_providers::testing_constant_provider<uint128_t>::all_values;
+    constexpr size_t num_standard_values = arr.size();
+    constexpr size_t num_standard_ops = num_standard_values;
+    constexpr size_t num_expected = num_standard_ops;
+
+    auto rgen = generator::rgen{};
+    auto op_vect = unary_op_u128_vect_t{};
+    op_vect.reserve(num_expected);
+	for (const auto& itm : arr)
+	{
+		op_vect.emplace_back(generator::create_random_unary_opcode(rgen), itm);
+	}
+
+    cjm_assert(op_vect.size() == num_expected);
+    
+    auto file_name = std::filesystem::path{"random_un_ops.txt"};
+    {
+        auto ofstream = string::make_throwing_ofstream<char>(file_name);
+        ofstream << op_vect;
+    }
+	
+    std::cout << "Wrote " << op_vect.size() << " operations to [" << file_name << "]." << newl;
+    std::filesystem::path file = file_name;
+    auto rt_op_vec = unary_op_u128_vect_t{};
+    try
+    {
+        cjm_assert(std::filesystem::exists(file));
+
+        if (!op_vect.empty())
+        {
+            rt_op_vec.reserve(op_vect.size());
+        }
+        {
+            auto ifstream = string::make_throwing_ifstream<char>(file_name);
+            ifstream >> rt_op_vec;
+        }
+    }
+    catch (const std::exception& ex)
+    {
+        std::cerr << "Exception thrown after writing to file [" << file_name << "]. Msg: [" << ex.what() << "]." << newl;
+        try
+        {
+            if (std::filesystem::exists(file_name))
+            {
+                std::filesystem::remove(file_name);
+            }
+        }
+        catch (const std::exception& ex2)
+        {
+            std::cerr << "Exception throw deleting file [" << file_name << "]. Msg: [" << ex2.what() << "]." << newl;
+        }
+        throw;
+    }
+
+    try
+    {
+        if (std::filesystem::exists(file_name))
+        {
+            std::filesystem::remove(file_name);
+        }
+    }
+    catch (const std::exception& ex)
+    {
+        std::cerr << "Exception throw deleting file [" << file_name << "]. Msg: [" << ex.what() << "]." << newl;
+    }
+    cjm_assert(rt_op_vec == op_vect);
+    std::cout << "The round tripped vector is identical to the source vector.";
+}
+
 void cjm::uint128_tests::execute_addition_tests()
 {
     constexpr auto test_name = "addition_tests"sv;
@@ -1740,8 +1823,22 @@ std::filesystem::path cjm::uint128_tests::create_failing_op_pathname(unary_op op
     return construct_op_filename(op, op_failed_test_tag);
 }
 
+cjm::uint128_tests::unary_op_u128_vect_t cjm::uint128_tests::generate_random_standard_test_ops()
+{
+    constexpr auto& standard_op_arr = u128_testing_constant_providers::testing_constant_provider<uint128_t>::all_values;
+    unary_op_u128_vect_t ret;
+    ret.reserve(standard_op_arr.size());
+    auto rgen = generator::rgen{};
+	for (const auto& item : standard_op_arr)
+	{
+        ret.emplace_back(create_random_unary_opcode(rgen), item);
+	}
+    cjm_assert(ret.size() == standard_op_arr.size());
+    return ret;
+}
+
 cjm::uint128_tests::unary_op_u128_vect_t cjm::uint128_tests::generate_post_inc_dec_ops(size_t num_ops_each_type,
-	bool include_standard_tests)
+                                                                                       bool include_standard_tests)
 {
     constexpr auto num_op_types = 2_szt;
     constexpr auto num_standard_ops_per_type = 

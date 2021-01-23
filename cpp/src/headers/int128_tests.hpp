@@ -129,7 +129,8 @@ namespace cjm::uint128_tests
     void execute_division_modulus_tests();
     void execute_unary_op_code_rt_serialization_tests();
     void execute_unary_operation_rt_serialization_tests();
-    void execute_unary_op_basic_test();
+    void execute_unary_operation_vec_rt_serialization_tests();
+	void execute_unary_op_basic_test();
     void execute_parse_file_test(std::string_view path, size_t expected_ops);
     void execute_unary_op_post_stat_assert_test();
     [[maybe_unused]] void print_n_static_assertions(const binary_op_u128_vect_t& op_vec, size_t n);
@@ -182,6 +183,7 @@ namespace cjm::uint128_tests
 	template<numerics::concepts::character Char>
     unary_op_u128_t parse_unary(std::basic_string_view<Char> sv);
 
+    unary_op_u128_vect_t generate_random_standard_test_ops();
     unary_op_u128_vect_t generate_post_inc_dec_ops(size_t num_ops_each_type, bool include_standard_tests);
     unary_op_u128_vect_t generate_pre_inc_dec_ops(size_t num_ops_each_type, bool include_standard_tests);
 	
@@ -2060,6 +2062,12 @@ namespace cjm::uint128_tests::generator
             {op = func(gen) };
 
         };
+
+    	template<typename Invocable>
+        concept unary_op_producer = requires (Invocable func, const rgen & gen, unary_op_u128_t op)
+        {
+            {op = func(gen)};
+        };
     }
 
 
@@ -2080,12 +2088,16 @@ namespace cjm::uint128_tests::generator
     std::vector<binary_operation<uint128_t, ctrl_uint128_t>>
         create_modulus_ops(const rgen& rgen, size_t num_ops, size_t max_dividend_size, size_t max_divisor_size);
 
+    unary_op create_random_unary_opcode(const rgen& rgen);
+	
     template<concepts::up_to_ui128 UnsignedInteger>
     uint128_t create_random_in_range(const rgen& rgen);
 
     template<concepts::up_to_ui128 UnsignedInteger>
     int create_shift_param_for_type(const rgen& rgen);
 
+
+	
 	template<concepts::binary_op_producer OpFactory>
     std::vector<binary_operation<uint128_t, ctrl_uint128_t>> create_many_ops(OpFactory factory, const rgen& gen, size_t num_ops);
 
