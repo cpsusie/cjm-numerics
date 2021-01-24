@@ -133,6 +133,19 @@ namespace cjm::uint128_tests
 	void execute_unary_op_basic_test();
     void execute_parse_file_test(std::string_view path, size_t expected_ops);
     void execute_unary_op_post_stat_assert_test();
+
+	void execute_unary_op_pre_inc_test();
+    void execute_unary_op_post_inc_test();
+    void execute_unary_op_pre_dec_test();
+    void execute_unary_op_post_dec_test();
+    void execute_unary_op_unary_plus_test();
+
+	void execute_unary_op_unary_minus_test();
+    void execute_unary_op_bitwise_not_test();
+    void execute_unary_op_bool_cast_test();
+    void execute_unary_op_logical_negation_test();
+	
+	
     [[maybe_unused]] void print_n_static_assertions(const binary_op_u128_vect_t& op_vec, size_t n);
     [[maybe_unused]] void print_n_static_assertions(const unary_op_u128_vect_t& op_vec, size_t n);
     constexpr auto base_un_op_filename = "unary_ops"sv;
@@ -185,7 +198,8 @@ namespace cjm::uint128_tests
 
     unary_op_u128_vect_t generate_random_standard_test_ops();
     unary_op_u128_vect_t generate_post_inc_dec_ops(size_t num_ops_each_type, bool include_standard_tests);
-    unary_op_u128_vect_t generate_pre_inc_dec_ops(size_t num_ops_each_type, bool include_standard_tests);
+    unary_op_u128_vect_t generate_specified_un_ops(unary_op op_code, size_t num_rnd_ops, 
+        bool include_standard_tests);
 	
     binary_op_u128_vect_t generate_easy_ops(size_t num_ops, binary_op op, bool include_standard_tests);
     binary_op_u128_vect_t generate_shift_ops(size_t num_ops, bool include_standard_tests);
@@ -372,6 +386,14 @@ namespace cjm::uint128_tests
     [[maybe_unused]] void compile_time_multiplication_test() noexcept;
     [[maybe_unused]] void compile_time_divmod_test() noexcept;
     [[maybe_unused]] void compile_time_postfix_un_op_test() noexcept;
+     
+	[[maybe_unused]] void compile_time_unary_op_pre_inc_test() noexcept;
+    [[maybe_unused]] void compile_time_unary_op_pre_dec_test() noexcept;
+    [[maybe_unused]] void compile_time_unary_op_unary_plus_test() noexcept;
+    [[maybe_unused]] void compile_time_unary_op_unary_minus_test() noexcept;
+    [[maybe_unused]] void compile_time_unary_op_bitwise_not_test() noexcept;
+    [[maybe_unused]] void compile_time_unary_op_bool_cast_test() noexcept;
+    [[maybe_unused]] void compile_time_unary_op_logical_negation_test() noexcept;
 }
 
 namespace std
@@ -1791,7 +1813,7 @@ U"UnaryPlus"sv, U"UnaryMinus"sv, U"BitwiseNot"sv, U"BoolCast"sv, U"LogicalNegati
 		}
 		else
 		{
-            res = "UNKNOWN OR INCORRECT RESULT";
+            result = "UNKNOWN OR INCORRECT RESULT";
 		}
         
 
@@ -1810,7 +1832,7 @@ U"UnaryPlus"sv, U"UnaryMinus"sv, U"BitwiseNot"sv, U"BoolCast"sv, U"LogicalNegati
 					<< digits << ", (" << operand << "_u" << digits << " - 1)));";
             break;
         case unary_op::pre_increment:
-            strm << "static_assert((--" << operand << "_u" << std::dec << digits
+            strm << "static_assert((++" << operand << "_u" << std::dec << digits
                 << ") == " << result << "_u" << digits << ");";
             break;
         case unary_op::post_increment:            
@@ -1819,7 +1841,7 @@ U"UnaryPlus"sv, U"UnaryMinus"sv, U"BitwiseNot"sv, U"BoolCast"sv, U"LogicalNegati
                 << digits << ", (" << operand << "_u" << digits << " + 1)));";
             break;
         case unary_op::unary_plus:
-            strm << "static_assert((" << std::dec << operand << "_u" << digits << ") == " << operand << "_u" << digits << ");";
+            strm << "static_assert((+" << std::dec << operand << "_u" << digits << ") == " << operand << "_u" << digits << ");";
             break;
         case unary_op::unary_minus:
             strm << "static_assert((-" << std::dec << operand << "_u" << digits << ") == " << result << "_u" << digits << ");";

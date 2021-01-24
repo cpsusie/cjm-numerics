@@ -232,7 +232,19 @@ void cjm::uint128_tests::execute_uint128_tests()
     execute_test(execute_unary_op_post_stat_assert_test, "unary_op_post_stat_assert_test"sv);
     execute_test(execute_unary_operation_rt_serialization_tests, "unary_operation_rt_serialization_tests"sv);
     execute_test(execute_unary_operation_vec_rt_serialization_tests, "unary_operation_vec_rt_serialization_tests"sv);
-    cout << "All tests PASSED." << newl;
+    
+	execute_test(execute_unary_op_post_inc_test, "unary_op_post_inc_test"sv);
+    execute_test(execute_unary_op_pre_inc_test, "unary_op_pre_inc_test"sv);
+    execute_test(execute_unary_op_pre_dec_test, "unary_op_pre_dec_test"sv);
+    execute_test(execute_unary_op_post_dec_test, "unary_op_post_dec_test"sv);
+    execute_test(execute_unary_op_unary_plus_test, "unary_op_unary_plus_test"sv);
+
+    execute_test(execute_unary_op_unary_minus_test, "unary_op_unary_minus_test"sv);
+    execute_test(execute_unary_op_bitwise_not_test, "unary_op_bitwise_not_test"sv);
+    execute_test(execute_unary_op_bool_cast_test, "unary_op_bool_cast_test"sv);
+    execute_test(execute_unary_op_logical_negation_test, "unary_op_logical_negation_test"sv);
+    
+	cout << "All tests PASSED." << newl;
 }
 
 void cjm::uint128_tests::execute_parse_file_test(std::string_view path, size_t expected_ops)
@@ -258,6 +270,105 @@ void cjm::uint128_tests::execute_unary_op_post_stat_assert_test()
     append_static_assertion(std::cout, post_inc) << newl;
     append_static_assertion(std::cout, post_dec) << newl;
 }
+
+void cjm::uint128_tests::execute_unary_op_pre_inc_test()
+{
+    constexpr auto test_name = "unary_op_pre_inc_test"sv;
+    auto op_vec = generate_specified_un_ops(unary_op::pre_increment, 5, true);
+	for (auto& itm : op_vec)
+	{
+        test_unary_operation(itm, test_name);
+	}
+    print_n_static_assertions(op_vec, 10_szt);
+}
+
+void cjm::uint128_tests::execute_unary_op_post_inc_test()
+{
+    constexpr auto test_name = "unary_op_post_inc_test"sv;
+    auto op_vec = generate_specified_un_ops(unary_op::post_increment, 5, true);
+    for (auto& itm : op_vec)
+    {
+        test_unary_operation(itm, test_name);
+    }
+    //print_n_static_assertions(op_vec, 10_szt);
+}
+
+void cjm::uint128_tests::execute_unary_op_pre_dec_test()
+{
+    constexpr auto test_name = "unary_op_pre_dec_test"sv;
+    auto op_vec = generate_specified_un_ops(unary_op::pre_decrement, 5, true);
+    for (auto& itm : op_vec)
+    {
+        test_unary_operation(itm, test_name);
+    }
+    print_n_static_assertions(op_vec, 10_szt);
+}
+
+void cjm::uint128_tests::execute_unary_op_post_dec_test()
+{
+    constexpr auto test_name = "unary_op_post_dec_test"sv;
+    auto op_vec = generate_specified_un_ops(unary_op::post_decrement, 5, true);
+    for (auto& itm : op_vec)
+    {
+        test_unary_operation(itm, test_name);
+    }
+}
+
+void cjm::uint128_tests::execute_unary_op_unary_plus_test()
+{
+    constexpr auto test_name = "unary_op_unary_plus_test"sv;
+    auto op_vec = generate_specified_un_ops(unary_op::unary_plus, 5, true);
+    for (auto& itm : op_vec)
+    {
+        test_unary_operation(itm, test_name);
+    }
+    //print_n_static_assertions(op_vec, 10_szt);
+}
+
+void cjm::uint128_tests::execute_unary_op_unary_minus_test()
+{
+    constexpr auto test_name = "unary_op_unary_minus_test"sv;
+    auto op_vec = generate_specified_un_ops(unary_op::unary_minus, 5, true);
+    for (auto& itm : op_vec)
+    {
+        test_unary_operation(itm, test_name);
+    }
+    //print_n_static_assertions(op_vec, 10_szt);
+}
+
+void cjm::uint128_tests::execute_unary_op_bitwise_not_test()
+{
+    constexpr auto test_name = "unary_op_bitwise_not_test"sv;
+    auto op_vec = generate_specified_un_ops(unary_op::bitwise_not, 5, true);
+    for (auto& itm : op_vec)
+    {
+        test_unary_operation(itm, test_name);
+    }
+    //print_n_static_assertions(op_vec, 10_szt);
+}
+
+void cjm::uint128_tests::execute_unary_op_bool_cast_test()
+{
+    constexpr auto test_name = "unary_op_bool_cast_test"sv;
+    auto op_vec = generate_specified_un_ops(unary_op::bool_cast, 5, true);
+    for (auto& itm : op_vec)
+    {
+        test_unary_operation(itm, test_name);
+    }
+    //print_n_static_assertions(op_vec, 10_szt);
+}
+
+void cjm::uint128_tests::execute_unary_op_logical_negation_test()
+{
+    constexpr auto test_name = "unary_op_logical_negation_test"sv;
+    auto op_vec = generate_specified_un_ops(unary_op::logical_negation, 5, true);
+    for (auto& itm : op_vec)
+    {
+        test_unary_operation(itm, test_name);
+    }
+    //print_n_static_assertions(op_vec, 10_szt);
+}
+
 void cjm::uint128_tests::print_n_static_assertions(const binary_op_u128_vect_t& op_vec, size_t n)
 {
     auto saver = cout_saver{ cout };
@@ -537,7 +648,7 @@ void cjm::uint128_tests::test_interconversion(const ctrl_uint128_t& control, uin
 {
 	const uint128_t ctrl_to_test = to_test(control);
 	const ctrl_uint128_t test_to_control = to_ctrl(test);
-    cjm::testing::cjm_assert(test_to_control == control && ctrl_to_test == test);
+    cjm_assert(test_to_control == control && ctrl_to_test == test);
 }
 
 
@@ -1875,6 +1986,43 @@ cjm::uint128_tests::unary_op_u128_vect_t cjm::uint128_tests::generate_post_inc_d
     return ret;
 }
 
+cjm::uint128_tests::unary_op_u128_vect_t cjm::uint128_tests::generate_specified_un_ops(unary_op op_code,
+	size_t num_rnd_ops, bool include_standard_tests)
+{
+	if (op_code < first_unary_op || op_code > last_unary_op)
+	{
+        auto strm = string::make_throwing_sstream<char>();
+        strm << "The specified unary operation code [" << op_code << "] is not a defined member of the unary_op enum class.";
+        throw std::invalid_argument{ strm.str() };
+	}
+
+    constexpr auto& arr = u128_testing_constant_providers::testing_constant_provider<uint128_t>::all_values;
+    const auto num_std = include_standard_tests ? arr.size() : 0_szt;
+    const auto total_to_gen = num_std + num_rnd_ops;
+
+    if (total_to_gen < 1) return unary_op_u128_vect_t{};
+	
+    auto rgen = generator::rgen{};
+	unary_op_u128_vect_t ret;
+    ret.reserve(total_to_gen);
+
+	if (num_std > 0)
+	{
+		for (const auto& val : arr)
+		{
+            ret.emplace_back(op_code, val);
+		}
+	}
+
+    auto num_rnd_so_far = 0_szt;
+    while (num_rnd_so_far++ < num_rnd_ops)
+    {
+        ret.emplace_back(op_code, generator::create_random_in_range<uint128_t>(rgen));
+    }
+    cjm_assert(ret.size() == total_to_gen);
+    return ret;
+}
+
 cjm::uint128_tests::binary_op_u128_vect_t cjm::uint128_tests::generate_easy_ops(size_t num_ops, binary_op op,
                                                                                 bool include_standard_tests)
 {
@@ -2636,6 +2784,96 @@ void cjm::uint128_tests::compile_time_postfix_un_op_test() noexcept
     static_assert((test_post_increment(1_u128)) == std::make_pair(1_u128, (1_u128 + 1)));
     static_assert((test_post_decrement(1_u128)) == std::make_pair(1_u128, (1_u128 - 1)));
 }
+
+void cjm::uint128_tests::compile_time_unary_op_pre_inc_test() noexcept
+{
+    static_assert((++340282366920938463463374607431768211455_u128) == 0_u128);
+    static_assert((++340282366920938463463374607431768211454_u128) == 340282366920938463463374607431768211455_u128);
+    static_assert((++0_u128) == 1_u128);
+    static_assert((++1_u128) == 2_u128);
+    static_assert((++170141183460469231731687303715884105728_u128) == 170141183460469231731687303715884105729_u128);
+    static_assert((++9223372036854775808_u128) == 9223372036854775809_u128);
+    static_assert((++18446744073709551615_u128) == 18446744073709551616_u128);
+    static_assert((++340282366920938463463374607431768211454_u128) == 340282366920938463463374607431768211455_u128);
+    static_assert((++18446744073709551616_u128) == 18446744073709551617_u128);
+    static_assert((++16704806145508003165175326272464834289_u128) == 16704806145508003165175326272464834290_u128);
+}
+
+void cjm::uint128_tests::compile_time_unary_op_pre_dec_test() noexcept
+{
+	
+}
+
+void cjm::uint128_tests::compile_time_unary_op_unary_plus_test() noexcept
+{
+    static_assert((+340282366920938463463374607431768211455_u128) == 340282366920938463463374607431768211455_u128);
+    static_assert((+340282366920938463463374607431768211454_u128) == 340282366920938463463374607431768211454_u128);
+    static_assert((+0_u128) == 0_u128);
+    static_assert((+1_u128) == 1_u128);
+    static_assert((+170141183460469231731687303715884105728_u128) == 170141183460469231731687303715884105728_u128);
+    static_assert((+9223372036854775808_u128) == 9223372036854775808_u128);
+    static_assert((+18446744073709551615_u128) == 18446744073709551615_u128);
+    static_assert((+340282366920938463463374607431768211454_u128) == 340282366920938463463374607431768211454_u128);
+    static_assert((+18446744073709551616_u128) == 18446744073709551616_u128);
+    static_assert((+337633647380721062220802820887106571678_u128) == 337633647380721062220802820887106571678_u128);
+}
+
+void cjm::uint128_tests::compile_time_unary_op_unary_minus_test() noexcept
+{
+    static_assert((-340282366920938463463374607431768211455_u128) == 1_u128);
+    static_assert((-340282366920938463463374607431768211454_u128) == 2_u128);
+    static_assert((-0_u128) == 0_u128);
+    static_assert((-1_u128) == 340282366920938463463374607431768211455_u128);
+    static_assert((-170141183460469231731687303715884105728_u128) == 170141183460469231731687303715884105728_u128);
+    static_assert((-9223372036854775808_u128) == 340282366920938463454151235394913435648_u128);
+    static_assert((-18446744073709551615_u128) == 340282366920938463444927863358058659841_u128);
+    static_assert((-340282366920938463463374607431768211454_u128) == 2_u128);
+    static_assert((-18446744073709551616_u128) == 340282366920938463444927863358058659840_u128);
+    static_assert((-177815907624818037021882524112632073290_u128) == 162466459296120426441492083319136138166_u128);	
+}
+
+void cjm::uint128_tests::compile_time_unary_op_bitwise_not_test() noexcept
+{
+    static_assert((~340282366920938463463374607431768211455_u128) == 0_u128);
+    static_assert((~340282366920938463463374607431768211454_u128) == 1_u128);
+    static_assert((~0_u128) == 340282366920938463463374607431768211455_u128);
+    static_assert((~1_u128) == 340282366920938463463374607431768211454_u128);
+    static_assert((~170141183460469231731687303715884105728_u128) == 170141183460469231731687303715884105727_u128);
+    static_assert((~9223372036854775808_u128) == 340282366920938463454151235394913435647_u128);
+    static_assert((~18446744073709551615_u128) == 340282366920938463444927863358058659840_u128);
+    static_assert((~340282366920938463463374607431768211454_u128) == 1_u128);
+    static_assert((~18446744073709551616_u128) == 340282366920938463444927863358058659839_u128);
+    static_assert((~71264099695017478707486265652617887073_u128) == 269018267225920984755888341779150324382_u128);
+}
+
+void cjm::uint128_tests::compile_time_unary_op_bool_cast_test() noexcept
+{
+    static_assert(static_cast<bool>(340282366920938463463374607431768211455_u128) == static_cast<bool>(1_u128));
+    static_assert(static_cast<bool>(340282366920938463463374607431768211454_u128) == static_cast<bool>(1_u128));
+    static_assert(static_cast<bool>(0_u128) == static_cast<bool>(0_u128));
+    static_assert(static_cast<bool>(1_u128) == static_cast<bool>(1_u128));
+    static_assert(static_cast<bool>(170141183460469231731687303715884105728_u128) == static_cast<bool>(1_u128));
+    static_assert(static_cast<bool>(9223372036854775808_u128) == static_cast<bool>(1_u128));
+    static_assert(static_cast<bool>(18446744073709551615_u128) == static_cast<bool>(1_u128));
+    static_assert(static_cast<bool>(340282366920938463463374607431768211454_u128) == static_cast<bool>(1_u128));
+    static_assert(static_cast<bool>(18446744073709551616_u128) == static_cast<bool>(1_u128));
+    static_assert(static_cast<bool>(37514777061657380268812876834447067224_u128) == static_cast<bool>(1_u128));
+}
+
+void cjm::uint128_tests::compile_time_unary_op_logical_negation_test() noexcept
+{
+    static_assert(static_cast<bool>(!340282366920938463463374607431768211455_u128) == static_cast<bool>(0_u128));
+    static_assert(static_cast<bool>(!340282366920938463463374607431768211454_u128) == static_cast<bool>(0_u128));
+    static_assert(static_cast<bool>(!0_u128) == static_cast<bool>(1_u128));
+    static_assert(static_cast<bool>(!1_u128) == static_cast<bool>(0_u128));
+    static_assert(static_cast<bool>(!170141183460469231731687303715884105728_u128) == static_cast<bool>(0_u128));
+    static_assert(static_cast<bool>(!9223372036854775808_u128) == static_cast<bool>(0_u128));
+    static_assert(static_cast<bool>(!18446744073709551615_u128) == static_cast<bool>(0_u128));
+    static_assert(static_cast<bool>(!340282366920938463463374607431768211454_u128) == static_cast<bool>(0_u128));
+    static_assert(static_cast<bool>(!18446744073709551616_u128) == static_cast<bool>(0_u128));
+    static_assert(static_cast<bool>(!334345165931069997008122611702154128321_u128) == static_cast<bool>(0_u128));
+}
+
 void cjm::uint128_tests::compile_time_comparison_test() noexcept
 {
     // ReSharper disable CppIdenticalOperandsInBinaryExpression
