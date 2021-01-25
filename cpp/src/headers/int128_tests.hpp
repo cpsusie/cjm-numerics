@@ -413,6 +413,13 @@ namespace std
     {
         std::size_t operator()(const cjm::uint128_tests::binary_operation<TestType, ControlType>& hash_me) noexcept;
     };
+
+    template<typename TestType, typename ControlType>
+        requires (cjm::uint128_tests::test_uint_and_control_set<TestType, ControlType>)
+    struct hash<cjm::uint128_tests::unary_operation<TestType, ControlType>>
+    {
+        std::size_t operator()(const cjm::uint128_tests::unary_operation<TestType, ControlType>& hash_me) noexcept;
+    };
 }
 
 namespace cjm::uint128_tests
@@ -2211,7 +2218,17 @@ namespace cjm::uint128_tests::generator
 }
 template<typename TestType, typename ControlType>
     requires (cjm::uint128_tests::test_uint_and_control_set<TestType, ControlType>)
-std::size_t std::hash<cjm::uint128_tests::binary_operation<TestType, ControlType>>::operator()(const cjm::uint128_tests::binary_operation<TestType, ControlType>& hash_me) noexcept
+std::size_t std::hash<cjm::uint128_tests::binary_operation<TestType, ControlType>>
+	::operator()(const cjm::uint128_tests::binary_operation<TestType, ControlType>& 
+        hash_me) noexcept
+{
+    return hash_me.hash_value();
+}
+
+template<typename TestType, typename ControlType>
+    requires (cjm::uint128_tests::test_uint_and_control_set<TestType, ControlType>)
+std::size_t std::hash<cjm::uint128_tests::unary_operation<TestType, ControlType>>::operator()
+	(const cjm::uint128_tests::unary_operation < TestType, ControlType>& hash_me) noexcept
 {
     return hash_me.hash_value();
 }
