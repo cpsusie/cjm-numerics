@@ -31,8 +31,9 @@
 #include <date/date.h>
 #include <filesystem>
 #include <tuple>
-
+#include <span>
 #include "istream_utils.hpp"
+#include "int128_test_switches.hpp"
 
 namespace cjm::uint128_tests
 {
@@ -47,7 +48,8 @@ namespace cjm::uint128_tests
     using std::cout;
     constexpr auto newl = '\n';
     using cout_saver = boost::io::ios_flags_saver;
-
+    using switches::test_switch;
+    using switches::test_mode;
     enum class unary_op : unsigned int;
     enum class binary_op : unsigned int;
     constexpr size_t binary_op_count = 11;
@@ -92,11 +94,17 @@ namespace cjm::uint128_tests
     ctrl_uint128_t to_ctrl(uint128_t convert);
     uint128_t to_test(const ctrl_uint128_t& convert);
 
+    void print_environ_data();
+    void print_sizes();
+    void print_alignments();
+	
     void execute_uint128_tests();
     constexpr size_t pow_2_arr_size = 63;
     constexpr std::array<std::uint64_t, pow_2_arr_size> get_pow2_arr();
     constexpr std::array<int, pow_2_arr_size> get_pow2_res_arr();
 
+    void execute_test_switch(const test_switch& test_switch);
+    void run_test_application(std::span<test_switch> switches);
     void execute_binary_operation_rt_ser_tests();
     void execute_trim_tests();
     void execute_ascii_char_interconversions();

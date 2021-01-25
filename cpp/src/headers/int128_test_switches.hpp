@@ -61,6 +61,7 @@ namespace cjm::uint128_tests::switches
 	std::string get_text_any_mode(test_mode mode);
 	std::pair<std::string, std::vector<std::string>> normalize_and_stringify_console_args(int argc, char* argv[]);
 	std::vector<test_switch> process_input(std::span<std::string> args);
+	
 
 	template<numerics::concepts::character Char>
 	std::basic_ostream<Char>& operator<<(std::basic_ostream<Char>& os, const test_mode& mode);
@@ -190,7 +191,8 @@ namespace cjm::uint128_tests::switches
 			std::string text = get_text_any_mode(mode);
 			local_str_t converted;
 			converted.reserve(text.length());
-			std::transform(text.cbegin(), text.cend(), std::back_inserter(converted), [](char c) -> char_t
+			std::transform(text.cbegin(), text.cend(),
+				std::back_inserter(converted), [](char c) -> char_t
 				{
 					return convert_char<char, char_t>(c);
 				});
@@ -200,25 +202,32 @@ namespace cjm::uint128_tests::switches
 	}
 }
 
-constexpr cjm::uint128_tests::switches::test_mode cjm::uint128_tests::switches::operator|(test_mode lhs, test_mode rhs) noexcept
+constexpr cjm::uint128_tests::switches::test_mode cjm::uint128_tests::switches::operator|(test_mode lhs,
+	test_mode rhs) noexcept
 {
-	auto temp = static_cast<test_mode_underlying_t>(static_cast<test_mode_underlying_t>(lhs) | static_cast<test_mode_underlying_t>(rhs));
+	auto temp = static_cast<test_mode_underlying_t>(static_cast<test_mode_underlying_t>(lhs) 
+		| static_cast<test_mode_underlying_t>(rhs));
 	return static_cast<test_mode>(temp);
 }
 
-constexpr cjm::uint128_tests::switches::test_mode cjm::uint128_tests::switches::operator&(test_mode lhs, test_mode rhs) noexcept
+constexpr cjm::uint128_tests::switches::test_mode cjm::uint128_tests::switches::operator&(test_mode lhs, 
+	test_mode rhs) noexcept
 {
-	auto temp = static_cast<test_mode_underlying_t>(static_cast<test_mode_underlying_t>(lhs) & static_cast<test_mode_underlying_t>(rhs));
+	auto temp = static_cast<test_mode_underlying_t>(static_cast<test_mode_underlying_t>(lhs) 
+		& static_cast<test_mode_underlying_t>(rhs));
 	return static_cast<test_mode>(temp);
 }
 
-constexpr cjm::uint128_tests::switches::test_mode cjm::uint128_tests::switches::operator^(test_mode lhs, test_mode rhs) noexcept
+constexpr cjm::uint128_tests::switches::test_mode cjm::uint128_tests::switches::operator^(test_mode lhs, 
+	test_mode rhs) noexcept
 {
-	auto temp = static_cast<test_mode_underlying_t>(static_cast<test_mode_underlying_t>(lhs) ^ static_cast<test_mode_underlying_t>(rhs));
+	auto temp = static_cast<test_mode_underlying_t>(static_cast<test_mode_underlying_t>(lhs) 
+		^ static_cast<test_mode_underlying_t>(rhs));
 	return static_cast<test_mode>(temp);
 }
 
-constexpr cjm::uint128_tests::switches::test_mode cjm::uint128_tests::switches::operator~(test_mode operand) noexcept
+constexpr cjm::uint128_tests::switches::test_mode cjm::uint128_tests::switches::operator~
+	(test_mode operand) noexcept
 {
 	auto temp = static_cast<test_mode_underlying_t>(~(static_cast<test_mode_underlying_t>(operand)));
 	return static_cast<test_mode>(temp);

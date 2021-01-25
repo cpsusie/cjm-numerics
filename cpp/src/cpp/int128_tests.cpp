@@ -118,6 +118,147 @@ cjm::uint128_tests::uint128_t cjm::uint128_tests::to_test(const ctrl_uint128_t& 
     return uint128_t::make_uint128(high_part, low_part);
 }
 
+void cjm::uint128_tests::print_alignments()
+{
+    std::cout << newl << "PRINTING ALIGNMENTS:" << newl;
+    std::cout << "\tAlignof unsigned short: [" << alignof(unsigned short) << "]." << newl;
+    std::cout << "\tAlignof unsigned int: [" << alignof(unsigned int) << "]." << newl;
+    std::cout << "\tAlignof unsigned long: [" << alignof(unsigned long) << "]." << newl;
+    std::cout << "\tAlignof unsigned long long: [" << alignof(unsigned long long) << "]." << newl;
+    std::cout << "\tAlignof size_t: [" << alignof(size_t) << "]." << newl;
+    std::cout << "\tAlignof uintmax_t: [" << alignof(std::uintmax_t) << "]." << newl;
+    if constexpr (numerics::has_intrinsic_u128)
+    {
+        std::cout << "\tAlignof built-in unsigned 128 bit integer: [" << alignof(numerics::natuint128_t) << "]." << newl;
+    }
+    else
+    {
+        std::cout << "\tunsigned 128 bit integer unavailable in this environment." << newl;
+    }
+    
+    std::cout << "\tAlignof char: [" << alignof(char) << "]." << newl;
+    std::cout << "\tAlignof wide character: [" << alignof(wchar_t) << "]." << newl;
+    std::cout << "\tAlignof cjm::numerics::uint128: [" << alignof(numerics::uint128) << "]." << newl;
+    std::cout << "\tAlignof float: [" << alignof(float) << "]." << newl;
+    std::cout << "\tAlignof double: [" << alignof(double) << "]." << newl;
+    std::cout << "\tAlignof long double: [" << alignof(long double) << "]." << newl;
+    std::cout << "\tAlignof pointer to object: [" << alignof(std::uintptr_t) << "]." << newl;
+    std::cout << "\tAlignof most aligned built-in: [" << alignof(std::max_align_t) << "]." << newl;
+    std::cout << "DONE PRINTING ALIGNMENTS" << newl;
+}
+
+void cjm::uint128_tests::execute_test_switch(const test_switch& test_switch)
+{
+    switch (test_switch.mode())
+    {
+    case test_mode::print_environ_info:
+        print_environ_data();
+        break;
+    case test_mode::run_default_tests:
+        execute_uint128_tests();
+        break;
+    default:
+		{
+			auto strm = string::make_throwing_sstream<char>();
+            strm << "Switch [" << test_switch.mode() << "] has not yet been implemented." << newl;
+            throw std::logic_error{ strm.str() };
+		}
+        break;
+    }
+}
+
+void cjm::uint128_tests::run_test_application(std::span<test_switch> switches)
+{
+	if (switches.empty())
+	{
+        print_environ_data();
+        execute_uint128_tests();
+	}
+    else
+    {
+        const auto has_print_environ = std::find_if(
+            switches.begin(), switches.end(),
+        [](const test_switch& ts) -> bool
+			{
+				    return ts.mode() == test_mode::print_environ_info;
+			}) != switches.end();
+        const auto has_execute_battery = std::find_if(switches.begin(),
+            switches.end(), [](const test_switch& ts) -> bool
+			{
+				    return ts.mode() == test_mode::run_default_tests;
+			}) != switches.end();
+    	if (has_print_environ)
+    	{
+            std::cout << "Executing switch [" << test_mode::print_environ_info << "]: " << newl;
+            print_environ_data();
+    		std::cout << "Done executing switch [" << test_mode::print_environ_info << "] " << newl << newl;
+    	}
+    	if (has_execute_battery)
+    	{
+            std::cout << "Executing switch [" << test_mode::run_default_tests << "]: " << newl;
+            execute_uint128_tests();
+            std::cout << "Done executing switch [" << test_mode::run_default_tests << "] " << newl << newl;
+    	}
+    }
+}
+
+void cjm::uint128_tests::print_sizes()
+{
+    std::cout << newl << "PRINTING SIZES:" << newl;
+    std::cout << "\tCHAR_BIT: " << CHAR_BIT << " bits per byte on this system." << newl;
+    std::cout << "\tSizeof unsigned short: [" << sizeof(unsigned short) << "]." << newl;
+    std::cout << "\tSizeof unsigned int: [" << sizeof(unsigned int) << "]." << newl;
+    std::cout << "\tSizeof unsigned long: [" << sizeof(unsigned long) << "]." << newl;
+    std::cout << "\tSizeof unsigned long long: [" << sizeof(unsigned long long) << "]." << newl;
+    std::cout << "\tSizeof size_t: [" << sizeof(size_t) << "]." << newl;
+    std::cout << "\tSizeof uintmax_t: [" << sizeof(std::uintmax_t) << "]." << newl;
+	if constexpr (numerics::has_intrinsic_u128)
+	{
+        std::cout << "\tSizeof built-in unsigned 128 bit integer: [" << sizeof(numerics::natuint128_t) << "]." << newl;
+	}
+	else
+	{
+        std::cout << "\tunsigned 128 bit integer unavailable in this environment." << newl;
+	}
+	if constexpr (std::is_signed_v<char>)
+	{
+        std::cout << "\tchar is signed in this implementation." << newl;
+	}
+    else
+    {
+        std::cout << "\tchar is unsigned in this implementation." << newl;
+    }
+
+	std::cout << "\tSizeof wide character: [" << sizeof(wchar_t) << "]." << newl;
+	if constexpr (std::is_signed_v<wchar_t>)
+	{
+        std::cout << "\tWide character is signed in this implementation." << newl;
+	}
+    else
+    {
+        std::cout << "\tWide character is unsigned in this implementation." << newl;
+    }
+
+    std::cout << "\tSizeof cjm::numerics::uint128: [" << sizeof(numerics::uint128) << "]." << newl;
+    std::cout << "\tSizeof float: [" << sizeof(float) << "]." << newl;
+    std::cout << "\tSizeof double: [" << sizeof(double) << "]." << newl;
+    std::cout << "\tSizeof long double: [" << sizeof(long double) << "]." << newl;
+    std::cout << "\tSizeof pointer to object: [" << sizeof(std::uintptr_t) << "]." << newl;
+    std::cout << "\tSizeof most aligned built-in: [" << sizeof(std::max_align_t) << "]." << newl;
+    std::cout << "DONE PRINTING SIZES" << newl;
+}
+void cjm::uint128_tests::print_environ_data()
+{
+    cout << "ENVIRONMENT DATA: " << newl;
+    print_sizes();
+    print_alignments();
+    print_constexpr_bitcast_available();
+    print_uint128_eval_mode();
+    print_cpp20_bitops_available();
+    print_builtin_uint128_data_if_present();
+	cout << "END ENVIRONMENT DATA" << newl << newl;
+}
+
 void cjm::uint128_tests::execute_ascii_char_interconversions()
 {
     for (int i = 0; i <= std::numeric_limits<char>::max(); ++i)
@@ -188,19 +329,7 @@ void cjm::uint128_tests::execute_uint128_tests()
     constexpr auto two_fifty_five = 0xff_u128;
 	constexpr auto all_at_ends = 0xff00'0000'0000'0000'0000'0000'0000'0000_u128;
     static_assert(((two_fifty_five << (15 * 8)) == all_at_ends) && ((all_at_ends >> (15 * 8)) == two_fifty_five));
-    cout << "ENVIRONMENT DATA: " << newl;
-    print_constexpr_bitcast_available();
-    print_uint128_eval_mode();
-    print_cpp20_bitops_available();
-    print_builtin_uint128_data_if_present();
-
-//    auto parse_file_test = []() -> void
-//    {
-//        execute_parse_file_test("binary_ops_add_generated_2021_Jan_10_14_42_55Z.txt"sv, 1028);
-//    };
-
-
-    cout << "END ENVIRONMENT DATA" << newl << newl;
+    cout << "BEGINNING STANDARD TEST BATTERY." << newl;
     execute_test(execute_generate_addition_ops_rt_ser_deser_test, "generate_addition_ops_rt_ser_deser_test"sv);
     //execute_test(parse_file_test, "parse_file_test"sv);
     execute_test(execute_basic_test_one, "basic_test_one"sv);
@@ -243,8 +372,7 @@ void cjm::uint128_tests::execute_uint128_tests()
     execute_test(execute_unary_op_bitwise_not_test, "unary_op_bitwise_not_test"sv);
     execute_test(execute_unary_op_bool_cast_test, "unary_op_bool_cast_test"sv);
     execute_test(execute_unary_op_logical_negation_test, "unary_op_logical_negation_test"sv);
-    
-	cout << "All tests PASSED." << newl;
+    cout << "STANDARD TEST BATTERY: All tests PASSED." << newl;
 }
 
 void cjm::uint128_tests::execute_parse_file_test(std::string_view path, size_t expected_ops)

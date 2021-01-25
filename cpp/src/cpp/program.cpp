@@ -38,7 +38,7 @@ namespace cjm::base_test_program
         std::cout << "Thing that isn't unsigned integer: [" << std::dec << val << "]." << newl;
     }
 
-    int execute_test_program() noexcept;
+    int execute_test_program(int argc, char* argv[]) noexcept;
 
     void native_test();
 
@@ -52,11 +52,7 @@ int execute_log_arg_processing(int argc, char* argv[]) noexcept;
 int main(int argc, char* argv[])
 {
     std::ios_base::sync_with_stdio(false);
-    int ret = print_args(argc, argv);
-	if (ret != 0) return ret;
-    ret = execute_log_arg_processing(argc, argv);
-    if (ret != 0) return ret;
-    return cjm::base_test_program::execute_test_program();
+    return cjm::base_test_program::execute_test_program(argc, argv);
 }
 
 int print_args(int argc, char* argv[]) noexcept
@@ -150,7 +146,7 @@ int execute_log_arg_processing(int argc, char* argv[]) noexcept
     return 0;
 }
 
-int cjm::base_test_program::execute_test_program() noexcept
+int cjm::base_test_program::execute_test_program(int argc, char* argv[]) noexcept
 {
     try
     {
@@ -159,80 +155,56 @@ int cjm::base_test_program::execute_test_program() noexcept
         using testing::cjm_assert;
         using namespace std::string_view_literals;
 
-        std::uint64_t ui = 0xc0de'd00d'fea2'b00bu;
-        std::int64_t  i1 = 938'336;
-        constexpr auto text = "Hi mom!"sv;
-        constexpr auto my_literal = 0xc0de'd00d'fea2'b00b'dead'beef'face'babe_u128;
-        constexpr auto my_second_literal = 0xc0de'd00d'fea2'cafe'babe'b00b'face'dad0_u128;
+        
         static_assert(cjm::numerics::concepts::unsigned_integer<uint128_t>);
-
-        {
-            auto stream = cjm::string::make_throwing_sstream<char16_t>();
-            stream << my_literal;
-            std::u16string str = stream.str();
-            cjm_assert(!str.empty());
-            auto round_tripped = cjm::numerics::uint128::make_from_string(str);
-            cjm_assert(round_tripped == my_literal);
-        }
-
+        std::vector<uint128_tests::test_switch> switch_vector;
         try
         {
-            constexpr auto number = 123'456'789;
-            auto stream = cjm::string::make_throwing_sstream<char16_t>();
-            stream << number;
-            int round_tripped = 0;
-            stream >> round_tripped;
-            cjm_assert(number == round_tripped);
-            std::cout << "The char16 conversion actually work in this environment." << newl;
+            auto [exec_name, string_vec] = uint128_tests::switches::normalize_and_stringify_console_args(argc, argv);
+            switch_vector = uint128_tests::switches::process_input(string_vec);
         }
-        catch (const std::bad_cast& ex)
+        catch (const testing::testing_failure& ex)
         {
-            std::cout << "Parsing for REGULAR integers does not exist for utc"
-                      <<  " strings.  Ex msg: " << ex.what() << "." << newl;
+            std::cerr << "One or more unit tests FAILED but the program did everything properly up to that point." << newl;
+            std::cerr << "Failure message: [" << ex.what() << "]" << newl;
+            return 0;
         }
-        catch (const cjm::testing::testing_failure&)
-        {
-            throw;
-        }
+    	catch (const std::runtime_error& ex)
+    	{
+            std::cerr << "There was a problem, likely when processing command-line arguments." << newl;
+            std::cerr << "Message: \"" << ex.what() << "\"." << newl;
+            return -1;
+    	}
         catch (const std::exception& ex)
         {
             std::cerr << "An unexpected exception was thrown while trying"
                       <<" to insert and extract an int with u16 string stream: ["
                       << ex.what() << "]." << newl;
+            return -1;
         }
 
-        native_test();
-
-        print_spec(ui);
-        print_spec(i1);
-        print_spec(text);
-        uint128_tests::execute_uint128_tests();
-
-        std::cout << "Here is a cute literal literal: [0x" << std::hex << my_literal << "]." << newl;
-        std::cout << "Here the little cutey is as dec: [" << std::dec << my_literal << "]." << newl;
-        std::cout << "Another cute literal: [0x" << std::hex << my_second_literal << "]." << newl;
-        std::cout << "Another cute literal as dec: [" << std::dec << my_second_literal << "]." << newl;
-        std::cout << "Bye now!" << std::endl;
-    }
-	catch (const std::exception& ex)
-	{
-        
 		try
 		{
-            std::cerr << "Test program FAILED!  Unhandled exception with message: [" << ex.what() << "].  Program will now terminate." << newl;
-            return -1;
+            cjm::uint128_tests::run_test_application(switch_vector);
 		}
-		catch (...)
-		{
-			//naught else can do here....
+    	catch (const testing::testing_failure& ex)
+    	{
+            std::cerr << "One or more unit tests FAILED but the program did everything properly up to that point." << newl;
+            std::cerr << "Failure message: [" << ex.what() << "]" << newl;
+            return 0;
+    	}
+    	catch (const std::exception& ex)
+    	{
+            std::cerr << "There was a problem (unrelated to a failed test) while executing the test program.  Message: [" << ex.what() << "]" << newl;
             return -1;
-		}
-	}
-	catch (...)
+    	}
+      
+    }
+   	catch (...)
 	{
         try
         {
-            std::cerr << "Test program FAILED!  A non-standard, unhandled exception was thrown.  The program must terminate.";
+            std::cerr << "Test program FAULT!  Either a non-standard, unhandled exception was thrown.  Or an exception was thrown in a catch block. The program must terminate.";
             return -1;
         }
 		catch (...)
