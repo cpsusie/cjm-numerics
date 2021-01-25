@@ -160,7 +160,8 @@ int cjm::base_test_program::execute_test_program(int argc, char* argv[]) noexcep
         std::vector<uint128_tests::test_switch> switch_vector;
         try
         {
-            auto [exec_name, string_vec] = uint128_tests::switches::normalize_and_stringify_console_args(argc, argv);
+            auto [exec_name, string_vec] = 
+                uint128_tests::switches::normalize_and_stringify_console_args(argc, argv);
             switch_vector = uint128_tests::switches::process_input(string_vec);
         }
         catch (const testing::testing_failure& ex)
@@ -185,7 +186,7 @@ int cjm::base_test_program::execute_test_program(int argc, char* argv[]) noexcep
 
 		try
 		{
-            cjm::uint128_tests::run_test_application(switch_vector);
+            uint128_tests::run_test_application(switch_vector);
 		}
     	catch (const testing::testing_failure& ex)
     	{

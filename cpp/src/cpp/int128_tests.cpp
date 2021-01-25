@@ -147,6 +147,28 @@ void cjm::uint128_tests::print_alignments()
     std::cout << "DONE PRINTING ALIGNMENTS" << newl;
 }
 
+void cjm::uint128_tests::save_random_unary_ops_to_file(std::filesystem::path target)
+{
+    auto random = generate_random_standard_test_ops();
+    {
+        auto fstrm = string::make_throwing_ofstream<char>(target);
+        fstrm << random;
+    }
+    cjm_assert(std::filesystem::exists(target));
+    std::cout << "Successfully wrote [" << random.size() << "] unary operations to file [" << target << "]" << newl;
+}
+
+void cjm::uint128_tests::save_random_binary_ops_to_file(std::filesystem::path target)
+{
+    auto random = generate_divmod_ops(10, true);
+    {
+        auto fstrm = string::make_throwing_ofstream<char>(target);
+        fstrm << random;
+    }
+    cjm_assert(std::filesystem::exists(target));
+    std::cout << "Successfully wrote [" << random.size() << "] binary operations to file [" << target << "]" << newl;
+}
+
 void cjm::uint128_tests::execute_test_switch(const test_switch& test_switch)
 {
     switch (test_switch.mode())
@@ -169,6 +191,9 @@ void cjm::uint128_tests::execute_test_switch(const test_switch& test_switch)
 
 void cjm::uint128_tests::run_test_application(std::span<test_switch> switches)
 {
+	//uncomment to generate random binary and unary ops file for demo purposes
+    /*save_random_binary_ops_to_file(std::filesystem::path{ "random_binary_ops.txt" });
+    save_random_unary_ops_to_file(std::filesystem::path{ "random_unary_ops.txt" });*/
 	if (switches.empty())
 	{
         print_environ_data();

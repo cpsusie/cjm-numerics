@@ -102,7 +102,8 @@ namespace cjm::uint128_tests
     constexpr size_t pow_2_arr_size = 63;
     constexpr std::array<std::uint64_t, pow_2_arr_size> get_pow2_arr();
     constexpr std::array<int, pow_2_arr_size> get_pow2_res_arr();
-
+    [[maybe_unused]] void save_random_unary_ops_to_file(std::filesystem::path target);
+    [[maybe_unused]] void save_random_binary_ops_to_file(std::filesystem::path target);
     void execute_test_switch(const test_switch& test_switch);
     void run_test_application(std::span<test_switch> switches);
     void execute_binary_operation_rt_ser_tests();
