@@ -1,10 +1,15 @@
 #include "int128_test_switches.hpp"
 
 #include <cassert>
+#include <boost/algorithm/string.hpp>
 
 namespace cjm::uint128_tests::switches
 {
-	struct test_switch::test_switch_impl final
+    test_mode match_switch(sv_t text);
+
+    sv_t strip_switch_token(sv_t text);
+
+    struct test_switch::test_switch_impl final
 	{
 		friend class test_switch;
 
@@ -24,7 +29,8 @@ namespace cjm::uint128_tests::switches
 	};
 
 
-	
+
+
 }
 
 namespace
@@ -162,7 +168,12 @@ const std::optional<std::filesystem::path>& cjm::uint128_tests::switches::test_s
 {
 	return m_impl->file_path();
 }
-
+cjm::uint128_tests::switches::test_switch::test_switch(cjm::uint128_tests::switches::test_mode mode,
+                                                       std::optional<std::string> parameter) : m_impl{}
+{
+    using namespace std::string_literals;
+    m_impl = std::make_unique<test_switch_impl>(parameter.value_or(""s), mode);
+}
 cjm::uint128_tests::switches::test_switch::test_switch() : m_impl{std::make_unique<test_switch_impl>()} {}
 cjm::uint128_tests::switches::test_switch::test_switch(const test_switch& other) : m_impl{}
 {
@@ -425,3 +436,158 @@ size_t std::hash<cjm::uint128_tests::switches::test_switch>::operator()(
 {
 	return key.hash_code();
 }
+bool cjm::uint128_tests::switches::starts_with_switch_token(cjm::uint128_tests::sv_t text) noexcept
+{
+    if (text.empty()) return false;
+    for (auto tkn : switch_tokens)
+    {
+        if (text.starts_with(tkn))
+            return true;
+    }
+    return false;
+}
+
+cjm::uint128_tests::switches::test_mode cjm::uint128_tests::switches::match_switch(sv_t text)
+{
+
+    if (!starts_with_switch_token(text))
+    {
+        throw not_a_switch{text};
+    }
+
+    sv_t stripped = strip_switch_token(text);
+    if (stripped.empty())
+    {
+        throw not_a_switch{text};
+    }
+
+    auto match = std::find_if(text_mode_lookup.cbegin(), text_mode_lookup.cend(),
+                             [=](const text_mode_t& pair) -> bool {
+        return boost::iequals(pair.first, text);
+    });
+    if (match != text_mode_lookup.cend())
+    {
+        return match->second;
+    }
+    throw unrecognized_switch{text};
+}
+
+cjm::uint128_tests::sv_t cjm::uint128_tests::switches::strip_switch_token(cjm::uint128_tests::sv_t text)
+{
+    for (auto tkn : switch_tokens )
+    {
+        if (text.starts_with(tkn))
+        {
+            const size_t token_length = tkn.length();
+            return text.substr(token_length);
+        }
+    }
+    return text;
+}
+
+std::string cjm::uint128_tests::switches::unrecognized_switch::create_message(
+        std::string_view unrecognized_switch_text)
+{
+    auto str = string::make_throwing_sstream<char>();
+    str << "The specified switch [" << unrecognized_switch_text << "] is not recognized." << newl;
+    str << "Valid switches include: " << newl;
+    for (auto [text, flag] : text_mode_lookup)
+    {
+        str << "\t\"-"sv << text << "\"" << newl;
+    }
+    return str.str();
+}
+std::string cjm::uint128_tests::switches::not_a_switch::create_message(
+        std::string_view not_switch_text)
+{
+    auto str = string::make_throwing_sstream<char>();
+    str << "Argument: [" << not_switch_text << "] is not a switch:" << newl;
+    str << "\tSwitches begin with: \"-\", \"--\", or (on windows): \"/\" " << newl;
+    return str.str();
+}
+cjm::uint128_tests::switches::unrecognized_switch::unrecognized_switch(const std::string &arg) : runtime_error(arg) {}
+
+cjm::uint128_tests::switches::unrecognized_switch::unrecognized_switch(cjm::uint128_tests::sv_t unknown_switch_text) : unrecognized_switch(create_message(unknown_switch_text))
+{
+
+}
+
+cjm::uint128_tests::switches::not_a_switch::not_a_switch(const std::string& arg) : runtime_error{arg}
+{
+}
+
+cjm::uint128_tests::switches::not_a_switch::not_a_switch(sv_t not_a_switch_text) : not_a_switch{create_message(not_a_switch_text)}
+{
+
+}
+
+
+std::vector<cjm::uint128_tests::switches::test_switch> cjm::uint128_tests::switches::process_input(std::span<std::string> args)
+{
+    std::vector<test_switch> ret;
+    if (args.empty())
+    {
+        ret.emplace_back(test_mode::print_environ_info, std::nullopt);
+        ret.emplace_back(test_mode::run_default_tests, std::nullopt);
+    }
+    auto it = args.begin();
+    auto end_it = args.end();
+    while (it != end_it)
+    {
+        std::string_view switch_text = *it;
+        test_mode mode = match_switch(switch_text);
+        auto parameter_needed = needs_parameter(mode).value();
+        if (parameter_needed)
+        {
+            auto next = it + 1;
+            if (next == end_it)
+            {
+                throw missing_parameter{mode};
+            }
+            std::string_view next_item = *next;
+            if (starts_with_switch_token(next_item))
+            {
+                // next item is another switch, not required param
+                //for this one
+                throw missing_parameter{mode};
+            }
+            ret.emplace_back(mode, *next);
+            it += 2;
+        }
+        else
+        {
+            ret.emplace_back(mode, std::nullopt);
+            ++it;
+        }
+    }
+    return ret;
+}
+
+cjm::uint128_tests::switches::missing_parameter::missing_parameter(const std::string& txt)
+    : runtime_error{txt} {}
+
+std::string cjm::uint128_tests::switches::missing_parameter::create_message(test_mode mode)
+{
+    auto strm = string::make_throwing_sstream<char>();
+    strm << "The specified switch [" << get_text_any_mode(mode) << "] requires a filename parameter, but none has been supplied." << newl;
+    auto found = std::find_if(text_mode_lookup.cbegin(),
+        text_mode_lookup.cend(),
+        [=](const text_mode_t& pair)
+            -> bool
+            {
+                return pair.second == mode;
+            });
+    if (found == text_mode_lookup.cend())
+    {
+        throw std::logic_error{"If we have parsed the mode and reached this point, we should be able to assume it is in the lookup."};
+    }
+    auto text = found->first;
+    strm << "Example: " << newl;
+    strm << "\t-" << text << " my_file.txt" << newl;
+    return strm.str();
+
+}
+
+cjm::uint128_tests::switches::missing_parameter
+    ::missing_parameter(cjm::uint128_tests::switches::test_mode mode)
+        : missing_parameter{create_message(mode)} {}

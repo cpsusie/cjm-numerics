@@ -19,6 +19,7 @@
 #include <boost/container_hash/hash.hpp>
 #include <functional>
 #include <utility>
+#include <span>
 #include "numerics.hpp"
 
 namespace cjm::uint128_tests::switches
@@ -37,10 +38,11 @@ namespace std
 
 namespace cjm::uint128_tests::switches
 {
+    using namespace std::string_view_literals;
 	using sv_t = std::string_view;
 	using str_t = std::string;
 	using test_mode_underlying_t = std::uint16_t;
-
+    constexpr std::array<sv_t, 3> switch_tokens = {"--"sv,"-"sv,"/"sv };
 	enum class test_mode : test_mode_underlying_t;
 	constexpr test_mode operator|(test_mode lhs, test_mode rhs) noexcept;
 	constexpr test_mode operator&(test_mode lhs, test_mode rhs) noexcept;
@@ -57,6 +59,7 @@ namespace cjm::uint128_tests::switches
 	constexpr std::optional<std::string_view> get_text_for_indiv_flag(test_mode mode) noexcept;
 	std::string get_text_any_mode(test_mode mode);
 	std::pair<std::string, std::vector<std::string>> normalize_and_stringify_console_args(int argc, char* argv[]);
+	std::vector<test_switch> process_input(std::span<std::string> args);
 	enum class test_mode : test_mode_underlying_t
 	{
 		unspecified = 0x00,
@@ -65,19 +68,30 @@ namespace cjm::uint128_tests::switches
 		print_environ_info = 0x04,
 		run_default_tests = 0x08
 	};
+    using text_mode_t = std::pair<sv_t, test_mode>;
 
 	constexpr bool is_single_specified_flag(test_mode mode) noexcept;
 	constexpr size_t num_specified_flags = 4;
 	constexpr auto individual_specified_flags = std::array<test_mode, num_specified_flags>
-	{	test_mode::execute_unary_from_file,
+	{
+	    test_mode::execute_unary_from_file,
 		test_mode::execute_binary_from_file,
 		test_mode::print_environ_info,
 		test_mode::run_default_tests
 	};
-	constexpr auto flags_requiring_parameter = std::array<test_mode, 2>{test_mode::execute_unary_from_file,
+    constexpr auto text_mode_lookup = std::array<text_mode_t, num_specified_flags>
+    {
+        std::make_pair("unary_from_file"sv, test_mode::execute_unary_from_file),
+        std::make_pair("binary_from_file"sv, test_mode::execute_binary_from_file),
+        std::make_pair("environ"sv, test_mode::print_environ_info),
+        std::make_pair("default_tests"sv, test_mode::run_default_tests)
+    };
+    constexpr auto flags_requiring_parameter = std::array<test_mode, 2>{test_mode::execute_unary_from_file,
 		test_mode::execute_binary_from_file};
     std::weak_ordering operator<=>(const test_switch& lhs, const test_switch& rhs) noexcept;
-	
+
+    bool starts_with_switch_token(sv_t text) noexcept;
+
 	class test_switch final
 	{
 	public:
@@ -88,7 +102,7 @@ namespace cjm::uint128_tests::switches
 		[[nodiscard]] const std::optional<std::filesystem::path>& file_path() const noexcept;
 
 		test_switch();
-		
+		test_switch(test_mode mode, std::optional<std::string> parameter);
 		test_switch(const test_switch& other);
 		test_switch(test_switch&& other) noexcept;
 		test_switch& operator=(const test_switch& other);
@@ -109,21 +123,51 @@ namespace cjm::uint128_tests::switches
 		std::unique_ptr<test_switch_impl> m_impl;
 	};
 
+    class unrecognized_switch : public std::runtime_error
+    {
+
+    public:
+        explicit unrecognized_switch(sv_t unknown_switch_text);
+        ~unrecognized_switch() override = default;
+    private:
+        explicit unrecognized_switch(const std::string& arg);
+        static std::string create_message(std::string_view unrecognized_switch_text);
+    };
+
+    class not_a_switch : public std::runtime_error
+    {
+    public:
+        explicit not_a_switch(sv_t not_a_switch);
+        ~not_a_switch() override = default;
+    private:
+        explicit not_a_switch(const std::string& arg);
+        static std::string create_message(std::string_view not_switch_text);
+    };
+
 	class bad_test_switch : public std::runtime_error
 	{
 	public:
 		
 		bad_test_switch(test_mode mode, std::string_view parameter);
-		bad_test_switch(test_mode mode, std::string_view message, std::string_view parameter);		
+		bad_test_switch(test_mode mode, std::string_view message, std::string_view parameter);
+		~bad_test_switch() override = default;
 	private:
 		
-		bad_test_switch(const std::string& message)
+		explicit bad_test_switch(const std::string& message)
 			: runtime_error(message) {}
 		static std::string create_message(test_mode mode, std::string_view parameter);
 		static std::string create_message(test_mode mode, std::string_view message, std::string_view parameter);
 	};
 	
-
+    class missing_parameter : public std::runtime_error
+    {
+    public:
+        explicit missing_parameter(test_mode mode);
+        ~missing_parameter() override = default;
+    private:
+        explicit missing_parameter(const std::string& txt);
+        static std::string create_message(test_mode mode);
+    };
 	
 }
 
@@ -182,6 +226,8 @@ constexpr cjm::uint128_tests::switches::test_mode cjm::uint128_tests::switches::
 {
 	return test_mode::print_environ_info | test_mode::run_default_tests;
 }
+
+
 
 constexpr bool cjm::uint128_tests::switches::has_flag(test_mode query, test_mode flag) noexcept
 {
@@ -293,4 +339,7 @@ get_text_for_indiv_flag(test_mode mode) noexcept
 		return std::nullopt;//better than undefined behavior....
 	}
 }
+
+
+
 #endif
