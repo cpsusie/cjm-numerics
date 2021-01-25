@@ -9,6 +9,8 @@
 #include "int128_tests.hpp"
 #include <boost/io/ios_state.hpp>
 #include "cjm_numeric_concepts.hpp"
+#include <exception>
+#include <stdexcept>
 #include "cjm_string.hpp"
 #include <fstream>
 #include <locale>
@@ -39,16 +41,21 @@ namespace cjm::base_test_program
     int execute_test_program() noexcept;
 
     void native_test();
+
+    void log_arg_processing(int argc, char* argv[]);
     	
 }
 
 int print_args(int argc, char* argv[]) noexcept;
+int execute_log_arg_processing(int argc, char* argv[]) noexcept;
 
 int main(int argc, char* argv[])
 {
     std::ios_base::sync_with_stdio(false);
     int ret = print_args(argc, argv);
-	if (ret != 0) return ret;  
+	if (ret != 0) return ret;
+    ret = execute_log_arg_processing(argc, argv);
+    if (ret != 0) return ret;
     return cjm::base_test_program::execute_test_program();
 }
 
@@ -127,6 +134,19 @@ int print_args(int argc, char* argv[]) noexcept
         }
         return -1;
     }
+    return 0;
+}
+
+int execute_log_arg_processing(int argc, char* argv[]) noexcept
+{
+	try
+	{
+        cjm::base_test_program::log_arg_processing(argc, argv);
+	}
+	catch (...)
+	{
+        return -1;
+	}
     return 0;
 }
 
@@ -224,6 +244,90 @@ int cjm::base_test_program::execute_test_program() noexcept
     return 0;
 }
 
+void cjm::base_test_program::log_arg_processing(int argc, char* argv[])
+{
+    
+    std::vector<std::string> vec;
+    try
+    {
+        auto [exec_temp, arguments_temp] =
+            cjm::uint128_tests::switches::normalize_and_stringify_console_args(argc, argv);
+        vec = std::move(arguments_temp);
+    }
+    catch (const std::exception& ex)
+    {
+        try
+        {
+            std::cerr << "Unable to parse arguments.  Exception message: [" << ex.what() << "]." << newl;
+        }
+        catch (...)
+        {
+
+        }
+        throw;
+    }
+    catch (...)
+    {
+        try
+        {
+            std::cerr << "Unable to parse arguments.  Non-standard exception thrown." << newl;
+        }
+        catch (...)
+        {
+
+        }
+        throw;
+    }
+
+    std::cout << "Successfully string-vectorized command line arguments." << newl;
+	try
+	{
+        auto prepared = cjm::uint128_tests::switches::process_input(vec);
+        const size_t num_switches = prepared.size();
+		std::cout << "Successfully identified " << num_switches << " switches from command line." << newl;
+        std::cout << "Will enumerate switches: " << newl;
+        size_t this_switch = 0;
+        
+		for (const auto& arg_switch : prepared)
+		{
+            std::cout << "\tArg switch# " << (++this_switch) << " of " << num_switches << ":" << newl;
+            std::cout << "\t\tSwitch value: [" << arg_switch.mode() << "]." << newl;
+			if (arg_switch.file_path() != std::nullopt)
+			{
+                const auto& file = arg_switch.file_path().value();
+                std::cout << "\t\tSwitch parameter: [" << file << "]" << newl;
+			}
+			else
+			{
+                std::cout << "\t\tSwitch lacks parameter." << newl;
+			}
+            std::cout << "\tDone Arg switch# " << this_switch << "." << newl;			
+		}
+        std::cout << "Done enumerating switches." << newl << newl;
+	}
+	catch (const std::runtime_error& ex)
+	{
+        std::cerr << "There was a problem with one or more of the command line switches: " << newl;
+        std::cerr << "[" << ex.what() << "]" << newl;
+        std::cerr << "Command line arguments were NOT valid." << newl << newl;
+	}
+	catch (const std::logic_error& ex)
+	{
+        std::cerr << "Logic error parsing command line arguments.  This requires debugging. Msg: [" << ex.what() << "]." << newl;
+        throw;
+	}
+	catch (const std::exception& ex)
+	{
+        std::cerr << "Unexpected error parsing command line arguments.  This requires debugging. Msg: [" << ex.what() << "]." << newl;
+        throw;
+	}
+	catch (...)
+	{
+        std::cerr << "Non-standard error encountered parsing command line arguments.  This requires debugging." << newl;
+        throw;
+	}
+	
+}
 
 #ifdef CJM_HAVE_BUILTIN_128
 void cjm::base_test_program::native_test()

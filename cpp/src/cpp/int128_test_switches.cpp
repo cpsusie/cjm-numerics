@@ -17,7 +17,6 @@ namespace cjm::uint128_tests::switches
 		[[nodiscard]] test_mode mode() const noexcept { return m_mode; }
 		test_switch_impl(std::string param, test_mode mode);
 		test_switch_impl();
-		test_switch_impl(int argc, char* argv[]);
 		test_switch_impl(const test_switch_impl& other) = default;
 		test_switch_impl(test_switch_impl&& other) noexcept = default;
 		test_switch_impl& operator=(const test_switch_impl& other) = default;
@@ -205,6 +204,8 @@ cjm::uint128_tests::switches::test_switch& cjm::uint128_tests::switches::test_sw
 	}
 	return *this;
 }
+
+
 
 cjm::uint128_tests::switches::bad_test_switch::bad_test_switch(test_mode mode, std::string_view parameter) : std::runtime_error(create_message(mode, parameter))
 {
@@ -463,7 +464,7 @@ cjm::uint128_tests::switches::test_mode cjm::uint128_tests::switches::match_swit
 
     auto match = std::find_if(text_mode_lookup.cbegin(), text_mode_lookup.cend(),
                              [=](const text_mode_t& pair) -> bool {
-        return boost::iequals(pair.first, text);
+        return boost::iequals(pair.first, stripped);
     });
     if (match != text_mode_lookup.cend())
     {
@@ -591,3 +592,5 @@ std::string cjm::uint128_tests::switches::missing_parameter::create_message(test
 cjm::uint128_tests::switches::missing_parameter
     ::missing_parameter(cjm::uint128_tests::switches::test_mode mode)
         : missing_parameter{create_message(mode)} {}
+
+cjm::uint128_tests::switches::test_switch::~test_switch() = default;

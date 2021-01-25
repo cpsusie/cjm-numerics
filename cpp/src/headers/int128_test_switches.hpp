@@ -21,7 +21,8 @@
 #include <utility>
 #include <span>
 #include "numerics.hpp"
-
+#include "cjm_numeric_concepts.hpp"
+#include "istream_utils.hpp"
 namespace cjm::uint128_tests::switches
 {
 	class test_switch;
@@ -60,6 +61,10 @@ namespace cjm::uint128_tests::switches
 	std::string get_text_any_mode(test_mode mode);
 	std::pair<std::string, std::vector<std::string>> normalize_and_stringify_console_args(int argc, char* argv[]);
 	std::vector<test_switch> process_input(std::span<std::string> args);
+
+	template<numerics::concepts::character Char>
+	std::basic_ostream<Char>& operator<<(std::basic_ostream<Char>& os, const test_mode& mode);
+	
 	enum class test_mode : test_mode_underlying_t
 	{
 		unspecified = 0x00,
@@ -107,7 +112,7 @@ namespace cjm::uint128_tests::switches
 		test_switch(test_switch&& other) noexcept;
 		test_switch& operator=(const test_switch& other);
 		test_switch& operator=(test_switch&& other) noexcept;
-		~test_switch() = default;
+		~test_switch();
 
 		friend std::weak_ordering operator<=>(const test_switch& lhs, const test_switch& rhs) noexcept;
 		friend bool operator==(const test_switch& lhs, const test_switch& rhs) noexcept = default;
@@ -168,7 +173,32 @@ namespace cjm::uint128_tests::switches
         explicit missing_parameter(const std::string& txt);
         static std::string create_message(test_mode mode);
     };
-	
+
+	template<numerics::concepts::character Char>
+	std::basic_ostream<Char>& switches::operator<<(std::basic_ostream<Char>& os, const test_mode& mode)
+	{
+		using char_t = std::remove_const_t<Char>;
+		using local_svt = std::basic_string_view<char_t>;
+		using local_str_t = std::basic_string<char_t>;
+		if constexpr (std::is_same_v<char_t, char>)
+		{
+			local_str_t text = get_text_any_mode(mode);
+			os << text;
+			return os;
+		}
+		else
+		{
+			std::string text = get_text_any_mode(mode);
+			local_str_t converted;
+			converted.reserve(text.length());
+			std::transform(text.cbegin(), text.cend(), std::back_inserter(converted), [](char c) -> char_t
+				{
+					return convert_char<char, char_t>(c);
+				});
+			os << converted;
+			return os;
+		}
+	}
 }
 
 constexpr cjm::uint128_tests::switches::test_mode cjm::uint128_tests::switches::operator|(test_mode lhs, test_mode rhs) noexcept
@@ -339,7 +369,6 @@ get_text_for_indiv_flag(test_mode mode) noexcept
 		return std::nullopt;//better than undefined behavior....
 	}
 }
-
 
 
 #endif
