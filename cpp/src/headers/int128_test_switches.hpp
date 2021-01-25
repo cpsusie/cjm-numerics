@@ -175,10 +175,9 @@ namespace cjm::uint128_tests::switches
     };
 
 	template<numerics::concepts::character Char>
-	std::basic_ostream<Char>& switches::operator<<(std::basic_ostream<Char>& os, const test_mode& mode)
+	std::basic_ostream<Char>& operator<<(std::basic_ostream<Char>& os, const test_mode& mode)
 	{
 		using char_t = std::remove_const_t<Char>;
-		using local_svt = std::basic_string_view<char_t>;
 		using local_str_t = std::basic_string<char_t>;
 		if constexpr (std::is_same_v<char_t, char>)
 		{
