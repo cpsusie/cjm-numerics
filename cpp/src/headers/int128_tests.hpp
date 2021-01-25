@@ -75,7 +75,7 @@ namespace cjm::uint128_tests
         requires (test_uint_and_control_set<TestType, ControlType>)
     struct binary_operation;
     template<typename TestType, typename ControlType>
-    requires (test_uint_and_control_set<TestType, ControlType>)
+		requires (test_uint_and_control_set<TestType, ControlType>)
     struct unary_operation;
     using binary_op_u128_t = binary_operation<uint128_t, ctrl_uint128_t>;
     using binary_op_u128_vect_t = std::vector<binary_op_u128_t>;
@@ -105,6 +105,8 @@ namespace cjm::uint128_tests
     [[maybe_unused]] void save_random_unary_ops_to_file(std::filesystem::path target);
     [[maybe_unused]] void save_random_binary_ops_to_file(std::filesystem::path target);
     void execute_test_switch(const test_switch& test_switch);
+    void execute_unary_test_file(const std::filesystem::path& file);
+    void execute_binary_test_file(const std::filesystem::path& file);
     void run_test_application(std::span<test_switch> switches);
     void execute_binary_operation_rt_ser_tests();
     void execute_trim_tests();

@@ -1,5 +1,5 @@
 #include "int128_tests.hpp"
-
+#include <ios>
 namespace
 {
     using uint128_t = cjm::numerics::uint128;
@@ -76,7 +76,81 @@ namespace
             << hms.seconds().count() << "Z." << cjm::uint128_tests::op_extension;
         return std::filesystem::path{ ss.str() };
     }
-	
+
+	template<typename VectorOfOperations>
+    void execute_test_file(std::string_view op_type, const std::filesystem::path& file)
+	{
+        using namespace cjm::uint128_tests;
+		
+        using vec_t = std::remove_const_t<VectorOfOperations>;
+		auto op_vec = vec_t{};
+        using op_t = std::remove_const_t<std::remove_reference_t<decltype(op_vec[0])>>;
+        op_t* ptr_current = nullptr;
+        bool opened = false;
+        try
+        {
+            {
+                auto istream = cjm::string::make_throwing_ifstream<char>(file);
+                opened = true;
+                istream >> op_vec;
+            }
+            const size_t num_ops = op_vec.size();
+            std::cout << "Successfully read " << num_ops << " " << op_type << " operations from file [" << file << "]." << newl;
+
+            for (auto& op : op_vec)
+            {
+                ptr_current = &op;
+                op.calculate_result();
+                cjm_assert(op.has_result() && op.has_correct_result());
+            }
+            std::cout << "All " << num_ops << " tests from file [" << file << "] PASSED." << newl;
+        }
+        catch (const std::ios::failure& ex)
+        {
+            if (opened)
+            {
+                std::cerr << "Unable to parse contents of file [" << file << "] as " << op_type << " operations.  Message: [" << ex.what() << "]." << newl;
+            }
+            else
+            {
+                std::cerr << "Unable to open " << op_type << " operations file [" << file << "] -- Message: [" << ex.what() << "]." << newl;
+            }
+            throw;
+        }
+        catch (const cjm::testing::testing_failure&)
+        {
+            std::cerr << "A test from: [" << file << "] FAILED!" << newl;
+            if (ptr_current)
+            {
+                std::cerr << "A " << op_type << " operation failed.  As a static_assertion it has the form: \"";
+                append_static_assertion(std::cerr, *ptr_current) << "\"." << newl;
+                auto dump_file = create_failing_op_pathname(ptr_current->op_code());
+                std::cerr << "Will attempt to serialize the failing operation to [" << dump_file << "]";
+                try
+                {
+                    auto ostream = cjm::string::make_throwing_ofstream<char>(dump_file);
+                    ostream << *ptr_current;
+                }
+                catch (const std::exception& ex)
+                {
+                    std::cerr << "Unable to serialize failing item to file because of exception.  "
+                        << "Msg: [" << ex.what() << "]." << newl;
+                    std::cerr << "Serializing to stderr instead (between brackets): ["
+                        << *ptr_current << "]." << newl;
+                }
+            }
+            else
+            {
+                std::cerr << "Unable to determine which test from the file failed." << newl;
+            }
+            throw;
+        }
+        catch (const std::exception& ex)
+        {
+            std::cerr << "An unexpected error occurred. Msg: [" << ex.what() << "]." << newl;
+            throw;
+        }
+	}
 	
 }
 
@@ -171,7 +245,7 @@ void cjm::uint128_tests::save_random_binary_ops_to_file(std::filesystem::path ta
 
 void cjm::uint128_tests::execute_test_switch(const test_switch& test_switch)
 {
-    switch (test_switch.mode())
+    switch (test_switch.mode())  // NOLINT(clang-diagnostic-switch-enum)
     {
     case test_mode::print_environ_info:
         print_environ_data();
@@ -179,14 +253,30 @@ void cjm::uint128_tests::execute_test_switch(const test_switch& test_switch)
     case test_mode::run_default_tests:
         execute_uint128_tests();
         break;
+    case test_mode::execute_unary_from_file: 
+        execute_unary_test_file(test_switch.file_path().value());
+        break;
+    case test_mode::execute_binary_from_file:
+        execute_binary_test_file(test_switch.file_path().value());
+        break;
     default:
 		{
 			auto strm = string::make_throwing_sstream<char>();
             strm << "Switch [" << test_switch.mode() << "] has not yet been implemented." << newl;
             throw std::logic_error{ strm.str() };
 		}
-        break;
+        break;   
     }
+}
+
+void cjm::uint128_tests::execute_unary_test_file(const std::filesystem::path& file)
+{
+    execute_test_file<unary_op_u128_vect_t>("unary"sv, file);
+}
+
+void cjm::uint128_tests::execute_binary_test_file(const std::filesystem::path& file)
+{
+    execute_test_file<binary_op_u128_vect_t>("binary"sv, file);
 }
 
 void cjm::uint128_tests::run_test_application(std::span<test_switch> switches)
@@ -223,6 +313,18 @@ void cjm::uint128_tests::run_test_application(std::span<test_switch> switches)
             std::cout << "Executing switch [" << test_mode::run_default_tests << "]: " << newl;
             execute_uint128_tests();
             std::cout << "Done executing switch [" << test_mode::run_default_tests << "] " << newl << newl;
+    	}
+    	for (const auto& test_switch : switches)
+    	{
+            const auto mode = test_switch.mode();
+    		if (mode == test_mode::execute_unary_from_file)
+    		{
+                execute_unary_test_file(test_switch.file_path().value());
+    		}
+            else if (mode == test_mode::execute_binary_from_file)
+            {
+                execute_binary_test_file(test_switch.file_path().value());
+            }
     	}
     }
 }
