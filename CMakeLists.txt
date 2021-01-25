@@ -15,4 +15,6 @@ endif()
         cpp/src/cpp/testing.cpp
         cpp/src/cpp/istream_utils.cpp
         cpp/src/cpp/int128_tests.cpp
-        cpp/src/cpp/uint128.cpp    )
+        cpp/src/cpp/uint128.cpp
+        cpp/src/cpp/int128_test_switches.cpp
+        )

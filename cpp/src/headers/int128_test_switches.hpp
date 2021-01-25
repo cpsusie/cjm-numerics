@@ -72,7 +72,7 @@ namespace cjm::uint128_tests::switches
 	};
 	constexpr auto flags_requiring_parameter = std::array<test_mode, 2>{test_mode::execute_unary_from_file,
 		test_mode::execute_binary_from_file};
-	
+    std::weak_ordering operator<=>(const test_switch& lhs, const test_switch& rhs) noexcept;
 	
 	class test_switch final
 	{
@@ -215,7 +215,8 @@ constexpr bool cjm::uint128_tests::switches::is_unspecified_or_combo_of_known_fl
 	constexpr auto inverse_mask = ~(test_mode::print_environ_info | test_mode::run_default_tests | test_mode::execute_binary_from_file | test_mode::execute_unary_from_file);
 	return  (mode & inverse_mask) == test_mode::unspecified;	
 }
-
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wswitch"
 constexpr std::optional<std::string_view> cjm::uint128_tests::switches::get_text_for_flag_combo(test_mode mode) noexcept
 {
 	using namespace std::string_view_literals;
@@ -259,8 +260,8 @@ constexpr std::optional<std::string_view> cjm::uint128_tests::switches::get_text
 		return std::nullopt;
 		// ReSharper restore CppRedundantParentheses
 	}
-	
 }
+#pragma GCC diagnostic pop
 
 constexpr std::optional<std::string_view> cjm::uint128_tests::switches::
 get_text_for_indiv_flag(test_mode mode) noexcept

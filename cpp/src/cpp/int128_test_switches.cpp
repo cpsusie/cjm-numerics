@@ -69,7 +69,7 @@ cjm::uint128_tests::switches::test_switch::test_switch_impl::test_switch_impl(st
 	else
 	{
 		auto needs_param = needs_parameter(mode).value();
-		if (needs_param && !m_parameter.has_value() || !exists(m_parameter.value()))
+		if (needs_param && (!m_parameter.has_value() || !exists(m_parameter.value())))
 		{
 			if (!m_parameter.has_value())
 			{
@@ -78,7 +78,6 @@ cjm::uint128_tests::switches::test_switch::test_switch_impl::test_switch_impl(st
 			auto msg = cjm::string::make_throwing_sstream<char>();
 			msg << "Mode requires file parameter referring to existing file.  Referenced file [" << m_parameter.value() << "] does not exist.";
 			std::string msg_str = msg.str();
-			sv_t msg_view = msg_str;
 			throw bad_test_switch(mode, msg_str, param);
 		}
 		
@@ -171,6 +170,8 @@ cjm::uint128_tests::switches::bad_test_switch::bad_test_switch(test_mode mode, s
 cjm::uint128_tests::switches::bad_test_switch::bad_test_switch(test_mode mode, std::string_view message,
 	std::string_view parameter) : std::runtime_error{create_message(mode, message, parameter)} {}
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wswitch"
 std::string cjm::uint128_tests::switches::bad_test_switch
 	::create_message(test_mode mode, std::string_view parameter)
 {
@@ -211,7 +212,6 @@ std::string cjm::uint128_tests::switches::bad_test_switch
 		}
 		else
 		{
-			
 			std::optional<std::filesystem::path> x = std::nullopt;
 			try
 			{
@@ -320,12 +320,12 @@ std::string cjm::uint128_tests::switches::bad_test_switch
 	}
 	return throwing_stream.str();
 }
+#pragma GCC diagnostic pop
 
 std::string cjm::uint128_tests::switches::bad_test_switch::create_message(test_mode mode, std::string_view message,
 	std::string_view parameter)
 {
 	auto strm = cjm::string::make_throwing_sstream<char>();
-	auto mode_rep = get_text_for_flag_combo(mode);
 	if (message.empty() && parameter.empty())
 	{
 		strm	<< "There is an unknown problem with the supplied switch: ["

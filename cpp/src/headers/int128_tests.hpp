@@ -1720,7 +1720,7 @@ U"UnaryPlus"sv, U"UnaryMinus"sv, U"BitwiseNot"sv, U"BoolCast"sv, U"LogicalNegati
         auto temp = std::array<lsv_t, elements>{};
         lsv_t line = sv;
         lsv_t remainder = line;
-        int added = 0;
+        unsigned added = 0;
         while (added < elements && !remainder.empty())
         {
             auto [symbol, remainder_temp] = get_up_to_delim(remainder, item_separator);
