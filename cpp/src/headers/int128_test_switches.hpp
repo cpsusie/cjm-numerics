@@ -18,6 +18,8 @@
 #include "cjm_string.hpp"
 #include <boost/container_hash/hash.hpp>
 #include <functional>
+#include "numerics.hpp"
+
 namespace cjm::uint128_tests::switches
 {
 	class test_switch;
@@ -215,8 +217,11 @@ constexpr bool cjm::uint128_tests::switches::is_unspecified_or_combo_of_known_fl
 	constexpr auto inverse_mask = ~(test_mode::print_environ_info | test_mode::run_default_tests | test_mode::execute_binary_from_file | test_mode::execute_unary_from_file);
 	return  (mode & inverse_mask) == test_mode::unspecified;	
 }
+
+#ifdef CJM_IS_GCC
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wswitch"
+#endif
 constexpr std::optional<std::string_view> cjm::uint128_tests::switches::get_text_for_flag_combo(test_mode mode) noexcept
 {
 	using namespace std::string_view_literals;
@@ -261,7 +266,9 @@ constexpr std::optional<std::string_view> cjm::uint128_tests::switches::get_text
 		// ReSharper restore CppRedundantParentheses
 	}
 }
+#ifdef CJM_IS_GCC
 #pragma GCC diagnostic pop
+#endif
 
 constexpr std::optional<std::string_view> cjm::uint128_tests::switches::
 get_text_for_indiv_flag(test_mode mode) noexcept

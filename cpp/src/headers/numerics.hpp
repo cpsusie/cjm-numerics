@@ -45,6 +45,13 @@
 #ifdef __cpp_lib_bitops
 #define CJM_HAS_BITOPS
 #endif
+#if defined (__GNUG__) || defined(__GNUC__)
+#define CJM_IS_GCC 1
+#endif
+#if defined (CJM_IS_GCC) && !defined(__clang__)
+#define CJM_IS_GCC_NOT_CLANG 1
+#endif
+
 
 namespace cjm
 {

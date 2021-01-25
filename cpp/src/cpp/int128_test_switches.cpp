@@ -170,8 +170,10 @@ cjm::uint128_tests::switches::bad_test_switch::bad_test_switch(test_mode mode, s
 cjm::uint128_tests::switches::bad_test_switch::bad_test_switch(test_mode mode, std::string_view message,
 	std::string_view parameter) : std::runtime_error{create_message(mode, message, parameter)} {}
 
+#ifdef CJM_IS_GCC
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wswitch"
+#endif
 std::string cjm::uint128_tests::switches::bad_test_switch
 	::create_message(test_mode mode, std::string_view parameter)
 {
@@ -320,7 +322,9 @@ std::string cjm::uint128_tests::switches::bad_test_switch
 	}
 	return throwing_stream.str();
 }
+#ifdef CJM_IS_GCC
 #pragma GCC diagnostic pop
+#endif
 
 std::string cjm::uint128_tests::switches::bad_test_switch::create_message(test_mode mode, std::string_view message,
 	std::string_view parameter)
