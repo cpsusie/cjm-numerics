@@ -173,6 +173,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\cpp\int128_tests.cpp" />
+    <ClCompile Include="..\cpp\int128_test_switches.cpp" />
     <ClCompile Include="..\cpp\istream_utils.cpp" />
     <ClCompile Include="..\cpp\program.cpp" />
     <ClCompile Include="..\cpp\testing.cpp" />
@@ -182,6 +183,7 @@
     <ClInclude Include="..\headers\cjm_numeric_concepts.hpp" />
     <ClInclude Include="..\headers\cjm_string.hpp" />
     <ClInclude Include="..\headers\int128_tests.hpp" />
+    <ClInclude Include="..\headers\int128_test_switches.hpp" />
     <ClInclude Include="..\headers\istream_utils.hpp" />
     <ClInclude Include="..\headers\numerics.hpp" />
     <ClInclude Include="..\headers\testing.hpp" />

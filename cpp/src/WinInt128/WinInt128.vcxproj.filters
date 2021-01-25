@@ -30,6 +30,9 @@
     <ClCompile Include="..\cpp\istream_utils.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\cpp\int128_test_switches.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\headers\cjm_numeric_concepts.hpp">
@@ -51,6 +54,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\headers\istream_utils.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\headers\int128_test_switches.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
