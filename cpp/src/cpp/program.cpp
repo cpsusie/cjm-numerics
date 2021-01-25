@@ -12,6 +12,8 @@
 #include "cjm_string.hpp"
 #include <fstream>
 #include <locale>
+#include <tuple>
+#include "int128_test_switches.hpp"
 
 namespace cjm::base_test_program
 {
@@ -37,12 +39,95 @@ namespace cjm::base_test_program
     int execute_test_program() noexcept;
 
     void native_test();
+    	
 }
 
-int main()
+int print_args(int argc, char* argv[]) noexcept;
+
+int main(int argc, char* argv[])
 {
     std::ios_base::sync_with_stdio(false);
+    int ret = print_args(argc, argv);
+	if (ret != 0) return ret;  
     return cjm::base_test_program::execute_test_program();
+}
+
+int print_args(int argc, char* argv[]) noexcept
+{
+    using namespace cjm::base_test_program;
+    std::string exec;
+    std::vector<std::string> vec;
+	try
+	{
+        auto [exec_temp, arguments_temp] = 
+            cjm::uint128_tests::switches::normalize_and_stringify_console_args(argc, argv);
+        exec = std::move(exec_temp);
+        vec = std::move(arguments_temp);
+	}
+    catch (const std::exception& ex)
+    {
+        try
+        {
+            std::cerr << "Unable to parse arguments.  Exception message: [" << ex.what() << "]." << newl;
+        }
+    	catch (...)
+    	{
+    		
+    	}
+        return -1;
+	}
+	catch (...)
+	{
+		try
+		{
+            std::cerr << "Unable to parse arguments.  Non-standard exception thrown." << newl;
+		}
+        catch (...)
+        {
+	        
+        }
+        return -1;
+	}
+
+	try
+	{
+        std::cout << "Will list command line arguments." << newl;
+        std::cout << "Executed: [" << exec << "]." << newl;
+        size_t this_param = 0;
+        const size_t num_params = vec.size();
+        std::cout << "Will now print all [" << num_params << "] parameters: " << newl;
+		for (const auto& str : vec)
+		{
+            std::cout << '\t' << "Parameter# " << (++this_param) << " of " << num_params << ": [" << str << "]." << newl;
+		}
+        std::cout << "Done printing command parameters." << newl;
+        std::cout << "Done listing command line arguments." << newl << newl;
+	}
+    catch (const std::exception& ex)
+    {
+        try
+        {
+            std::cerr << "Unable to parse arguments.  Exception message: [" << ex.what() << "]." << newl;
+        }
+        catch (...)
+        {
+
+        }
+        return -1;
+    }
+    catch (...)
+    {
+        try
+        {
+            std::cerr << "Unable to parse arguments.  Non-standard exception thrown." << newl;
+        }
+        catch (...)
+        {
+
+        }
+        return -1;
+    }
+    return 0;
 }
 
 int cjm::base_test_program::execute_test_program() noexcept

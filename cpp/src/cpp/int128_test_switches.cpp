@@ -108,6 +108,39 @@ std::string cjm::uint128_tests::switches::get_text_any_mode(test_mode mode)
 	return str.str();
 }
 
+std::pair<std::string, std::vector<std::string>> cjm::uint128_tests::switches::normalize_and_stringify_console_args(
+	int argc, char* argv[])
+{
+	if (argc < 1) throw std::invalid_argument{ "The first parameter must always be greater than or equal to one." };
+	if (!argv) throw std::invalid_argument{ "The second parameter must not be null." };
+	std::string current_exec_temp = argv[0];
+	current_exec_temp = cjm::string::trim(current_exec_temp);
+
+	std::string current_exec = std::move(current_exec_temp);
+	//current_exec.reserve(current_exec_temp.size());
+	//todo fixit ... don't think i want lower unless confirmed to be a switch rather than a parameter
+	
+	/*std::transform(current_exec_temp.cbegin(), current_exec_temp.cend(), 
+		std::back_inserter(current_exec), 
+		[](unsigned char c)
+		{
+			return std::tolower(c);
+		});*/
+	
+	std::vector<std::string> ret;
+	if (argc > 1)
+	{
+		for (auto* it = argv + 1; it != argv + argc; ++it)
+		{
+			std::string temp = *it;
+			temp = cjm::string::trim(std::move(temp));
+			ret.push_back(std::move(temp));
+		}
+		
+	}
+	return std::make_pair(current_exec, ret);
+}
+
 cjm::uint128_tests::switches::test_mode cjm::uint128_tests::switches::test_switch::mode() const noexcept
 {
 	return m_impl->mode();

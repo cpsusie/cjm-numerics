@@ -18,6 +18,7 @@
 #include "cjm_string.hpp"
 #include <boost/container_hash/hash.hpp>
 #include <functional>
+#include <utility>
 #include "numerics.hpp"
 
 namespace cjm::uint128_tests::switches
@@ -55,6 +56,7 @@ namespace cjm::uint128_tests::switches
 	constexpr std::optional<std::string_view> get_text_for_flag_combo(test_mode mode) noexcept;
 	constexpr std::optional<std::string_view> get_text_for_indiv_flag(test_mode mode) noexcept;
 	std::string get_text_any_mode(test_mode mode);
+	std::pair<std::string, std::vector<std::string>> normalize_and_stringify_console_args(int argc, char* argv[]);
 	enum class test_mode : test_mode_underlying_t
 	{
 		unspecified = 0x00,
@@ -85,8 +87,8 @@ namespace cjm::uint128_tests::switches
 		[[nodiscard]] size_t hash_code() const noexcept;
 		[[nodiscard]] const std::optional<std::filesystem::path>& file_path() const noexcept;
 
-		test_switch(int argc, char* argv[]);
 		test_switch();
+		
 		test_switch(const test_switch& other);
 		test_switch(test_switch&& other) noexcept;
 		test_switch& operator=(const test_switch& other);

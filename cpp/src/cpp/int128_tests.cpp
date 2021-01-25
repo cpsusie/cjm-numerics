@@ -279,7 +279,7 @@ void cjm::uint128_tests::execute_unary_op_pre_inc_test()
 	{
         test_unary_operation(itm, test_name);
 	}
-    print_n_static_assertions(op_vec, 10_szt);
+    //print_n_static_assertions(op_vec, 10_szt);
 }
 
 void cjm::uint128_tests::execute_unary_op_post_inc_test()
@@ -301,7 +301,7 @@ void cjm::uint128_tests::execute_unary_op_pre_dec_test()
     {
         test_unary_operation(itm, test_name);
     }
-    print_n_static_assertions(op_vec, 10_szt);
+    //print_n_static_assertions(op_vec, 10_szt);
 }
 
 void cjm::uint128_tests::execute_unary_op_post_dec_test()
