@@ -178,6 +178,7 @@
     <ClCompile Include="..\cpp\program.cpp" />
     <ClCompile Include="..\cpp\testing.cpp" />
     <ClCompile Include="..\cpp\uint128.cpp" />
+    <ClCompile Include="..\cpp\uint128_test_program.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\headers\cjm_numeric_concepts.hpp" />
@@ -188,6 +189,7 @@
     <ClInclude Include="..\headers\numerics.hpp" />
     <ClInclude Include="..\headers\testing.hpp" />
     <ClInclude Include="..\headers\uint128.hpp" />
+    <ClInclude Include="..\headers\uint128_test_program.hpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\headers\cjm_string.inl" />

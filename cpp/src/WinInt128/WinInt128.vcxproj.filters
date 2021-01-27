@@ -33,6 +33,9 @@
     <ClCompile Include="..\cpp\int128_test_switches.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\cpp\uint128_test_program.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\headers\cjm_numeric_concepts.hpp">
@@ -57,6 +60,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\headers\int128_test_switches.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\headers\uint128_test_program.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
