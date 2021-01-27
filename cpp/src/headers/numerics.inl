@@ -1,6 +1,26 @@
 #ifndef CJM_NUMERICS_INL
 #define CJM_NUMERICS_INL
 
+namespace cjm::numerics
+{
+		
+	template<typename Char, typename CharTraits>
+	requires (cjm::numerics::concepts::char_or_wchar_t_with_traits<Char, CharTraits>)
+		std::basic_ostream<Char, CharTraits>& operator<<(std::basic_ostream<Char, CharTraits>& os, compiler_used compiler)
+	{
+		using char_t = std::remove_const_t<Char>;
+		if constexpr (std::is_same_v<char_t, char>)
+		{
+			os << get_text_narrow(compiler);
+		}
+		else
+		{
+			os << get_text_wide(compiler);
+		}
+		return os;
+	}
+}
+
 constexpr long double cjm::numerics::math_functions::ten_to_the_power(int exponent)
 {
 	if (exponent == 1)

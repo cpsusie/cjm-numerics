@@ -406,14 +406,27 @@ namespace cjm::numerics::concepts
                                              std::is_same_v<T, char16_t> ||
                                              std::is_same_v<T, char32_t>);
 
+	template<typename T>
+    concept char_or_wchar_t = character<T> && !utf_character<T>;
+
     template<typename Char, typename CharTraits>
     concept char_with_traits = character<Char> && std::is_nothrow_convertible_v<CharTraits, std::char_traits<Char>>;
+
+	template<typename Char, typename CharTraits>
+    concept char_or_wchar_t_with_traits = char_or_wchar_t<Char> && char_with_traits<Char, CharTraits>;
 
     template<typename Char, typename CharAllocator>
     concept char_with_allocator = character<Char> && std::is_nothrow_convertible_v<std::allocator<Char>, CharAllocator>;
 
+	template<typename Char, typename CharAllocator>
+    concept char_or_wchar_t_with_allocator = char_or_wchar_t<Char> && char_with_allocator<Char, CharAllocator>;
+
     template<typename Char, typename CharTraits, typename CharAllocator>
     concept char_with_traits_and_allocator = character<Char> && char_with_traits<Char, CharTraits> && char_with_allocator<Char, CharAllocator>;
+
+	template<typename Char, typename CharTraits, typename CharAllocator>
+    concept char_or_wchar_t_with_traits_and_allocator = char_or_wchar_t_with_allocator<Char, CharAllocator> && char_or_wchar_t_with_traits<Char, CharTraits>;
+	
 
     template<typename Allocator>
     concept char_allocator = std::is_nothrow_convertible_v<std::allocator<char>, Allocator>;
