@@ -187,6 +187,7 @@
     <ClInclude Include="..\headers\int128_test_switches.hpp" />
     <ClInclude Include="..\headers\istream_utils.hpp" />
     <ClInclude Include="..\headers\numerics.hpp" />
+    <ClInclude Include="..\headers\numerics_configuration.hpp" />
     <ClInclude Include="..\headers\testing.hpp" />
     <ClInclude Include="..\headers\uint128.hpp" />
     <ClInclude Include="..\headers\uint128_test_program.hpp" />
@@ -195,6 +196,7 @@
     <None Include="..\headers\cjm_string.inl" />
     <None Include="..\headers\int128_tests.inl" />
     <None Include="..\headers\numerics.inl" />
+    <None Include="..\headers\numerics_configuration.inl" />
     <None Include="..\headers\uint128.inl" />
   </ItemGroup>
   <ItemGroup>

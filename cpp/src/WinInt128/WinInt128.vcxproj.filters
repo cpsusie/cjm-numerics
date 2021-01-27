@@ -65,6 +65,9 @@
     <ClInclude Include="..\headers\uint128_test_program.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\headers\numerics_configuration.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\headers\cjm_string.inl">
@@ -77,6 +80,9 @@
       <Filter>Header Files</Filter>
     </None>
     <None Include="..\headers\int128_tests.inl">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="..\headers\numerics_configuration.inl">
       <Filter>Header Files</Filter>
     </None>
   </ItemGroup>
