@@ -17,4 +17,5 @@ endif()
         cpp/src/cpp/int128_tests.cpp
         cpp/src/cpp/uint128.cpp
         cpp/src/cpp/int128_test_switches.cpp
+        cpp/src/cpp/uint128_test_program.cpp
         )
