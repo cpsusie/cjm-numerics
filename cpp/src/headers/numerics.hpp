@@ -48,20 +48,19 @@ namespace cjm
 			template<typename TInt>
 			constexpr std::make_unsigned_t<TInt> int_abs(TInt val) noexcept;
 
-			template<typename TInt>
+			template<cjm::numerics::concepts::integer TInt>
 			constexpr TInt int_sign(TInt val) noexcept;
 
-			template<typename TInt>
-			constexpr TInt int_gcd(TInt first, TInt second) noexcept;
+			template<concepts::unsigned_integer TUInt>
+			constexpr TUInt int_gcd(TUInt first, TUInt second) noexcept;
 
-			template<typename TInt>
-			constexpr TInt int_lcm(TInt first, TInt second);
+			template<concepts::unsigned_integer TUInt>
+			constexpr TUInt int_lcm(TUInt first, TUInt second) noexcept;
 			
-
 			template<typename TInt>
 			constexpr TInt floor_log2(TInt val);
 
-			template<typename TInt>
+			template<cjm::numerics::concepts::integer TInt>
 			constexpr TInt int_pow(TInt radix, unsigned exponent);
 
 			template<typename TUInt>

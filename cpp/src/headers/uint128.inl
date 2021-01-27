@@ -608,9 +608,16 @@ namespace cjm
         	//(I use this style with explicit else when using if constexpr or std::is_constant_evaluated)
 			else  // ReSharper disable CppUnreachableCode				
 			{
-				if constexpr (calculation_mode == uint128_calc_mode::intrinsic_u128)
+				if constexpr (calculation_mode == uint128_calc_mode::
+                    intrinsic_u128)
 				{
-					return divmod_result_t{ static_cast<natuint128_t>(dividend) / static_cast<natuint128_t>(divisor), static_cast<natuint128_t>(dividend) % static_cast<natuint128_t>(divisor) };
+					return divmod_result_t
+					{
+						static_cast<natuint128_t>(dividend) /
+								static_cast<natuint128_t>(divisor),
+						static_cast<natuint128_t>(dividend) %
+								static_cast<natuint128_t>(divisor)
+					};
 				}
 				else if constexpr (calculation_mode == uint128_calc_mode::msvc_x64)
 				{
@@ -953,21 +960,22 @@ namespace cjm
 			{
 #pragma warning(push)
 #pragma warning (disable: 4244) //this warning pops in in msvc when compiling as 32 bit even though this if constexpr branch never taken in that case.
-				hash = low + 0x9e3779b9 + (hash << 6) + (hash >> 2);
-				hash = hi + 0x9e3779b9 + (hash << 6) + (hash >> 2);
+				hash = low + 0x9e37'79b9 + (hash << 6) + (hash >> 2);
+				hash = hi + 0x9e37'79b9 + (hash << 6) + (hash >> 2);
 #pragma warning(pop)				
 			}
 			else // ReSharper disable once CppUnreachableCode
 			{
+				//todo fixit examine this .... something is fishy here
 				size_t hi_hi = hi >> 32;
-				size_t hi_low = static_cast<size_t>(hi & 0x0000'FFFF);
+				size_t hi_low = static_cast<size_t>(hi & 0x0000'ffff);
 				size_t low_hi = low >> 32;
-				size_t low_low = static_cast<size_t>(low & 0x0000'FFFF);
+				size_t low_low = static_cast<size_t>(low & 0x0000'ffff);
 
-				hash = low_low + 0x9e3779b9 + (hash << 6) + (hash >> 2);
-				hash = low_hi + 0x9e3779b9 + (hash << 6) + (hash >> 2);
-				hash = hi_low + 0x9e3779b9 + (hash << 6) + (hash >> 2);
-				hash = hi_hi + 0x9e3779b9 + (hash << 6) + (hash >> 2);
+				hash = low_low + 0x9e37'79b9 + (hash << 6) + (hash >> 2);
+				hash = low_hi + 0x9e37'79b9 + (hash << 6) + (hash >> 2);
+                hash = hi_low + 0x9e37'79b9 + (hash << 6) + (hash >> 2);
+				hash = hi_hi + 0x9e37'79b9 + (hash << 6) + (hash >> 2);
 			}
 			return hash;
 		}
@@ -1191,15 +1199,15 @@ namespace cjm
             return std::countl_zero(n);
         }
 
-        constexpr int internal::countl_zero(uint128 ui) noexcept
+        constexpr int internal::countl_zero(uint128 n) noexcept
         {
-            assert(ui != 0);
-            auto hp = ui.high_part();
+            assert(n != 0);
+            auto hp = n.high_part();
         	if ( hp != 0)
         	{
                 return std::countl_zero(hp);
         	}
-            return std::numeric_limits<typename uint128::int_part>::digits + std::countl_zero(ui.low_part());
+            return std::numeric_limits<typename uint128::int_part>::digits + std::countl_zero(n.low_part());
         }
 		
 		template <typename T>
@@ -1766,60 +1774,6 @@ constexpr cjm::numerics::uint128 std::numeric_limits<cjm::numerics::uint128>::de
 	return std::numeric_limits<uint64_t>::denorm_min();
 }
 
-#pragma warning( push )
-#pragma warning ( disable : 4100)
-template<>
-// ReSharper disable once CppParameterNeverUsed
-constexpr cjm::numerics::uint128 cjm::numerics::math_functions::int_sign([[maybe_unused]] uint128 val) noexcept
-{
-	return uint128{ 1 };
-}
-#pragma warning ( pop )
-template<>
-constexpr cjm::numerics::uint128 cjm::numerics::math_functions::int_gcd(uint128 first, //NOLINT (bugprone-exception-escape)
-    uint128 second) noexcept //modulus operator only throws for zero divisor.  logic herein prevents divisor from being zero
-{
-    assert(first != 0 || second != 0);
-	while (second != 0)
-	{
-		uint128 r = first % second;
-		first = second;
-		second = r;
-	}
-	return first;
-}
-template<>
-constexpr cjm::numerics::uint128 cjm::numerics::math_functions::int_lcm(uint128 first, uint128 second) 
-{
-	if (first == 0 && second == 0)
-	{
-		return 0;
-	}
-	if (first == 0)
-	{
-		std::swap(first, second);
-	}
-	uint128 product = first * second;
-	if (product == 0)
-		return 0;
-	if (product < first || product < second)
-		throw std::overflow_error("Integer overflow occurred.");
-	return product / (int_gcd(first, second));
-}
-
-template <>
-constexpr cjm::numerics::uint128 cjm::numerics::math_functions::floor_log2(uint128 val)
-{
-	if (val < 1)
-		throw std::domain_error("Illegal attempt to find base-2 logarithm of zero or a negative number.");
-	int rshiftCount = 0;
-	while (val > 1)
-	{
-		val >>= 1;
-		++rshiftCount;
-	}
-	return rshiftCount;
-}
 
 template<typename Chars, typename CharTraits>
 requires cjm::numerics::concepts::char_with_traits<Chars, CharTraits>
