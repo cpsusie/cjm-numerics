@@ -1,135 +1,14 @@
 #ifndef CJM_NUMERICS_HPP_
 #define CJM_NUMERICS_HPP_
-#ifdef _MSC_VER
-#define CJM_MSC
-#endif
-#if defined(_MSC_VER) && defined(_M_X64)
-#include <intrin.h>
-#pragma intrinsic(_umul128)
-#pragma intrinsic(_BitScanReverse64)
-#pragma intrinsic(__lzcnt64)
-#pragma intrinsic(_udiv128)  // NOLINT(clang-diagnostic-ignored-pragma-intrinsic)
-#pragma intrinsic(__shiftleft128)
-#pragma intrinsic(__shiftright128)
-#ifndef CJM_MSC_X64
-#define CJM_MSC_X64
-#define CJM_UMUL128 _umul128
-#define CJM_BITSCAN_REV_64 _BitScanReverse64
-#define CJM_LZCNT_64 __lzcnt64
-#define CJM_UDIV128 _udiv128
-#define CJM_LSHIFT128 __shiftleft128
-#define CJM_RSHIFT128 __shiftright128
-#endif
-#else
-#define CJM_UMUL128 internal::cjm_bad_umul128
-#define CJM_BITSCAN_REV_64 internal::cjm_badrev_bitscan_64
-#define CJM_LZCNT_64 internal::cjm_bad_lzcnt_64
-#define CJM_UDIV128 internal::cjm_bad_udiv128
-#define CJM_LSHIFT128 internal::cjm_bad_shiftleft128
-#define CJM_RSHIFT128 internal::cjm_bad_shiftright128
-#endif
-#include <climits>
-#include <cmath>
-#include <limits>
-#include <type_traits>
-#include <numeric>
-#include <cstring>
-#include <functional>
-#include "cjm_numeric_concepts.hpp"
-#include <bit>
-#ifdef __cpp_lib_bit_cast
-#define CJM_BIT_CAST_CONST constexpr
-#else
-#define CJM_BIT_CAST_CONST inline
-#endif
-#ifdef __cpp_lib_bitops
-#define CJM_HAS_BITOPS
-#endif
-#if defined (__GNUG__) || defined(__GNUC__)
-#define CJM_IS_GCC 1
-#endif
-#if defined (CJM_IS_GCC) && !defined(__clang__)
-#define CJM_IS_GCC_NOT_CLANG 1
-#endif
-
+#include "numerics_configuration.hpp"
 
 namespace cjm
 {
-	
+
 	namespace numerics
 	{
-		namespace internal
-		{
-			//alternate declarations for cjm_intrinsic_macros ... never defined because never used but need something that won't blow compiler up
-			//when examining untaken if constexpr branch.
-			extern unsigned char cjm_badrev_bitscan_64(unsigned long* index, std::uint64_t mask);
-			extern std::uint64_t cjm_bad_lzcnt_64(std::uint64_t mask);
-			extern std::uint64_t cjm_bad_umul128(std::uint64_t multiplicand, std::uint64_t multiplicand_two, std::uint64_t* carry);
-			extern std::uint64_t cjm_bad_udiv128(std::uint64_t high_dividend, std::uint64_t low_dividend, std::uint64_t divisor, std::uint64_t* remainder);
-			extern std::uint64_t cjm_bad_shiftleft128(std::uint64_t low, std::uint64_t high, unsigned char shift_amount);
-			extern std::uint64_t cjm_bad_shiftright128(std::uint64_t low, std::uint64_t high, unsigned char shift_amount);
-		}
-		class uint128;
-        constexpr bool has_cpp20_bitops =
-#ifdef CJM_HAS_BITOPS
-                true;
-#else
-        false
-#endif
-		constexpr bool constexpr_bit_casting =
-#ifdef __cpp_lib_bit_cast
-			true;
-#else
-			false;
-#endif
-	    constexpr bool has_msc_x64 =
-#ifdef CJM_MSC_X64
-        true;
-#else
-	    false;
-#endif
-	    constexpr bool has_msc =
-#ifdef CJM_MSC
-    true;
-#else
-	    false;
-#endif
-	    constexpr bool has_intrinsic_u128 =
-#ifdef __SIZEOF_INT128__
-        true;
-		using uint128_align_t = unsigned __int128;
-		using natuint128_t = unsigned __int128;
-#ifndef CJM_HAVE_BUILTIN_128
-#define CJM_HAVE_BUILTIN_128
-#endif
-#else
-	    false;
-		namespace internal
-		{
-			struct alignas(alignof(std::uint64_t) * 2) cjm_align {
-				std::uint64_t m_low;
-				std::uint64_t m_high;
-			};
-		}
-		using uint128_align_t = std::conditional_t<has_msc_x64, internal::cjm_align, std::uint64_t>;
-		using natuint128_t = uint128;
-#ifdef CJM_HAVE_BUILTIN_128
-#undef CJM_HAVE_BUILTIN_128
-#endif
-#endif
-	    constexpr size_t uint128_align = alignof(uint128_align_t);
-
+		enum class compiler_used : unsigned;
 		
-		
-
-		enum class uint128_calc_mode : std::uint8_t
-        {
-		    default_eval = 0x00,
-		    msvc_x64,
-		    intrinsic_u128,
-        };
-		constexpr uint128_calc_mode init_eval_mode() noexcept;
-
 		/// <summary>
 		/// Serves as a proxy for C++20's std::bit_cast which is not
 		/// yet available on Clang.  If std::bit_cast is available,
@@ -164,23 +43,23 @@ namespace cjm
 		
 		namespace math_functions
 		{
+			//todo fixit -- work on making these make more sense in context of library only uint128
 			template<typename TInt>
 			constexpr std::make_unsigned_t<TInt> int_abs(TInt val) noexcept;
 
-			template<typename TInt>
+			template<cjm::numerics::concepts::integer TInt>
 			constexpr TInt int_sign(TInt val) noexcept;
 
-			template<typename TInt>
-			constexpr TInt int_gcd(TInt first, TInt second) noexcept;
+			template<concepts::unsigned_integer TUInt>
+			constexpr TUInt int_gcd(TUInt first, TUInt second) noexcept;
 
-			template<typename TInt>
-			constexpr TInt int_lcm(TInt first, TInt second);
+			template<concepts::unsigned_integer TUInt>
+			constexpr TUInt int_lcm(TUInt first, TUInt second) noexcept;
 			
-
 			template<typename TInt>
 			constexpr TInt floor_log2(TInt val);
 
-			template<typename TInt>
+			template<cjm::numerics::concepts::integer TInt>
 			constexpr TInt int_pow(TInt radix, unsigned exponent);
 
 			template<typename TUInt>
@@ -190,27 +69,11 @@ namespace cjm
 			
 			
 		}
-		#pragma warning(push)
-		#pragma warning (disable:4068) 
-        #pragma clang diagnostic push
-        #pragma ide diagnostic ignored "UnreachableCode"
-        constexpr uint128_calc_mode init_eval_mode() noexcept
-        {
-            if constexpr (has_intrinsic_u128)
-            {
-                return uint128_calc_mode::intrinsic_u128;
-            }
-            else if constexpr (has_msc_x64)
-            {
-                return uint128_calc_mode::msvc_x64;
-            }
-            else
-            {
-                return uint128_calc_mode::default_eval;
-            }
-        }
-        #pragma clang diagnostic pop
-		#pragma warning(pop)
+
+		template<typename Char, typename CharTraits = std::char_traits<Char>>
+			requires (cjm::numerics::concepts::char_or_wchar_t_with_traits<Char, CharTraits>)
+		std::basic_ostream<Char, CharTraits>& operator<<(std::basic_ostream<Char, CharTraits>& os, compiler_used comp);
+		
 	}
 
 	
@@ -226,7 +89,7 @@ namespace std
 	* to facilitate interoperability with code  that relies on these traits.  */
 	/************************************************************************/
 	template<>
-	class numeric_limits<cjm::numerics::uint128>
+	class numeric_limits<cjm::numerics::uint128> final
 	{
 		static constexpr int times_log10_of_two(int x)
 		{
@@ -247,7 +110,7 @@ namespace std
 		static constexpr bool is_arithmetic = true;
 		static constexpr bool is_iec559 = std::numeric_limits<uint64_t>::is_iec559;
 		static constexpr bool is_modulo = std::numeric_limits<uint64_t>::is_modulo;
-		static constexpr int digits = CHAR_BIT * (sizeof(std::uint64_t) + sizeof(std::uint64_t));
+		static constexpr int digits = std::numeric_limits<uint64_t>::digits * 2;
 		static constexpr int digits10 = digits * 301'299 / 1'000'000;
 		static constexpr int max_digits10 = std::numeric_limits<uint64_t>::max_digits10;
 		static constexpr int radix = 2;

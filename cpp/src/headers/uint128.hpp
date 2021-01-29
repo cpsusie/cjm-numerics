@@ -160,18 +160,7 @@ namespace cjm::numerics
     constexpr uint128 operator*(uint128 lhs, uint128 rhs) noexcept;
     //Division and modulus are friends declared within class
 
-    namespace math_functions
-    {
-        template<>
-        constexpr uint128 int_sign(uint128 val) noexcept;
 
-        template<>
-        constexpr uint128 int_gcd(uint128 first, //NOLINT (bugprone-exception-escape)
-            uint128 second) noexcept;  
-
-        template<>
-        constexpr uint128 int_lcm(uint128 first, uint128 second);
-    }
 
     enum class u128_str_format
     {
@@ -183,7 +172,7 @@ namespace cjm::numerics
 
     template<typename Chars, typename CharTraits = std::char_traits<Chars>>
               requires cjm::numerics::concepts::char_with_traits<Chars, CharTraits>
-    struct u128_parsing_helper
+    struct u128_parsing_helper final
     {
         using char_t = Chars;
 
@@ -271,7 +260,7 @@ namespace std
     * or any other use for which std::hash is used by default       */
     /************************************************************************/
     template<>
-    struct hash<cjm::numerics::uint128>
+    struct hash<cjm::numerics::uint128> final
     {
         constexpr hash() noexcept = default;
         constexpr size_t operator()(const cjm::numerics::uint128& keyVal) const noexcept;      
@@ -505,23 +494,6 @@ namespace cjm::numerics
     static_assert(concepts::nothrow_convertible<std::array<unsigned char, sizeof(uint128)>, typename uint128::byte_array>);
     static_assert(concepts::cjm_unsigned_integer<uint128>, "Needs to comply with cjm_unsigned_integer concept.");
     static_assert(concepts::integer<uint128>, "Needs to be an integer.");
-}
-
-
-
-namespace std
-{ //fixme todo --- get rid of the traits overloads -- undefined behavior
-	template<>
-	struct make_unsigned<cjm::numerics::uint128>
-	{
-		using type = cjm::numerics::uint128;
-	};
-	
-
-
-
-
-
 }
 
 

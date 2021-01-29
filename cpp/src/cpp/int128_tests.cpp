@@ -377,6 +377,7 @@ void cjm::uint128_tests::print_sizes()
 void cjm::uint128_tests::print_environ_data()
 {
     cout << "ENVIRONMENT DATA: " << newl;
+    cout << "Detected compiler: [" << numerics::compiler << "]." << newl;
     print_sizes();
     print_alignments();
     print_constexpr_bitcast_available();
