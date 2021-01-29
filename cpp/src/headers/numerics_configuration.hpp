@@ -1,3 +1,4 @@
+// ReSharper disable CppClangTidyCppcoreguidelinesMacroUsage
 #ifndef CJM_NUMERICS_CONFIGURATION_HPP_
 #define CJM_NUMERICS_CONFIGURATION_HPP_
 #ifdef _MSC_VER

@@ -172,7 +172,7 @@ namespace cjm::numerics
 
     template<typename Chars, typename CharTraits = std::char_traits<Chars>>
               requires cjm::numerics::concepts::char_with_traits<Chars, CharTraits>
-    struct u128_parsing_helper
+    struct u128_parsing_helper final
     {
         using char_t = Chars;
 
@@ -260,7 +260,7 @@ namespace std
     * or any other use for which std::hash is used by default       */
     /************************************************************************/
     template<>
-    struct hash<cjm::numerics::uint128>
+    struct hash<cjm::numerics::uint128> final
     {
         constexpr hash() noexcept = default;
         constexpr size_t operator()(const cjm::numerics::uint128& keyVal) const noexcept;      

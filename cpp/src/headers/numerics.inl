@@ -6,16 +6,16 @@ namespace cjm::numerics
 		
 	template<typename Char, typename CharTraits>
 	requires (cjm::numerics::concepts::char_or_wchar_t_with_traits<Char, CharTraits>)
-		std::basic_ostream<Char, CharTraits>& operator<<(std::basic_ostream<Char, CharTraits>& os, compiler_used compiler)
+		std::basic_ostream<Char, CharTraits>& operator<<(std::basic_ostream<Char, CharTraits>& os, compiler_used comp)
 	{
 		using char_t = std::remove_const_t<Char>;
 		if constexpr (std::is_same_v<char_t, char>)
 		{
-			os << get_text_narrow(compiler);
+			os << get_text_narrow(comp);
 		}
 		else
 		{
-			os << get_text_wide(compiler);
+			os << get_text_wide(comp);
 		}
 		return os;
 	}

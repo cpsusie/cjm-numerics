@@ -2,8 +2,6 @@
 #define CJM_NUMERICS_HPP_
 #include "numerics_configuration.hpp"
 
-
-
 namespace cjm
 {
 
@@ -45,6 +43,7 @@ namespace cjm
 		
 		namespace math_functions
 		{
+			//todo fixit -- work on making these make more sense in context of library only uint128
 			template<typename TInt>
 			constexpr std::make_unsigned_t<TInt> int_abs(TInt val) noexcept;
 
@@ -73,7 +72,7 @@ namespace cjm
 
 		template<typename Char, typename CharTraits = std::char_traits<Char>>
 			requires (cjm::numerics::concepts::char_or_wchar_t_with_traits<Char, CharTraits>)
-		std::basic_ostream<Char, CharTraits>& operator<<(std::basic_ostream<Char, CharTraits>& os, compiler_used compiler);
+		std::basic_ostream<Char, CharTraits>& operator<<(std::basic_ostream<Char, CharTraits>& os, compiler_used comp);
 		
 	}
 
@@ -90,7 +89,7 @@ namespace std
 	* to facilitate interoperability with code  that relies on these traits.  */
 	/************************************************************************/
 	template<>
-	class numeric_limits<cjm::numerics::uint128>
+	class numeric_limits<cjm::numerics::uint128> final
 	{
 		static constexpr int times_log10_of_two(int x)
 		{
@@ -111,7 +110,7 @@ namespace std
 		static constexpr bool is_arithmetic = true;
 		static constexpr bool is_iec559 = std::numeric_limits<uint64_t>::is_iec559;
 		static constexpr bool is_modulo = std::numeric_limits<uint64_t>::is_modulo;
-		static constexpr int digits = CHAR_BIT * (sizeof(std::uint64_t) + sizeof(std::uint64_t));
+		static constexpr int digits = std::numeric_limits<uint64_t>::digits * 2;
 		static constexpr int digits10 = digits * 301'299 / 1'000'000;
 		static constexpr int max_digits10 = std::numeric_limits<uint64_t>::max_digits10;
 		static constexpr int radix = 2;
