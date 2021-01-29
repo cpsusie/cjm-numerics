@@ -144,6 +144,7 @@ namespace cjm::uint128_tests
 	void execute_unary_op_basic_test();
     void execute_parse_file_test(std::string_view path, size_t expected_ops);
     void execute_unary_op_post_stat_assert_test();
+    void execute_test_convert_to_float();
 
 	void execute_unary_op_pre_inc_test();
     void execute_unary_op_post_inc_test();

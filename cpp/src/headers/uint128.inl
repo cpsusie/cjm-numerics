@@ -704,18 +704,25 @@ namespace cjm
 		}
 
         //converting ctors from floating point types
-        inline uint128::uint128(float f) noexcept
+        inline uint128::uint128(float f) noexcept : uint128()
         {
-	        
+            auto temp = internal::make_from_floating_point(f);
+            m_high = temp.m_high;
+            m_low = temp.m_low;
         }
 		
-        inline uint128::uint128(double d) noexcept
+        inline uint128::uint128(double d) noexcept : uint128()
         {
-	        
+            auto temp = internal::make_from_floating_point(d);
+            m_high = temp.m_high;
+            m_low = temp.m_low;
         }
-        inline uint128::uint128(long double d) noexcept
+		
+        inline uint128::uint128(long double d) noexcept : uint128()
         {
-	        
+            auto temp = internal::make_from_floating_point(d);
+            m_high = temp.m_high;
+            m_low = temp.m_low;
         }
 		
         template<typename Chars, typename CharTraits, typename Allocator>
@@ -2486,8 +2493,12 @@ namespace cjm::numerics::internal
     uint128 make_from_floating_point(TFloat v) noexcept
     {
         using float_t = std::remove_cvref_t<TFloat>;
-        if constexpr (std::is_same_v<float_t, long double> && (compiler == compiler_used::clang || compiler == compiler_used::clang_gcc))
+        if constexpr (std::is_same_v<float_t, long double> && !sse3_available && 
+            (compiler == compiler_used::clang || compiler == compiler_used::clang_gcc))
         {
+        	// Go 50 bits at a time, that fits in a double
+            static_assert(std::numeric_limits<double>::digits >= 50, "double digits must >= 50");
+            static_assert(std::numeric_limits<long double>::digits <= 150, "long double digits must <= 150.");
             // Undefined behavior if v is not finite or cannot fit into uint128.
             assert(std::isfinite(v) && v > -1 && v < std::ldexp(1.0L, 128));
 
@@ -2502,7 +2513,20 @@ namespace cjm::numerics::internal
         }
         else
         {
+        	
+            // Rounding behavior is towards zero, same as for built-in types.
+            // Undefined behavior if v is NaN or cannot fit into uint128.
+            assert(std::isfinite(v) && v > -1 &&
+                (std::numeric_limits<float_t>::max_exponent <= 128 ||
+                    v < std::ldexp(static_cast<float_t>(1), 128)));
 
+            if (v >= std::ldexp(static_cast<float_t>(1), 64)) 
+            {
+                const auto hi = static_cast<std::uint64_t>(std::ldexp(v, -64));
+                const auto lo = static_cast<std::uint64_t>(v - std::ldexp(static_cast<float_t>(hi), 64));
+                return uint128{ hi, lo };
+            }
+            return static_cast<std::uint64_t>(v);
         }
     }
 }
