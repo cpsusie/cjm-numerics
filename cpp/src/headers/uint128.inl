@@ -35,6 +35,8 @@ namespace cjm
 {
 	namespace numerics
 	{
+
+		
         namespace uint128_literals
         {
             template<char... Chars>
@@ -700,6 +702,22 @@ namespace cjm
 			m_high = 0;
 			return *this;
 		}
+
+        //converting ctors from floating point types
+        inline uint128::uint128(float f) noexcept
+        {
+	        
+        }
+		
+        inline uint128::uint128(double d) noexcept
+        {
+	        
+        }
+        inline uint128::uint128(long double d) noexcept
+        {
+	        
+        }
+		
         template<typename Chars, typename CharTraits, typename Allocator>
             requires cjm::numerics::concepts::char_with_traits_and_allocator<Chars, CharTraits, Allocator>
         uint128 uint128::make_from_string(const std::basic_string<Chars, CharTraits, Allocator>& parseMe)
@@ -1719,11 +1737,6 @@ namespace cjm
 
 
 		}
-
-
-
-
-
 	}
 }
 
@@ -2467,6 +2480,32 @@ parse_hex_str(sv hex_str)
 	}   
 }
 
+namespace cjm::numerics::internal
+{
+    template<concepts::builtin_floating_point TFloat>
+    uint128 make_from_floating_point(TFloat v) noexcept
+    {
+        using float_t = std::remove_cvref_t<TFloat>;
+        if constexpr (std::is_same_v<float_t, long double> && (compiler == compiler_used::clang || compiler == compiler_used::clang_gcc))
+        {
+            // Undefined behavior if v is not finite or cannot fit into uint128.
+            assert(std::isfinite(v) && v > -1 && v < std::ldexp(1.0L, 128));
+
+            v = std::ldexp(v, -100);
+            const auto w0 = static_cast<std::uint64_t>(static_cast<double>(std::trunc(v)));
+            v = std::ldexp(v - static_cast<double>(w0), 50);
+            const auto w1 = static_cast<std::uint64_t>(static_cast<double>(std::trunc(v)));
+            v = std::ldexp(v - static_cast<double>(w1), 50);
+            const auto w2 = static_cast<std::uint64_t>(static_cast<double>(std::trunc(v)));
+            return (static_cast<uint128>(w0) << 100) | (static_cast<uint128>(w1) << 50) |
+                static_cast<uint128>(w2);
+        }
+        else
+        {
+
+        }
+    }
+}
 
 /*
  * Evil macro'd up version of fls64 from google:

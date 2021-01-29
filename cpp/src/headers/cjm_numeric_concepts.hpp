@@ -54,8 +54,15 @@ namespace cjm::numerics::concepts
     template<typename T>
     concept builtin_unsigned_integer = builtin_integer<T> && unsigned_integer<T>;
 
-    static_assert(builtin_unsigned_integer <std::uint64_t>);
-    static_assert(builtin_unsigned_integer <std::uint8_t>);
+    /// <summary>
+    /// Applies to floating point numbers that are built in types.
+    /// </summary>
+    template<typename T>
+    concept builtin_floating_point = std::floating_point<T>;
+    
+    static_assert(builtin_floating_point<float>&& builtin_floating_point<double>&& builtin_floating_point<long double>);
+    static_assert(builtin_unsigned_integer<std::uint64_t>);
+    static_assert(builtin_unsigned_integer<std::uint8_t>);
 }
 
 namespace cjm::numerics

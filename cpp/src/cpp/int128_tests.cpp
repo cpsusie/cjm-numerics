@@ -378,6 +378,14 @@ void cjm::uint128_tests::print_environ_data()
 {
     cout << "ENVIRONMENT DATA: " << newl;
     cout << "Detected compiler: [" << numerics::compiler << "]." << newl;
+	if constexpr (numerics::sse3_available)
+	{
+        cout << "SSE3: [AVAILABLE]." << newl;
+	}
+    else
+    {
+	    cout << "SSE3: [NOT AVAILABLE]." << newl;
+    }
     print_sizes();
     print_alignments();
     print_constexpr_bitcast_available();

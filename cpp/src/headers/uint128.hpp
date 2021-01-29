@@ -15,7 +15,11 @@
 #include "numerics.hpp"
 #include "cjm_numeric_concepts.hpp"
 #include "cjm_string.hpp"
+#include <cmath>
 #include "istream_utils.hpp"
+#include <cctype>
+#include <cwctype>
+#include <concepts>
 // Copyright 2018 CJM Screws, LLC
 // 
 // This contents of this file (uint128.hpp) and its inline implementation file (uint128.inl)
@@ -105,6 +109,9 @@ namespace cjm::numerics
     	
         template <typename T>
         constexpr void step(T& n, int& pos, int shift) noexcept;
+
+    	template<concepts::builtin_floating_point TFloat>
+        uint128 make_from_floating_point(TFloat v) noexcept;
     }
 
     /// <summary>
@@ -394,6 +401,11 @@ namespace cjm::numerics
         constexpr uint128& operator=(long long v) noexcept;
         constexpr uint128& operator=(unsigned long long v) noexcept;
 
+    	//converting ctors from floating point types
+        inline explicit uint128(float f) noexcept;
+        inline explicit uint128(double d) noexcept;
+        inline explicit uint128(long double d) noexcept;
+
         // Conversion operators to other arithmetic types
         constexpr explicit operator bool() const noexcept;
         constexpr explicit operator char() const noexcept;
@@ -458,7 +470,9 @@ namespace cjm::numerics
         [[nodiscard]] constexpr byte_array to_big_endian_arr() const noexcept; //NOLINT (bugprone-exception-escape)
 
     private:
-        
+        template<concepts::builtin_floating_point TFloat>
+        friend uint128 internal::make_from_floating_point(TFloat v) noexcept;
+    	
         static constexpr size_t calculate_hash(int_part hi, int_part low) noexcept;
         static constexpr void hash_combine(size_t& seed, size_t newVal) noexcept;
         static constexpr uint128 make_from_bytes_native(byte_array b) noexcept;
