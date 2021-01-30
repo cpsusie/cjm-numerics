@@ -2528,6 +2528,51 @@ namespace cjm::numerics::internal
             }
             return static_cast<std::uint64_t>(v);
         }
+    }    
+}
+
+namespace cjm::numerics
+{
+    template<concepts::builtin_floating_point TFloat>
+    uint128 safe_from_floating_or_throw(TFloat v)
+    {
+        using float_t = std::remove_cvref_t<TFloat>;
+        if constexpr (std::is_same_v<float_t, long double> && !sse3_available &&
+            (compiler == compiler_used::clang || compiler == compiler_used::clang_gcc))
+        {
+            if (!(std::isfinite(v) && v > -1 && v < std::ldexp(1.0L, 128)))
+                throw std::invalid_argument{ "Specified floating point value cannot be converted to uint128." };
+            return internal::make_from_floating_point(v);
+        }
+        else
+        {
+            if (!(std::isfinite(v) && v > -1 &&
+                (std::numeric_limits<float_t>::max_exponent <= 128 ||
+                    v < std::ldexp(static_cast<float_t>(1), 128))))
+                throw std::invalid_argument{ "Specified floating point value cannot be converted to uint128." };
+            return internal::make_from_floating_point(v);
+        }
+    }
+
+    template<concepts::builtin_floating_point TFloat>
+    std::optional<uint128> safe_from_floating(TFloat v) noexcept
+    {
+        using float_t = std::remove_cvref_t<TFloat>;
+        if constexpr (std::is_same_v<float_t, long double> && !sse3_available &&
+            (compiler == compiler_used::clang || compiler == compiler_used::clang_gcc))
+        {
+            if (!(std::isfinite(v) && v > -1 && v < std::ldexp(1.0L, 128)))
+                return std::nullopt;
+            return std::make_optional(make_from_floating_point(v));
+        }
+        else
+        {
+            if (!(std::isfinite(v) && v > -1 &&
+                (std::numeric_limits<float_t>::max_exponent <= 128 ||
+                    v < std::ldexp(static_cast<float_t>(1), 128))))
+                return std::nullopt;
+            return std::make_optional(make_from_floating_point(v));
+        }
     }
 }
 
