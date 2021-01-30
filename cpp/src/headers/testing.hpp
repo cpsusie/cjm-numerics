@@ -1,21 +1,31 @@
-#pragma once
-#ifndef CJM_TESTSETTINGS_HPP 
-#define CJM_TESTSETTINGS_HPP
+#ifndef CJM_TESTING_HPP_
+#define CJM_TESTING_HPP_
 #include <functional>
+#include <boost/io/ios_state.hpp>
 #include <type_traits>
 #include <algorithm>
 #include <iostream>
 #include <iomanip>
 #include "numerics.hpp"
+#include <sstream>
 #include "cjm_numeric_concepts.hpp"
+#include "cjm_string.hpp"
 namespace cjm
 {
 	namespace testing
 	{
+	    using cout_saver = boost::io::ios_flags_saver;
+	    constexpr auto newl = "\n";
 	    void cjm_deny(bool predicateExpression);
 		void cjm_assert(bool predicateExpression);
 
 		void cjm_assert_throws(const std::function<void()>& func);
+
+		template<numerics::concepts::printable_subtractable_totally_ordered T>
+		void cjm_assert_equal(const T& lhs, const T& rhs);
+
+		template<numerics::concepts::printable_subtractable_totally_ordered T>
+		void cjm_assert_close_enough(const T& lhs, const T& rhs, long double percent_tolerance = 0.00001L);
 
 		template<typename Predicate>
 		void cjm_assert(Predicate p);
@@ -40,6 +50,8 @@ namespace cjm
 		class testing_failure : public std::domain_error 
 		{
 		public:
+		    explicit testing_failure(std::string&& msg) : domain_error{msg}
+		        {}
 			explicit testing_failure(const std::string& msg)
 				: domain_error(msg) {}
 
@@ -151,6 +163,120 @@ namespace cjm
 			std::transform(ret.begin(), ret.end(), ret.begin(), [](unsigned char c) -> unsigned char {return static_cast<unsigned char>(toupper(c)); });
 			return ret;
 		}
+
+        template<numerics::concepts::printable_subtractable_totally_ordered T>
+        void cjm_assert_equal(const T& lhs, const T& rhs)
+        {
+            using val_type_t = std::remove_cvref_t<std::remove_const_t<T>>;
+            using namespace std::string_view_literals;
+            std::strong_ordering res = lhs <=> rhs;
+            if (res == std::strong_ordering::equal)
+                return;
+            val_type_t difference;
+            const val_type_t* greater;
+            std::string_view greater_variable, lesser_variable;
+            if (res == std::strong_ordering::less)
+            {
+                difference = (rhs - lhs);
+                greater = &rhs;
+                greater_variable = "rhs"sv;
+                lesser_variable = "lhs"sv;
+            }
+            else
+            {
+                difference = (lhs - rhs);
+                greater = &lhs;
+                greater_variable = "lhs"sv;
+                lesser_variable = "rhs"sv;
+            }
+            res == std::strong_ordering::less ? (rhs - lhs) : (lhs-rhs);
+            auto strm = string::make_throwing_sstream<char>();
+            constexpr auto hex_width = std::numeric_limits<val_type_t>::digits / 4;
+            static_assert(hex_width > 0);
+            strm
+                << "Test failed.  [0x" << std::hex << std::setw(hex_width)
+                << std::setfill('0') << lhs << "] does not equal [0x"
+                << std::hex << std::setw(hex_width) << std::setfill('0')
+                << rhs << "]." << "  " << greater_variable
+                << " is greater than " << lesser_variable << " by [0x"
+                << std::hex << std::setw(hex_width)
+                << std::setfill('0') << difference
+                << "], or (in decimal): \"" << std::dec << difference
+                << "\"." << "  Percent difference: " <<
+                    (100.0L * (static_cast<long double>(difference) /
+                        static_cast<long double>(*greater)))
+                << "%." << newl;
+            throw testing_failure{strm.str()};
+        }
+
+        template<numerics::concepts::printable_subtractable_totally_ordered T>
+        void cjm_assert_close_enough(const T& lhs, const T& rhs, long double percent_tolerance)
+        {
+            if (percent_tolerance <= 0 || percent_tolerance >= 1 )
+                throw testing_failure{"percent_tolerance must be between 0 and 1 EXCLUSIVELY."};
+            using val_type_t = std::remove_cvref_t<std::remove_const_t<T>>;
+            using namespace std::string_view_literals;
+            
+            constexpr auto hex_width = std::numeric_limits<val_type_t>::digits / 4;
+            constexpr auto float_prec = 64;
+            
+            std::strong_ordering res = lhs <=> rhs;
+            if (res == std::strong_ordering::equal)
+                return;
+            val_type_t difference;
+            const val_type_t* greater;
+            std::string_view greater_variable, lesser_variable;
+            if (res == std::strong_ordering::less)
+            {
+                difference = (rhs - lhs);
+                greater = &rhs;
+                greater_variable = "rhs"sv;
+                lesser_variable = "lhs"sv;
+            }
+            else
+            {
+                difference = (lhs - rhs);
+                greater = &lhs;
+                greater_variable = "lhs"sv;
+                lesser_variable = "rhs"sv;
+            }
+
+            const long double percent_difference = static_cast<long double>(difference) / static_cast<long double>(*greater);
+            const long double percent_difference_print = percent_difference * 100.0L;
+            const long double percent_tolerance_print = percent_tolerance * 100.0L;
+            if (percent_difference <= percent_tolerance)
+            {
+                auto saver = cout_saver{std::cout};
+                std::cout << "[0x" << std::hex << std::setw(hex_width)
+                        << std::setfill('0') << lhs << "] does not equal [0x"
+                        << std::hex << std::setw(hex_width) << std::setfill('0')
+                        << rhs << "].  The values are within the specified percent"
+                        << " tolerance of: \"" << std::dec << std::setprecision(float_prec)
+                        << percent_tolerance_print << std::fixed
+                        << "%\".  Actual percent difference: \"" << std::dec
+                        << std::setprecision(float_prec) << std::fixed << percent_difference_print << "\"." << newl;
+                return;
+            }
+
+            res == std::strong_ordering::less ? (rhs - lhs) : (lhs-rhs);
+            auto strm = string::make_throwing_sstream<char>();
+
+            strm
+                    << "Test failed.  Values not within specified percent tolerance of: \""
+                    << std::dec << std::setprecision(float_prec) << percent_tolerance_print << "%\"."
+                    << "  [0x" << std::hex << std::setw(hex_width)
+                    << std::setfill('0') << lhs << "] does not equal [0x"
+                    << std::hex << std::setw(hex_width) << std::setfill('0')
+                    << rhs << "]." << "  " << greater_variable
+                    << " is greater than " << lesser_variable << " by [0x"
+                    << std::hex << std::setw(hex_width)
+                    << std::setfill('0') << difference
+                    << "], or (in decimal): \"" << std::dec << difference
+                    << "\"." << "  Percent difference: "
+                    << std::dec << std::setprecision(float_prec) << std::fixed
+                    << percent_difference_print << "%." << newl;
+            throw testing_failure{strm.str()};
+        }
 	}
 }
 
