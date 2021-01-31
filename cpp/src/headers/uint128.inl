@@ -5,7 +5,6 @@
 #include "cjm_string.hpp"
 #include <cwctype>
 
-
 //
 // Copyright 2017 The Abseil Authors.
 //
@@ -1713,8 +1712,8 @@ namespace cjm
                 uint128 remainder = 0;
                 uint128::constexpr_div_mod_impl(lhs, rhs, &quotient, &remainder);
                 return remainder;
-            }
-            else
+            } // ReSharper disable once CppRedundantElseKeywordInsideCompoundStatement	           
+            else     // ReSharper disable once CppUnreachableCode            
             {
                 if constexpr (calculation_mode == uint128_calc_mode::intrinsic_u128)
                 {
@@ -1741,8 +1740,6 @@ namespace cjm
                     return remainder;
                 }
             }
-
-
 		}
 	}
 }
@@ -2563,7 +2560,7 @@ namespace cjm::numerics
         {
             if (!(std::isfinite(v) && v > -1 && v < std::ldexp(1.0L, 128)))
                 return std::nullopt;
-            return std::make_optional(make_from_floating_point(v));
+            return std::make_optional(internal::make_from_floating_point(v));
         }
         else
         {
@@ -2571,7 +2568,7 @@ namespace cjm::numerics
                 (std::numeric_limits<float_t>::max_exponent <= 128 ||
                     v < std::ldexp(static_cast<float_t>(1), 128))))
                 return std::nullopt;
-            return std::make_optional(make_from_floating_point(v));
+            return std::make_optional(internal::make_from_floating_point(v));
         }
     }
 }

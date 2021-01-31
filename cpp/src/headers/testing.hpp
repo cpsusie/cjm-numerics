@@ -8,6 +8,7 @@
 #include <iomanip>
 #include "numerics.hpp"
 #include <sstream>
+#include <optional>
 #include "cjm_numeric_concepts.hpp"
 #include "cjm_string.hpp"
 namespace cjm
@@ -25,7 +26,19 @@ namespace cjm
 		void cjm_assert_equal(const T& lhs, const T& rhs);
 
 		template<numerics::concepts::printable_subtractable_totally_ordered T>
+		void cjm_assert_equal(const T& lhs, const std::optional<T>& rhs);
+
+		template<numerics::concepts::printable_subtractable_totally_ordered T>
+		void cjm_assert_equal(const std::optional<T>& lhs, const T& rhs);
+
+		template<numerics::concepts::printable_subtractable_totally_ordered T>
 		void cjm_assert_close_enough(const T& lhs, const T& rhs, long double percent_tolerance = 0.00001L);
+
+		template<numerics::concepts::printable_subtractable_totally_ordered T>
+		void cjm_assert_close_enough(const std::optional<T>& lhs, const T& rhs, long double percent_tolerance = 0.00001L);
+
+		template<typename T>
+		void cjm_assert_nullopt(const std::optional<T>& optional);
 
 		template<typename Predicate>
 		void cjm_assert(Predicate p);
@@ -277,6 +290,47 @@ namespace cjm
                     << percent_difference_print << "%." << newl;
             throw testing_failure{strm.str()};
         }
+
+	    template <numerics::concepts::printable_subtractable_totally_ordered T>
+	    void cjm_assert_close_enough(const std::optional<T>& lhs, const T& rhs, long double percent_tolerance)
+	    {
+			if (!lhs.has_value()) throw std::invalid_argument{ "lhs is std::nullopt." };
+			return cjm_assert_close_enough(*lhs, rhs, percent_tolerance);
+	    }
+
+		template <numerics::concepts::printable_subtractable_totally_ordered T>
+		void cjm_assert_close_enough(std::optional<T>&& lhs, const T& rhs, long double percent_tolerance)
+		{
+			if (!lhs.has_value()) throw std::invalid_argument{ "lhs is std::nullopt." };
+			return cjm_assert_close_enough(*lhs, rhs, percent_tolerance);
+		}
+
+	    template<typename T>
+		void cjm_assert_nullopt(const std::optional<T>& optional)
+		{
+			if (optional.has_value()) throw testing_failure{ "The specified parameter is not std::nullopt." };
+		}
+
+		template<numerics::concepts::printable_subtractable_totally_ordered T>
+		void cjm_assert_equal(const T& lhs, const std::optional<T>& rhs)
+		{
+			if (!rhs.has_value()) throw testing_failure{ "The right hand parameter is std::nullopt." };
+			cjm_assert_equal(lhs, *rhs);
+		}
+
+	    template <numerics::concepts::printable_subtractable_totally_ordered T>
+	    void cjm_assert_equal(const std::optional<T>& lhs, const T& rhs)
+	    {
+			if (!lhs.has_value()) throw testing_failure{ "The left hand parameter is std::nullopt." };
+			cjm_assert_equal(*lhs, rhs);
+	    }
+
+	    template<numerics::concepts::printable_subtractable_totally_ordered T>
+		void cjm_assert_close_enough(const T& lhs, const std::optional<T>& rhs, long double percent_tolerance)
+		{
+			if (!rhs.has_value())  throw testing_failure{ "The right hand parameter is std::nullopt." };
+			cjm_assert_close_enough(lhs, *rhs, percent_tolerance);
+		}
 	}
 }
 

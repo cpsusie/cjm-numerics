@@ -515,6 +515,7 @@ void cjm::uint128_tests::execute_uint128_tests()
     execute_test(execute_test_convert_to_long_double, "test_convert_to_long_double"sv);
 
     execute_test(execute_throwing_float_conversion_test, "throwing_float_conversion_test"sv);
+    execute_test(execute_safe_float_conversions_test, "safe_float_conversions_test"sv);
     cout << "STANDARD TEST BATTERY: All tests PASSED." << newl;
 }
 
@@ -654,6 +655,94 @@ void cjm::uint128_tests::execute_throwing_float_conversion_test()
 	    cjm_assert_close_enough(numerics::safe_from_floating_or_throw(zero_point_zero_one), 0_u128);
 	    cjm_assert_close_enough(numerics::safe_from_floating_or_throw(big_ass_num), 0x8000'0000'0000'0000'0000'0000'0000'0000_u128);
 	    cjm_assert_close_enough(numerics::safe_from_floating_or_throw(not_quite_as_big_ass_num), 0x8000'0000'0000'0000_u128);
+    }
+    {
+        using float_t = double;
+        const float_t zero = 0.0;
+        const float_t one = 1.0;
+        const float_t zero_point_zero_one = 0.01;
+        const float_t big_ass_num = static_cast<float_t>(0x8000'0000'0000'0000'0000'0000'0000'0000_u128);
+        const float_t not_quite_as_big_ass_num = static_cast<float_t>(0x8000'0000'0000'0000_u128);
+
+        cjm_assert_close_enough(numerics::safe_from_floating_or_throw(zero), 0_u128);
+        cjm_assert_close_enough(numerics::safe_from_floating_or_throw(one), 1_u128);
+        cjm_assert_close_enough(numerics::safe_from_floating_or_throw(zero_point_zero_one), 0_u128);
+        cjm_assert_close_enough(numerics::safe_from_floating_or_throw(big_ass_num), 0x8000'0000'0000'0000'0000'0000'0000'0000_u128);
+        cjm_assert_close_enough(numerics::safe_from_floating_or_throw(not_quite_as_big_ass_num), 0x8000'0000'0000'0000_u128);
+    }
+    {
+        using float_t = long double;
+        const float_t zero = 0.0L;
+        const float_t one = 1.0L;
+        const float_t zero_point_zero_one = 0.01L;
+        const float_t big_ass_num = static_cast<float_t>(0x8000'0000'0000'0000'0000'0000'0000'0000_u128);
+        const float_t not_quite_as_big_ass_num = static_cast<float_t>(0x8000'0000'0000'0000_u128);
+
+        cjm_assert_close_enough(numerics::safe_from_floating_or_throw(zero), 0_u128);
+        cjm_assert_close_enough(numerics::safe_from_floating_or_throw(one), 1_u128);
+        cjm_assert_close_enough(numerics::safe_from_floating_or_throw(zero_point_zero_one), 0_u128);
+        cjm_assert_close_enough(numerics::safe_from_floating_or_throw(big_ass_num), 0x8000'0000'0000'0000'0000'0000'0000'0000_u128);
+        cjm_assert_close_enough(numerics::safe_from_floating_or_throw(not_quite_as_big_ass_num), 0x8000'0000'0000'0000_u128);
+    }
+}
+
+void cjm::uint128_tests::execute_safe_float_conversions_test()
+{
+    constexpr float max_float = std::numeric_limits<float>::max();
+    constexpr double max_double = std::numeric_limits<double>::max();
+    constexpr long double max_l_d = std::numeric_limits<long double>::max();
+
+    using arb_int = boost::multiprecision::cpp_int;
+    constexpr auto max_uint128_t = std::numeric_limits<uint128_t>::max();
+    const ctrl_uint128_t ctrl_max = to_ctrl(max_uint128_t);
+    const arb_int arb_max = static_cast<arb_int>(ctrl_max);
+
+    const bool max_float_exceeds = static_cast<arb_int>(max_float) > arb_max;
+    const bool max_double_exceeds = static_cast<arb_int>(max_double) > arb_max;
+    const bool max_ld_exceeds = static_cast<arb_int>(max_l_d) > arb_max;
+
+    if (max_float_exceeds)
+    {
+        const auto converted = numerics::safe_from_floating(max_float);
+        cjm_assert_nullopt(converted);
+	}
+    if (max_double_exceeds)
+    {
+        const auto converted = numerics::safe_from_floating(max_double);
+        cjm_assert_nullopt(converted);
+    }
+    if (max_ld_exceeds)
+    {
+        const auto converted = numerics::safe_from_floating(max_l_d);
+        cjm_assert_nullopt(converted);
+    }
+
+    {
+        const auto converted = numerics::safe_from_floating(-1.01f);
+        cjm_assert_nullopt(converted);
+    }
+    {
+        const auto converted = numerics::safe_from_floating(-1.01);
+        cjm_assert_nullopt(converted);
+    }
+    {
+        const auto converted = numerics::safe_from_floating(-1.01L);
+        cjm_assert_nullopt(converted);
+    }
+    
+    {
+        using float_t = float;
+        const float_t zero = 0.0f;
+        const float_t one = 1.0f;
+        const float_t zero_point_zero_one = 0.01f;
+        const float_t big_ass_num = static_cast<float_t>(0x8000'0000'0000'0000'0000'0000'0000'0000_u128);
+        const float_t not_quite_as_big_ass_num = static_cast<float_t>(0x8000'0000'0000'0000_u128);
+
+        cjm_assert_close_enough(numerics::safe_from_floating(zero), 0_u128);
+        cjm_assert_close_enough(numerics::safe_from_floating(one), 1_u128);
+        cjm_assert_close_enough(numerics::safe_from_floating(zero_point_zero_one), 0_u128);
+        cjm_assert_close_enough(numerics::safe_from_floating(big_ass_num), 0x8000'0000'0000'0000'0000'0000'0000'0000_u128);
+        cjm_assert_close_enough(numerics::safe_from_floating(not_quite_as_big_ass_num), 0x8000'0000'0000'0000_u128);
     }
     {
         using float_t = double;
