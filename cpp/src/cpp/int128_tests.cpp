@@ -515,8 +515,8 @@ void cjm::uint128_tests::execute_uint128_tests()
     execute_test(execute_test_convert_to_long_double, "test_convert_to_long_double"sv);
 
     execute_test(execute_throwing_float_conversion_test, "throwing_float_conversion_test"sv);
-    execute_test(execute_safe_float_conversions_test, "safe_float_conversions_test"sv);
     cout << "STANDARD TEST BATTERY: All tests PASSED." << newl;
+    static_assert(most_sign_set_bit(2_u128) == 1);
 }
 
 void cjm::uint128_tests::execute_parse_file_test(std::string_view path, size_t expected_ops)
@@ -546,14 +546,14 @@ void cjm::uint128_tests::execute_test_convert_to_double()
 {
     constexpr auto oh_d00d_big_src = 0xc0de'd00d'0000'0000'0000'0000'0000'0000_u128;
     constexpr auto oh_d00d_half_src = 0xc0de'd00d'0000'0000_u128;
-    using float_t = double;
-    const float_t zero = 0.0;
-    const float_t one = 1.0;
-    const float_t zero_point_zero_one = 0.01;
-    const float_t big_ass_num = static_cast<float_t>(0x8000'0000'0000'0000'0000'0000'0000'0000_u128);
-    const float_t not_quite_as_big_ass_num = static_cast<float_t>(0x8000'0000'0000'0000_u128);
-    const float_t oh_d00d_big = static_cast<float_t>(0xc0de'd00d'0000'0000'0000'0000'0000'0000_u128);
-    const float_t oh_d00d_half = static_cast<float_t>(0xc0de'd00d'0000'0000_u128);
+    using flt_t = double;
+    const flt_t zero = 0.0;
+    const flt_t one = 1.0;
+    const flt_t zero_point_zero_one = 0.01;
+    const flt_t big_ass_num = static_cast<flt_t>(0x8000'0000'0000'0000'0000'0000'0000'0000_u128);
+    const flt_t not_quite_as_big_ass_num = static_cast<flt_t>(0x8000'0000'0000'0000_u128);
+    const flt_t oh_d00d_big = static_cast<flt_t>(0xc0de'd00d'0000'0000'0000'0000'0000'0000_u128);
+    const flt_t oh_d00d_half = static_cast<flt_t>(0xc0de'd00d'0000'0000_u128);
     cjm_assert_close_enough(static_cast<uint128_t>(zero), 0_u128);
     cjm_assert_close_enough(static_cast<uint128_t>(one), 1_u128);
     cjm_assert_close_enough(static_cast<uint128_t>(zero_point_zero_one), 0_u128);
@@ -566,16 +566,16 @@ void cjm::uint128_tests::execute_test_convert_to_double()
 }
 void cjm::uint128_tests::execute_test_convert_to_long_double()
 {
-    using float_t = long double;
+    using flt_t = long double;
     constexpr auto oh_d00d_big_src = 0xc0de'd00d'dad0'0000'0000'0000'0000'0000_u128;
     constexpr auto oh_d00d_half_src = 0xc0de'd00d'dad0'0000_u128;
-    const float_t zero = 0.0;
-    const float_t one = 1.0;
-    const float_t zero_point_zero_one = 0.01;
-    const float_t big_ass_num = static_cast<float_t>(0x8000'0000'0000'0000'0000'0000'0000'0000_u128);
-    const float_t not_quite_as_big_ass_num = static_cast<float_t>(0x8000'0000'0000'0000_u128);
-    const float_t oh_d00d_big = static_cast<float_t>(0xc0de'd00d'0000'0000'0000'0000'0000'0000_u128);
-    const float_t oh_d00d_half = static_cast<float_t>(0xc0de'd00d'0000'0000_u128);
+    const flt_t zero = 0.0;
+    const flt_t one = 1.0;
+    const flt_t zero_point_zero_one = 0.01;
+    const flt_t big_ass_num = static_cast<flt_t>(0x8000'0000'0000'0000'0000'0000'0000'0000_u128);
+    const flt_t not_quite_as_big_ass_num = static_cast<flt_t>(0x8000'0000'0000'0000_u128);
+    const flt_t oh_d00d_big = static_cast<flt_t>(0xc0de'd00d'0000'0000'0000'0000'0000'0000_u128);
+    const flt_t oh_d00d_half = static_cast<flt_t>(0xc0de'd00d'0000'0000_u128);
     cjm_assert_close_enough(static_cast<uint128_t>(zero), 0_u128);
     cjm_assert_close_enough(static_cast<uint128_t>(one), 1_u128);
     cjm_assert_close_enough(static_cast<uint128_t>(zero_point_zero_one), 0_u128);
@@ -643,12 +643,12 @@ void cjm::uint128_tests::execute_throwing_float_conversion_test()
         std::cerr << "You should never see this: " << converted << newl;
     });
     {
-		using float_t = float;
-	    const float_t zero = 0.0f;
-	    const float_t one = 1.0f;
-	    const float_t zero_point_zero_one = 0.01f;
-	    const float_t big_ass_num = static_cast<float_t>(0x8000'0000'0000'0000'0000'0000'0000'0000_u128);
-	    const float_t not_quite_as_big_ass_num = static_cast<float_t>(0x8000'0000'0000'0000_u128);
+		using flt_t = float;
+	    const flt_t zero = 0.0f;
+	    const flt_t one = 1.0f;
+	    const flt_t zero_point_zero_one = 0.01f;
+	    const flt_t big_ass_num = static_cast<flt_t>(0x8000'0000'0000'0000'0000'0000'0000'0000_u128);
+	    const flt_t not_quite_as_big_ass_num = static_cast<flt_t>(0x8000'0000'0000'0000_u128);
 
 	    cjm_assert_close_enough(numerics::safe_from_floating_or_throw(zero), 0_u128);
 	    cjm_assert_close_enough(numerics::safe_from_floating_or_throw(one), 1_u128);
@@ -657,12 +657,12 @@ void cjm::uint128_tests::execute_throwing_float_conversion_test()
 	    cjm_assert_close_enough(numerics::safe_from_floating_or_throw(not_quite_as_big_ass_num), 0x8000'0000'0000'0000_u128);
     }
     {
-        using float_t = double;
-        const float_t zero = 0.0;
-        const float_t one = 1.0;
-        const float_t zero_point_zero_one = 0.01;
-        const float_t big_ass_num = static_cast<float_t>(0x8000'0000'0000'0000'0000'0000'0000'0000_u128);
-        const float_t not_quite_as_big_ass_num = static_cast<float_t>(0x8000'0000'0000'0000_u128);
+        using flt_t = double;
+        const flt_t zero = 0.0;
+        const flt_t one = 1.0;
+        const flt_t zero_point_zero_one = 0.01;
+        const flt_t big_ass_num = static_cast<flt_t>(0x8000'0000'0000'0000'0000'0000'0000'0000_u128);
+        const flt_t not_quite_as_big_ass_num = static_cast<flt_t>(0x8000'0000'0000'0000_u128);
 
         cjm_assert_close_enough(numerics::safe_from_floating_or_throw(zero), 0_u128);
         cjm_assert_close_enough(numerics::safe_from_floating_or_throw(one), 1_u128);
@@ -671,12 +671,12 @@ void cjm::uint128_tests::execute_throwing_float_conversion_test()
         cjm_assert_close_enough(numerics::safe_from_floating_or_throw(not_quite_as_big_ass_num), 0x8000'0000'0000'0000_u128);
     }
     {
-        using float_t = long double;
-        const float_t zero = 0.0L;
-        const float_t one = 1.0L;
-        const float_t zero_point_zero_one = 0.01L;
-        const float_t big_ass_num = static_cast<float_t>(0x8000'0000'0000'0000'0000'0000'0000'0000_u128);
-        const float_t not_quite_as_big_ass_num = static_cast<float_t>(0x8000'0000'0000'0000_u128);
+        using flt_t = long double;
+        const flt_t zero = 0.0L;
+        const flt_t one = 1.0L;
+        const flt_t zero_point_zero_one = 0.01L;
+        const flt_t big_ass_num = static_cast<flt_t>(0x8000'0000'0000'0000'0000'0000'0000'0000_u128);
+        const flt_t not_quite_as_big_ass_num = static_cast<flt_t>(0x8000'0000'0000'0000_u128);
 
         cjm_assert_close_enough(numerics::safe_from_floating_or_throw(zero), 0_u128);
         cjm_assert_close_enough(numerics::safe_from_floating_or_throw(one), 1_u128);
@@ -731,12 +731,12 @@ void cjm::uint128_tests::execute_safe_float_conversions_test()
     }
     
     {
-        using float_t = float;
-        const float_t zero = 0.0f;
-        const float_t one = 1.0f;
-        const float_t zero_point_zero_one = 0.01f;
-        const float_t big_ass_num = static_cast<float_t>(0x8000'0000'0000'0000'0000'0000'0000'0000_u128);
-        const float_t not_quite_as_big_ass_num = static_cast<float_t>(0x8000'0000'0000'0000_u128);
+        using flt_t = float;
+        const flt_t zero = 0.0f;
+        const flt_t one = 1.0f;
+        const flt_t zero_point_zero_one = 0.01f;
+        const flt_t big_ass_num = static_cast<flt_t>(0x8000'0000'0000'0000'0000'0000'0000'0000_u128);
+        const flt_t not_quite_as_big_ass_num = static_cast<flt_t>(0x8000'0000'0000'0000_u128);
 
         cjm_assert_close_enough(numerics::safe_from_floating(zero), 0_u128);
         cjm_assert_close_enough(numerics::safe_from_floating(one), 1_u128);
@@ -745,12 +745,12 @@ void cjm::uint128_tests::execute_safe_float_conversions_test()
         cjm_assert_close_enough(numerics::safe_from_floating(not_quite_as_big_ass_num), 0x8000'0000'0000'0000_u128);
     }
     {
-        using float_t = double;
-        const float_t zero = 0.0;
-        const float_t one = 1.0;
-        const float_t zero_point_zero_one = 0.01;
-        const float_t big_ass_num = static_cast<float_t>(0x8000'0000'0000'0000'0000'0000'0000'0000_u128);
-        const float_t not_quite_as_big_ass_num = static_cast<float_t>(0x8000'0000'0000'0000_u128);
+        using flt_t = double;
+        const flt_t zero = 0.0;
+        const flt_t one = 1.0;
+        const flt_t zero_point_zero_one = 0.01;
+        const flt_t big_ass_num = static_cast<flt_t>(0x8000'0000'0000'0000'0000'0000'0000'0000_u128);
+        const flt_t not_quite_as_big_ass_num = static_cast<flt_t>(0x8000'0000'0000'0000_u128);
 
         cjm_assert_close_enough(numerics::safe_from_floating_or_throw(zero), 0_u128);
         cjm_assert_close_enough(numerics::safe_from_floating_or_throw(one), 1_u128);
@@ -759,12 +759,12 @@ void cjm::uint128_tests::execute_safe_float_conversions_test()
         cjm_assert_close_enough(numerics::safe_from_floating_or_throw(not_quite_as_big_ass_num), 0x8000'0000'0000'0000_u128);
     }
     {
-        using float_t = long double;
-        const float_t zero = 0.0L;
-        const float_t one = 1.0L;
-        const float_t zero_point_zero_one = 0.01L;
-        const float_t big_ass_num = static_cast<float_t>(0x8000'0000'0000'0000'0000'0000'0000'0000_u128);
-        const float_t not_quite_as_big_ass_num = static_cast<float_t>(0x8000'0000'0000'0000_u128);
+        using flt_t = long double;
+        const flt_t zero = 0.0L;
+        const flt_t one = 1.0L;
+        const flt_t zero_point_zero_one = 0.01L;
+        const flt_t big_ass_num = static_cast<flt_t>(0x8000'0000'0000'0000'0000'0000'0000'0000_u128);
+        const flt_t not_quite_as_big_ass_num = static_cast<flt_t>(0x8000'0000'0000'0000_u128);
 
         cjm_assert_close_enough(numerics::safe_from_floating_or_throw(zero), 0_u128);
         cjm_assert_close_enough(numerics::safe_from_floating_or_throw(one), 1_u128);
@@ -776,12 +776,12 @@ void cjm::uint128_tests::execute_safe_float_conversions_test()
 
 void cjm::uint128_tests::execute_test_convert_to_float()
 {
-    using float_t = float;
-    const float_t zero = 0.0f;
-    const float_t one = 1.0f;
-    const float_t zero_point_zero_one = 0.01f;
-    const float_t big_ass_num = static_cast<float_t>(0x8000'0000'0000'0000'0000'0000'0000'0000_u128);
-    const float_t not_quite_as_big_ass_num = static_cast<float_t>(0x8000'0000'0000'0000_u128);
+    using flt_t = float;
+    const flt_t zero = 0.0f;
+    const flt_t one = 1.0f;
+    const flt_t zero_point_zero_one = 0.01f;
+    const flt_t big_ass_num = static_cast<flt_t>(0x8000'0000'0000'0000'0000'0000'0000'0000_u128);
+    const flt_t not_quite_as_big_ass_num = static_cast<flt_t>(0x8000'0000'0000'0000_u128);
 
     cjm_assert_close_enough(static_cast<uint128_t>(zero), 0_u128);
     cjm_assert_close_enough(static_cast<uint128_t>(one), 1_u128);

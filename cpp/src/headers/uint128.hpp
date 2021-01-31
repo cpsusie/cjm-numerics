@@ -146,6 +146,8 @@ namespace cjm::numerics
     /// </summary>
     /// <param name="v">value to convert</param>
     /// <returns>the floating part converted to uint128</returns>
+    /// <exception cref="std::invalid_argument"><param ref name="v"/> would
+    /// have caused undefined behavior.</exception>
     template<concepts::builtin_floating_point TFloat>
     uint128 safe_from_floating_or_throw(TFloat v);
 
