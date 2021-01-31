@@ -34,10 +34,13 @@
 #include <span>
 #include "istream_utils.hpp"
 #include "int128_test_switches.hpp"
+#include <absl/numeric/int128.h>
+
 
 namespace cjm::uint128_tests
 {
     using ctrl_uint128_t = boost::multiprecision::uint128_t;
+    using alt_ctrl_uint128_t = absl::uint128;
     using uint128_t = numerics::uint128;
     using namespace numerics::uint128_literals;
     using namespace numerics::literals;
@@ -90,13 +93,15 @@ namespace cjm::uint128_tests
     	
     template<invocable Invocable>
     void execute_test(Invocable test, std::string_view test_name);
-
+    alt_ctrl_uint128_t to_alt_ctrl(uint128_t convert) noexcept;
+    uint128_t to_test(alt_ctrl_uint128_t convert) noexcept;
     ctrl_uint128_t to_ctrl(uint128_t convert);
     uint128_t to_test(const ctrl_uint128_t& convert);
 
     void print_environ_data();
     void print_sizes();
     void print_alignments();
+    void print_floating_point_info();
 	
     void execute_uint128_tests();
     constexpr size_t pow_2_arr_size = 63;
@@ -144,6 +149,13 @@ namespace cjm::uint128_tests
 	void execute_unary_op_basic_test();
     void execute_parse_file_test(std::string_view path, size_t expected_ops);
     void execute_unary_op_post_stat_assert_test();
+    void execute_test_convert_to_float();
+    void execute_test_convert_to_double();
+    void execute_test_convert_to_long_double();
+    void execute_throwing_float_conversion_test();
+    void execute_safe_float_conversions_test();
+    void execute_controlled_from_float_conversion_test();
+    void execute_controlled_float_rt_conversion_test();
 
 	void execute_unary_op_pre_inc_test();
     void execute_unary_op_post_inc_test();
@@ -155,8 +167,7 @@ namespace cjm::uint128_tests
     void execute_unary_op_bitwise_not_test();
     void execute_unary_op_bool_cast_test();
     void execute_unary_op_logical_negation_test();
-	
-	
+    	
     [[maybe_unused]] void print_n_static_assertions(const binary_op_u128_vect_t& op_vec, size_t n);
     [[maybe_unused]] void print_n_static_assertions(const unary_op_u128_vect_t& op_vec, size_t n);
     constexpr auto base_un_op_filename = "unary_ops"sv;
@@ -2133,6 +2144,9 @@ namespace cjm::uint128_tests::generator
     template<concepts::up_to_ui128 UnsignedInteger>
     uint128_t create_random_in_range(const rgen& rgen);
 
+    template<numerics::concepts::builtin_floating_point TFloat>
+    auto generate_u128_float(const rgen& rgen) -> std::remove_cvref_t<std::remove_const_t<TFloat>>;
+	
     template<concepts::up_to_ui128 UnsignedInteger>
     int create_shift_param_for_type(const rgen& rgen);
 
@@ -2206,6 +2220,43 @@ namespace cjm::uint128_tests::generator
             vec.emplace_back(factory(gen));
     	}
         return vec;
+    }
+
+    template<numerics::concepts::builtin_floating_point TFloat>
+    auto generate_u128_float(const rgen& rgen)->std::remove_cvref_t<std::remove_const_t<TFloat>>
+    {
+        using flt_t = std::remove_cvref_t<std::remove_const_t<TFloat>>;
+        constexpr size_t float_size = sizeof(flt_t);
+        constexpr int uint128_digits = std::numeric_limits<uint128_t>::digits;
+        constexpr int uint16_digits = std::numeric_limits<std::uint16_t>::digits;
+        constexpr int uint32_digits = std::numeric_limits<std::uint32_t>::digits;
+        constexpr int uint16_lshift_modulo = uint128_digits - uint16_digits;
+        constexpr int uint32_lshift_modulo = uint128_digits - uint32_digits;
+        static_assert( uint16_lshift_modulo > 0);
+        static_assert(uint32_lshift_modulo > 0);
+    	
+    	if constexpr (float_size == sizeof(float))
+    	{
+
+            uint128_t source = generator::create_random_in_range<std::uint16_t>(rgen);
+            const auto l_shift_amnt = rgen.generate_shift_param(uint128_digits) % uint16_lshift_modulo;
+            source <<= l_shift_amnt;
+            const int decimal = static_cast<int>(generator::create_random_in_range<std::uint8_t>(rgen));
+            flt_t dec_part = static_cast<flt_t>(decimal) / 100.0f;
+            auto integer_part = static_cast<flt_t>(source);
+            return integer_part + dec_part;
+    	}
+        else
+        {
+            uint128_t source = generator::create_random_in_range<std::uint32_t>(rgen);
+            const auto l_shift_amnt = rgen.generate_shift_param(std::numeric_limits<uint128_t>::digits);
+            source <<= l_shift_amnt;
+            const int decimal = static_cast<int>(generator::create_random_in_range<std::uint8_t>(rgen));
+            const flt_t dividend = 100;
+            flt_t dec_part = static_cast<flt_t>(decimal) / dividend;
+            auto integer_part = static_cast<flt_t>(source);
+            return integer_part + dec_part;
+        }
     }
 
     //static_assert(std::is_same_v<twister_t, std::mt19937_64>);

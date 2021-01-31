@@ -54,8 +54,16 @@ namespace cjm::numerics::concepts
     template<typename T>
     concept builtin_unsigned_integer = builtin_integer<T> && unsigned_integer<T>;
 
-    static_assert(builtin_unsigned_integer <std::uint64_t>);
-    static_assert(builtin_unsigned_integer <std::uint8_t>);
+    /// <summary>
+    /// Applies to floating point numbers that are built in types.
+    /// </summary>
+    template<typename T>
+    concept builtin_floating_point = std::floating_point<T>;
+
+
+    static_assert(builtin_floating_point<float>&& builtin_floating_point<double>&& builtin_floating_point<long double>);
+    static_assert(builtin_unsigned_integer<std::uint64_t>);
+    static_assert(builtin_unsigned_integer<std::uint8_t>);
 }
 
 namespace cjm::numerics
@@ -467,6 +475,18 @@ namespace cjm::numerics::concepts
         using string_t = std::remove_cvref<std::basic_string<Char, CharTraits, CharAllocator>>;
         using sstream_t = std::remove_cvref<std::basic_stringstream<Char, CharTraits, CharAllocator>>;
         using allocator_t = std::remove_cvref<CharAllocator>;
+    };
+
+    template<typename T>
+    concept printable_subtractable_totally_ordered =
+    std::totally_ordered<T>
+    && number<T>
+    && requires (std::basic_ostream<char>& nos, std::basic_ostream<wchar_t>& wos, const T& val_l, const T& val_r)
+    {
+        {val_l - val_r}                 noexcept    ->  nothrow_convertible<T>;
+        {val_l <=> val_r}               noexcept    -> nothrow_convertible<std::strong_ordering>;
+        {wos << val_l}                              -> nothrow_convertible<std::basic_ostream<wchar_t>&>;
+        {nos << val_l}                              -> nothrow_convertible<std::basic_ostream<char>&>;
     };
 }
 

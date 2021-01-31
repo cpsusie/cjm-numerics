@@ -156,7 +156,12 @@ namespace cjm
 #endif
 #endif
 		constexpr size_t uint128_align = alignof(uint128_align_t);
-
+		constexpr bool sse3_available =
+#if defined(__SSE3__)
+			true;
+#else
+			false;
+#endif
 
 
 

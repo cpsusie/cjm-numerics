@@ -5,7 +5,6 @@
 #include "cjm_string.hpp"
 #include <cwctype>
 
-
 //
 // Copyright 2017 The Abseil Authors.
 //
@@ -35,6 +34,8 @@ namespace cjm
 {
 	namespace numerics
 	{
+
+		
         namespace uint128_literals
         {
             template<char... Chars>
@@ -700,6 +701,29 @@ namespace cjm
 			m_high = 0;
 			return *this;
 		}
+
+        //converting ctors from floating point types
+        inline uint128::uint128(float f) noexcept : uint128()
+        {
+            auto temp = internal::make_from_floating_point(f);
+            m_high = temp.m_high;
+            m_low = temp.m_low;
+        }
+		
+        inline uint128::uint128(double d) noexcept : uint128()
+        {
+            auto temp = internal::make_from_floating_point(d);
+            m_high = temp.m_high;
+            m_low = temp.m_low;
+        }
+		
+        inline uint128::uint128(long double d) noexcept : uint128()
+        {
+            auto temp = internal::make_from_floating_point(d);
+            m_high = temp.m_high;
+            m_low = temp.m_low;
+        }
+		
         template<typename Chars, typename CharTraits, typename Allocator>
             requires cjm::numerics::concepts::char_with_traits_and_allocator<Chars, CharTraits, Allocator>
         uint128 uint128::make_from_string(const std::basic_string<Chars, CharTraits, Allocator>& parseMe)
@@ -1105,7 +1129,7 @@ namespace cjm
 		inline uint128 uint128::rshift_msvc_x64(uint128 shift_me, int shift_amount) noexcept
 		{
 			assert(shift_amount > -1 && shift_amount < std::numeric_limits<uint128>::digits);
-			auto ret = uint128{};
+            uint128 ret;
 			if (shift_amount >= 64)
 			{
 				ret.m_high = 0;
@@ -1207,7 +1231,7 @@ namespace cjm
         	{
                 return std::countl_zero(hp);
         	}
-            return std::numeric_limits<typename uint128::int_part>::digits + std::countl_zero(n.low_part());
+            return std::numeric_limits<uint128::int_part>::digits + std::countl_zero(n.low_part());
         }
 		
 		template <typename T>
@@ -1229,7 +1253,7 @@ namespace cjm
 			{
 				return fls_default(n);
 			}
-			else
+			else // ReSharper disable once CppUnreachableCode				
 			{
 				if constexpr (calculation_mode == uint128_calc_mode::msvc_x64)
 				{
@@ -1314,8 +1338,8 @@ namespace cjm
                 if (lo == 0)
                     ++high; // carry
                 return uint128::make_uint128(high, lo);
-            }
-            else
+            }  // ReSharper disable once CppRedundantElseKeywordInsideCompoundStatement	           
+            else  // ReSharper disable once CppUnreachableCode  
             {
                 if constexpr (calculation_mode == uint128_calc_mode::intrinsic_u128)
                 {
@@ -1374,20 +1398,21 @@ namespace cjm
                 assert(amount < std::numeric_limits<uint128>::digits && amount > -1);
                 // uint64_t shifts of >= 64 are undefined, so we will need some
                 // special-casing.
-                auto absAmount = static_cast<int>(math_functions::int_abs(amount));
-                if (absAmount < static_cast<int>(uint128::int_part_bits))
+                const auto abs_amount = static_cast<int>(math_functions::int_abs(amount));
+                if (abs_amount < static_cast<int>(uint128::int_part_bits))
                 {
-                    if (absAmount != 0)
+                    if (abs_amount != 0)
                     {
-                        return uint128::make_uint128((lhs.high_part() >> absAmount),
-                                                    (lhs.low_part() >> absAmount) |
-                                                    (lhs.high_part() << (static_cast<int>(uint128::int_part_bits) -absAmount)));
+                        return
+                    		uint128::make_uint128((lhs.high_part() >> abs_amount),
+                            (lhs.low_part() >> abs_amount) |
+                               (lhs.high_part() << (static_cast<int>(uint128::int_part_bits) -abs_amount)));
                     }
                     return lhs;
                 }
-                return uint128::make_uint128(0, lhs.high_part() >> (absAmount - static_cast<int>(uint128::int_part_bits)));
+                return uint128::make_uint128(0, lhs.high_part() >> (abs_amount - static_cast<int>(uint128::int_part_bits)));
             }
-            else
+            else // ReSharper disable once CppUnreachableCode	            
             {
                 if constexpr (calculation_mode == uint128_calc_mode::intrinsic_u128)
                 {
@@ -1440,7 +1465,7 @@ namespace cjm
                 }
                 return uint128::make_uint128(lhs.low_part() << (absAmount - static_cast<int>(uint128::int_part_bits)), 0);
             }
-            else
+            else // ReSharper disable once CppUnreachableCode        
             {
                 if constexpr (calculation_mode == uint128_calc_mode::intrinsic_u128)
                 {
@@ -1495,8 +1520,8 @@ namespace cjm
                     return uint128::make_uint128(result.high_part() + 1, result.low_part());
                 }
                 return result;
-            }
-            else
+            }  // ReSharper disable once CppRedundantElseKeywordInsideCompoundStatement
+			else   // ReSharper disable once CppUnreachableCode
             {
                 if constexpr (calculation_mode == uint128_calc_mode::intrinsic_u128)
                 {
@@ -1530,8 +1555,8 @@ namespace cjm
                     return uint128::make_uint128(result.high_part() - 1, result.low_part());
                 }
                 return result;
-            }
-            else
+            }  // ReSharper disable once CppRedundantElseKeywordInsideCompoundStatement
+            else  // ReSharper disable once CppUnreachableCode
             {
                 if constexpr (calculation_mode == uint128_calc_mode::intrinsic_u128)
                 {
@@ -1570,35 +1595,36 @@ namespace cjm
                 result += uint128(a32 * b00) << uint128::int_part_bottom_half_bits;
                 result += uint128(a00 * b32) << uint128::int_part_bottom_half_bits;
                 return result;
-            }
-            else
-            {
+            }// NOLINT(readability-misleading-indentation)
+	            // ReSharper disable once CppRedundantElseKeywordInsideCompoundStatement
+            else // ReSharper disable once CppUnreachableCode 
+			{   
                 if constexpr (calculation_mode == uint128_calc_mode::intrinsic_u128)
-                {
-                    return static_cast<natuint128_t>(lhs) * static_cast<natuint128_t>(rhs);
-                }
-	            else if constexpr (calculation_mode == uint128_calc_mode::msvc_x64)
+				{
+				    return static_cast<natuint128_t>(lhs) * static_cast<natuint128_t>(rhs);
+				}
+				else if constexpr (calculation_mode == uint128_calc_mode::msvc_x64)
 	            {
 					std::uint64_t carry = 0;
 					std::uint64_t low_product = CJM_UMUL128(lhs.low_part(), rhs.low_part(), &carry);
 					return uint128::make_uint128(lhs.low_part() * rhs.high_part() + lhs.high_part() * rhs.low_part() + carry, low_product);
-		        }
-                else // constexpr (calculation_mode == uint128_calc_mode::default_eval)
-                {
-                    using int_part = uint128::int_part;
-                    int_part a32 = lhs.low_part() >> uint128::int_part_bottom_half_bits;
-                    int_part a00 = lhs.low_part() & uint128::int_part_bottom_half_bitmask;
-                    int_part b32 = rhs.low_part() >> uint128::int_part_bottom_half_bits;
-                    int_part b00 = rhs.low_part() & uint128::int_part_bottom_half_bitmask;
+				}
+				else 
+				{   // constexpr (calculation_mode == uint128_calc_mode::default_eval)
+				    using int_part = uint128::int_part;
+				    int_part a32 = lhs.low_part() >> uint128::int_part_bottom_half_bits;
+				    int_part a00 = lhs.low_part() & uint128::int_part_bottom_half_bitmask;
+				    int_part b32 = rhs.low_part() >> uint128::int_part_bottom_half_bits;
+				    int_part b00 = rhs.low_part() & uint128::int_part_bottom_half_bitmask;
 
-                    uint128 result = uint128::make_uint128(lhs.high_part() * rhs.low_part() +
-                                                          lhs.low_part() * rhs.high_part() +
-                                                          a32 * b32,
-                                                          a00 * b00);
-                    result += uint128(a32 * b00) << uint128::int_part_bottom_half_bits;
-                    result += uint128(a00 * b32) << uint128::int_part_bottom_half_bits;
-                    return result;
-                }
+				    uint128 result = uint128::make_uint128(lhs.high_part() * rhs.low_part() +
+				                                          lhs.low_part() * rhs.high_part() +
+				                                          a32 * b32,
+				                                          a00 * b00);
+				    result += uint128(a32 * b00) << uint128::int_part_bottom_half_bits;
+				    result += uint128(a00 * b32) << uint128::int_part_bottom_half_bits;
+				    return result;
+				}
             }
 		}
 
@@ -1639,6 +1665,7 @@ namespace cjm
                 return uint128::fls(value);
             }
         }
+       
 
         constexpr uint128 operator/(uint128 lhs, uint128 rhs)
 		{
@@ -1649,30 +1676,31 @@ namespace cjm
                 uint128 remainder = 0;
                 uint128::constexpr_div_mod_impl(lhs, rhs, &quotient, &remainder);
                 return quotient;
-            }
-		    else
-            {
-		        if constexpr (calculation_mode == uint128_calc_mode::intrinsic_u128)
+            } // ReSharper disable once CppRedundantElseKeywordInsideCompoundStatement			    
+		    else // ReSharper disable once CppUnreachableCode
+		    {
+                if constexpr (calculation_mode == uint128_calc_mode::intrinsic_u128)
                 {
-                    if (rhs == 0) { throw std::domain_error("Division by zero is illegal."); }
-                    return static_cast<natuint128_t>(lhs) / static_cast<natuint128_t>(rhs);
-                }
-		        else if constexpr (calculation_mode == uint128_calc_mode::msvc_x64)
+					if (rhs == 0) { throw std::domain_error("Division by zero is illegal."); }
+					return static_cast<natuint128_t>(lhs) / static_cast<natuint128_t>(rhs);
+				}
+				else if constexpr (calculation_mode == uint128_calc_mode::msvc_x64)  // NOLINT(readability-misleading-indentation)
 				{
-                    if (rhs == 0) { throw std::domain_error("Division by zero is illegal."); }
+					if (rhs == 0) { throw std::domain_error("Division by zero is illegal."); }
 					uint128 quotient = 0;
 					uint128 remainder = 0;
 					uint128::div_mod_msc_x64_impl(lhs, rhs, &quotient, &remainder);
 					return quotient;
+				} 
+				else // NOLINT(readability-misleading-indentation)
+				{
+                    // constexpr (calculation_mode == uint128_calc_mode::default_eval)  
+					if (rhs == 0) { throw std::domain_error("Division by zero is illegal."); }
+					uint128 quotient = 0;
+					uint128 remainder = 0;
+					uint128::constexpr_div_mod_impl(lhs, rhs, &quotient, &remainder);
+					return quotient;
 				}
-                else // constexpr (calculation_mode == uint128_calc_mode::default_eval)
-                {
-                    if (rhs == 0) { throw std::domain_error("Division by zero is illegal."); }
-                    uint128 quotient = 0;
-                    uint128 remainder = 0;
-                    uint128::constexpr_div_mod_impl(lhs, rhs, &quotient, &remainder);
-                    return quotient;
-                }
             }
 		}
 
@@ -1688,8 +1716,8 @@ namespace cjm
                 uint128 remainder = 0;
                 uint128::constexpr_div_mod_impl(lhs, rhs, &quotient, &remainder);
                 return remainder;
-            }
-            else
+            } // ReSharper disable once CppRedundantElseKeywordInsideCompoundStatement	           
+            else     // ReSharper disable once CppUnreachableCode            
             {
                 if constexpr (calculation_mode == uint128_calc_mode::intrinsic_u128)
                 {
@@ -1716,14 +1744,7 @@ namespace cjm
                     return remainder;
                 }
             }
-
-
 		}
-
-
-
-
-
 	}
 }
 
@@ -2414,7 +2435,7 @@ parse_hex_str(sv hex_str)
     if (length < 1)
     {
         throw std::invalid_argument{ "Cannot parse supplied string as 128-bit unsigned integer: string is empty." };
-    };
+    }
     bool allZero = std::all_of(hex_str.cbegin(), hex_str.cend(), [](char_t c) -> bool
         {
             return c == zero_cast;
@@ -2467,6 +2488,97 @@ parse_hex_str(sv hex_str)
 	}   
 }
 
+namespace cjm::numerics::internal
+{
+    template<concepts::builtin_floating_point TFloat>
+    uint128 make_from_floating_point(TFloat v) noexcept
+    {
+        using flt_t = std::remove_cvref_t<TFloat>;
+        if constexpr (std::is_same_v<flt_t, long double> && !sse3_available && 
+	        // ReSharper disable once CppRedundantBooleanExpressionArgument
+	        (compiler == compiler_used::clang || compiler == compiler_used::clang_gcc))
+        {
+        	// Go 50 bits at a time, that fits in a double
+            static_assert(std::numeric_limits<double>::digits >= 50, "double digits must >= 50");
+            static_assert(std::numeric_limits<long double>::digits <= 150, "long double digits must <= 150.");
+            // Undefined behavior if v is not finite or cannot fit into uint128.
+            assert(std::isfinite(v) && v > -1 && v < std::ldexp(1.0L, 128));
+            
+            v = std::ldexp(v, -100);
+            const auto w0 = static_cast<std::uint64_t>(static_cast<double>(std::trunc(v)));
+            v = std::ldexp(v - static_cast<double>(w0), 50);
+            const auto w1 = static_cast<std::uint64_t>(static_cast<double>(std::trunc(v)));
+            v = std::ldexp(v - static_cast<double>(w1), 50);
+            const auto w2 = static_cast<std::uint64_t>(static_cast<double>(std::trunc(v)));
+            return (static_cast<uint128>(w0) << 100) | (static_cast<uint128>(w1) << 50) |
+                static_cast<uint128>(w2);
+        }
+        else
+        {
+        	
+            // Rounding behavior is towards zero, same as for built-in types.
+            // Undefined behavior if v is NaN or cannot fit into uint128.
+            assert(std::isfinite(v) && v > -1 &&
+                (std::numeric_limits<flt_t>::max_exponent <= 128 ||
+                    v < std::ldexp(static_cast<flt_t>(1), 128)));
+
+            if (v >= std::ldexp(static_cast<flt_t>(1), 64)) 
+            {
+                const auto hi = static_cast<std::uint64_t>(std::ldexp(v, -64));
+                const auto lo = static_cast<std::uint64_t>(v - std::ldexp(static_cast<flt_t>(hi), 64));
+                return uint128{ hi, lo };
+            }
+            return static_cast<std::uint64_t>(v);
+        }
+    }    
+}
+
+namespace cjm::numerics
+{
+    template<concepts::builtin_floating_point TFloat>
+    uint128 safe_from_floating_or_throw(TFloat v)
+    {
+        using flt_t = std::remove_cvref_t<TFloat>;
+        if constexpr (std::is_same_v<flt_t, long double> && !sse3_available &&
+	        // ReSharper disable once CppRedundantBooleanExpressionArgument
+	        (compiler == compiler_used::clang || compiler == compiler_used::clang_gcc))
+        {
+            if (!(std::isfinite(v) && v > -1 && v < std::ldexp(1.0L, 128)))
+                throw std::invalid_argument{ "Specified floating point value cannot be converted to uint128." };
+            return internal::make_from_floating_point(v);
+        }
+        else
+        {
+            if (!(std::isfinite(v) && v > -1 &&
+                (std::numeric_limits<flt_t>::max_exponent <= 128 ||
+                    v < std::ldexp(static_cast<flt_t>(1), 128))))
+                throw std::invalid_argument{ "Specified floating point value cannot be converted to uint128." };
+            return internal::make_from_floating_point(v);
+        }
+    }
+
+    template<concepts::builtin_floating_point TFloat>
+    std::optional<uint128> safe_from_floating(TFloat v) noexcept
+    {
+        using flt_t = std::remove_cvref_t<TFloat>;
+        if constexpr (std::is_same_v<flt_t, long double> && !sse3_available &&
+	        // ReSharper disable once CppRedundantBooleanExpressionArgument
+	        (compiler == compiler_used::clang || compiler == compiler_used::clang_gcc))
+        {
+            if (!(std::isfinite(v) && v > -1 && v < std::ldexp(1.0L, 128)))
+                return std::nullopt;
+            return std::make_optional(internal::make_from_floating_point(v));
+        }
+        else
+        {
+            if (!(std::isfinite(v) && v > -1 &&
+                (std::numeric_limits<flt_t>::max_exponent <= 128 ||
+                    v < std::ldexp(static_cast<flt_t>(1), 128))))
+                return std::nullopt;
+            return std::make_optional(internal::make_from_floating_point(v));
+        }
+    }
+}
 
 /*
  * Evil macro'd up version of fls64 from google:

@@ -4,18 +4,25 @@ project(Int128)
 set(CMAKE_CXX_STANDARD 20)
 set(GCC_COVERAGE_COMPILE_FLAGS "-Wall -Werror -Wextra -Wstrict-aliasing -Wno-unknown-pragmas -Wstrict-overflow")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${GCC_COVERAGE_COMPILE_FLAGS}" )
+set(CMAKE_VERBOSE_MAKEFILE ON)
 include_directories(cpp/src/cpp)
 include_directories(cpp/src/headers)
-find_package(Boost)
+find_package(Boost REQUIRED)
 IF (Boost_FOUND)
     include_directories(${Boost_INCLUDE_DIR})
 endif()
-    add_executable(Int128
-        cpp/src/cpp/program.cpp
-        cpp/src/cpp/testing.cpp
-        cpp/src/cpp/istream_utils.cpp
-        cpp/src/cpp/int128_tests.cpp
-        cpp/src/cpp/uint128.cpp
-        cpp/src/cpp/int128_test_switches.cpp
-        cpp/src/cpp/uint128_test_program.cpp
-        )
+find_package(absl REQUIRED)
+IF (absl_FOUND)
+    include_directories(${absl_INCLUDE_DIRS})
+endif()
+
+add_executable(Int128
+    cpp/src/cpp/program.cpp
+    cpp/src/cpp/testing.cpp
+    cpp/src/cpp/istream_utils.cpp
+    cpp/src/cpp/int128_tests.cpp
+    cpp/src/cpp/uint128.cpp
+    cpp/src/cpp/int128_test_switches.cpp
+    cpp/src/cpp/uint128_test_program.cpp
+    )
+target_link_libraries(Int128 absl::numeric)
