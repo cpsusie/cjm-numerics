@@ -515,6 +515,7 @@ void cjm::uint128_tests::execute_uint128_tests()
     execute_test(execute_test_convert_to_long_double, "test_convert_to_long_double"sv);
 
     execute_test(execute_throwing_float_conversion_test, "throwing_float_conversion_test"sv);
+    execute_test(execute_safe_float_conversions_test, "safe_float_conversions_test"sv);
     cout << "STANDARD TEST BATTERY: All tests PASSED." << newl;
     static_assert(most_sign_set_bit(2_u128) == 1);
 }
@@ -752,11 +753,11 @@ void cjm::uint128_tests::execute_safe_float_conversions_test()
         const flt_t big_ass_num = static_cast<flt_t>(0x8000'0000'0000'0000'0000'0000'0000'0000_u128);
         const flt_t not_quite_as_big_ass_num = static_cast<flt_t>(0x8000'0000'0000'0000_u128);
 
-        cjm_assert_close_enough(numerics::safe_from_floating_or_throw(zero), 0_u128);
-        cjm_assert_close_enough(numerics::safe_from_floating_or_throw(one), 1_u128);
-        cjm_assert_close_enough(numerics::safe_from_floating_or_throw(zero_point_zero_one), 0_u128);
-        cjm_assert_close_enough(numerics::safe_from_floating_or_throw(big_ass_num), 0x8000'0000'0000'0000'0000'0000'0000'0000_u128);
-        cjm_assert_close_enough(numerics::safe_from_floating_or_throw(not_quite_as_big_ass_num), 0x8000'0000'0000'0000_u128);
+        cjm_assert_close_enough(numerics::safe_from_floating(zero), 0_u128);
+        cjm_assert_close_enough(numerics::safe_from_floating(one), 1_u128);
+        cjm_assert_close_enough(numerics::safe_from_floating(zero_point_zero_one), 0_u128);
+        cjm_assert_close_enough(numerics::safe_from_floating(big_ass_num), 0x8000'0000'0000'0000'0000'0000'0000'0000_u128);
+        cjm_assert_close_enough(numerics::safe_from_floating(not_quite_as_big_ass_num), 0x8000'0000'0000'0000_u128);
     }
     {
         using flt_t = long double;
@@ -766,11 +767,11 @@ void cjm::uint128_tests::execute_safe_float_conversions_test()
         const flt_t big_ass_num = static_cast<flt_t>(0x8000'0000'0000'0000'0000'0000'0000'0000_u128);
         const flt_t not_quite_as_big_ass_num = static_cast<flt_t>(0x8000'0000'0000'0000_u128);
 
-        cjm_assert_close_enough(numerics::safe_from_floating_or_throw(zero), 0_u128);
-        cjm_assert_close_enough(numerics::safe_from_floating_or_throw(one), 1_u128);
-        cjm_assert_close_enough(numerics::safe_from_floating_or_throw(zero_point_zero_one), 0_u128);
-        cjm_assert_close_enough(numerics::safe_from_floating_or_throw(big_ass_num), 0x8000'0000'0000'0000'0000'0000'0000'0000_u128);
-        cjm_assert_close_enough(numerics::safe_from_floating_or_throw(not_quite_as_big_ass_num), 0x8000'0000'0000'0000_u128);
+        cjm_assert_close_enough(numerics::safe_from_floating(zero), 0_u128);
+        cjm_assert_close_enough(numerics::safe_from_floating(one), 1_u128);
+        cjm_assert_close_enough(numerics::safe_from_floating(zero_point_zero_one), 0_u128);
+        cjm_assert_close_enough(numerics::safe_from_floating(big_ass_num), 0x8000'0000'0000'0000'0000'0000'0000'0000_u128);
+        cjm_assert_close_enough(numerics::safe_from_floating(not_quite_as_big_ass_num), 0x8000'0000'0000'0000_u128);
     }
 }
 
