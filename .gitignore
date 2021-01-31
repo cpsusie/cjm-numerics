@@ -416,6 +416,7 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+workspace.xml
 /cmake-build-release/CMakeFiles/clion-log.txt
 /cmake-build-debug/file.txt
 /cmake-build-debug-clang/
