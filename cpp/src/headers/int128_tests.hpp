@@ -101,6 +101,7 @@ namespace cjm::uint128_tests
     void print_environ_data();
     void print_sizes();
     void print_alignments();
+    void print_floating_point_info();
 	
     void execute_uint128_tests();
     constexpr size_t pow_2_arr_size = 63;

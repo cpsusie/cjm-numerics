@@ -278,7 +278,68 @@ cjm::uint128_tests::uint128_t cjm::uint128_tests::to_test(const ctrl_uint128_t& 
 	const std::uint64_t high_part = static_cast<std::uint64_t>(convert >> 64);
     return uint128_t::make_uint128(high_part, low_part);
 }
+void cjm::uint128_tests::print_floating_point_info()
+{
+    constexpr bool is_float_iec = std::numeric_limits<float>::is_iec559;
+    constexpr bool is_double_iec = std::numeric_limits<double>::is_iec559;
+    constexpr bool is_long_double_iec = std::numeric_limits<long double>::is_iec559;
+    auto saver = cout_saver {cout};
+    
+    cout << newl << "Printing data for type float: " << newl;
+    if constexpr (is_float_iec)
+    {
+        cout << "\tfloat (size: " << std::dec << sizeof(float ) << ", align: " << alignof(float) << ") is an iec559 type." << newl;
+        cout << "\tfloat uses " << std::numeric_limits<float>::digits -1 << " of its " << (sizeof(float) * CHAR_BIT) << " bits for mantissa." << newl;
+        cout << "\tfloat's min exponent: " << std::numeric_limits<float>::min_exponent << "; max exponent: " << std::numeric_limits<float>::max_exponent << "." << newl;
+        cout << "\tfloat's max value: " << std::numeric_limits<float>::max() << "." << newl;
+        cout << "Done printing data for type float." << newl << newl;
+    }
+    else
+    {
+        cout << "\tfloat (size: " << std::dec << sizeof(float ) << ", align: " << alignof(float) << ") is an NOT iec559 type." << newl;
+        cout << "\tfloat uses " << std::numeric_limits<float>::digits << " of its " << (sizeof(float) * CHAR_BIT) << " bits for mantissa." << newl;
+        cout << "\tfloat's min exponent: " << std::numeric_limits<float>::min_exponent << "; max exponent: " << std::numeric_limits<float>::max_exponent << "." << newl;
+        cout << "\tfloat's max value: " << std::numeric_limits<float>::max() << "." << newl;
+        cout << "Done printing data for type float." << newl << newl;
+    }
 
+    cout << "Printing data for type double: " << newl;
+    if constexpr (is_double_iec)
+    {
+        cout << "\tdouble (size: " << std::dec << sizeof(double ) << ", align: " << alignof(double) << ") is an iec559 type." << newl;
+        cout << "\tdouble uses " << std::numeric_limits<double>::digits -1 << " of its " << (sizeof(double) * CHAR_BIT) << " bits for mantissa." << newl;
+        cout << "\tdouble's min exponent: " << std::numeric_limits<double>::min_exponent << "; max exponent: " << std::numeric_limits<double>::max_exponent << "." << newl;
+        cout << "\tdouble's max value: " << std::numeric_limits<double>::max() << "." << newl;
+        cout << "Done printing data for type double." << newl << newl;
+    }
+    else
+    {
+        cout << "\tdouble (size: " << std::dec << sizeof(double ) << ", align: " << alignof(double) << ") is an NOT iec559 type." << newl;
+        cout << "\tdouble uses " << std::numeric_limits<double>::digits << " of its " << (sizeof(double) * CHAR_BIT) << " bits for mantissa." << newl;
+        cout << "\tdouble's min exponent: " << std::numeric_limits<double>::min_exponent << "; max exponent: " << std::numeric_limits<double>::max_exponent << "." << newl;
+        cout << "\tdouble's max value: " << std::numeric_limits<double>::max() << "." << newl;
+        cout << "Done printing data for type double." << newl << newl;
+    }
+
+    cout << "Printing data for type long double: " << newl;
+    if constexpr (is_long_double_iec)
+    {
+        cout << "\tlong double (size: " << std::dec << sizeof(long double ) << ", align: " << alignof(long double) << ") is an iec559 type." << newl;
+        cout << "\tlong double uses " << std::numeric_limits<long double>::digits -1 << " of its " << (sizeof(long double) * CHAR_BIT) << " bits for mantissa." << newl;
+        cout << "\tlong double's min exponent: " << std::numeric_limits<long double>::min_exponent << "; max exponent: " << std::numeric_limits<long double>::max_exponent << "." << newl;
+        cout << "\tlong double's max value: " << std::numeric_limits<long double>::max() << "." << newl;
+        cout << "Done printing data for type long double." << newl << newl;
+    }
+    else
+    {
+        cout << "\tlong double (size: " << std::dec << sizeof(long double ) << ", align: " << alignof(long double) << ") is an NOT iec559 type." << newl;
+        cout << "\tlong double uses " << std::numeric_limits<long double>::digits << " of its " << (sizeof(long double) * CHAR_BIT) << " bits for mantissa." << newl;
+        cout << "\tlong double's min exponent: " << std::numeric_limits<long double>::min_exponent << "; max exponent: " << std::numeric_limits<long double>::min_exponent << "." << newl;
+        cout << "\tlong double's max value: " << std::numeric_limits<long double>::max() << "." << newl;
+        cout << "Done printing data for type long double." << newl;
+    }
+    cout << "Done printing floating point information." << newl << newl;
+}
 void cjm::uint128_tests::print_alignments()
 {
     std::cout << newl << "PRINTING ALIGNMENTS:" << newl;
@@ -475,6 +536,7 @@ void cjm::uint128_tests::print_environ_data()
     }
     print_sizes();
     print_alignments();
+    print_floating_point_info();
     print_constexpr_bitcast_available();
     print_uint128_eval_mode();
     print_cpp20_bitops_available();
