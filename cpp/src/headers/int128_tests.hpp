@@ -34,10 +34,13 @@
 #include <span>
 #include "istream_utils.hpp"
 #include "int128_test_switches.hpp"
+#include <absl/numeric/int128.h>
+
 
 namespace cjm::uint128_tests
 {
     using ctrl_uint128_t = boost::multiprecision::uint128_t;
+    using alt_ctrl_uint128_t = absl::uint128;
     using uint128_t = numerics::uint128;
     using namespace numerics::uint128_literals;
     using namespace numerics::literals;
@@ -90,7 +93,8 @@ namespace cjm::uint128_tests
     	
     template<invocable Invocable>
     void execute_test(Invocable test, std::string_view test_name);
-
+    alt_ctrl_uint128_t to_alt_ctrl(uint128_t convert) noexcept;
+    uint128_t to_test(alt_ctrl_uint128_t convert) noexcept;
     ctrl_uint128_t to_ctrl(uint128_t convert);
     uint128_t to_test(const ctrl_uint128_t& convert);
 

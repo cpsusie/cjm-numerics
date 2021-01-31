@@ -139,28 +139,6 @@ namespace cjm::numerics
 		requires cjm::numerics::concepts::char_with_traits<Char, CharTraits>
 	std::basic_istream<Char, CharTraits>& operator>>(std::basic_istream<Char, CharTraits>& is, uint128& v);
 
-    /// <summary>
-    /// Convert a built-in floating point type to a uint128.
-    /// If the value of the float would cause the operation to
-    /// invoke undefined behavior, throw std::invalid_argument
-    /// </summary>
-    /// <param name="v">value to convert</param>
-    /// <returns>the floating part converted to uint128</returns>
-    /// <exception cref="std::invalid_argument"><param ref name="v"/> would
-    /// have caused undefined behavior.</exception>
-    template<concepts::builtin_floating_point TFloat>
-    uint128 safe_from_floating_or_throw(TFloat v);
-
-    /// <summary>
-    /// Convert a built-in floating point type to a uint128.
-    /// If the value of the float would cause the operation to
-    /// invoke undefined behavior, throw std::invalid_argument
-    /// </summary>
-    /// <param name="v">value to convert</param>
-    /// <returns>the floating part converted to uint128</returns>
-    template<concepts::builtin_floating_point TFloat>
-    std::optional<uint128> safe_from_floating(TFloat v) noexcept;
-	
 	//Comparison operators
 	constexpr std::strong_ordering operator <=>(uint128 lhs, uint128 rhs) noexcept; 
     constexpr bool operator==(uint128 lhs, uint128 rhs) noexcept;

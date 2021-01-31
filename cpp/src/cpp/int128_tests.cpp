@@ -178,6 +178,22 @@ void cjm::uint128_tests::validate_divmod_op(const binary_op_u128_t& op)
 	}	
 }
 
+cjm::uint128_tests::alt_ctrl_uint128_t cjm::uint128_tests::to_alt_ctrl(uint128_t convert) noexcept
+{
+    alt_ctrl_uint128_t ret = static_cast<std::uint64_t>(convert >> 64);
+    ret <<= 64;
+    ret |= static_cast<std::uint64_t>(convert);
+    return ret;
+}
+
+uint128_t cjm::uint128_tests::to_test(alt_ctrl_uint128_t convert) noexcept
+{
+    uint128_t ret = static_cast<std::uint64_t>(convert >> 64);
+    ret <<= 64;
+    ret |= static_cast<std::uint64_t>(convert);
+    return ret;
+}
+
 cjm::uint128_tests::ctrl_uint128_t cjm::uint128_tests::to_ctrl(uint128_t convert) 
 {
     ctrl_uint128_t ret = convert.high_part();
@@ -570,6 +586,12 @@ void cjm::uint128_tests::execute_test_convert_to_long_double()
     using flt_t = long double;
     constexpr auto oh_d00d_big_src = 0xc0de'd00d'dad0'0000'0000'0000'0000'0000_u128;
     constexpr auto oh_d00d_half_src = 0xc0de'd00d'dad0'0000_u128;
+    const auto oh_d00d_big_ctrl = to_ctrl(oh_d00d_big_src);
+    const auto oh_d00d_half_ctrl = to_ctrl(oh_d00d_half_src);
+    const auto oh_d00d_big_alt_ctrl = to_alt_ctrl(oh_d00d_big_src);
+    const auto oh_dood_half_alt_ctrl = to_alt_ctrl(oh_d00d_half_src);
+    cjm_assert(to_test(oh_d00d_big_alt_ctrl) == oh_d00d_big_src);
+    cjm_assert(to_test(oh_dood_half_alt_ctrl) == oh_d00d_half_src);
     const flt_t zero = 0.0;
     const flt_t one = 1.0;
     const flt_t zero_point_zero_one = 0.01;
@@ -577,15 +599,23 @@ void cjm::uint128_tests::execute_test_convert_to_long_double()
     const flt_t not_quite_as_big_ass_num = static_cast<flt_t>(0x8000'0000'0000'0000_u128);
     const flt_t oh_d00d_big = static_cast<flt_t>(0xc0de'd00d'0000'0000'0000'0000'0000'0000_u128);
     const flt_t oh_d00d_half = static_cast<flt_t>(0xc0de'd00d'0000'0000_u128);
+    const flt_t ctrl_oh_d00d_big = static_cast<flt_t>(oh_d00d_big_ctrl);
+    const flt_t ctrl_oh_d00d_half = static_cast<flt_t>(oh_d00d_half_ctrl);
+    const flt_t alt_ctrl_oh_d00d_big = static_cast<flt_t>(oh_d00d_big_alt_ctrl);
     cjm_assert_close_enough(static_cast<uint128_t>(zero), 0_u128);
     cjm_assert_close_enough(static_cast<uint128_t>(one), 1_u128);
     cjm_assert_close_enough(static_cast<uint128_t>(zero_point_zero_one), 0_u128);
     cjm_assert_close_enough(static_cast<uint128_t>(big_ass_num), 0x8000'0000'0000'0000'0000'0000'0000'0000_u128);
     cjm_assert_close_enough(static_cast<uint128_t>(not_quite_as_big_ass_num), 0x8000'0000'0000'0000_u128);
-    const auto rt_oh_d00d_big = static_cast<uint128_t>(oh_d00d_big);
+	const auto rt_oh_d00d_big = static_cast<uint128_t>(oh_d00d_big);
     const auto rt_oh_d00d_half = static_cast<uint128_t>(oh_d00d_half);
     cjm_assert_close_enough(rt_oh_d00d_big, oh_d00d_big_src);
     cjm_assert_close_enough(rt_oh_d00d_half, oh_d00d_half_src);
+    cjm_assert_close_enough(static_cast<uint128_t>(ctrl_oh_d00d_big), oh_d00d_big_src);
+    cjm_assert_close_enough(static_cast<uint128_t>(ctrl_oh_d00d_half), oh_d00d_half_src);
+    auto saver = cout_saver{ std::cout };
+    std::cout << "rt'd ctrl_oh_d00d_big: [0x" << std::hex << std::setw(std::numeric_limits<uint128_t>::digits / 4) << std::setfill('0') << static_cast<uint128_t>(ctrl_oh_d00d_big) << "]." << newl;
+    std::cout << "rt'd alt_ctrl_oh_d00d_big: [0x" << std::hex << std::setw(std::numeric_limits<uint128_t>::digits / 4) << std::setfill('0') << static_cast<uint128_t>(alt_ctrl_oh_d00d_big) << "]." << newl;
 }
 
 void cjm::uint128_tests::execute_throwing_float_conversion_test()
