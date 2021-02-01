@@ -1034,10 +1034,7 @@ void cjm::uint128_tests::execute_hash_dx()
     {
         auto hashes = std::unordered_set<size_t>{};
         hashes.reserve(num_hashes);
-
-        auto values = std::unordered_set<uint128_t>{};
-        values.reserve(num_hashes);
-            	
+        		            	
         auto vec = std::vector<uint128_t>{};
         vec.reserve(num_hashes);
 
@@ -1045,10 +1042,11 @@ void cjm::uint128_tests::execute_hash_dx()
         {
             vec.emplace_back(generator::create_random_in_range<uint128_t>(gen));
         }
-             
-        std::copy(vec.cbegin(), vec.cend(), std::inserter(values, values.begin()));
 
-        std::transform(vec.cbegin(), vec.cend(), std::inserter(hashes, hashes.begin()),
+        auto values = std::unordered_set<uint128_t>(vec.cbegin(), vec.cend());
+		        
+
+        std::transform(values.cbegin(), values.cend(), std::inserter(hashes, hashes.begin()),
         [](const uint128_t& v) -> size_t
         {
             return std::hash<uint128_t>{}(v);
