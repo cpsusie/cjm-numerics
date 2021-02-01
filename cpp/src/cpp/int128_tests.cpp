@@ -668,6 +668,7 @@ void cjm::uint128_tests::execute_uint128_tests()
     execute_test(execute_controlled_from_float_conversion_test, "controlled_from_float_conversion_test"sv);
     execute_test(execute_controlled_float_rt_conversion_test, "controlled_float_rt_conversion_test"sv);
 
+    execute_test(execute_issue_10_strm_insrt_test, "issue_10_strm_insrt_test"sv);
 	execute_test(execute_hash_dx, "hash_dx"sv);
 
 	cout << "STANDARD TEST BATTERY: All tests PASSED." << newl;
@@ -1071,6 +1072,93 @@ void cjm::uint128_tests::execute_hash_dx()
         << " unique values were generated.  Those values were reduced to "
         << unique_hashes << " unique hashes." << " There were " << difference
         << " colliding hash values." << newl;
+}
+
+void cjm::uint128_tests::execute_issue_10_strm_insrt_test()
+{
+    using pair_t = std::pair<uint128_t, size_t>;
+    using tuple_t = std::tuple<uint128_t, size_t, std::string>;
+    constexpr std::array<pair_t,7> x = 
+    {
+		std::make_pair(0x00_u128, 1_szt),
+		std::make_pair(0x01_u128, 1_szt),
+    	std::make_pair(0x10_u128, 2_szt),
+    	std::make_pair(0x100_u128, 3_szt),
+    	std::make_pair(0x1000, 4_szt),
+    	std::make_pair(0xfea2'dead'beef'f00d_u128, 16_szt),
+    	std::make_pair(0xc0de'd00d'fea2'cafe'babe'b00b'600d'f00d_u128, 32_szt)
+	};
+
+    auto make_string = [](const pair_t& p, bool setw) -> std::string
+    {
+        auto strm = string::make_throwing_sstream<char>();
+        strm << std::hex;
+        if (setw)
+        {
+            strm << std::setw(std::numeric_limits<uint128_t>::digits / 4)
+                << std::setfill('0') << p.first;
+        }
+        else
+        {
+            strm << p.first;
+        }
+        return strm.str();
+    };
+    constexpr auto setw_expect_width = static_cast<size_t>(std::numeric_limits<uint128_t>::digits / 4);
+    auto setw_res_vec = std::vector<tuple_t>{};
+    auto nosetw_res_vec = std::vector<tuple_t>{};
+	for (const auto& p : x)
+	{
+        std::string setw_str = make_string(p, true);
+        std::string nosetw_str = make_string(p, false);
+        if (setw_str.size() != setw_expect_width)
+            setw_res_vec.emplace_back(std::make_tuple(p.first, setw_expect_width, std::move(setw_str)));
+        if (nosetw_str.size() != p.second)
+            setw_res_vec.emplace_back(std::make_tuple(p.first, p.second, std::move(nosetw_str)));		
+	}
+
+	try
+	{
+        cjm_assert(setw_res_vec.empty() && nosetw_res_vec.empty());
+	}
+	catch (const testing_failure& ex)
+	{
+        auto saver = cout_saver{ std::cerr };
+        std::cerr << std::dec;
+        std::cerr << newl << "\tTest failed.  One or more string's were not the expected length." << newl;
+		if (!setw_res_vec.empty())
+		{
+            std::cerr   << "\tThe following " << setw_res_vec.size()
+						<< " results were made with setw and have unexpected lengths:" << newl;
+			for (const auto& [value, length,
+                text] : setw_res_vec)
+			{
+                std::cerr
+					<< "\t\tFor value: [0x" << std::hex << value
+					<< "], expected width: [" << std::dec
+					<< length << "]; text: [" << text << "]; actual length: ["
+					<< text.length() << "]." << newl;
+			}
+		}
+		if (!nosetw_res_vec.empty())
+		{
+            std::cerr << "\tThe following " << nosetw_res_vec.size()
+                << " results were made WITHOUT setw and have unexpected lengths:" << newl;
+            for (const auto& [value, length,
+                text] : setw_res_vec)
+            {
+                std::cerr
+                    << "\t\tFor value: [0x" << std::hex << value
+                    << "], expected width: [" << std::dec
+                    << length << "]; text: [" << text << "]; actual length: ["
+                    << text.length() << "]." << newl;
+            }
+		}
+        std::cerr
+			<< "Done printing failing results.  Original exception msg: ["
+			<< ex.what() << "]." << newl;
+        throw;
+	}	
 }
 
 void cjm::uint128_tests::execute_test_convert_to_float()
