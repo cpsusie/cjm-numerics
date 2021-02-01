@@ -667,7 +667,10 @@ void cjm::uint128_tests::execute_uint128_tests()
 
     execute_test(execute_controlled_from_float_conversion_test, "controlled_from_float_conversion_test"sv);
     execute_test(execute_controlled_float_rt_conversion_test, "controlled_float_rt_conversion_test"sv);
-    cout << "STANDARD TEST BATTERY: All tests PASSED." << newl;
+
+	execute_test(execute_hash_dx, "hash_dx"sv);
+
+	cout << "STANDARD TEST BATTERY: All tests PASSED." << newl;
     static_assert(most_sign_set_bit(2_u128) == 1);
 }
 
@@ -1020,6 +1023,56 @@ void cjm::uint128_tests::execute_controlled_float_rt_conversion_test()
 		test_u128_rt_float_conversion<long double>(v);
 	});
     cout << "long double passed." << newl;
+}
+
+void cjm::uint128_tests::execute_hash_dx()
+{
+    constexpr size_t num_hashes = 1'000'000;
+    auto gen = generator::rgen{};
+    size_t unique_values, unique_hashes, difference;
+	try
+    {
+        auto hashes = std::unordered_set<size_t>{};
+        hashes.reserve(num_hashes);
+
+        auto values = std::unordered_set<uint128_t>{};
+        values.reserve(num_hashes);
+            	
+        auto vec = std::vector<uint128_t>{};
+        vec.reserve(num_hashes);
+
+    	while (vec.size() < num_hashes)
+        {
+            vec.emplace_back(generator::create_random_in_range<uint128_t>(gen));
+        }
+             
+        std::copy(vec.cbegin(), vec.cend(), std::inserter(values, values.begin()));
+
+        std::transform(vec.cbegin(), vec.cend(), std::inserter(hashes, hashes.begin()),
+        [](const uint128_t& v) -> size_t
+        {
+            return std::hash<uint128_t>{}(v);
+        });
+        unique_values = values.size();
+        unique_hashes = hashes.size();
+        difference = unique_values - unique_hashes;    	
+    }
+	catch (const std::bad_alloc& ex)
+	{
+        std::cerr
+			<< "HASH_DX ran out of memory and could not be completed.  "
+			<<"This will not count as a failed test, but no diagnostic "
+			<<"info can be provided. Consider reducing num_hashes (currently: "
+			<< num_hashes << "), changing to x64 or getting more memory if "
+			<< "you want to see the results of this dx.  "
+			<< "Exception message: [" << ex.what() << "]." << newl;
+        return;
+	}
+	
+    std::cout << "Of " << num_hashes << " uint128_t's, " << unique_values
+        << " unique values were generated.  Those values were reduced to "
+        << unique_hashes << " unique hashes." << " There were " << difference
+        << " colliding hash values." << newl;
 }
 
 void cjm::uint128_tests::execute_test_convert_to_float()

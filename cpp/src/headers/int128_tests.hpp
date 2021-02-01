@@ -32,6 +32,7 @@
 #include <filesystem>
 #include <tuple>
 #include <span>
+#include <unordered_set>
 #include "istream_utils.hpp"
 #include "int128_test_switches.hpp"
 #include <absl/numeric/int128.h>
@@ -156,6 +157,8 @@ namespace cjm::uint128_tests
     void execute_safe_float_conversions_test();
     void execute_controlled_from_float_conversion_test();
     void execute_controlled_float_rt_conversion_test();
+
+    void execute_hash_dx();
 
 	void execute_unary_op_pre_inc_test();
     void execute_unary_op_post_inc_test();
