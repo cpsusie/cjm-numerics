@@ -668,7 +668,10 @@ void cjm::uint128_tests::execute_uint128_tests()
     execute_test(execute_controlled_from_float_conversion_test, "controlled_from_float_conversion_test"sv);
     execute_test(execute_controlled_float_rt_conversion_test, "controlled_float_rt_conversion_test"sv);
 
+    
+	
     execute_test(execute_issue_10_strm_insrt_test, "issue_10_strm_insrt_test"sv);
+    execute_test(execute_issue_10_showbase_test, "issue_10_showbase_test"sv);
 	execute_test(execute_hash_dx, "hash_dx"sv);
 
 	cout << "STANDARD TEST BATTERY: All tests PASSED." << newl;
@@ -1159,6 +1162,53 @@ void cjm::uint128_tests::execute_issue_10_strm_insrt_test()
 			<< ex.what() << "]." << newl;
         throw;
 	}	
+}
+
+void cjm::uint128_tests::execute_issue_10_showbase_test()
+{
+    using namespace std::string_view_literals;
+    constexpr auto one = 0x01_u128;
+    constexpr auto beef = 0xdead'beef_u128;
+    constexpr auto beef_prepend_1 = 0x1'dead'beef_u128;
+    constexpr auto cafe_babe = 0xc0de'd00d'fea2'cafe'babe'b00b'600d'f00d_u128;
+    auto get_string = [](const uint128_t& v, bool setw) -> std::string
+    {
+        auto stream = string::make_throwing_sstream<char>();
+        stream << std::hex << std::showbase;
+        if (setw)
+            stream << std::internal << std::setw(32) << std::setfill('0') << v;
+        else
+            stream << v;
+        return stream.str();
+    };
+	
+    
+    cjm_assert(get_string(one, false) == "0x1"sv);
+    cjm_assert(get_string(beef, false) == "0xdeadbeef"sv);
+    cjm_assert(get_string(beef_prepend_1, false) == "0x1deadbeef"sv);
+    cjm_assert(get_string(cafe_babe, false) == "0xc0ded00dfea2cafebabeb00b600df00d"sv);
+
+    constexpr auto expected_one = "0x00000000000000000000000000000001"sv;
+    cjm_assert(34_szt == expected_one.size());
+    const auto actual_one = get_string(one, true);
+
+    constexpr auto expected_beef = "0x000000000000000000000000deadbeef"sv;
+    cjm_assert(34_szt == expected_beef.size());
+    const auto actual_beef = get_string(beef, true);
+
+    constexpr auto expected_beef_prep_1 = "0x000000000000000000000001deadbeef"sv;
+    cjm_assert(34_szt == expected_beef_prep_1.size());
+	const auto actual_beef_prep_1 = get_string(beef_prepend_1, true);
+
+    constexpr auto expected_cafe_babe = "0xc0ded00dfea2cafebabeb00b600df00d"sv;
+    cjm_assert(34_szt == expected_cafe_babe.size());
+    const auto actual_cafe_babe = get_string(cafe_babe, true);
+	
+    cjm_assert(expected_one == actual_one);
+    cjm_assert(expected_beef == actual_beef);
+    cjm_assert(expected_beef_prep_1 == actual_beef_prep_1);
+    cjm_assert(expected_cafe_babe == actual_cafe_babe );
+	
 }
 
 void cjm::uint128_tests::execute_test_convert_to_float()

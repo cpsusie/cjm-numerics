@@ -160,6 +160,7 @@ namespace cjm::uint128_tests
 
     void execute_hash_dx();
     void execute_issue_10_strm_insrt_test();
+    void execute_issue_10_showbase_test();
 	
 	void execute_unary_op_pre_inc_test();
     void execute_unary_op_post_inc_test();

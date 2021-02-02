@@ -337,20 +337,21 @@ namespace cjm
 			using common_type_t = std::common_type_t<str_size_t, std::streamsize>;
 			if (static_cast<common_type_t>(width) > static_cast<common_type_t>( rep.size()))
 			{
+                const auto width_less_size = static_cast<str_size_t>(static_cast<common_type_t>(width)
+                    - static_cast<common_type_t>(rep.size()));
 				iosflags adjustfield = flags & ios::adjustfield;
 				if (adjustfield == ios::left)
 				{
-					rep.append(static_cast<str_size_t>(static_cast<common_type_t>(width) - static_cast<common_type_t>(rep.size())), os.fill());
+					rep.append(width_less_size, os.fill());
 				}
-				else if (adjustfield == ios::internal && (flags & ios::showbase) && (flags & ios::basefield) == ios::hex && v != 0)
+				else if (adjustfield == ios::internal && (flags & ios::showbase) 
+                    && (flags & ios::basefield) == ios::hex && v != 0)
 				{
-					width = static_cast<common_type_t>(rep.size());
-					rep.insert(2, static_cast<str_size_t>(width), os.fill());
+					rep.insert(2, width_less_size+2, os.fill());
 				}
 				else
 				{
-					width = static_cast<common_type_t>(rep.size());
-					rep.insert(0, static_cast<str_size_t>(width), os.fill());
+					rep.insert(0, width_less_size, os.fill());
 				}
 			}
 			return os << rep;
@@ -383,7 +384,8 @@ namespace cjm
                         is.get(c);
                         if (!is.bad() && !is.fail())
                         {
-                            if (!std::isspace<char>(static_cast<char>(static_cast<unsigned char>(c)), std::locale("")))
+                            if (!std::isspace<char>(
+                                static_cast<char>(static_cast<unsigned char>(c)), std::locale("")))
                                 str.push_back(c);
                             else
                                 break;
