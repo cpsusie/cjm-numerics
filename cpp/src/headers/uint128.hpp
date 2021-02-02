@@ -365,7 +365,7 @@ namespace cjm::numerics
 			requires cjm::numerics::concepts::char_with_traits_and_allocator<Chars, CharTraits, Allocator>
         static uint128 make_from_string(const std::basic_string<Chars, CharTraits, Allocator>& parseMe);
 
-
+        friend constexpr int_part add_with_carry(int_part low, int_part high, unsigned char carry_in, unsigned char& carry_out) noexcept;
 
         static constexpr uint128 make_from_bytes_little_endian(byte_array bytes) noexcept;
         static constexpr uint128 make_from_bytes_big_endian(byte_array bytes) noexcept;

@@ -1667,7 +1667,31 @@ namespace cjm
                 return uint128::fls(value);
             }
         }
-       
+
+
+        constexpr uint128::int_part add_with_carry(uint128::int_part low, uint128::int_part high,
+	        unsigned char carry_in, unsigned char& carry_out) noexcept
+        {
+	        if (std::is_constant_evaluated())
+	        {
+		        
+	        }
+        	else
+        	{
+                if constexpr (calculation_mode == uint128_calc_mode::intrinsic_u128)
+                {
+                    
+                }
+                else if constexpr (calculation_mode == uint128_calc_mode::msvc_x64)
+                {
+                    
+                }
+                else
+                {
+                	
+                }
+        	}
+        }
 
         constexpr uint128 operator/(uint128 lhs, uint128 rhs)
 		{
