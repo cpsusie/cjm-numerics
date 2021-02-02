@@ -1676,8 +1676,8 @@ namespace cjm
 	        {
 		        
 	        }
-        	else
-        	{
+			else
+			{
                 if constexpr (calculation_mode == uint128_calc_mode::intrinsic_u128)
                 {
                     
