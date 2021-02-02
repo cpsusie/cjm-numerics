@@ -337,20 +337,21 @@ namespace cjm
 			using common_type_t = std::common_type_t<str_size_t, std::streamsize>;
 			if (static_cast<common_type_t>(width) > static_cast<common_type_t>( rep.size()))
 			{
+                const auto width_less_size = static_cast<str_size_t>(static_cast<common_type_t>(width)
+                    - static_cast<common_type_t>(rep.size()));
 				iosflags adjustfield = flags & ios::adjustfield;
 				if (adjustfield == ios::left)
 				{
-					rep.append(static_cast<str_size_t>(static_cast<common_type_t>(width) - static_cast<common_type_t>(rep.size())), os.fill());
+					rep.append(width_less_size, os.fill());
 				}
-				else if (adjustfield == ios::internal && (flags & ios::showbase) && (flags & ios::basefield) == ios::hex && v != 0)
+				else if (adjustfield == ios::internal && (flags & ios::showbase) 
+                    && (flags & ios::basefield) == ios::hex && v != 0)
 				{
-					width = static_cast<common_type_t>(rep.size());
-					rep.insert(2, static_cast<str_size_t>(width), os.fill());
+					rep.insert(2, width_less_size+2, os.fill());
 				}
 				else
 				{
-					width = static_cast<common_type_t>(rep.size());
-					rep.insert(0, static_cast<str_size_t>(width), os.fill());
+					rep.insert(0, width_less_size, os.fill());
 				}
 			}
 			return os << rep;
@@ -383,7 +384,8 @@ namespace cjm
                         is.get(c);
                         if (!is.bad() && !is.fail())
                         {
-                            if (!std::isspace<char>(static_cast<char>(static_cast<unsigned char>(c)), std::locale("")))
+                            if (!std::isspace<char>(
+                                static_cast<char>(static_cast<unsigned char>(c)), std::locale("")))
                                 str.push_back(c);
                             else
                                 break;
@@ -991,10 +993,10 @@ namespace cjm
 			else // ReSharper disable once CppUnreachableCode
 			{
 				//todo fixit examine this .... something is fishy here
-				size_t hi_hi = hi >> 32;
-				size_t hi_low = static_cast<size_t>(hi & 0x0000'ffff);
-				size_t low_hi = low >> 32;
-				size_t low_low = static_cast<size_t>(low & 0x0000'ffff);
+				size_t hi_hi = static_cast<size_t>(hi >> 32);
+				size_t hi_low = static_cast<size_t>(hi & 0xffff'ffff);
+				size_t low_hi = static_cast<size_t>(low >> 32);
+				size_t low_low = static_cast<size_t>(low & 0xffff'ffff);
 
 				hash = low_low + 0x9e37'79b9 + (hash << 6) + (hash >> 2);
 				hash = low_hi + 0x9e37'79b9 + (hash << 6) + (hash >> 2);

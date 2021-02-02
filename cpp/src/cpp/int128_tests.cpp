@@ -667,7 +667,14 @@ void cjm::uint128_tests::execute_uint128_tests()
 
     execute_test(execute_controlled_from_float_conversion_test, "controlled_from_float_conversion_test"sv);
     execute_test(execute_controlled_float_rt_conversion_test, "controlled_float_rt_conversion_test"sv);
-    cout << "STANDARD TEST BATTERY: All tests PASSED." << newl;
+
+    
+	
+    execute_test(execute_issue_10_strm_insrt_test, "issue_10_strm_insrt_test"sv);
+    execute_test(execute_issue_10_showbase_test, "issue_10_showbase_test"sv);
+	execute_test(execute_hash_dx, "hash_dx"sv);
+
+	cout << "STANDARD TEST BATTERY: All tests PASSED." << newl;
     static_assert(most_sign_set_bit(2_u128) == 1);
 }
 
@@ -1020,6 +1027,188 @@ void cjm::uint128_tests::execute_controlled_float_rt_conversion_test()
 		test_u128_rt_float_conversion<long double>(v);
 	});
     cout << "long double passed." << newl;
+}
+
+void cjm::uint128_tests::execute_hash_dx()
+{
+    constexpr size_t num_hashes = 1'000'000;
+    auto gen = generator::rgen{};
+    size_t unique_values, unique_hashes, difference;
+	try
+    {
+        auto hashes = std::unordered_set<size_t>{};
+        hashes.reserve(num_hashes);
+        		            	
+        auto vec = std::vector<uint128_t>{};
+        vec.reserve(num_hashes);
+
+    	while (vec.size() < num_hashes)
+        {
+            vec.emplace_back(generator::create_random_in_range<uint128_t>(gen));
+        }
+
+        auto values = std::unordered_set<uint128_t>(vec.cbegin(), vec.cend());
+		        
+
+        std::transform(values.cbegin(), values.cend(), std::inserter(hashes, hashes.begin()),
+        [](const uint128_t& v) -> size_t
+        {
+            return std::hash<uint128_t>{}(v);
+        });
+        unique_values = values.size();
+        unique_hashes = hashes.size();
+        difference = unique_values - unique_hashes;    	
+    }
+	catch (const std::bad_alloc& ex)
+	{
+        std::cerr
+			<< "HASH_DX ran out of memory and could not be completed.  "
+			<<"This will not count as a failed test, but no diagnostic "
+			<<"info can be provided. Consider reducing num_hashes (currently: "
+			<< num_hashes << "), changing to x64 or getting more memory if "
+			<< "you want to see the results of this dx.  "
+			<< "Exception message: [" << ex.what() << "]." << newl;
+        return;
+	}
+	
+    std::cout << "Of " << num_hashes << " uint128_t's, " << unique_values
+        << " unique values were generated.  Those values were reduced to "
+        << unique_hashes << " unique hashes." << " There were " << difference
+        << " colliding hash values." << newl;
+}
+
+void cjm::uint128_tests::execute_issue_10_strm_insrt_test()
+{
+    using pair_t = std::pair<uint128_t, size_t>;
+    using tuple_t = std::tuple<uint128_t, size_t, std::string>;
+    constexpr std::array<pair_t,7> x = 
+    {
+		std::make_pair(0x00_u128, 1_szt),
+		std::make_pair(0x01_u128, 1_szt),
+    	std::make_pair(0x10_u128, 2_szt),
+    	std::make_pair(0x100_u128, 3_szt),
+    	std::make_pair(0x1000, 4_szt),
+    	std::make_pair(0xfea2'dead'beef'f00d_u128, 16_szt),
+    	std::make_pair(0xc0de'd00d'fea2'cafe'babe'b00b'600d'f00d_u128, 32_szt)
+	};
+
+    auto make_string = [](const pair_t& p, bool setw) -> std::string
+    {
+        auto strm = string::make_throwing_sstream<char>();
+        strm << std::hex;
+        if (setw)
+        {
+            strm << std::setw(std::numeric_limits<uint128_t>::digits / 4)
+                << std::setfill('0') << p.first;
+        }
+        else
+        {
+            strm << p.first;
+        }
+        return strm.str();
+    };
+    constexpr auto setw_expect_width = static_cast<size_t>(std::numeric_limits<uint128_t>::digits / 4);
+    auto setw_res_vec = std::vector<tuple_t>{};
+    auto nosetw_res_vec = std::vector<tuple_t>{};
+	for (const auto& p : x)
+	{
+        std::string setw_str = make_string(p, true);
+        std::string nosetw_str = make_string(p, false);
+        if (setw_str.size() != setw_expect_width)
+            setw_res_vec.emplace_back(std::make_tuple(p.first, setw_expect_width, std::move(setw_str)));
+        if (nosetw_str.size() != p.second)
+            setw_res_vec.emplace_back(std::make_tuple(p.first, p.second, std::move(nosetw_str)));		
+	}
+
+	try
+	{
+        cjm_assert(setw_res_vec.empty() && nosetw_res_vec.empty());
+	}
+	catch (const testing_failure& ex)
+	{
+        auto saver = cout_saver{ std::cerr };
+        std::cerr << std::dec;
+        std::cerr << newl << "\tTest failed.  One or more string's were not the expected length." << newl;
+		if (!setw_res_vec.empty())
+		{
+            std::cerr   << "\tThe following " << setw_res_vec.size()
+						<< " results were made with setw and have unexpected lengths:" << newl;
+			for (const auto& [value, length,
+                text] : setw_res_vec)
+			{
+                std::cerr
+					<< "\t\tFor value: [0x" << std::hex << value
+					<< "], expected width: [" << std::dec
+					<< length << "]; text: [" << text << "]; actual length: ["
+					<< text.length() << "]." << newl;
+			}
+		}
+		if (!nosetw_res_vec.empty())
+		{
+            std::cerr << "\tThe following " << nosetw_res_vec.size()
+                << " results were made WITHOUT setw and have unexpected lengths:" << newl;
+            for (const auto& [value, length,
+                text] : setw_res_vec)
+            {
+                std::cerr
+                    << "\t\tFor value: [0x" << std::hex << value
+                    << "], expected width: [" << std::dec
+                    << length << "]; text: [" << text << "]; actual length: ["
+                    << text.length() << "]." << newl;
+            }
+		}
+        std::cerr
+			<< "Done printing failing results.  Original exception msg: ["
+			<< ex.what() << "]." << newl;
+        throw;
+	}	
+}
+
+void cjm::uint128_tests::execute_issue_10_showbase_test()
+{
+    using namespace std::string_view_literals;
+    constexpr auto one = 0x01_u128;
+    constexpr auto beef = 0xdead'beef_u128;
+    constexpr auto beef_prepend_1 = 0x1'dead'beef_u128;
+    constexpr auto cafe_babe = 0xc0de'd00d'fea2'cafe'babe'b00b'600d'f00d_u128;
+    auto get_string = [](const uint128_t& v, bool setw) -> std::string
+    {
+        auto stream = string::make_throwing_sstream<char>();
+        stream << std::hex << std::showbase;
+        if (setw)
+            stream << std::internal << std::setw(32) << std::setfill('0') << v;
+        else
+            stream << v;
+        return stream.str();
+    };
+	
+    
+    cjm_assert(get_string(one, false) == "0x1"sv);
+    cjm_assert(get_string(beef, false) == "0xdeadbeef"sv);
+    cjm_assert(get_string(beef_prepend_1, false) == "0x1deadbeef"sv);
+    cjm_assert(get_string(cafe_babe, false) == "0xc0ded00dfea2cafebabeb00b600df00d"sv);
+
+    constexpr auto expected_one = "0x00000000000000000000000000000001"sv;
+    cjm_assert(34_szt == expected_one.size());
+    const auto actual_one = get_string(one, true);
+
+    constexpr auto expected_beef = "0x000000000000000000000000deadbeef"sv;
+    cjm_assert(34_szt == expected_beef.size());
+    const auto actual_beef = get_string(beef, true);
+
+    constexpr auto expected_beef_prep_1 = "0x000000000000000000000001deadbeef"sv;
+    cjm_assert(34_szt == expected_beef_prep_1.size());
+	const auto actual_beef_prep_1 = get_string(beef_prepend_1, true);
+
+    constexpr auto expected_cafe_babe = "0xc0ded00dfea2cafebabeb00b600df00d"sv;
+    cjm_assert(34_szt == expected_cafe_babe.size());
+    const auto actual_cafe_babe = get_string(cafe_babe, true);
+	
+    cjm_assert(expected_one == actual_one);
+    cjm_assert(expected_beef == actual_beef);
+    cjm_assert(expected_beef_prep_1 == actual_beef_prep_1);
+    cjm_assert(expected_cafe_babe == actual_cafe_babe );
+	
 }
 
 void cjm::uint128_tests::execute_test_convert_to_float()
