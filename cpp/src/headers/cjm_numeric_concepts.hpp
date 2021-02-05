@@ -134,6 +134,9 @@ namespace cjm::numerics::concepts
     template<typename T, size_t Size>
     concept matches_size = (sizeof(T) == Size);
 
+    template<typename T, size_t Digits>
+    concept matches_digits = (std::numeric_limits<T>::digits == Digits);
+
 	template<typename TArray, typename TElement, size_t Size>
     concept is_array_of_T_of_size = std::is_same_v<std::array<TElement, Size>, TArray>;
 
@@ -228,8 +231,6 @@ namespace cjm::numerics::concepts
         // template<cjm::numerics::concepts::can_find_most_significant_set_bitpos UI>
         // constexpr int most_sign_set_bit(UI value) noexcept;
         can_find_most_significant_set_bitpos<T> &&
-        //limb tye is half size of type
-        (sizeof(typename T::int_part) == sizeof(T) /2) &&
         //has static constexpr member called int_parts_bits equal to number of bits in int_part
 		(T::int_part_bits == std::numeric_limits<typename T::int_part>::digits) &&
         //has static constexpr member called int_part_bottom_half_bits that equals half of int_part_bits
@@ -275,8 +276,8 @@ namespace cjm::numerics::concepts
         std::totally_ordered<T> &&
         //its int_part dependent type (i.e. limb type) is an unsigned integer type
         unsigned_integer<typename T::int_part> &&
-        //its int_part dependent type (i.e. limb type) is half its size
-        matches_size<typename T::int_part, (sizeof(T) / 2)> && //its int_part_type 
+        //its int_part dependent type (i.e. limb type) is half its size (in binary digits)
+        matches_digits<typename T::int_part, std::numeric_limits<T>::digits / 2> && //its int_part_type
         //defines dependent type byte_array as a std::array of unsigned char of length equal to sizeof(T)
         is_array_of_T_of_size<typename T::byte_array, unsigned char, sizeof(T)> &&
         //can be hashed without throwing any exception by using a specialization of std::hash
@@ -364,9 +365,8 @@ namespace cjm::numerics::concepts
         {y &= x_const}                      noexcept;
         {y |= x_const}                      noexcept;
         {y ^= x_const}                      noexcept;
-        //todo fixit implement
-        //{y <<= x_const}                   noexcept;
-        //{y >>= x_const}                   noexcept;
+        {y <<= x_const}                     noexcept;
+        {y >>= x_const}                     noexcept;
         {y <<= s}                           noexcept;
         {y >>= s}                           noexcept;
         //implements the following compound assignment operators which may throw exceptions:

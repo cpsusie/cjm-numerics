@@ -877,15 +877,45 @@ namespace cjm
 
 		constexpr uint128& uint128::operator<<=(int amount) noexcept
 		{
+            assert(amount > -1 && amount < std::numeric_limits<uint128>::digits);
 			*this = *this << amount;
 			return *this;
 		}
 
 		constexpr uint128& uint128::operator>>=(int amount) noexcept
 		{
+            assert(amount > -1 && amount < std::numeric_limits<uint128>::digits);
 			*this = *this >> amount;
 			return *this;
 		}
+
+        constexpr uint128& uint128::operator<<=(unsigned amount) noexcept
+        {
+            assert(amount < std::numeric_limits<uint128>::digits);
+            *this = *this << amount;
+            return *this;
+        }
+
+        constexpr uint128& uint128::operator>>=(unsigned amount) noexcept
+        {
+            assert( amount < std::numeric_limits<uint128>::digits);
+            *this = *this >> amount;
+            return *this;
+        }
+
+        constexpr uint128& uint128::operator<<=(uint128 amount) noexcept
+        {
+            assert(amount < std::numeric_limits<uint128>::digits);
+            *this = *this << amount;
+            return *this;
+        }
+
+        constexpr uint128& uint128::operator>>=(uint128 amount) noexcept
+        {
+            assert( amount < std::numeric_limits<uint128>::digits);
+            *this = *this >> amount;
+            return *this;
+        }
 
 		constexpr uint128& uint128::operator&=(uint128 other) noexcept
 		{

@@ -448,6 +448,10 @@ namespace cjm::numerics
         constexpr uint128 operator--(int) noexcept;
         constexpr uint128& operator<<=(int amount) noexcept;
         constexpr uint128& operator>>=(int amount) noexcept;
+        constexpr uint128& operator<<=(unsigned amount) noexcept;
+        constexpr uint128& operator>>=(unsigned amount) noexcept;
+        constexpr uint128& operator<<=(uint128 amount) noexcept;
+        constexpr uint128& operator>>=(uint128 amount) noexcept;
         constexpr uint128& operator&=(uint128 other) noexcept;
         constexpr uint128& operator|=(uint128 other) noexcept;
         constexpr uint128& operator^=(uint128 other) noexcept;
