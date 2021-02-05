@@ -1529,10 +1529,15 @@ namespace cjm
                 {
                     return static_cast<natuint128_t>(lhs) + static_cast<natuint128_t>(rhs);
                 }
-//	            else if constexpr (calculation_mode == uint128_calc_mode::msvc_x64)
-//              {
-//
-//              }
+	            else if constexpr (calculation_mode == uint128_calc_mode::msvc_x64)
+				{
+                    uint128 ret = 0;
+                    unsigned char carry_in = 0;
+                    unsigned char carry_out = CJM_ADDCARRY64(carry_in, lhs.m_low, rhs.m_low, &(ret.m_low));
+                    carry_in = carry_out;
+                    carry_out = CJM_ADDCARRY64(carry_in, lhs.m_high, rhs.m_high, &(ret.m_high));
+                    return ret;
+				}
                 else // constexpr (calculation_mode == uint128_calc_mode::default_eval)
                 {
                     uint128 result = uint128::make_uint128(lhs.high_part() + rhs.high_part(),
@@ -1669,26 +1674,37 @@ namespace cjm
         }
 
 
-        constexpr uint128::int_part add_with_carry(uint128::int_part low, uint128::int_part high,
+        constexpr uint128::int_part add_with_carry(uint128::int_part lhs, uint128::int_part rhs,
 	        unsigned char carry_in, unsigned char& carry_out) noexcept
         {
+            using int_t = typename uint128::int_part;
 	        if (std::is_constant_evaluated())
 	        {
-		        
+                int_t ret = lhs;
+                int_t max = std::max(lhs, rhs);
+                if (carry_in)
+                    ++ret;
+                ret += rhs;
+                carry_out = ret < max ? 1 : 0;
+                return ret;
 	        }
 			else
 			{
-                if constexpr (calculation_mode == uint128_calc_mode::intrinsic_u128)
+                if constexpr (calculation_mode == uint128_calc_mode::msvc_x64)
                 {
-                    
-                }
-                else if constexpr (calculation_mode == uint128_calc_mode::msvc_x64)
-                {
-                    
+                    int_t ret = 0;
+                    carry_out = CJM_ADDCARRY64(carry_in, lhs, rhs, &ret);
+                    return ret;
                 }
                 else
                 {
-                	
+                    int_t ret = lhs;
+                    int_t max = std::max(lhs, rhs);
+                    if (carry_in)
+                        ++ret;
+                    ret += rhs;
+                    carry_out = ret < max ? 1 : 0;
+                    return ret;
                 }
         	}
         }

@@ -437,6 +437,7 @@ namespace cjm::numerics
         [[nodiscard]] constexpr size_t hash_code() const noexcept;
                
         // Arithmetic operators.
+        friend constexpr uint128 operator+(uint128 lhs, uint128 rhs) noexcept;
         constexpr uint128& operator+=(uint128 other) noexcept;
         constexpr uint128& operator-=(uint128 other) noexcept;
         constexpr uint128& operator*=(uint128 other) noexcept;

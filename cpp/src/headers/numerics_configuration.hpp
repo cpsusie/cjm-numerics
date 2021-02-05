@@ -20,6 +20,7 @@
 #define CJM_UDIV128 _udiv128
 #define CJM_LSHIFT128 __shiftleft128
 #define CJM_RSHIFT128 __shiftright128
+#define CJM_ADDCARRY64 _addcarry_u64
 #endif
 #else
 #define CJM_UMUL128 internal::cjm_bad_umul128
@@ -28,6 +29,7 @@
 #define CJM_UDIV128 internal::cjm_bad_udiv128
 #define CJM_LSHIFT128 internal::cjm_bad_shiftleft128
 #define CJM_RSHIFT128 internal::cjm_bad_shiftright128
+#define CJM_ADDCARRY64 internal::cjm_bad_addc64
 #endif
 #include <climits>
 #include <cmath>
@@ -76,6 +78,7 @@ namespace cjm
 			extern std::uint64_t cjm_bad_udiv128(std::uint64_t high_dividend, std::uint64_t low_dividend, std::uint64_t divisor, std::uint64_t* remainder);
 			extern std::uint64_t cjm_bad_shiftleft128(std::uint64_t low, std::uint64_t high, unsigned char shift_amount);
 			extern std::uint64_t cjm_bad_shiftright128(std::uint64_t low, std::uint64_t high, unsigned char shift_amount);
+			extern unsigned char cjm_bad_addc64(unsigned char c_in, std::uint64_t x, std::uint64_t y, std::uint64_t* sum) noexcept;
 		}
 
 		enum class compiler_used : unsigned
