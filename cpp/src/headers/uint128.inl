@@ -1545,11 +1545,11 @@ namespace cjm
 		{
             if (std::is_constant_evaluated())
             {
-                uint128 result = uint128::make_uint128(lhs.high_part() + rhs.high_part(),
-                                                      lhs.low_part() + rhs.low_part());
-                if (result.low_part() < lhs.low_part()) // check for carry
+                auto result = uint128{ lhs.m_high + rhs.m_high,
+                                                      lhs.m_low + rhs.m_low};
+                if (result.m_low < lhs.m_low) // check for carry
                 {
-                    return uint128::make_uint128(result.high_part() + 1, result.low_part());
+                    ++result.m_high;                    
                 }
                 return result;
             }  // ReSharper disable once CppRedundantElseKeywordInsideCompoundStatement
@@ -1570,11 +1570,11 @@ namespace cjm
 				}
                 else // constexpr (calculation_mode == uint128_calc_mode::default_eval)
                 {
-                    uint128 result = uint128::make_uint128(lhs.high_part() + rhs.high_part(),
-                                                          lhs.low_part() + rhs.low_part());
-                    if (result.low_part() < lhs.low_part()) // check for carry
+                    auto result = uint128{ lhs.m_high + rhs.m_high,
+                                                       lhs.m_low + rhs.m_low };
+                    if (result.m_low < lhs.m_low) // check for carry
                     {
-                        return uint128::make_uint128(result.high_part() + 1, result.low_part());
+                        ++result.m_high;
                     }
                     return result;
                 }
@@ -1585,11 +1585,10 @@ namespace cjm
 		{
             if (std::is_constant_evaluated())
             {
-                uint128 result = uint128::make_uint128(lhs.high_part() - rhs.high_part(),
-                                                      lhs.low_part() - rhs.low_part());
-                if (lhs.low_part() < rhs.low_part()) // check for borrow
+                auto result = uint128{ lhs.m_high - rhs.m_high, lhs.m_low - rhs.m_low };
+                if (lhs.m_low < rhs.m_low) // check for borrow
                 {
-                    return uint128::make_uint128(result.high_part() - 1, result.low_part());
+                    --result.m_high;
                 }
                 return result;
             }  // ReSharper disable once CppRedundantElseKeywordInsideCompoundStatement
@@ -1599,17 +1598,22 @@ namespace cjm
                 {
                     return static_cast<natuint128_t>(lhs) - static_cast<natuint128_t>(rhs);
                 }
-//	            else if constexpr (calculation_mode == uint128_calc_mode::msvc_x64)
-//              {
-//
-//              }
+	            else if constexpr (calculation_mode == uint128_calc_mode::msvc_x64)
+				{
+                    uint128 ret = 0;
+                    unsigned char carry_in = 0;
+                    unsigned char carry_out = 0;
+	            	carry_out = CJM_SUBBORROW_64(carry_in, lhs.m_low, rhs.m_low, &(ret.m_low));
+                    carry_in = carry_out;
+                    carry_out = CJM_SUBBORROW_64(carry_in, lhs.m_high, rhs.m_high, &(ret.m_high));
+                    return ret;
+				}
                 else // constexpr (calculation_mode == uint128_calc_mode::default_eval)
                 {
-                    uint128 result = uint128::make_uint128(lhs.high_part() - rhs.high_part(),
-                                                          lhs.low_part() - rhs.low_part());
-                    if (lhs.low_part() < rhs.low_part()) // check for borrow
+                    auto result = uint128{ lhs.m_high - rhs.m_high, lhs.m_low - rhs.m_low };
+                    if (lhs.m_low < rhs.m_low) // check for borrow
                     {
-                        return uint128::make_uint128(result.high_part() - 1, result.low_part());
+                        --result.m_high;
                     }
                     return result;
                 }
@@ -1618,7 +1622,7 @@ namespace cjm
 		constexpr uint128 operator*(uint128 lhs, uint128 rhs) noexcept
 		{
             if (std::is_constant_evaluated())
-            {
+			{
                 using int_part = uint128::int_part;
                 int_part a32 = lhs.low_part() >> uint128::int_part_bottom_half_bits;
                 int_part a00 = lhs.low_part() & uint128::int_part_bottom_half_bitmask;
@@ -1632,9 +1636,9 @@ namespace cjm
                 result += uint128(a32 * b00) << uint128::int_part_bottom_half_bits;
                 result += uint128(a00 * b32) << uint128::int_part_bottom_half_bits;
                 return result;
-            }// NOLINT(readability-misleading-indentation)
+			}// NOLINT(readability-misleading-indentation)
 	            // ReSharper disable once CppRedundantElseKeywordInsideCompoundStatement
-            else // ReSharper disable once CppUnreachableCode 
+			else // ReSharper disable once CppUnreachableCode 
 			{   
                 if constexpr (calculation_mode == uint128_calc_mode::intrinsic_u128)
 				{
@@ -1738,6 +1742,44 @@ namespace cjm
                 }
         	}
         }
+
+        constexpr uint128::int_part sub_with_borrow(uint128::int_part minuend, uint128::int_part subtrahend,
+            unsigned char borrow_in, unsigned char& borrow_out) noexcept
+        {
+            using int_t = typename uint128::int_part;
+            if (std::is_constant_evaluated())
+            {
+                int_t ret = minuend;
+                if (borrow_in)
+                {
+                	--ret;
+                }
+                ret -= subtrahend;
+                borrow_out = ret > minuend ? 0 : 1;
+                return ret;
+            }
+            else
+            {
+                if constexpr (calculation_mode == uint128_calc_mode::msvc_x64)
+                {
+                    int_t ret = 0;
+                    borrow_out = CJM_SUBBORROW_64(borrow_in, minuend, subtrahend, &ret);
+                    return ret;
+                }
+                else
+                {
+                    int_t ret = minuend;
+                    if (borrow_in)
+                    {
+                        --ret;
+                    }
+                    ret -= subtrahend;
+                    borrow_out = ret > minuend ? 0 : 1;
+                    return ret;
+                }
+            }
+        }
+		
 
         constexpr uint128 operator/(uint128 lhs, uint128 rhs)
 		{

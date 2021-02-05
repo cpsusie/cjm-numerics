@@ -365,8 +365,27 @@ namespace cjm::numerics
 			requires cjm::numerics::concepts::char_with_traits_and_allocator<Chars, CharTraits, Allocator>
         static uint128 make_from_string(const std::basic_string<Chars, CharTraits, Allocator>& parseMe);
 
-        friend constexpr int_part add_with_carry(int_part low, int_part high, unsigned char carry_in, unsigned char& carry_out) noexcept;
-
+        /// <summary>
+        /// future functionality -- add with carry
+        /// </summary>
+        /// <param name="first_addend">first addend</param>
+        /// <param name="second_addend">second addend</param>
+        /// <param name="carry_in">carry in</param>
+        /// <param name="carry_out">carry out</param>
+        /// <returns>sum</returns>
+        /// <remarks>NOT TESTED </remarks>
+        friend constexpr int_part add_with_carry(int_part first_addend, int_part second_addend, 
+            unsigned char carry_in, unsigned char& carry_out) noexcept;
+        /// <summary>
+		/// future functionality -- subtraction with borrow
+		/// </summary>
+		/// <param name="minuend">the minuend</param>
+		/// <param name="subtrahend">the subtrahend</param>
+		/// <param name="borrow_in">borrow in</param>
+		/// <param name="borrow_out">borrow out</param>
+		/// <returns>difference</returns>
+		/// <remarks>NOT TESTED </remarks>
+        friend constexpr int_part sub_with_borrow(int_part minuend, int_part subtrahend, unsigned char borrow_in, unsigned char& borrow_out) noexcept;
         static constexpr uint128 make_from_bytes_little_endian(byte_array bytes) noexcept;
         static constexpr uint128 make_from_bytes_big_endian(byte_array bytes) noexcept;
         static constexpr uint128 make_uint128(std::uint64_t high, std::uint64_t low) noexcept;
@@ -438,6 +457,7 @@ namespace cjm::numerics
                
         // Arithmetic operators.
         friend constexpr uint128 operator+(uint128 lhs, uint128 rhs) noexcept;
+        friend constexpr uint128 operator-(uint128 lhs, uint128 rhs) noexcept;
         constexpr uint128& operator+=(uint128 other) noexcept;
         constexpr uint128& operator-=(uint128 other) noexcept;
         constexpr uint128& operator*=(uint128 other) noexcept;
