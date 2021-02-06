@@ -2644,7 +2644,19 @@ namespace cjm::numerics::internal
             }
             return static_cast<std::uint64_t>(v);
         }
-    }    
+    }
+
+	template<concepts::builtin_128bit_unsigned_integer Ui128>
+	Ui128 add_with_carry(Ui128 first_addend, Ui128 second_addend, unsigned char carry_in,
+		unsigned char& carry_out) noexcept
+	{
+		Ui128 ret = first_addend;
+		if (carry_in)
+			++ret;
+		ret += second_addend;
+		carry_out = ret < first_addend ? 1 : 0;
+		return ret;
+	}
 }
 
 namespace cjm::numerics

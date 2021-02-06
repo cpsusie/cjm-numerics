@@ -674,6 +674,8 @@ void cjm::uint128_tests::execute_uint128_tests()
     execute_test(execute_issue_10_showbase_test, "issue_10_showbase_test"sv);
 	execute_test(execute_hash_dx, "hash_dx"sv);
 
+	execute_test(execute_builtin_add_with_carry_test, "builtin_add_with_carry_test"sv);
+
 	cout << "STANDARD TEST BATTERY: All tests PASSED." << newl;
     static_assert(most_sign_set_bit(2_u128) == 1);
 }
@@ -3916,7 +3918,53 @@ void cjm::uint128_tests::generator::rgen::shuffle(binary_op_u128_vect_t& vec, si
     assert(end <= vec.end());
     std::shuffle(begin, end, m_gen->m_twister);        
 }
+void cjm::uint128_tests::execute_builtin_add_with_carry_test()
+{
+	if constexpr (cjm::numerics::concepts::builtin_128bit_unsigned_integer<cjm::numerics::natuint128_t>)
+	{
+		using nat_u128_t = cjm::numerics::natuint128_t;
 
+		auto print_input = [] (unsigned char in, uint128_t lhs, uint128_t rhs) -> void
+		{
+			auto saver = cout_saver{cout};
+			std::cout
+				<< "Executing add with carry for inputs -- carry in: [" << std::dec
+				<< static_cast<unsigned>(in) << "], lhs: [0x" << std::hex << std::setw(32)
+				<< std::setfill('0') << lhs << "], rhs: [0x" << std::hex << std::setw(32)
+				<< std::setfill('0') << rhs << "]." << newl;
+		};
+
+		auto print_sum = [] (unsigned char out, uint128_t sum) -> void
+		{
+			auto saver = cout_saver{cout};
+			std::cout
+				<< "Result: sum: [0x" << std::hex << std::setw(32) << std::setfill('0')
+				<< sum << "], out: [" << std::dec
+				<< static_cast<unsigned>(out) << "]." << newl;
+		};
+
+		constexpr auto lhs_1_src = 0xc0de'd00d'fea2'cafe'babe'b00b'600d'f00d_u128;
+		constexpr auto rhs_1_src = 0xf00d'600d'dead'beef'600d'c0de'600d'd00d_u128;
+		auto lhs_1 = static_cast<nat_u128_t>(lhs_1_src);
+		auto rhs_1 = static_cast<nat_u128_t>(rhs_1_src);
+		constexpr unsigned char carry_in_1 = 0;
+		unsigned char carry_out = 0;
+		print_input(carry_in_1, lhs_1_src, rhs_1_src);
+
+		auto result = cjm::numerics::internal::add_with_carry(lhs_1, rhs_1, carry_in_1, carry_out);
+		print_sum(carry_out, static_cast<uint128_t>(result));
+
+		constexpr auto expected_sum = lhs_1_src + rhs_1_src;
+		constexpr unsigned char expected_carry_out = expected_sum < lhs_1_src ? 1 : 0;
+
+		cjm_assert(carry_out == expected_carry_out && result == expected_sum);
+
+	}
+	else
+	{
+		std::cout << "NOT EXECUTING BECAUSE BUILT-IN UINT128 NOT AVAILABLE." << newl;
+	}
+}
 #ifdef CJM_HAVE_BUILTIN_128
 void cjm::uint128_tests::execute_builtin_u128fls_test_if_avail()
 {

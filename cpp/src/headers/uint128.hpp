@@ -78,8 +78,14 @@
 namespace cjm::numerics
 {
     class uint128;
-    template<typename LimbType>
-    class fixed_uint;
+
+    ///<summary>
+    ///In the future, will define
+    ///cjm unsigned integers of larger type implemented in terms
+    ///of a cjm unsigned integer of smaller type.
+    ///</summary>
+    template<concepts::cjm_unsigned_integer LimbType>
+    class [[maybe_unused]] fixed_uint;
 
     template<concepts::integer IntegerType>
     struct divmod_result;
@@ -112,6 +118,10 @@ namespace cjm::numerics
 
     	template<concepts::builtin_floating_point TFloat>
         uint128 make_from_floating_point(TFloat v) noexcept;
+
+    	template<concepts::builtin_128bit_unsigned_integer Ui128>
+    	Ui128 add_with_carry(Ui128 first_addend, Ui128 second_addend, unsigned char carry_in,
+						  unsigned char& carry_out) noexcept;
     }
 
     /// <summary>
@@ -351,8 +361,6 @@ namespace cjm::numerics
     public:
         static constexpr size_t byte_array_size = 16;
 
-    	friend class fixed_uint<uint128>;
-            	
         using int_part = std::uint64_t;      
         using byte_array = std::array<unsigned char, byte_array_size>;
         using divmod_result_t = divmod_result<uint128>;
@@ -378,7 +386,7 @@ namespace cjm::numerics
         /// <param name="carry_out">carry out</param>
         /// <returns>sum</returns>
         /// <remarks>NOT TESTED </remarks>
-        friend constexpr int_part add_with_carry(int_part first_addend, 
+        friend constexpr int_part add_with_carry(int_part first_addend,
             int_part second_addend, unsigned char carry_in, 
 				unsigned char& carry_out) noexcept;
         /// <summary>
@@ -548,6 +556,7 @@ namespace cjm::numerics
         int_part m_high;
         int_part m_low;
 #endif
+
     };
 
 	//Ensure compliance with concepts
