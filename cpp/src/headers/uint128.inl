@@ -817,13 +817,13 @@ namespace cjm
 		{
 			return static_cast<unsigned long>(m_low);
 		}
-		constexpr uint128::operator long long() const noexcept
+		constexpr uint128::operator std::int64_t() const noexcept
 		{
-			return static_cast<long long>(m_low);
+			return static_cast<std::int64_t>(m_low);
 		}
-		constexpr uint128::operator unsigned long long() const noexcept
+		constexpr uint128::operator std::uint64_t() const noexcept
 		{
-			return static_cast<unsigned long long>(m_low);
+			return static_cast<std::uint64_t>(m_low);
 		}
 
 		constexpr size_t uint128::hash_code() const noexcept
@@ -2657,6 +2657,20 @@ namespace cjm::numerics::internal
 		carry_out = ret < first_addend ? 1 : 0;
 		return ret;
 	}
+
+    template<concepts::cjm_unsigned_integer Ui128>
+		requires (sizeof(Ui128) == 16 && !concepts::builtin_128bit_unsigned_integer<Ui128>)
+	Ui128 add_with_carry(Ui128 first_addend, Ui128 second_addend,
+            unsigned char carry_in, unsigned char& carry_out) noexcept
+    {
+        Ui128 ret = first_addend;
+        if (carry_in)
+            ++ret;
+        ret += second_addend;
+        carry_out = ret < first_addend ? 1 : 0;
+        return ret;
+    }
+	
 }
 
 namespace cjm::numerics

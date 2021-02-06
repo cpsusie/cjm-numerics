@@ -72,9 +72,6 @@
 // File: int128.h
 // -----------------------------------------------------------------------------
 
-//If compiled on a Big Endian system, change "true" to "false"
-#define CJM_NUMERICS_LITTLE_ENDIAN true
-
 namespace cjm::numerics
 {
     class uint128;
@@ -122,6 +119,12 @@ namespace cjm::numerics
     	template<concepts::builtin_128bit_unsigned_integer Ui128>
     	Ui128 add_with_carry(Ui128 first_addend, Ui128 second_addend, unsigned char carry_in,
 						  unsigned char& carry_out) noexcept;
+        //Not intended to be used, made so untaken if constexpr branch of builtin test doesn't
+    	//blow up ... even though it isn't taken
+    	template<concepts::cjm_unsigned_integer Ui128>
+			requires (sizeof(Ui128) == 16 && !concepts::builtin_128bit_unsigned_integer<Ui128>)
+        Ui128 add_with_carry(Ui128 first_addend, Ui128 second_addend,
+			unsigned char carry_in, unsigned char& carry_out) noexcept;
     }
 
     /// <summary>
@@ -458,8 +461,8 @@ namespace cjm::numerics
         constexpr explicit operator unsigned int() const noexcept;
         constexpr explicit operator long() const noexcept;
         constexpr explicit operator unsigned long() const noexcept;
-        constexpr explicit operator long long() const noexcept;
-        constexpr explicit operator unsigned long long() const noexcept;
+        constexpr explicit operator std::int64_t() const noexcept;
+        constexpr explicit operator std::uint64_t() const noexcept;
         explicit operator float() const;
         explicit operator double() const;
         explicit operator long double() const;

@@ -1,6 +1,44 @@
-// ReSharper disable CppClangTidyCppcoreguidelinesMacroUsage
 #ifndef CJM_NUMERICS_CONFIGURATION_HPP_
 #define CJM_NUMERICS_CONFIGURATION_HPP_
+#ifndef __cpp_char8_t
+#error "CJM NUMERICS UINT128 requires a C++20 implementation that supports char8_t."
+#endif
+#ifndef  __cpp_concepts
+#error "CJM NUMERICS UINT128 requires support for C++20 concepts."
+#endif
+#ifndef  __cpp_impl_three_way_comparison
+#error "CJM NUMERICS UINT128 requires support for C++20 three way comparison operator <=>."
+#endif
+#ifndef __cpp_nontype_template_args
+#error	"CJM NUMERICS UINT128 plans to require support for C++20 class non-type template arguments."
+#endif
+#ifndef __cpp_lib_bitops
+#error	"CJM NUMERICS UINT128 requires standard library support for C++20 bit operations."
+#endif
+#ifndef __cpp_lib_char8_t
+#error	"CJM NUMERICS UINT128 requires standard library support for C++20 char8_t type."
+#endif
+#ifndef __cpp_lib_concepts
+#error	"CJM NUMERICS UINT128 requires standard library support for C++20 concepts."
+#endif
+#ifndef __cpp_lib_endian
+#error	"CJM NUMERICS UINT128 requires standard library support for C++20 std::endian."
+#endif
+#ifndef __cpp_lib_is_constant_evaluated
+#error	"CJM NUMERICS UINT128 requires standard library support for C++20 std::is_constant_evaluated."
+#endif
+#ifndef __cpp_lib_is_nothrow_convertible
+#error	"CJM NUMERICS UINT128 requires standard library support for C++20 std::is_nothrow_convertible."
+#endif
+#ifndef __cpp_lib_remove_cvref
+#error	"CJM NUMERICS UINT128 requires standard library support for C++20 std::remove_cvref."
+#endif
+#ifndef __cpp_lib_span
+#error	"CJM NUMERICS UINT128 requires standard library support for C++20 std::span."
+#endif
+#ifndef __cpp_lib_starts_ends_with
+#error	"CJM NUMERICS UINT128 requires standard library support for starts_with and ends_with in std::string and std::string_view."
+#endif
 #ifdef _MSC_VER
 #define CJM_MSC
 #endif
@@ -33,6 +71,7 @@
 #define CJM_ADDCARRY64 internal::cjm_bad_addc64
 #define CJM_SUBBORROW_64 internal::cjm_bad_subb64
 #endif
+
 #include <climits>
 #include <cmath>
 #include <limits>
@@ -63,6 +102,20 @@
 #endif
 #if defined (CJM_IS_CLANG) && !defined(CJM_IS_GCC)
 #define CJM_IS_CLANG_NOT_GCC
+#endif
+#if defined (CJM_NUMERICS_LITTLE_ENDIAN)
+#error "CJM_NUMERICS_LITTLE_ENDIAN should not be set directly"
+#endif
+#if defined(CJM_MSC)
+#define CJM_NUMERICS_LITTLE_ENDIAN true
+#elif !defined(CJM_NUMERICS_LITTLE_ENDIAN) && (!defined(__BYTE_ORDER__) || ( !defined(__ORDER_LITTLE_ENDIAN__) && !defined(__ORDER_BIG_ENDIAN__)))
+#error "Unable to detect endianness of system."
+#elif !defined(CJM_NUMERICS_LITTLE_ENDIAN) && (__BYTE_ORDER__ ==  __ORDER_LITTLE_ENDIAN__)
+#define CJM_NUMERICS_LITTLE_ENDIAN true
+#elif (__BYTE_ORDER__ ==  __ORDER_BIG_ENDIAN__)
+#define CJM_NUMERICS_LITTLE_ENDIAN false
+#else
+#error "Unable to detect endianness of system."
 #endif
 
 namespace cjm
@@ -178,9 +231,8 @@ namespace cjm
 			intrinsic_u128,
 		};
 		constexpr uint128_calc_mode init_eval_mode() noexcept;
-	}
+	}	
 }
-
 
 #endif
 #include "numerics_configuration.inl"
