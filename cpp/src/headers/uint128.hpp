@@ -455,12 +455,10 @@ namespace cjm::numerics
         constexpr explicit operator char16_t() const noexcept;
         constexpr explicit operator char32_t() const noexcept;
         constexpr explicit operator wchar_t() const noexcept;
-        constexpr explicit operator short() const noexcept;
-        constexpr explicit operator unsigned short() const noexcept;
-        constexpr explicit operator int() const noexcept;
-        constexpr explicit operator unsigned int() const noexcept;
-        constexpr explicit operator long() const noexcept;
-        constexpr explicit operator unsigned long() const noexcept;
+        constexpr explicit operator std::int16_t() const noexcept;
+        constexpr explicit operator std::uint16_t() const noexcept;
+        constexpr explicit operator std::int32_t() const noexcept;
+        constexpr explicit operator std::uint32_t() const noexcept;
         constexpr explicit operator std::int64_t() const noexcept;
         constexpr explicit operator std::uint64_t() const noexcept;
         explicit operator float() const;

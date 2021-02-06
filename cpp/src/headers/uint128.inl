@@ -793,29 +793,21 @@ namespace cjm
 		{
 			return static_cast<wchar_t>(m_low);
 		}
-		constexpr uint128::operator short() const noexcept
+		constexpr uint128::operator std::int16_t() const noexcept
 		{
-			return static_cast<short>(m_low);
+			return static_cast<std::int16_t>(m_low);
 		}
-		constexpr uint128::operator unsigned short() const noexcept
+		constexpr uint128::operator std::uint16_t() const noexcept
 		{
-			return static_cast<unsigned short>(m_low);
+			return static_cast<std::uint16_t>(m_low);
 		}
-		constexpr uint128::operator int() const noexcept
+		constexpr uint128::operator std::int32_t() const noexcept
 		{
-			return static_cast<int>(m_low);
+			return static_cast<std::int32_t>(m_low);
 		}
-		constexpr uint128::operator unsigned int() const noexcept
+		constexpr uint128::operator std::uint32_t() const noexcept
 		{
-			return static_cast<unsigned int>(m_low);
-		}
-		constexpr uint128::operator long() const noexcept
-		{
-			return static_cast<long>(m_low);
-		}
-		constexpr uint128::operator unsigned long() const noexcept
-		{
-			return static_cast<unsigned long>(m_low);
+			return static_cast<std::uint32_t>(m_low);
 		}
 		constexpr uint128::operator std::int64_t() const noexcept
 		{

@@ -1,5 +1,18 @@
 #ifndef CJM_NUMERICS_CONFIGURATION_HPP_
 #define CJM_NUMERICS_CONFIGURATION_HPP_
+#include <climits>
+#include <cmath>
+#include <limits>
+#include <type_traits>
+#include <numeric>
+#include <cstring>
+#include <functional>
+#include "cjm_numeric_concepts.hpp"
+#include <bit>
+#include <array>
+#include <string_view>
+#include <span>
+#include <cstdint>
 #ifndef __cpp_char8_t
 #error "CJM NUMERICS UINT128 requires a C++20 implementation that supports char8_t."
 #endif
@@ -72,17 +85,7 @@
 #define CJM_SUBBORROW_64 internal::cjm_bad_subb64
 #endif
 
-#include <climits>
-#include <cmath>
-#include <limits>
-#include <type_traits>
-#include <numeric>
-#include <cstring>
-#include <functional>
-#include "cjm_numeric_concepts.hpp"
-#include <bit>
-#include <array>
-#include <string_view>
+
 #ifdef __cpp_lib_bit_cast
 #define CJM_BIT_CAST_CONST constexpr
 #else
@@ -125,6 +128,32 @@ namespace cjm
 	{
 		namespace internal
 		{
+			//REQUIRE USUAL SIZES AND DIGIT COUNTS
+			//REQUIRE DEFINITION of all optional fixed-width integer types in cstdint from 8-64 sizes
+			//REQUIRE CHAR_BIT to be normal (number of bits in char/unsigned char/signed char to be 8)
+			static_assert(CHAR_BIT == 8, "CJM NUMERICS is not designed for systems where CHAR_BIT != 8.");
+
+			//require definition of std::uint8_t and std::int8_t, usual size and digit count
+			static_assert(sizeof(std::uint8_t) == 1 && std::numeric_limits<std::uint8_t>::digits == 8,
+			              "CJM NUMERICS requires definition of std::uint8_t to be a type 1 byte long and with 8 binary digits.");
+			static_assert(sizeof(std::int8_t) == 1 && std::numeric_limits<std::int8_t>::digits == std::numeric_limits<std::uint8_t>::digits -1,
+			              "CJM NUMERICS requires definition of std::int8_t to be a type 1 byte long and with 7 binary digits.");
+			//require definition of std::uint16_t and std::int16_t, usual size and digit count
+			static_assert(sizeof(std::uint16_t) == 2 && std::numeric_limits<std::uint16_t>::digits == 16,
+					"CJM NUMERICS requires definition of std::uint16_t to be a type 2 bytes long and with 16 binary digits.");
+			static_assert(sizeof(std::int16_t) == 2 && std::numeric_limits<std::int16_t>::digits == std::numeric_limits<std::uint16_t>::digits -1,
+			              "CJM NUMERICS requires definition of std::int16_t to be a type 2 bytes long and with 15 binary digits.");
+			//require definition of std::uint32_t and std::int32_t, usual size and digit count
+			static_assert(sizeof(std::uint32_t) == 4 && std::numeric_limits<std::uint32_t>::digits == 32,
+			              "CJM NUMERICS requires definition of std::uint32_t to be a type 2 bytes long and with 32 binary digits.");
+			static_assert(sizeof(std::int32_t) == 4 && std::numeric_limits<std::int32_t>::digits == std::numeric_limits<std::uint32_t>::digits -1,
+			              "CJM NUMERICS requires definition of std::int32_t to be a type 2 bytes long and with 31 binary digits.");
+			//require definition of std::uint64_t and std::int64_t, usual size and digit count
+			static_assert(sizeof(std::uint64_t) == 8 && std::numeric_limits<std::uint64_t>::digits == 64,
+			              "CJM NUMERICS requires definition of std::uint64_t to be a type 8 bytes long and with 64 binary digits.");
+			static_assert(sizeof(std::int64_t) == 8 && std::numeric_limits<std::int64_t>::digits == std::numeric_limits<std::uint64_t>::digits -1,
+			              "CJM NUMERICS requires definition of std::int64_t to be a type 8 bytes long and with 63 binary digits.");
+
 			//alternate declarations for cjm_intrinsic_macros ... never defined because never used but need something that won't blow compiler up
 			//when examining untaken if constexpr branch.
 			extern unsigned char cjm_badrev_bitscan_64(unsigned long* index, std::uint64_t mask);

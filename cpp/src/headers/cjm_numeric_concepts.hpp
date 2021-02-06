@@ -372,14 +372,12 @@ namespace cjm::numerics::concepts
         nothrow_convertible<T, bool> &&
         nothrow_convertible<T, char> &&
         nothrow_convertible<T, signed char> &&
-        nothrow_convertible<T, short> &&
-        nothrow_convertible<T, int> &&
-        nothrow_convertible<T, long> &&
+        nothrow_convertible<T, std::int16_t> &&
+        nothrow_convertible<T, std::int32_t> &&
         nothrow_convertible<T, std::int64_t> &&
         nothrow_convertible<T, unsigned char> &&
-        nothrow_convertible<T, unsigned short> &&
-        nothrow_convertible<T, unsigned int> &&
-        nothrow_convertible<T, unsigned long> &&
+        nothrow_convertible<T, std::uint16_t> &&
+        nothrow_convertible<T, std::uint32_t> &&
         nothrow_convertible<T, std::uint64_t> &&
         //must be explicitly or implicitly nothrow convertible to at least the following types:                
         //bool, char, signed char, unsigned char, char8_t, char16_t, char32_t, wchar_t,
@@ -394,16 +392,12 @@ namespace cjm::numerics::concepts
         nothrow_castable<char16_t, T> &&
         nothrow_castable<char32_t, T> &&
         nothrow_castable<wchar_t, T> &&
-        nothrow_castable<short, T>&&
-        nothrow_castable<int, T>&&
-        nothrow_castable<long, T>&&
-        nothrow_castable<long long, T> &&
-        nothrow_castable<std::int64_t, T> && 
-        nothrow_castable<unsigned short, T>&&
-        nothrow_castable<unsigned int, T>&&
-        nothrow_castable<unsigned long, T>&&
-        nothrow_castable<unsigned long long, T>&&
-        nothrow_castable<std::uint64_t, T> &&
+        nothrow_castable<std::int16_t, T>&&
+        nothrow_castable<std::int32_t, T>&&
+        nothrow_castable<std::int64_t, T>&&
+        nothrow_castable<std::uint16_t, T>&&
+        nothrow_castable<std::uint32_t, T>&&
+        nothrow_castable<std::uint64_t, T>&&
         nothrow_castable<typename T::int_part, T> &&
         //must be explicitly castable to the following types (exceptions permitted):
         //float, double, long double
