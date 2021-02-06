@@ -367,19 +367,51 @@ namespace cjm::numerics
         using int_part = std::uint64_t;      
         using byte_array = std::array<unsigned char, byte_array_size>;
         using divmod_result_t = divmod_result<uint128>;
-    	
+
+        /// <summary>
+        /// Parses a string_view into a uint128
+        /// </summary>
+        /// <typeparam name="Chars">Character type</typeparam>
+        /// <typeparam name="CharTraits">Character traits type</typeparam>
+        /// <param name="parse_me">the string_view to parse.</param>
+        /// <returns>A uint128 parsed from parse_me.</returns>
+        /// <exception cref="std::invalid_argument">A uint128 could not be parsed from
+        /// the supplied value.</exception>
         template<typename Chars, typename CharTraits = std::char_traits<Chars>>
 			requires cjm::numerics::concepts::char_with_traits<Chars, CharTraits>
         static uint128 make_from_string(std::basic_string_view<Chars, CharTraits> 
-            parseMe);
+            parse_me);
 
+		/// <summary>
+	    /// Parses a string into a uint128
+	    /// </summary>
+	    /// <typeparam name="Chars">Character type</typeparam>
+	    /// <typeparam name="CharTraits">Character traits type</typeparam>
+	    /// <param name="parse_me">the string to parse.</param>
+	    /// <returns>A uint128 parsed from parse_me.</returns>
+	    /// <exception cref="std::invalid_argument">A uint128 could not be parsed from
+	    /// the supplied value.</exception>
         template<typename Chars, typename CharTraits = std::char_traits<Chars>,
     		typename Allocator = std::allocator<Chars>>
 			requires cjm::numerics::concepts::char_with_traits_and_allocator<Chars,
     			CharTraits, Allocator>
         static uint128 make_from_string(const std::basic_string<Chars, CharTraits, 
-            Allocator>& parseMe);
+            Allocator>& parse_me);
 
+        /// <summary>
+        /// Future function NOT TESTED
+        /// Perform add with carry on two unsigned 128 bit integers
+        /// </summary>
+        /// <param name="first_addend">first addend</param>
+        /// <param name="second_addend">second addend</param>
+        /// <param name="carry_in">0 for no carry-in, 1 for carry-in</param>
+        /// <returns>a pair whose first member is the sum and the second number
+        /// represents carry_out.  carry_out will be non-zero if the addition overflowed.</returns>
+        /// <remarks>This is present for future features and has not yet been fully tested.</remarks>
+        friend constexpr std::pair<uint128, unsigned char>
+    		add_with_carry(uint128 first_addend, uint128 second_addend, 
+                unsigned char carry_in) noexcept;
+    	
         /// <summary>
         /// future functionality -- add with carry
         /// </summary>

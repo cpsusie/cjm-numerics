@@ -600,7 +600,7 @@ namespace cjm
             static_assert(calculation_mode != uint128_calc_mode::intrinsic_u128 || !std::is_same_v<natuint128_t, uint128>, 
                 "It should not be possible for calc_mode to be intrinsic and have natuint128_t be set as uint128/");
             assert(divisor != 0);
-			if (std::is_constant_evaluated())
+			if (std::is_constant_evaluated()) 
 			{
 				uint128 quotient{};
 				uint128 remainder{};
@@ -728,17 +728,17 @@ namespace cjm
 		
         template<typename Chars, typename CharTraits, typename Allocator>
             requires cjm::numerics::concepts::char_with_traits_and_allocator<Chars, CharTraits, Allocator>
-        uint128 uint128::make_from_string(const std::basic_string<Chars, CharTraits, Allocator>& parseMe)
+        uint128 uint128::make_from_string(const std::basic_string<Chars, CharTraits, Allocator>& parse_me)
         {
-            return make_from_string(std::basic_string_view<Chars, CharTraits>{parseMe});
+            return make_from_string(std::basic_string_view<Chars, CharTraits>{parse_me});
         }
 
         template<typename Chars, typename CharTraits>
             requires cjm::numerics::concepts::char_with_traits<Chars, CharTraits>
-		uint128 uint128::make_from_string(std::basic_string_view<Chars, CharTraits> parseMe)
+		uint128 uint128::make_from_string(std::basic_string_view<Chars, CharTraits> parse_me)
 		{
 			using ph = u128_parsing_helper<Chars, CharTraits>;
-			auto str = std::basic_string<Chars, CharTraits>{parseMe};
+			auto str = std::basic_string<Chars, CharTraits>{parse_me};
 			auto trimmed = ph::trim_and_strip(str);
 			auto parseFormat = ph::get_format(trimmed);
 			uint128 ret;
@@ -1731,6 +1731,50 @@ namespace cjm
                     ret += rhs;
                     carry_out = ret < max ? 1 : 0;
                     return ret;
+                }
+        	}
+        }
+
+        constexpr std::pair<uint128, unsigned char>
+            add_with_carry(uint128 first_addend, uint128 second_addend,
+                unsigned char carry_in) noexcept
+        {
+	        if (std::is_constant_evaluated())
+	        {
+                uint128 ret = first_addend;
+                if (carry_in)
+                    ++ret;
+                ret += second_addend;
+                unsigned char carry_out = ret < first_addend;
+                return std::make_pair(ret, carry_out);
+	        }
+        	else
+        	{
+                if constexpr (calculation_mode == uint128_calc_mode::msvc_x64)
+                {
+                    unsigned char carry_1 = 0;
+                    unsigned char carry_2 = 0;
+                    auto ret = uint128{};
+                    ret.m_low = add_with_carry(first_addend.m_low, second_addend.m_low, 0, carry_1);
+                    ret.m_high = add_with_carry(first_addend.m_high, second_addend.m_high, carry_1, carry_2);
+                    return std::make_pair(ret, carry_2);
+                }
+                else if constexpr (calculation_mode == uint128_calc_mode::intrinsic_u128)
+                {
+                    unsigned char carry_out = 0;
+                    auto temp = cjm::numerics::internal::add_with_carry(cjm::numerics::bit_cast<natuint128_t>(first_addend), 
+							cjm::numerics::bit_cast<natuint128_t>(second_addend), 
+								carry_in, carry_out);
+                         return std::make_pair(temp, carry_out);
+                }
+                else
+                {
+                    uint128 ret = first_addend;
+                    if (carry_in)
+                        ++ret;
+                    ret += second_addend;
+                    unsigned char carry_out = ret < first_addend;
+                    return std::make_pair(ret, carry_out);
                 }
         	}
         }
