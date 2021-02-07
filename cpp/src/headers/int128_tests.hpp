@@ -174,6 +174,7 @@ namespace cjm::uint128_tests
     void execute_unary_op_logical_negation_test();
 
     void execute_builtin_add_with_carry_test();
+    void execute_basic_u128_adc_test();
     	
     [[maybe_unused]] void print_n_static_assertions(const binary_op_u128_vect_t& op_vec, size_t n);
     [[maybe_unused]] void print_n_static_assertions(const unary_op_u128_vect_t& op_vec, size_t n);

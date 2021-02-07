@@ -1755,7 +1755,7 @@ namespace cjm
                     unsigned char carry_1 = 0;
                     unsigned char carry_2 = 0;
                     auto ret = uint128{};
-                    ret.m_low = add_with_carry(first_addend.m_low, second_addend.m_low, 0, carry_1);
+                    ret.m_low = add_with_carry(first_addend.m_low, second_addend.m_low, carry_in, carry_1);
                     ret.m_high = add_with_carry(first_addend.m_high, second_addend.m_high, carry_1, carry_2);
                     return std::make_pair(ret, carry_2);
                 }

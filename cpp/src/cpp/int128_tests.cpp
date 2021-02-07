@@ -667,14 +667,13 @@ void cjm::uint128_tests::execute_uint128_tests()
 
     execute_test(execute_controlled_from_float_conversion_test, "controlled_from_float_conversion_test"sv);
     execute_test(execute_controlled_float_rt_conversion_test, "controlled_float_rt_conversion_test"sv);
-
     
-	
     execute_test(execute_issue_10_strm_insrt_test, "issue_10_strm_insrt_test"sv);
     execute_test(execute_issue_10_showbase_test, "issue_10_showbase_test"sv);
 	execute_test(execute_hash_dx, "hash_dx"sv);
 
 	execute_test(execute_builtin_add_with_carry_test, "builtin_add_with_carry_test"sv);
+    execute_test(execute_basic_u128_adc_test, "basic_u128_adc_test"sv);
 
 	cout << "STANDARD TEST BATTERY: All tests PASSED." << newl;
     static_assert(most_sign_set_bit(2_u128) == 1);
@@ -3965,6 +3964,54 @@ void cjm::uint128_tests::execute_builtin_add_with_carry_test()
 		std::cout << "NOT EXECUTING BECAUSE BUILT-IN UINT128 NOT AVAILABLE." << newl;
 	}
 }
+
+void cjm::uint128_tests::execute_basic_u128_adc_test()
+{
+    constexpr auto addend_1_left = 0xdead'beef'600d'f00d'ffff'ffff'ffff'ffff_u128;
+    constexpr auto addend_1_right = 0xffff'ffff'ffff'ffff'c0de'd00d'fea2'b00b_u128;
+
+    constexpr auto addend_2_left = 0xffff'ffff'ffff'ffff_u128;
+    constexpr auto addend_2_right = 0xc0de'd00d'fea2'b00b_u128;
+    constexpr auto expected_sum_3 = addend_2_left + addend_2_right;
+    constexpr auto expected_sum_4 = expected_sum_3 + 1;
+	constexpr bool expected_carry_out_3 = false;
+    constexpr bool expected_carry_out_4 = false;
+	
+    constexpr auto expected_sum_1 = addend_1_left + addend_1_right;
+    constexpr auto expected_sum_2 = expected_sum_1 + 1;
+    constexpr bool expected_carry_out_1 = true;
+    constexpr bool expected_carry_out_2 = true;
+    constexpr auto ctime_res_1 = add_with_carry(addend_1_left, addend_1_right, 0);
+    constexpr auto ctime_res_2 = add_with_carry(addend_1_left, addend_1_right, 1);
+    constexpr auto ctime_res_3 = add_with_carry(addend_2_left, addend_2_right, 0);
+    constexpr auto ctime_res_4 = add_with_carry(addend_2_left, addend_2_right, 1);
+	
+    auto [actual_sum, actual_carry_out] = add_with_carry(addend_1_left, addend_1_right, 0);
+    auto [actual_sum_2, actual_carry_out_2] = add_with_carry(addend_1_left, addend_1_right, 1);
+    auto [actual_sum_3, actual_carry_out_3] = add_with_carry(addend_2_left, addend_2_right, 0);
+	auto [actual_sum_4, actual_carry_out_4] = add_with_carry(addend_2_left, addend_2_right, 1);
+	
+	cjm_assert(actual_sum == expected_sum_1); 
+    cjm_assert((actual_carry_out != 0) == expected_carry_out_1);
+    cjm_assert(actual_sum == ctime_res_1.first);
+    cjm_assert((actual_carry_out != 0) == (ctime_res_1.second!= 0));
+
+    cjm_assert(actual_sum_2 == expected_sum_2);
+    cjm_assert((actual_carry_out_2 != 0) == expected_carry_out_2);
+    cjm_assert(actual_sum_2 == ctime_res_2.first);
+    cjm_assert((actual_carry_out_2 != 0) == (ctime_res_2.second != 0));
+
+    cjm_assert(actual_sum_3 == expected_sum_3);
+    cjm_assert((actual_carry_out_3 != 0) == expected_carry_out_3);
+    cjm_assert(actual_sum_3 == ctime_res_3.first);
+    cjm_assert((actual_carry_out_3 != 0) == (ctime_res_3.second != 0));
+
+    cjm_assert(actual_sum_4 == expected_sum_4);
+    cjm_assert((actual_carry_out_4 != 0) == expected_carry_out_4);
+    cjm_assert(actual_sum_4 == ctime_res_4.first);
+    cjm_assert((actual_carry_out_4 != 0) == (ctime_res_4.second != 0));
+}
+
 #ifdef CJM_HAVE_BUILTIN_128
 void cjm::uint128_tests::execute_builtin_u128fls_test_if_avail()
 {
