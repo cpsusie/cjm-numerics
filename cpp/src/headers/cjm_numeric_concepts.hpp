@@ -68,9 +68,29 @@ namespace cjm::numerics::concepts
 
 namespace cjm::numerics
 {
-    template<concepts::integer IntegerType>
-    struct divmod_result;
-    	
+	template<concepts::integer IntegerType>
+	struct divmod_result;
+}
+
+namespace std
+{
+	template<cjm::numerics::concepts::integer Integer>
+	struct hash<cjm::numerics::divmod_result<Integer>>
+	{
+		constexpr hash() noexcept = default;
+		constexpr size_t operator()(const cjm::numerics::divmod_result<Integer>& hash_me) const noexcept;
+	};
+}
+
+namespace cjm::numerics
+{
+    ///<summary>
+    ///cjm integers return divmod_results from their div_mod
+    ///family of functions.  Simply, it is a quotient and remainder.
+    ///It is also totally ordered (with total ordering ops constexpr via <=>)
+    ///and constexpr nothrow hashable via std::hash in case one desires to store
+    ///this type in an ordered or unordered set or map.
+    ///</summary>
     template<concepts::integer IntegerType>
     struct divmod_result final
     {
@@ -107,13 +127,6 @@ namespace cjm::numerics
 
 namespace std
 {
-	template<cjm::numerics::concepts::integer Integer>
-	struct hash<cjm::numerics::divmod_result<Integer>>
-	{
-        constexpr hash() noexcept = default;
-        constexpr size_t operator()(const cjm::numerics::divmod_result<Integer>& hash_me) const noexcept;
-	};
-
 	template <cjm::numerics::concepts::integer Integer>
 	constexpr size_t hash<cjm::numerics::divmod_result<Integer>>::operator()(
 		const cjm::numerics::divmod_result<Integer>& hash_me) const noexcept
@@ -131,12 +144,48 @@ namespace std
 
 namespace cjm::numerics::concepts
 {
+	///<summary>
+	///Describes the relationship between a type T and a compile-time constant
+	///of type size_t called size where sizeof(T) == size.
+	///</summary>
+	///<remarks>
+	///Used to require a template parameter to have a specific size.
+	///For example, the relation would hold, by definition, for char and 1
+	///on any system.
+	///</remarks>
     template<typename T, size_t Size>
     concept matches_size = (sizeof(T) == Size);
 
+    ///<summary>
+    ///Describes a relationship between a numeric type T
+    ///and a compile-time constant of type size_t called Digits where
+    ///std::numeric_limits<T>::digits has been specialized and returns
+    ///the value Digits
+    ///</summary>
+    ///<remarks>
+    ///Used to test that a numeric type T has exactly Digits binary
+    ///digits in its value representation as specialized in std::numeric_limits.
+    ///For example: this concept describes the relationship between std::uint64_t (T)
+    ///and the compile time constant 64.  It also describes the relation between
+    /// unsigned char and the constant CHAR_BIT on any system.
+    ///</remarks>
+    template<typename T, size_t Digits>
+    concept matches_digits = (std::numeric_limits<T>::digits == Digits);
+
+    ///<summary>
+    ///Describes a relationship between two types (TArray and TElement) and a
+    ///compile time constant value of type size_t called Size where TArray is
+    ///a std::array<TElement, Size>
+    ///</summary>
 	template<typename TArray, typename TElement, size_t Size>
     concept is_array_of_T_of_size = std::is_same_v<std::array<TElement, Size>, TArray>;
 
+	///<summary>
+	///Describes a relationship between two types: To and From
+	///where To and From are the same type or a value of From
+	///is implicitly convertible to a value of To without the possibility
+	///of a thrown exception during the conversion
+	///</summary>
     template<typename To, typename From>
     concept nothrow_convertible = std::is_same_v<To, From> || std::is_nothrow_convertible_v<From, To>;
 
@@ -155,19 +204,37 @@ namespace cjm::numerics::concepts
             {static_cast<To>(x)} noexcept -> nothrow_convertible<To>;
         };
 	}
-
+	///<summary>
+	///Describes a relationship between two types: To and From
+	///where a value of type to is either implicitly convertible to a
+	///value of type From, OR can be explicitly converted to a value
+	///of type From via explicit static_cast.
+	///</summary>
     template<typename To, typename From>
     concept castable = std::convertible_to<From, To> || internal::castable_helper<To, From>;
-	
+
+	///<summary>
+	///Describes a relationship between two types: To and From
+	///where a value of type To is either implicitly nothrow convertible
+	///to a value of type From OR is nothrow convertible to a value
+	///of type From via an explicit static_cast
+	///</summary>
     template<typename To, typename From>
     concept nothrow_castable = (nothrow_convertible<To, From> || internal::nothrow_castable_helper<To, From>) && castable<To, From>;
-	
+
+    ///<summary>
+    ///Describes a type that is hashable via std::hash
+    ///</summary>
     template<typename T>
     concept hashable = requires(T x)
     {
         {std::hash<T>{}(x)} -> nothrow_convertible<size_t>;
     };
 
+    ///<summary>
+    ///Describes a type that is hashable with std::hash
+    ///without possibility of thrown exception
+    ///</summary>
 	template<typename T>
     concept nothrow_hashable = hashable<T> && requires (T x)
     {
@@ -175,16 +242,29 @@ namespace cjm::numerics::concepts
     };
 
 
-
+	/// <summary>
+	/// Describes requirements for the type of division_modulus_result object
+	/// that cjm integers produce when performing the div_mod family of functions on them.
+	/// </summary>
     template<typename DivModResType, typename IntegerType>
-    concept division_modulus_result =   integer<IntegerType> &&
+	concept division_modulus_result =	//IntegerType must be an integer
+										integer<IntegerType> &&
+										//DivModResType must be nothrow default constructible
 										std::is_nothrow_default_constructible_v<DivModResType> &&
-										std::is_trivially_copyable_v<DivModResType> &&
+								        //DivModResType must be trivially copyable
+							        	std::is_trivially_copyable_v<DivModResType> &&
+					                    //DivModResType must have a constructor that constructs it
+					                    //from two IntegerType parameters
 										std::constructible_from<IntegerType, IntegerType> &&
+								        //DivModResType must be a standard layout type
 										std::is_standard_layout_v<DivModResType> &&
+								        //IntegerType must be nothrow hashable using std::hash
 										nothrow_hashable<IntegerType> &&
+								        //DivModResType must be nothrow hashable using std::hash
 										nothrow_hashable<DivModResType> &&
-										std::totally_ordered<DivModResType> && requires (const DivModResType dmres, IntegerType it)
+								        //DivModResType must be a totally ordered type
+										std::totally_ordered<DivModResType> &&
+    requires (const DivModResType dmres, IntegerType it)
     {
         {it = dmres.quotient}    noexcept;
         {it = dmres.remainder}   noexcept;
@@ -195,6 +275,10 @@ namespace cjm::numerics::concepts
     static_assert(integer<std::uint64_t>);
     static_assert(std::is_standard_layout_v<divmod_result<std::uint64_t>>);
     static_assert(std::totally_ordered < divmod_result<std::uint64_t>>);
+
+    ///<summary>
+    /// Size of type is evenly divisible by CHAR_BIT
+    ///</summary>
     template<typename T>
     concept size_evenly_divisible_by_char_bit = (sizeof(T) % CHAR_BIT) == 0;
 
@@ -228,8 +312,6 @@ namespace cjm::numerics::concepts
         // template<cjm::numerics::concepts::can_find_most_significant_set_bitpos UI>
         // constexpr int most_sign_set_bit(UI value) noexcept;
         can_find_most_significant_set_bitpos<T> &&
-        //limb tye is half size of type
-        (sizeof(typename T::int_part) == sizeof(T) /2) &&
         //has static constexpr member called int_parts_bits equal to number of bits in int_part
 		(T::int_part_bits == std::numeric_limits<typename T::int_part>::digits) &&
         //has static constexpr member called int_part_bottom_half_bits that equals half of int_part_bits
@@ -275,8 +357,8 @@ namespace cjm::numerics::concepts
         std::totally_ordered<T> &&
         //its int_part dependent type (i.e. limb type) is an unsigned integer type
         unsigned_integer<typename T::int_part> &&
-        //its int_part dependent type (i.e. limb type) is half its size
-        matches_size<typename T::int_part, (sizeof(T) / 2)> && //its int_part_type 
+        //its int_part dependent type (i.e. limb type) is half its size (in binary digits)
+        matches_digits<typename T::int_part, std::numeric_limits<T>::digits / 2> && //its int_part_type
         //defines dependent type byte_array as a std::array of unsigned char of length equal to sizeof(T)
         is_array_of_T_of_size<typename T::byte_array, unsigned char, sizeof(T)> &&
         //can be hashed without throwing any exception by using a specialization of std::hash
@@ -290,14 +372,12 @@ namespace cjm::numerics::concepts
         nothrow_convertible<T, bool> &&
         nothrow_convertible<T, char> &&
         nothrow_convertible<T, signed char> &&
-        nothrow_convertible<T, short> &&
-        nothrow_convertible<T, int> &&
-        nothrow_convertible<T, long> &&
+        nothrow_convertible<T, std::int16_t> &&
+        nothrow_convertible<T, std::int32_t> &&
         nothrow_convertible<T, std::int64_t> &&
         nothrow_convertible<T, unsigned char> &&
-        nothrow_convertible<T, unsigned short> &&
-        nothrow_convertible<T, unsigned int> &&
-        nothrow_convertible<T, unsigned long> &&
+        nothrow_convertible<T, std::uint16_t> &&
+        nothrow_convertible<T, std::uint32_t> &&
         nothrow_convertible<T, std::uint64_t> &&
         //must be explicitly or implicitly nothrow convertible to at least the following types:                
         //bool, char, signed char, unsigned char, char8_t, char16_t, char32_t, wchar_t,
@@ -312,37 +392,35 @@ namespace cjm::numerics::concepts
         nothrow_castable<char16_t, T> &&
         nothrow_castable<char32_t, T> &&
         nothrow_castable<wchar_t, T> &&
-        nothrow_castable<short, T>&&
-        nothrow_castable<int, T>&&
-        nothrow_castable<long, T>&&
-        nothrow_castable<long long, T> &&
-        nothrow_castable<std::int64_t, T> && 
-        nothrow_castable<unsigned short, T>&&
-        nothrow_castable<unsigned int, T>&&
-        nothrow_castable<unsigned long, T>&&
-        nothrow_castable<unsigned long long, T>&&
-        nothrow_castable<std::uint64_t, T> &&
+        nothrow_castable<std::int16_t, T>&&
+        nothrow_castable<std::int32_t, T>&&
+        nothrow_castable<std::int64_t, T>&&
+        nothrow_castable<std::uint16_t, T>&&
+        nothrow_castable<std::uint32_t, T>&&
+        nothrow_castable<std::uint64_t, T>&&
         nothrow_castable<typename T::int_part, T> &&
         //must be explicitly castable to the following types (exceptions permitted):
         //float, double, long double
         castable<float, T> &&
         castable<double, T> &&
         castable<long double, T> &&
-        requires (T x, T y, const T x_const, const T y_const, const int s, const typename T::byte_array arr)
+        requires (T x, T y, const T x_const, const T y_const, const int s, const unsigned u, const typename T::byte_array arr)
     {
         //implements all binary arithmetic operators.  Only division and modulus may throw exception.
         {x_const + y_const}                 noexcept    ->  nothrow_convertible<T>;
         {x_const - y_const}                 noexcept    ->  nothrow_convertible<T>;
-        {x_const* y_const}                  noexcept    ->  nothrow_convertible<T>;
+        {x_const * y_const}                  noexcept    ->  nothrow_convertible<T>;
         {x_const / y_const}                             ->  nothrow_convertible<T>;
-        {x_const% y_const}                              ->  nothrow_convertible<T>;
+        {x_const % y_const}                              ->  nothrow_convertible<T>;
         //implements binary bitwise operators all nothrow
-        {x_const& y_const}                  noexcept    ->  nothrow_convertible<T>;
+        {x_const & y_const}                  noexcept    ->  nothrow_convertible<T>;
         {x_const | y_const}                 noexcept    ->  nothrow_convertible<T>;
-        {x_const^ y_const}                  noexcept    ->  nothrow_convertible<T>;
+        {x_const ^ y_const}                  noexcept    ->  nothrow_convertible<T>;
         //implements binary bit-shift operators with both a T operand and and int operand none throw exceptions
         {x_const << y_const}                noexcept    ->  nothrow_convertible<T>;
         {x_const >> y_const}                noexcept    ->  nothrow_convertible<T>;
+        {x_const << s}                      noexcept    ->  nothrow_convertible<T>;
+        {x_const >> s}                      noexcept    ->  nothrow_convertible<T>;
         {x_const << s}                      noexcept    ->  nothrow_convertible<T>;
         {x_const >> s}                      noexcept    ->  nothrow_convertible<T>;
         //implements unary +,-,~,! operators
@@ -357,18 +435,19 @@ namespace cjm::numerics::concepts
         {T{ x++ }}                          noexcept    ->  std::same_as<T>;
         //implements the following compound assignment operators which may not throw exceptions:
         // +=(const T); -=(const T); *=(const T); &=(const T); |=(const T); ^=(const T);
-        // <<=(const int), >>=(const int) --- AND TO BE ADDED: <<=(const T), >>=(const T)
+        // <<=(const int), >>=(const int), <<=(const unsigned), >>=(const unsigned), <<=(const T) >>=(const T)
         {y += x_const}                      noexcept;
         {y -= x_const}                      noexcept;
         {y *= x_const}                      noexcept;
         {y &= x_const}                      noexcept;
         {y |= x_const}                      noexcept;
         {y ^= x_const}                      noexcept;
-        //todo fixit implement
-        //{y <<= x_const}                   noexcept;
-        //{y >>= x_const}                   noexcept;
+        {y <<= x_const}                     noexcept;
+        {y >>= x_const}                     noexcept;
         {y <<= s}                           noexcept;
         {y >>= s}                           noexcept;
+        {y <<= u}                           noexcept;
+        {y >>= u}                           noexcept;
         //implements the following compound assignment operators which may throw exceptions:
         {y /= x_const};
         {y %= x_const};
@@ -385,7 +464,7 @@ namespace cjm::numerics::concepts
 											noexcept    -> nothrow_convertible<T>;
 		{T::make_from_bytes_big_endian(arr)}
                                             noexcept    -> nothrow_convertible<T>;
-		//offers a static nothrow unsafe div_mod method that returns T::divmod_result_t (undefined behavior if divisor == 0
+		//offers a static nothrow unsafe div_mod method that returns T::divmod_result_t (undefined behavior if divisor == 0)
     	{T::unsafe_div_mod(x_const, y_const)}
 											noexcept    -> nothrow_convertible<typename T::divmod_result_t>;
         //offers a static nothrow  try_div_mod method that returns std::optional<T::divmod_result_t> returns
@@ -450,43 +529,58 @@ namespace cjm::numerics::concepts
     /// <summary>
     /// Determines whether you can bitcast From to To:
     ///    to be bit_castable, the types must both:
-    ///     1- have the same size and alignment as the other
+    ///     1- have the same size as the other
     ///     2- be no-throw default constructible
     ///     3- be trivially copyable
     /// </summary>
     template<typename To, typename From>
     concept bit_castable = sizeof(To) == sizeof(From) 
-        && std::is_trivially_copyable_v<To> && std::is_trivially_copyable_v<From> && !std::is_polymorphic_v<To> && !std::is_polymorphic_v<From> && std::is_nothrow_default_constructible_v<To> && std::is_nothrow_default_constructible_v<From>;
+        && std::is_trivially_copyable_v<To>
+        && std::is_trivially_copyable_v<From>
+        && !std::is_polymorphic_v<To>
+        && !std::is_polymorphic_v<From>
+        && std::is_nothrow_default_constructible_v<To>
+        && std::is_nothrow_default_constructible_v<From>;
 
 
-    template<typename Char, typename CharTraits> requires char_with_traits<Char, CharTraits>
-    struct matching_str_data
-    {
-        using ostream_t = std::remove_cvref<std::basic_ostream<Char, CharTraits>>;
-        using istream_t = std::remove_cvref<std::basic_istream<Char, CharTraits>>;
-        using sv_t = std::remove_cvref<std::basic_string_view<Char, CharTraits>>;
-        using char_t = std::remove_cvref<Char>;
-        using traits_t =  std::remove_cvref<CharTraits>;
-    };
+//    template<typename Char, typename CharTraits> requires char_with_traits<Char, CharTraits>
+//    struct matching_str_data
+//    {
+//        using ostream_t = std::remove_cvref<std::basic_ostream<Char, CharTraits>>;
+//        using istream_t = std::remove_cvref<std::basic_istream<Char, CharTraits>>;
+//        using sv_t = std::remove_cvref<std::basic_string_view<Char, CharTraits>>;
+//        using char_t = std::remove_cvref<Char>;
+//        using traits_t =  std::remove_cvref<CharTraits>;
+//    };
+//
+//    template<typename Char, typename CharTraits, typename CharAllocator> requires char_with_traits_and_allocator<Char, CharTraits, CharAllocator>
+//    struct matching_str_data_ex :  public matching_str_data<Char, CharTraits>
+//    {
+//        using string_t = std::remove_cvref<std::basic_string<Char, CharTraits, CharAllocator>>;
+//        using sstream_t = std::remove_cvref<std::basic_stringstream<Char, CharTraits, CharAllocator>>;
+//        using allocator_t = std::remove_cvref<CharAllocator>;
+//    };
 
-    template<typename Char, typename CharTraits, typename CharAllocator> requires char_with_traits_and_allocator<Char, CharTraits, CharAllocator>
-    struct matching_str_data_ex :  public matching_str_data<Char, CharTraits>
-    {
-        using string_t = std::remove_cvref<std::basic_string<Char, CharTraits, CharAllocator>>;
-        using sstream_t = std::remove_cvref<std::basic_stringstream<Char, CharTraits, CharAllocator>>;
-        using allocator_t = std::remove_cvref<CharAllocator>;
-    };
-
+	///<summary>
+	///A concept used to define template parameters in unit tests
+	///that test for equality or near equality (within a specified limit)
+	///and print diagnostic message on failure.
+	///</summary>
     template<typename T>
     concept printable_subtractable_totally_ordered =
-    std::totally_ordered<T>
-    && number<T>
-    && requires (std::basic_ostream<char>& nos, std::basic_ostream<wchar_t>& wos, const T& val_l, const T& val_r)
+    	std::totally_ordered<T> //totally ordered
+    	&& number<T> //a number
+    	&& requires (std::basic_ostream<char>& nos,
+    			std::basic_ostream<wchar_t>& wos, const T& val_l, const T& val_r)
     {
+	    //nothrow subtractable
         {val_l - val_r}                 noexcept    ->  nothrow_convertible<T>;
-        {val_l <=> val_r}               noexcept    -> nothrow_convertible<std::strong_ordering>;
-        {wos << val_l}                              -> nothrow_convertible<std::basic_ostream<wchar_t>&>;
-        {nos << val_l}                              -> nothrow_convertible<std::basic_ostream<char>&>;
+    	//strongly ordered spaceship operator (no throw)
+        {val_l <=> val_r}               noexcept    -> nothrow_convertible<std::strong_ordering>; //strongly ordered
+        //insertable into a (default traits and default allocator having) wide character stream
+        {wos << val_l}                              -> nothrow_convertible<std::basic_ostream<wchar_t>&>; //wide stream insertable
+        //insertable into a (default traits and default allocator having) narrow character stream
+        {nos << val_l}                              -> nothrow_convertible<std::basic_ostream<char>&>; //narrow stream insertable
     };
 }
 

@@ -424,3 +424,5 @@ workspace.xml
 /cmake-build-release-clang/
 /cmake-build-release-clang/
 /clang-release-scripted/
+/gcc-release-scripted/Int128
+/listing.asm

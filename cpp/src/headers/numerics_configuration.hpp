@@ -1,34 +1,5 @@
-// ReSharper disable CppClangTidyCppcoreguidelinesMacroUsage
 #ifndef CJM_NUMERICS_CONFIGURATION_HPP_
 #define CJM_NUMERICS_CONFIGURATION_HPP_
-#ifdef _MSC_VER
-#define CJM_MSC
-#endif
-#if defined(_MSC_VER) && defined(_M_X64)
-#include <intrin.h>
-#pragma intrinsic(_umul128)
-#pragma intrinsic(_BitScanReverse64)
-#pragma intrinsic(__lzcnt64)
-#pragma intrinsic(_udiv128)  // NOLINT(clang-diagnostic-ignored-pragma-intrinsic)
-#pragma intrinsic(__shiftleft128)
-#pragma intrinsic(__shiftright128)
-#ifndef CJM_MSC_X64
-#define CJM_MSC_X64
-#define CJM_UMUL128 _umul128
-#define CJM_BITSCAN_REV_64 _BitScanReverse64
-#define CJM_LZCNT_64 __lzcnt64
-#define CJM_UDIV128 _udiv128
-#define CJM_LSHIFT128 __shiftleft128
-#define CJM_RSHIFT128 __shiftright128
-#endif
-#else
-#define CJM_UMUL128 internal::cjm_bad_umul128
-#define CJM_BITSCAN_REV_64 internal::cjm_badrev_bitscan_64
-#define CJM_LZCNT_64 internal::cjm_bad_lzcnt_64
-#define CJM_UDIV128 internal::cjm_bad_udiv128
-#define CJM_LSHIFT128 internal::cjm_bad_shiftleft128
-#define CJM_RSHIFT128 internal::cjm_bad_shiftright128
-#endif
 #include <climits>
 #include <cmath>
 #include <limits>
@@ -40,6 +11,83 @@
 #include <bit>
 #include <array>
 #include <string_view>
+#include <span>
+#include <cstdint>
+#ifndef __cpp_char8_t
+#error "CJM NUMERICS UINT128 requires a C++20 implementation that supports char8_t."
+#endif
+#ifndef  __cpp_concepts
+#error "CJM NUMERICS UINT128 requires support for C++20 concepts."
+#endif
+#ifndef  __cpp_impl_three_way_comparison
+#error "CJM NUMERICS UINT128 requires support for C++20 three way comparison operator <=>."
+#endif
+#ifndef __cpp_nontype_template_args
+#error	"CJM NUMERICS UINT128 plans to require support for C++20 class non-type template arguments."
+#endif
+#ifndef __cpp_lib_bitops
+#error	"CJM NUMERICS UINT128 requires standard library support for C++20 bit operations."
+#endif
+#ifndef __cpp_lib_char8_t
+#error	"CJM NUMERICS UINT128 requires standard library support for C++20 char8_t type."
+#endif
+#ifndef __cpp_lib_concepts
+#error	"CJM NUMERICS UINT128 requires standard library support for C++20 concepts."
+#endif
+#ifndef __cpp_lib_endian
+#error	"CJM NUMERICS UINT128 requires standard library support for C++20 std::endian."
+#endif
+#ifndef __cpp_lib_is_constant_evaluated
+#error	"CJM NUMERICS UINT128 requires standard library support for C++20 std::is_constant_evaluated."
+#endif
+#ifndef __cpp_lib_is_nothrow_convertible
+#error	"CJM NUMERICS UINT128 requires standard library support for C++20 std::is_nothrow_convertible."
+#endif
+#ifndef __cpp_lib_remove_cvref
+#error	"CJM NUMERICS UINT128 requires standard library support for C++20 std::remove_cvref."
+#endif
+#ifndef __cpp_lib_span
+#error	"CJM NUMERICS UINT128 requires standard library support for C++20 std::span."
+#endif
+#ifndef __cpp_lib_starts_ends_with
+#error	"CJM NUMERICS UINT128 requires standard library support for starts_with and ends_with in std::string and std::string_view."
+#endif
+#ifdef _MSC_VER
+#define CJM_MSC
+#endif
+#if defined(_MSC_VER) && defined(_M_X64)
+#include <intrin.h>
+#pragma intrinsic(_umul128)
+#pragma intrinsic(_BitScanReverse64)
+#pragma intrinsic(__lzcnt64)
+#pragma intrinsic(_udiv128)  // NOLINT(clang-diagnostic-ignored-pragma-intrinsic)
+#pragma intrinsic(__shiftleft128)
+#pragma intrinsic(__shiftright128)
+#pragma intrinsic(_addcarry_u64)
+#pragma intrinsic(_subborrow_u64)
+#ifndef CJM_MSC_X64
+#define CJM_MSC_X64
+#define CJM_UMUL128 _umul128
+#define CJM_BITSCAN_REV_64 _BitScanReverse64
+#define CJM_LZCNT_64 __lzcnt64
+#define CJM_UDIV128 _udiv128
+#define CJM_LSHIFT128 __shiftleft128
+#define CJM_RSHIFT128 __shiftright128
+#define CJM_ADDCARRY64 _addcarry_u64
+#define CJM_SUBBORROW_64 _subborrow_u64
+#endif
+#else
+#define CJM_UMUL128 internal::cjm_bad_umul128
+#define CJM_BITSCAN_REV_64 internal::cjm_badrev_bitscan_64
+#define CJM_LZCNT_64 internal::cjm_bad_lzcnt_64
+#define CJM_UDIV128 internal::cjm_bad_udiv128
+#define CJM_LSHIFT128 internal::cjm_bad_shiftleft128
+#define CJM_RSHIFT128 internal::cjm_bad_shiftright128
+#define CJM_ADDCARRY64 internal::cjm_bad_addc64
+#define CJM_SUBBORROW_64 internal::cjm_bad_subb64
+#endif
+
+
 #ifdef __cpp_lib_bit_cast
 #define CJM_BIT_CAST_CONST constexpr
 #else
@@ -60,6 +108,20 @@
 #if defined (CJM_IS_CLANG) && !defined(CJM_IS_GCC)
 #define CJM_IS_CLANG_NOT_GCC
 #endif
+#if defined (CJM_NUMERICS_LITTLE_ENDIAN)
+#error "CJM_NUMERICS_LITTLE_ENDIAN should not be set directly"
+#endif
+#if defined(CJM_MSC)
+#define CJM_NUMERICS_LITTLE_ENDIAN true
+#elif !defined(CJM_NUMERICS_LITTLE_ENDIAN) && (!defined(__BYTE_ORDER__) || ( !defined(__ORDER_LITTLE_ENDIAN__) && !defined(__ORDER_BIG_ENDIAN__)))
+#error "Unable to detect endianness of system."
+#elif !defined(CJM_NUMERICS_LITTLE_ENDIAN) && (__BYTE_ORDER__ ==  __ORDER_LITTLE_ENDIAN__)
+#define CJM_NUMERICS_LITTLE_ENDIAN true
+#elif (__BYTE_ORDER__ ==  __ORDER_BIG_ENDIAN__)
+#define CJM_NUMERICS_LITTLE_ENDIAN false
+#else
+#error "Unable to detect endianness of system."
+#endif
 
 namespace cjm
 {
@@ -68,6 +130,32 @@ namespace cjm
 	{
 		namespace internal
 		{
+			//REQUIRE USUAL SIZES AND DIGIT COUNTS
+			//REQUIRE DEFINITION of all optional fixed-width integer types in cstdint from 8-64 sizes
+			//REQUIRE CHAR_BIT to be normal (number of bits in char/unsigned char/signed char to be 8)
+			static_assert(CHAR_BIT == 8, "CJM NUMERICS is not designed for systems where CHAR_BIT != 8.");
+
+			//require definition of std::uint8_t and std::int8_t, usual size and digit count
+			static_assert(sizeof(std::uint8_t) == 1 && std::numeric_limits<std::uint8_t>::digits == 8,
+			              "CJM NUMERICS requires definition of std::uint8_t to be a type 1 byte long and with 8 binary digits.");
+			static_assert(sizeof(std::int8_t) == 1 && std::numeric_limits<std::int8_t>::digits == std::numeric_limits<std::uint8_t>::digits -1,
+			              "CJM NUMERICS requires definition of std::int8_t to be a type 1 byte long and with 7 binary digits.");
+			//require definition of std::uint16_t and std::int16_t, usual size and digit count
+			static_assert(sizeof(std::uint16_t) == 2 && std::numeric_limits<std::uint16_t>::digits == 16,
+					"CJM NUMERICS requires definition of std::uint16_t to be a type 2 bytes long and with 16 binary digits.");
+			static_assert(sizeof(std::int16_t) == 2 && std::numeric_limits<std::int16_t>::digits == std::numeric_limits<std::uint16_t>::digits -1,
+			              "CJM NUMERICS requires definition of std::int16_t to be a type 2 bytes long and with 15 binary digits.");
+			//require definition of std::uint32_t and std::int32_t, usual size and digit count
+			static_assert(sizeof(std::uint32_t) == 4 && std::numeric_limits<std::uint32_t>::digits == 32,
+			              "CJM NUMERICS requires definition of std::uint32_t to be a type 2 bytes long and with 32 binary digits.");
+			static_assert(sizeof(std::int32_t) == 4 && std::numeric_limits<std::int32_t>::digits == std::numeric_limits<std::uint32_t>::digits -1,
+			              "CJM NUMERICS requires definition of std::int32_t to be a type 2 bytes long and with 31 binary digits.");
+			//require definition of std::uint64_t and std::int64_t, usual size and digit count
+			static_assert(sizeof(std::uint64_t) == 8 && std::numeric_limits<std::uint64_t>::digits == 64,
+			              "CJM NUMERICS requires definition of std::uint64_t to be a type 8 bytes long and with 64 binary digits.");
+			static_assert(sizeof(std::int64_t) == 8 && std::numeric_limits<std::int64_t>::digits == std::numeric_limits<std::uint64_t>::digits -1,
+			              "CJM NUMERICS requires definition of std::int64_t to be a type 8 bytes long and with 63 binary digits.");
+
 			//alternate declarations for cjm_intrinsic_macros ... never defined because never used but need something that won't blow compiler up
 			//when examining untaken if constexpr branch.
 			extern unsigned char cjm_badrev_bitscan_64(unsigned long* index, std::uint64_t mask);
@@ -76,6 +164,8 @@ namespace cjm
 			extern std::uint64_t cjm_bad_udiv128(std::uint64_t high_dividend, std::uint64_t low_dividend, std::uint64_t divisor, std::uint64_t* remainder);
 			extern std::uint64_t cjm_bad_shiftleft128(std::uint64_t low, std::uint64_t high, unsigned char shift_amount);
 			extern std::uint64_t cjm_bad_shiftright128(std::uint64_t low, std::uint64_t high, unsigned char shift_amount);
+			extern unsigned char cjm_bad_addc64(unsigned char c_in, std::uint64_t x, std::uint64_t y, std::uint64_t* sum) noexcept;
+			extern unsigned char cjm_bad_subb64(unsigned char b_in, std::uint64_t minuend, std::uint64_t subtrahend, std::uint64_t* difference) noexcept;
 		}
 
 		enum class compiler_used : unsigned
@@ -172,9 +262,8 @@ namespace cjm
 			intrinsic_u128,
 		};
 		constexpr uint128_calc_mode init_eval_mode() noexcept;
-	}
+	}	
 }
-
 
 #endif
 #include "numerics_configuration.inl"

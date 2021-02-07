@@ -177,6 +177,9 @@ cjm::numerics::uint128::uint128(__uint128_t other) noexcept
 //(though allowed in C) is undefined behavior in C++ and 2- isn't necessary
 //anyway because this function is a static member of uint128 and has
 //direct access to its m_high and m_low members anyway.
+//If the optimized path from clang cannot be taken, I revert
+//to using abseil's shift with subtract algorithm as elsewhere
+//rather than using the slow-case handler from clang.
 #if defined(_MSC_VER) && defined(_M_X64)
 void uint128::div_mod_msc_x64_impl(uint128 dividend, uint128 divisor, uint128* quotient_ret, uint128* remainder_ret) noexcept
 {

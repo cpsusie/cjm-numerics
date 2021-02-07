@@ -667,12 +667,15 @@ void cjm::uint128_tests::execute_uint128_tests()
 
     execute_test(execute_controlled_from_float_conversion_test, "controlled_from_float_conversion_test"sv);
     execute_test(execute_controlled_float_rt_conversion_test, "controlled_float_rt_conversion_test"sv);
-
     
-	
     execute_test(execute_issue_10_strm_insrt_test, "issue_10_strm_insrt_test"sv);
     execute_test(execute_issue_10_showbase_test, "issue_10_showbase_test"sv);
 	execute_test(execute_hash_dx, "hash_dx"sv);
+
+	execute_test(execute_builtin_add_with_carry_test, "builtin_add_with_carry_test"sv);
+    execute_test(execute_basic_u128_adc_test, "basic_u128_adc_test"sv);
+    execute_test(execute_basic_u128_sbb_test, "basic_u128_sbb_test"sv);
+    execute_test(execute_builtin_sub_with_borrow_test, "builtin_sub_with_borrow_test"sv);
 
 	cout << "STANDARD TEST BATTERY: All tests PASSED." << newl;
     static_assert(most_sign_set_bit(2_u128) == 1);
@@ -3226,6 +3229,10 @@ cjm::uint128_tests::binary_op_u128_vect_t cjm::uint128_tests::generate_divmod_op
             auto* dividend = first >= second ? &first : &second;
             auto* divisor = dividend == &first ? &second : &first;
             assert(dividend != divisor);
+			while (*divisor == 0)
+			{
+                *divisor = generator::create_random_in_range<uint128_t>(rgen);				
+			}
             ret.emplace_back(binary_op::divide, *dividend, *divisor);
             ret.emplace_back(binary_op::modulus, *dividend, *divisor);
             added_this_range += 2;
@@ -3915,6 +3922,264 @@ void cjm::uint128_tests::generator::rgen::shuffle(binary_op_u128_vect_t& vec, si
     auto end = begin + shuffle_depth;
     assert(end <= vec.end());
     std::shuffle(begin, end, m_gen->m_twister);        
+}
+void cjm::uint128_tests::execute_builtin_add_with_carry_test()
+{
+    if constexpr (cjm::numerics::concepts::builtin_128bit_unsigned_integer<cjm::numerics::natuint128_t>)
+	{
+		using nat_u128_t = cjm::numerics::natuint128_t;
+
+		auto print_input = [] (unsigned char in, uint128_t lhs, uint128_t rhs) -> void
+		{
+			auto saver = cout_saver{cout};
+			std::cout
+				<< "Executing add with carry for inputs -- carry in: [" << std::dec
+				<< static_cast<unsigned>(in) << "], lhs: [0x" << std::hex << std::setw(32)
+				<< std::setfill('0') << lhs << "], rhs: [0x" << std::hex << std::setw(32)
+				<< std::setfill('0') << rhs << "]." << newl;
+		};
+
+		auto print_sum = [] (unsigned char out, uint128_t sum) -> void
+		{
+			auto saver = cout_saver{cout};
+			std::cout
+				<< "Result: sum: [0x" << std::hex << std::setw(32) << std::setfill('0')
+				<< sum << "], out: [" << std::dec
+				<< static_cast<unsigned>(out) << "]." << newl;
+		};
+
+		constexpr auto lhs_1_src = 0xc0de'd00d'fea2'cafe'babe'b00b'600d'f00d_u128;
+		constexpr auto rhs_1_src = 0xf00d'600d'dead'beef'600d'c0de'600d'd00d_u128;
+		auto lhs_1 = static_cast<nat_u128_t>(lhs_1_src);
+		auto rhs_1 = static_cast<nat_u128_t>(rhs_1_src);
+		constexpr unsigned char carry_in_1 = 0;
+		unsigned char carry_out = 0;
+		print_input(carry_in_1, lhs_1_src, rhs_1_src);
+
+		auto result = cjm::numerics::internal::add_with_carry(lhs_1, rhs_1, carry_in_1, carry_out);
+		print_sum(carry_out, static_cast<uint128_t>(result));
+
+		constexpr auto expected_sum = lhs_1_src + rhs_1_src;
+		constexpr unsigned char expected_carry_out = expected_sum < lhs_1_src ? 1 : 0;
+
+		cjm_assert(carry_out == expected_carry_out && result == expected_sum);
+
+		constexpr auto ctime_res_1 = cjm::numerics::add_with_carry(lhs_1_src, rhs_1_src, carry_in_1);
+		cjm_assert(ctime_res_1.first == expected_sum && ((ctime_res_1.second == 0) == (expected_carry_out == 0)));
+
+	}
+	else
+	{
+		std::cout << "NOT EXECUTING BECAUSE BUILT-IN UINT128 NOT AVAILABLE." << newl;
+	}
+}
+
+void cjm::uint128_tests::execute_builtin_sub_with_borrow_test()
+{
+	if constexpr (cjm::numerics::concepts::builtin_128bit_unsigned_integer<cjm::numerics::natuint128_t>)
+	{
+		using nat_u128_t = cjm::numerics::natuint128_t;
+
+		auto print_input = [] (unsigned char in, uint128_t lhs, uint128_t rhs) -> void
+		{
+			auto saver = cout_saver{cout};
+			std::cout
+					<< "Executing sub with borrow for inputs -- borrow in: [" << std::dec
+					<< static_cast<unsigned>(in) << "], lhs: [0x" << std::hex << std::setw(32)
+					<< std::setfill('0') << lhs << "], rhs: [0x" << std::hex << std::setw(32)
+					<< std::setfill('0') << rhs << "]." << newl;
+		};
+
+		auto print_sum = [] (unsigned char out, uint128_t difference) -> void
+		{
+			auto saver = cout_saver{cout};
+			std::cout
+					<< "Result: difference: [0x" << std::hex << std::setw(32) << std::setfill('0')
+					<< difference << "], out: [" << std::dec
+					<< static_cast<unsigned>(out) << "]." << newl << newl;
+		};
+
+		constexpr auto minuend_1 = 0xc0de'd00d'fea2'cafe'babe'b00b'600d'f00d_u128;
+		constexpr auto subtrahend_1 = 0xf00d'600d'dead'beef'600d'c0de'600d'd00d_u128;
+		auto nat_minuend_1 = static_cast<nat_u128_t>(minuend_1);
+		auto nat_subtrahend_1 = static_cast<nat_u128_t>(subtrahend_1);
+		constexpr unsigned char borrow_in_1 = 0;
+		unsigned char borrow_out_1 = 0;
+		print_input(borrow_in_1, minuend_1, subtrahend_1);
+
+		auto result_1 = cjm::numerics::internal::sub_with_borrow(nat_minuend_1, nat_subtrahend_1, borrow_in_1, borrow_out_1);
+		print_sum(borrow_out_1, static_cast<uint128_t>(result_1));
+
+		constexpr auto expected_diff_1 = minuend_1 - subtrahend_1;
+		constexpr unsigned char expected_borrow_out_1 = expected_diff_1 > minuend_1 ? 1 : 0;
+
+		cjm_assert(borrow_out_1 == expected_borrow_out_1 && result_1 == expected_diff_1);
+
+		constexpr auto minuend_2 = 0x01_u128;
+		constexpr auto subtrahend_2 = 0x600d'd00d_u128;
+		auto nat_minuend_2 = static_cast<nat_u128_t>(minuend_2);
+		auto nat_subtrahend_2 = static_cast<nat_u128_t>(subtrahend_2);
+		constexpr unsigned char borrow_in_2 = 0;
+		unsigned char borrow_out_2 = 0;
+		print_input(borrow_in_2, minuend_2, subtrahend_2);
+
+		nat_u128_t result_2 = cjm::numerics::internal::sub_with_borrow(nat_minuend_2, nat_subtrahend_2, borrow_in_2, borrow_out_2);
+		print_sum(borrow_out_2, static_cast<uint128_t>(result_2));
+
+		constexpr auto expected_diff_2 = minuend_2 - subtrahend_2;
+		constexpr unsigned char expected_borrow_out_2 = expected_diff_2 > minuend_2 ? 1 : 0;
+
+		cjm_assert(borrow_out_2 == expected_borrow_out_2 && result_2 == expected_diff_2);
+
+		const auto& minuend_3 = minuend_2;
+		const auto& subtrahend_3 = subtrahend_2;
+		const auto& nat_minuend_3 = nat_minuend_2;
+		const auto& nat_subtrahend_3 = nat_subtrahend_2;
+		constexpr unsigned char borrow_in_3 = 1;
+		unsigned char borrow_out_3 = 0;
+		print_input(borrow_in_3, minuend_3, subtrahend_3);
+
+		nat_u128_t result_3 = cjm::numerics::internal::sub_with_borrow(nat_minuend_3, nat_subtrahend_3, borrow_in_3, borrow_out_3);
+		print_sum(borrow_out_3, static_cast<uint128_t>(result_3));
+
+		constexpr auto expected_diff_3 = expected_diff_2 - 1;
+		constexpr auto expected_borrow_out_3 = expected_borrow_out_2;
+
+		cjm_assert(borrow_out_3 == expected_borrow_out_3 && result_3 == expected_diff_3);
+
+		constexpr auto ctime_res_1 = cjm::numerics::sub_with_borrow(minuend_1, subtrahend_1, borrow_in_1);
+		constexpr auto ctime_res_2 = cjm::numerics::sub_with_borrow(minuend_2, subtrahend_2, borrow_in_2);
+		constexpr auto ctime_res_3 =  cjm::numerics::sub_with_borrow(minuend_2, subtrahend_2, borrow_in_3);
+
+		cjm_assert(ctime_res_1.first == expected_diff_1 && ((ctime_res_1.second == 0) == (expected_borrow_out_1 == 0)));
+		cjm_assert(ctime_res_2.first == expected_diff_2 && ((ctime_res_2.second == 0) == (expected_borrow_out_2 == 0)));
+		cjm_assert(ctime_res_3.first == expected_diff_3 && ((ctime_res_3.second == 0) == (expected_borrow_out_3 == 0)));
+	}
+	else
+	{
+		std::cout << "NOT EXECUTING BECAUSE BUILT-IN UINT128 NOT AVAILABLE." << newl;
+	}
+}
+
+void cjm::uint128_tests::execute_basic_u128_adc_test()
+{
+    constexpr auto addend_1_left = 0xdead'beef'600d'f00d'ffff'ffff'ffff'ffff_u128;
+    constexpr auto addend_1_right = 0xffff'ffff'ffff'ffff'c0de'd00d'fea2'b00b_u128;
+
+    constexpr auto addend_2_left = 0xffff'ffff'ffff'ffff_u128;
+    constexpr auto addend_2_right = 0xc0de'd00d'fea2'b00b_u128;
+    constexpr auto expected_sum_3 = addend_2_left + addend_2_right;
+    constexpr auto expected_sum_4 = expected_sum_3 + 1;
+	constexpr bool expected_carry_out_3 = false;
+    constexpr bool expected_carry_out_4 = false;
+	
+    constexpr auto expected_sum_1 = addend_1_left + addend_1_right;
+    constexpr auto expected_sum_2 = expected_sum_1 + 1;
+    constexpr bool expected_carry_out_1 = true;
+    constexpr bool expected_carry_out_2 = true;
+    constexpr auto ctime_res_1 = add_with_carry(addend_1_left, addend_1_right, 0);
+    constexpr auto ctime_res_2 = add_with_carry(addend_1_left, addend_1_right, 1);
+    constexpr auto ctime_res_3 = add_with_carry(addend_2_left, addend_2_right, 0);
+    constexpr auto ctime_res_4 = add_with_carry(addend_2_left, addend_2_right, 1);
+	
+    auto [actual_sum, actual_carry_out] = add_with_carry(addend_1_left, addend_1_right, 0);
+    auto [actual_sum_2, actual_carry_out_2] = add_with_carry(addend_1_left, addend_1_right, 1);
+    auto [actual_sum_3, actual_carry_out_3] = add_with_carry(addend_2_left, addend_2_right, 0);
+	auto [actual_sum_4, actual_carry_out_4] = add_with_carry(addend_2_left, addend_2_right, 1);
+	
+	cjm_assert(actual_sum == expected_sum_1); 
+    cjm_assert((actual_carry_out != 0) == expected_carry_out_1);
+    cjm_assert(actual_sum == ctime_res_1.first);
+    cjm_assert((actual_carry_out != 0) == (ctime_res_1.second!= 0));
+
+    cjm_assert(actual_sum_2 == expected_sum_2);
+    cjm_assert((actual_carry_out_2 != 0) == expected_carry_out_2);
+    cjm_assert(actual_sum_2 == ctime_res_2.first);
+    cjm_assert((actual_carry_out_2 != 0) == (ctime_res_2.second != 0));
+
+    cjm_assert(actual_sum_3 == expected_sum_3);
+    cjm_assert((actual_carry_out_3 != 0) == expected_carry_out_3);
+    cjm_assert(actual_sum_3 == ctime_res_3.first);
+    cjm_assert((actual_carry_out_3 != 0) == (ctime_res_3.second != 0));
+
+    cjm_assert(actual_sum_4 == expected_sum_4);
+    cjm_assert((actual_carry_out_4 != 0) == expected_carry_out_4);
+    cjm_assert(actual_sum_4 == ctime_res_4.first);
+    cjm_assert((actual_carry_out_4 != 0) == (ctime_res_4.second != 0));
+}
+
+void cjm::uint128_tests::execute_basic_u128_sbb_test()
+{
+    constexpr auto subtrahend_1 = 0xdead'beef'600d'f00d'ffff'ffff'ffff'ffff_u128;
+    constexpr auto minuend_1 = 0xffff'ffff'ffff'ffff'c0de'd00d'fea2'b00b_u128;
+    constexpr bool expected_borrow_out_1 = false;
+
+	constexpr auto minuend_2 = 0xffff'ffff'ffff'ffff_u128;
+    constexpr auto subtrahend_2 = 0xc0de'd00d'fea2'b00b_u128;
+    constexpr bool expected_borrow_out_2 = false;
+
+	constexpr auto minuend_3 = subtrahend_1;
+    constexpr auto subtrahend_3 = minuend_1;
+    constexpr auto expected_borrow_out_3 = true;
+	
+    constexpr auto minuend_4 = subtrahend_2;
+    constexpr auto subtrahend_4 = minuend_2;
+    constexpr auto expected_borrow_out_4 = true;
+
+    constexpr auto expected_difference_1 = minuend_1 - subtrahend_1;
+    constexpr auto expected_difference_2 = minuend_2 - subtrahend_2;
+    constexpr auto expected_difference_3 = minuend_3 - subtrahend_3;
+    constexpr auto expected_difference_4 = minuend_4 - subtrahend_4;
+    	
+    constexpr auto ctime_res_1_no_bin = sub_with_borrow(minuend_1, subtrahend_1, 0);
+	constexpr auto ctime_res_1_bin = sub_with_borrow(minuend_1, subtrahend_1, 1);
+    constexpr auto ctime_res_2_no_bin = sub_with_borrow(minuend_2, subtrahend_2, 0);
+    constexpr auto ctime_res_2_bin = sub_with_borrow(minuend_2, subtrahend_2, 1);
+    constexpr auto ctime_res_3_no_bin = sub_with_borrow(minuend_3, subtrahend_3, 0);
+    constexpr auto ctime_res_3_bin = sub_with_borrow(minuend_3, subtrahend_3, 1);
+    constexpr auto ctime_res_4_no_bin = sub_with_borrow(minuend_4, subtrahend_4, 0);
+    constexpr auto ctime_res_4_bin = sub_with_borrow(minuend_4, subtrahend_4, 1);
+
+    cjm_assert(ctime_res_1_no_bin.first == expected_difference_1);
+    cjm_assert((ctime_res_1_no_bin.second != 0) == expected_borrow_out_1);
+    cjm_assert(ctime_res_1_bin.first == expected_difference_1 -1);
+    cjm_assert((ctime_res_1_bin.second != 0) == expected_borrow_out_1);
+
+    cjm_assert(ctime_res_2_no_bin.first == expected_difference_2);
+    cjm_assert((ctime_res_2_no_bin.second != 0) == expected_borrow_out_2);
+    cjm_assert(ctime_res_2_bin.first == expected_difference_2 - 1);
+    cjm_assert((ctime_res_2_bin.second != 0) == expected_borrow_out_2);
+
+    cjm_assert(ctime_res_3_no_bin.first == expected_difference_3);
+    cjm_assert((ctime_res_3_no_bin.second != 0) == expected_borrow_out_3);
+    cjm_assert(ctime_res_3_bin.first == expected_difference_3 - 1);
+    cjm_assert((ctime_res_3_bin.second != 0) == expected_borrow_out_3);
+
+    cjm_assert(ctime_res_4_no_bin.first == expected_difference_4);
+    cjm_assert((ctime_res_4_no_bin.second != 0) == expected_borrow_out_4);
+    cjm_assert(ctime_res_4_bin.first == expected_difference_4 - 1);
+    cjm_assert((ctime_res_4_bin.second != 0) == expected_borrow_out_4);
+
+    auto [actual_diff_1_no_bin, act_bout_1_no_bin] = sub_with_borrow(minuend_1, subtrahend_1, 0);
+    auto [actual_diff_1_bin, act_bout_1_bin] = sub_with_borrow(minuend_1, subtrahend_1, 1);
+    auto [actual_diff_2_no_bin, act_bout_2_no_bin] = sub_with_borrow(minuend_2, subtrahend_2, 0);
+    auto [actual_diff_2_bin, act_bout_2_bin] = sub_with_borrow(minuend_2, subtrahend_2, 1);
+    auto [actual_diff_3_no_bin, act_bout_3_no_bin] = sub_with_borrow(minuend_3, subtrahend_3, 0);
+    auto [actual_diff_3_bin, act_bout_3_bin] = sub_with_borrow(minuend_3, subtrahend_3, 1);
+    auto [actual_diff_4_no_bin, act_bout_4_no_bin] = sub_with_borrow(minuend_4, subtrahend_4, 0);
+    auto [actual_diff_4_bin, act_bout_4_bin] = sub_with_borrow(minuend_4, subtrahend_4, 1);
+
+    cjm_assert(actual_diff_1_no_bin == ctime_res_1_no_bin.first && ((act_bout_1_no_bin != 0) == (ctime_res_1_no_bin.second != 0)));
+    cjm_assert(actual_diff_1_bin == ctime_res_1_bin.first && ((act_bout_1_bin != 0) == (ctime_res_1_bin.second != 0)));
+
+	cjm_assert(actual_diff_2_no_bin == ctime_res_2_no_bin.first && ((act_bout_2_no_bin != 0) == (ctime_res_2_no_bin.second != 0)));
+    cjm_assert(actual_diff_2_bin == ctime_res_2_bin.first && ((act_bout_2_bin != 0) == (ctime_res_2_bin.second != 0)));
+
+	cjm_assert(actual_diff_3_no_bin == ctime_res_3_no_bin.first && ((act_bout_3_no_bin != 0) == (ctime_res_3_no_bin.second != 0)));
+    cjm_assert(actual_diff_3_bin == ctime_res_3_bin.first && ((act_bout_3_bin != 0) == (ctime_res_3_bin.second != 0)));
+
+    cjm_assert(actual_diff_4_no_bin == ctime_res_4_no_bin.first && ((act_bout_4_no_bin != 0) == (ctime_res_4_no_bin.second != 0)));
+    cjm_assert(actual_diff_4_bin == ctime_res_4_bin.first && ((act_bout_4_bin != 0) == (ctime_res_4_bin.second != 0)));
 }
 
 #ifdef CJM_HAVE_BUILTIN_128

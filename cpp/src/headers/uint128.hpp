@@ -72,14 +72,17 @@
 // File: int128.h
 // -----------------------------------------------------------------------------
 
-//If compiled on a Big Endian system, change "true" to "false"
-#define CJM_NUMERICS_LITTLE_ENDIAN true
-
 namespace cjm::numerics
 {
     class uint128;
-    template<typename LimbType>
-    class fixed_uint;
+
+    ///<summary>
+    ///In the future, will define
+    ///cjm unsigned integers of larger type implemented in terms
+    ///of a cjm unsigned integer of smaller type.
+    ///</summary>
+    template<concepts::cjm_unsigned_integer LimbType>
+    class [[maybe_unused]] fixed_uint;
 
     template<concepts::integer IntegerType>
     struct divmod_result;
@@ -112,6 +115,26 @@ namespace cjm::numerics
 
     	template<concepts::builtin_floating_point TFloat>
         uint128 make_from_floating_point(TFloat v) noexcept;
+
+    	template<concepts::builtin_128bit_unsigned_integer Ui128>
+    	Ui128 add_with_carry(Ui128 first_addend, Ui128 second_addend, unsigned char carry_in,
+						  unsigned char& carry_out) noexcept;
+
+        template<concepts::builtin_128bit_unsigned_integer Ui128>
+        Ui128 sub_with_borrow(Ui128 minuend, Ui128 subtrahend, unsigned char borrow_in,
+            unsigned char& borrow_out) noexcept;
+    	
+        template<concepts::cjm_unsigned_integer Ui128>
+			requires (sizeof(Ui128) == 16 && !concepts::builtin_128bit_unsigned_integer<Ui128>)
+        Ui128 sub_with_borrow(Ui128 minuend, Ui128 subtrahend,
+            unsigned char borrow_in, unsigned char& borrow_out) noexcept;
+    	
+        //Not intended to be used, made so untaken if constexpr branch of builtin test doesn't
+    	//blow up ... even though it isn't taken
+    	template<concepts::cjm_unsigned_integer Ui128>
+			requires (sizeof(Ui128) == 16 && !concepts::builtin_128bit_unsigned_integer<Ui128>)
+        Ui128 add_with_carry(Ui128 first_addend, Ui128 second_addend,
+			unsigned char carry_in, unsigned char& carry_out) noexcept;
     }
 
     /// <summary>
@@ -351,33 +374,106 @@ namespace cjm::numerics
     public:
         static constexpr size_t byte_array_size = 16;
 
-    	friend class fixed_uint<uint128>;
-            	
         using int_part = std::uint64_t;      
         using byte_array = std::array<unsigned char, byte_array_size>;
         using divmod_result_t = divmod_result<uint128>;
-    	
+
+        /// <summary>
+        /// Parses a string_view into a uint128
+        /// </summary>
+        /// <typeparam name="Chars">Character type</typeparam>
+        /// <typeparam name="CharTraits">Character traits type</typeparam>
+        /// <param name="parse_me">the string_view to parse.</param>
+        /// <returns>A uint128 parsed from parse_me.</returns>
+        /// <exception cref="std::invalid_argument">A uint128 could not be parsed from
+        /// the supplied value.</exception>
         template<typename Chars, typename CharTraits = std::char_traits<Chars>>
-                requires cjm::numerics::concepts::char_with_traits<Chars, CharTraits>
-        static uint128 make_from_string(std::basic_string_view<Chars, CharTraits> parseMe);
+			requires cjm::numerics::concepts::char_with_traits<Chars, CharTraits>
+        static uint128 make_from_string(std::basic_string_view<Chars, CharTraits> 
+            parse_me);
 
-        template<typename Chars, typename CharTraits = std::char_traits<Chars>, typename Allocator = std::allocator<Chars>>
-			requires cjm::numerics::concepts::char_with_traits_and_allocator<Chars, CharTraits, Allocator>
-        static uint128 make_from_string(const std::basic_string<Chars, CharTraits, Allocator>& parseMe);
+		/// <summary>
+	    /// Parses a string into a uint128
+	    /// </summary>
+	    /// <typeparam name="Chars">Character type</typeparam>
+	    /// <typeparam name="CharTraits">Character traits type</typeparam>
+	    /// <param name="parse_me">the string to parse.</param>
+	    /// <returns>A uint128 parsed from parse_me.</returns>
+	    /// <exception cref="std::invalid_argument">A uint128 could not be parsed from
+	    /// the supplied value.</exception>
+        template<typename Chars, typename CharTraits = std::char_traits<Chars>,
+    		typename Allocator = std::allocator<Chars>>
+			requires cjm::numerics::concepts::char_with_traits_and_allocator<Chars,
+    			CharTraits, Allocator>
+        static uint128 make_from_string(const std::basic_string<Chars, CharTraits, 
+            Allocator>& parse_me);
 
+        /// <summary>
+        /// For future functionality -- will facilitate building addition operations
+        /// for a uint256 type.
+        /// Perform add with carry on two unsigned 128 bit integers
+        /// </summary>
+        /// <param name="first_addend">first addend</param>
+        /// <param name="second_addend">second addend</param>
+        /// <param name="carry_in">0 for no carry-in, 1 for carry-in</param>
+        /// <returns>a pair whose first member is the sum and the second number
+        /// represents carry_out.  carry_out will be non-zero if the addition overflowed.</returns>
+        /// <remarks>Not yet fully tested.</remarks>
+        friend constexpr std::pair<uint128, unsigned char>
+    		add_with_carry(uint128 first_addend, uint128 second_addend, 
+                unsigned char carry_in) noexcept;
 
-
+        /// <summary>
+        /// For future functionality -- will facilitate building subtraction operations
+	    /// for a uint256 type.
+        /// </summary>
+        /// <param name="minuend">minuend</param>
+        /// <param name="subtrahend">subtrahend</param>
+		/// <param name="borrow_in">0 for no borrow-in, 1 for borrow-in</param>
+        /// <returns>a pair whose first member is the difference and the second number
+        /// represents borrow_out.  borrow_out will be non-zero if the subtraction overflowed.</returns>
+        /// <remarks>Not yet fully tested.</remarks>
+        friend constexpr std::pair<uint128, unsigned char> sub_with_borrow(uint128 minuend, 
+            uint128 subtrahend, unsigned char borrow_in) noexcept;
+    	
+        /// <summary>
+        /// add with carry for limbs / int parts
+        /// </summary>
+        /// <param name="first_addend">first addend</param>
+        /// <param name="second_addend">second addend</param>
+        /// <param name="carry_in">carry in</param>
+        /// <param name="carry_out">carry out</param>
+        /// <returns>sum and carry out</returns>
+        /// <remarks>Not yet fully tested.</remarks>
+        friend constexpr int_part add_with_carry(int_part first_addend,
+            int_part second_addend, unsigned char carry_in, 
+				unsigned char& carry_out) noexcept;
+        /// <summary>
+		/// subtract with borrow for limbs / int parts
+		/// </summary>
+		/// <param name="minuend">the minuend</param>
+		/// <param name="subtrahend">the subtrahend</param>
+		/// <param name="borrow_in">borrow in</param>
+		/// <param name="borrow_out">borrow out</param>
+		/// <returns>difference and borrow out</returns>
+		/// <remarks>Not yet fully tested.</remarks>
+        friend constexpr int_part sub_with_borrow(int_part minuend, int_part subtrahend,  
+            unsigned char borrow_in, unsigned char& borrow_out) noexcept;
         static constexpr uint128 make_from_bytes_little_endian(byte_array bytes) noexcept;
         static constexpr uint128 make_from_bytes_big_endian(byte_array bytes) noexcept;
-        static constexpr uint128 make_uint128(std::uint64_t high, std::uint64_t low) noexcept;
-        static constexpr std::optional<divmod_result_t> try_div_mod(uint128 dividend, uint128 divisor) noexcept;
+        static constexpr uint128 make_uint128(std::uint64_t high, 
+            std::uint64_t low) noexcept;
+        static constexpr std::optional<divmod_result_t> try_div_mod(uint128 dividend, 
+            uint128 divisor) noexcept;
     	static constexpr divmod_result_t div_mod(uint128 dividend, uint128 divisor);
-        static constexpr divmod_result_t unsafe_div_mod(uint128 dividend, uint128 divisor) noexcept; //NOLINT (bugprone-exception-escape)
-        static void instrumented_div_mod(std::basic_ostream<char>& stream, uint128 dividend, uint128 divisor,
-            uint128* quotient_ret, uint128* remainder_ret);
+        static constexpr divmod_result_t unsafe_div_mod(uint128 dividend, 
+            uint128 divisor) noexcept; //NOLINT (bugprone-exception-escape)
+        static void instrumented_div_mod(std::basic_ostream<char>& stream, uint128 dividend, 
+            uint128 divisor, uint128* quotient_ret, uint128* remainder_ret);
         static constexpr int_part int_part_bits{ sizeof(int_part) * CHAR_BIT };
         static constexpr int_part int_part_bottom_half_bits{ int_part_bits / 2 };
-        static constexpr int_part int_part_bottom_half_bitmask{std::numeric_limits<int_part>::max() >> int_part_bottom_half_bits};
+        static constexpr int_part int_part_bottom_half_bitmask{
+        	std::numeric_limits<int_part>::max() >> int_part_bottom_half_bits};
         static constexpr int most_sign_set_bit(uint128 value) noexcept;
         constexpr uint128() noexcept;
         constexpr uint128(const uint128& other) noexcept = default;
@@ -415,14 +511,12 @@ namespace cjm::numerics
         constexpr explicit operator char16_t() const noexcept;
         constexpr explicit operator char32_t() const noexcept;
         constexpr explicit operator wchar_t() const noexcept;
-        constexpr explicit operator short() const noexcept;
-        constexpr explicit operator unsigned short() const noexcept;
-        constexpr explicit operator int() const noexcept;
-        constexpr explicit operator unsigned int() const noexcept;
-        constexpr explicit operator long() const noexcept;
-        constexpr explicit operator unsigned long() const noexcept;
-        constexpr explicit operator long long() const noexcept;
-        constexpr explicit operator unsigned long long() const noexcept;
+        constexpr explicit operator std::int16_t() const noexcept;
+        constexpr explicit operator std::uint16_t() const noexcept;
+        constexpr explicit operator std::int32_t() const noexcept;
+        constexpr explicit operator std::uint32_t() const noexcept;
+        constexpr explicit operator std::int64_t() const noexcept;
+        constexpr explicit operator std::uint64_t() const noexcept;
         explicit operator float() const;
         explicit operator double() const;
         explicit operator long double() const;
@@ -437,6 +531,8 @@ namespace cjm::numerics
         [[nodiscard]] constexpr size_t hash_code() const noexcept;
                
         // Arithmetic operators.
+        friend constexpr uint128 operator+(uint128 lhs, uint128 rhs) noexcept;
+        friend constexpr uint128 operator-(uint128 lhs, uint128 rhs) noexcept;
         constexpr uint128& operator+=(uint128 other) noexcept;
         constexpr uint128& operator-=(uint128 other) noexcept;
         constexpr uint128& operator*=(uint128 other) noexcept;
@@ -447,6 +543,10 @@ namespace cjm::numerics
         constexpr uint128 operator--(int) noexcept;
         constexpr uint128& operator<<=(int amount) noexcept;
         constexpr uint128& operator>>=(int amount) noexcept;
+        constexpr uint128& operator<<=(unsigned amount) noexcept;
+        constexpr uint128& operator>>=(unsigned amount) noexcept;
+        constexpr uint128& operator<<=(uint128 amount) noexcept;
+        constexpr uint128& operator>>=(uint128 amount) noexcept;
         constexpr uint128& operator&=(uint128 other) noexcept;
         constexpr uint128& operator|=(uint128 other) noexcept;
         constexpr uint128& operator^=(uint128 other) noexcept;
@@ -459,8 +559,10 @@ namespace cjm::numerics
         friend constexpr uint128 operator>>(uint128 lhs, uint128 amount) noexcept;
         friend constexpr uint128 operator<<(uint128 lhs, uint128 amount) noexcept;
         template<typename Char, typename CharTraits, typename Allocator>
-            requires cjm::numerics::concepts::char_with_traits_and_allocator<Char, CharTraits, Allocator>
-        friend std::basic_ostream<Char, CharTraits>& operator<< (std::basic_ostream<Char, CharTraits>& os, uint128 v);
+            requires cjm::numerics::concepts::char_with_traits_and_allocator<Char,
+    			CharTraits, Allocator>
+        friend std::basic_ostream<Char, CharTraits>& operator<< (std::basic_ostream<Char, 
+			CharTraits>& os, uint128 v);
 
         //Accessor for sub-components
         [[nodiscard]] constexpr int_part low_part() const noexcept;
@@ -479,7 +581,8 @@ namespace cjm::numerics
         static constexpr byte_array to_bytes_native(uint128 convert_me) noexcept; //NOLINT ((bugprone-exception-escape)
         inline static uint128 lshift_msvc_x64(uint128 shift_me, int shift_amount) noexcept;
         inline static uint128 rshift_msvc_x64(uint128 shift_me, int shift_amount) noexcept;
-        static void best_safe_div_mod(uint128 dividend, uint128 divisor, uint128 * quotient, uint128 * remainder);
+        static void best_safe_div_mod(uint128 dividend, uint128 divisor, 
+            uint128 * quotient, uint128 * remainder);
         static constexpr void constexpr_div_mod_impl(uint128 dividend, uint128 divisor,
             uint128 * quotient_ret, uint128 * remainder_ret);
         static constexpr void unsafe_constexpr_div_mod_impl(uint128 dividend, uint128 divisor,
@@ -487,12 +590,20 @@ namespace cjm::numerics
         static constexpr int fls(uint128 n) noexcept;
         static void div_mod_msc_x64_impl(uint128 dividend, uint128 divisor,
             uint128 * quotient_ret, uint128 * remainder_ret) noexcept;
-        template<typename Char, typename CharTraits = std::char_traits<Char>, typename Allocator = std::allocator<Char>>
-        requires (!cjm::numerics::concepts::utf_character<Char>) && (cjm::numerics::concepts::char_with_traits_and_allocator<Char, CharTraits, Allocator>)
-        static std::basic_string<Char, CharTraits, Allocator> to_string(uint128 item, std::ios_base::fmtflags flags);
-        template<typename Char, typename CharTraits = std::char_traits<Char>, typename Allocator = std::allocator<Char>>
-        requires (cjm::numerics::concepts::utf_character<Char>) && (cjm::numerics::concepts::char_with_traits_and_allocator<Char, CharTraits, Allocator>)
-        static std::basic_string<Char, CharTraits, Allocator> to_string(uint128 item, std::ios_base::fmtflags flags);
+        template<typename Char, typename CharTraits = std::char_traits<Char>,
+    		typename Allocator = std::allocator<Char>>
+				requires (!cjm::numerics::concepts::utf_character<Char>)
+    				&& (cjm::numerics::concepts::char_with_traits_and_allocator<Char, 
+							CharTraits, Allocator>)
+        static std::basic_string<Char, CharTraits, Allocator>
+    		to_string(uint128 item, std::ios_base::fmtflags flags);
+        template<typename Char, typename CharTraits = std::char_traits<Char>,
+    		typename Allocator = std::allocator<Char>>
+				requires (cjm::numerics::concepts::utf_character<Char>)
+    				&& (cjm::numerics::concepts::char_with_traits_and_allocator<Char,
+							CharTraits, Allocator>)
+        static std::basic_string<Char, CharTraits, Allocator> to_string(uint128 item,
+            std::ios_base::fmtflags flags);
 
 
 #if CJM_NUMERICS_LITTLE_ENDIAN
@@ -502,6 +613,7 @@ namespace cjm::numerics
         int_part m_high;
         int_part m_low;
 #endif
+
     };
 
 	//Ensure compliance with concepts
