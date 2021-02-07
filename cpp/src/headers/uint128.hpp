@@ -409,7 +409,8 @@ namespace cjm::numerics
             Allocator>& parse_me);
 
         /// <summary>
-        /// Future function NOT TESTED
+        /// For future functionality -- will facilitate building addition operations
+        /// for a uint256 type.
         /// Perform add with carry on two unsigned 128 bit integers
         /// </summary>
         /// <param name="first_addend">first addend</param>
@@ -417,45 +418,45 @@ namespace cjm::numerics
         /// <param name="carry_in">0 for no carry-in, 1 for carry-in</param>
         /// <returns>a pair whose first member is the sum and the second number
         /// represents carry_out.  carry_out will be non-zero if the addition overflowed.</returns>
-        /// <remarks>This is present for future features and has not yet been fully tested.</remarks>
+        /// <remarks>Not yet fully tested.</remarks>
         friend constexpr std::pair<uint128, unsigned char>
     		add_with_carry(uint128 first_addend, uint128 second_addend, 
                 unsigned char carry_in) noexcept;
 
         /// <summary>
-        /// Future function NOT TESTED
-        /// Perform sub with carry on two unsigned 128 bit integers
+        /// For future functionality -- will facilitate building subtraction operations
+	    /// for a uint256 type.
         /// </summary>
         /// <param name="minuend">minuend</param>
         /// <param name="subtrahend">subtrahend</param>
 		/// <param name="borrow_in">0 for no borrow-in, 1 for borrow-in</param>
         /// <returns>a pair whose first member is the difference and the second number
         /// represents borrow_out.  borrow_out will be non-zero if the subtraction overflowed.</returns>
-        /// <remarks>This is present for future features and has not yet been fully tested.</remarks>
+        /// <remarks>Not yet fully tested.</remarks>
         friend constexpr std::pair<uint128, unsigned char> sub_with_borrow(uint128 minuend, 
             uint128 subtrahend, unsigned char borrow_in) noexcept;
     	
         /// <summary>
-        /// future functionality -- add with carry
+        /// add with carry for limbs / int parts
         /// </summary>
         /// <param name="first_addend">first addend</param>
         /// <param name="second_addend">second addend</param>
         /// <param name="carry_in">carry in</param>
         /// <param name="carry_out">carry out</param>
-        /// <returns>sum</returns>
-        /// <remarks>NOT TESTED </remarks>
+        /// <returns>sum and carry out</returns>
+        /// <remarks>Not yet fully tested.</remarks>
         friend constexpr int_part add_with_carry(int_part first_addend,
             int_part second_addend, unsigned char carry_in, 
 				unsigned char& carry_out) noexcept;
         /// <summary>
-		/// future functionality -- subtraction with borrow
+		/// subtract with borrow for limbs / int parts
 		/// </summary>
 		/// <param name="minuend">the minuend</param>
 		/// <param name="subtrahend">the subtrahend</param>
 		/// <param name="borrow_in">borrow in</param>
 		/// <param name="borrow_out">borrow out</param>
-		/// <returns>difference</returns>
-		/// <remarks>NOT TESTED </remarks>
+		/// <returns>difference and borrow out</returns>
+		/// <remarks>Not yet fully tested.</remarks>
         friend constexpr int_part sub_with_borrow(int_part minuend, int_part subtrahend,  
             unsigned char borrow_in, unsigned char& borrow_out) noexcept;
         static constexpr uint128 make_from_bytes_little_endian(byte_array bytes) noexcept;

@@ -675,8 +675,7 @@ void cjm::uint128_tests::execute_uint128_tests()
 	execute_test(execute_builtin_add_with_carry_test, "builtin_add_with_carry_test"sv);
     execute_test(execute_basic_u128_adc_test, "basic_u128_adc_test"sv);
     execute_test(execute_basic_u128_sbb_test, "basic_u128_sbb_test"sv);
-
-	
+    execute_test(execute_builtin_sub_with_borrow_test, "builtin_sub_with_borrow_test"sv);
 
 	cout << "STANDARD TEST BATTERY: All tests PASSED." << newl;
     static_assert(most_sign_set_bit(2_u128) == 1);
@@ -3965,6 +3964,96 @@ void cjm::uint128_tests::execute_builtin_add_with_carry_test()
 
 		cjm_assert(carry_out == expected_carry_out && result == expected_sum);
 
+		constexpr auto ctime_res_1 = cjm::numerics::add_with_carry(lhs_1_src, rhs_1_src, carry_in_1);
+		cjm_assert(ctime_res_1.first == expected_sum && ((ctime_res_1.second == 0) == (expected_carry_out == 0)));
+
+	}
+	else
+	{
+		std::cout << "NOT EXECUTING BECAUSE BUILT-IN UINT128 NOT AVAILABLE." << newl;
+	}
+}
+
+void cjm::uint128_tests::execute_builtin_sub_with_borrow_test()
+{
+	if constexpr (cjm::numerics::concepts::builtin_128bit_unsigned_integer<cjm::numerics::natuint128_t>)
+	{
+		using nat_u128_t = cjm::numerics::natuint128_t;
+
+		auto print_input = [] (unsigned char in, uint128_t lhs, uint128_t rhs) -> void
+		{
+			auto saver = cout_saver{cout};
+			std::cout
+					<< "Executing sub with borrow for inputs -- borrow in: [" << std::dec
+					<< static_cast<unsigned>(in) << "], lhs: [0x" << std::hex << std::setw(32)
+					<< std::setfill('0') << lhs << "], rhs: [0x" << std::hex << std::setw(32)
+					<< std::setfill('0') << rhs << "]." << newl;
+		};
+
+		auto print_sum = [] (unsigned char out, uint128_t difference) -> void
+		{
+			auto saver = cout_saver{cout};
+			std::cout
+					<< "Result: difference: [0x" << std::hex << std::setw(32) << std::setfill('0')
+					<< difference << "], out: [" << std::dec
+					<< static_cast<unsigned>(out) << "]." << newl << newl;
+		};
+
+		constexpr auto minuend_1 = 0xc0de'd00d'fea2'cafe'babe'b00b'600d'f00d_u128;
+		constexpr auto subtrahend_1 = 0xf00d'600d'dead'beef'600d'c0de'600d'd00d_u128;
+		auto nat_minuend_1 = static_cast<nat_u128_t>(minuend_1);
+		auto nat_subtrahend_1 = static_cast<nat_u128_t>(subtrahend_1);
+		constexpr unsigned char borrow_in_1 = 0;
+		unsigned char borrow_out_1 = 0;
+		print_input(borrow_in_1, minuend_1, subtrahend_1);
+
+		auto result_1 = cjm::numerics::internal::sub_with_borrow(nat_minuend_1, nat_subtrahend_1, borrow_in_1, borrow_out_1);
+		print_sum(borrow_out_1, static_cast<uint128_t>(result_1));
+
+		constexpr auto expected_diff_1 = minuend_1 - subtrahend_1;
+		constexpr unsigned char expected_borrow_out_1 = expected_diff_1 > minuend_1 ? 1 : 0;
+
+		cjm_assert(borrow_out_1 == expected_borrow_out_1 && result_1 == expected_diff_1);
+
+		constexpr auto minuend_2 = 0x01_u128;
+		constexpr auto subtrahend_2 = 0x600d'd00d_u128;
+		auto nat_minuend_2 = static_cast<nat_u128_t>(minuend_2);
+		auto nat_subtrahend_2 = static_cast<nat_u128_t>(subtrahend_2);
+		constexpr unsigned char borrow_in_2 = 0;
+		unsigned char borrow_out_2 = 0;
+		print_input(borrow_in_2, minuend_2, subtrahend_2);
+
+		nat_u128_t result_2 = cjm::numerics::internal::sub_with_borrow(nat_minuend_2, nat_subtrahend_2, borrow_in_2, borrow_out_2);
+		print_sum(borrow_out_2, static_cast<uint128_t>(result_2));
+
+		constexpr auto expected_diff_2 = minuend_2 - subtrahend_2;
+		constexpr unsigned char expected_borrow_out_2 = expected_diff_2 > minuend_2 ? 1 : 0;
+
+		cjm_assert(borrow_out_2 == expected_borrow_out_2 && result_2 == expected_diff_2);
+
+		const auto& minuend_3 = minuend_2;
+		const auto& subtrahend_3 = subtrahend_2;
+		const auto& nat_minuend_3 = nat_minuend_2;
+		const auto& nat_subtrahend_3 = nat_subtrahend_2;
+		constexpr unsigned char borrow_in_3 = 1;
+		unsigned char borrow_out_3 = 0;
+		print_input(borrow_in_3, minuend_3, subtrahend_3);
+
+		nat_u128_t result_3 = cjm::numerics::internal::sub_with_borrow(nat_minuend_3, nat_subtrahend_3, borrow_in_3, borrow_out_3);
+		print_sum(borrow_out_3, static_cast<uint128_t>(result_3));
+
+		constexpr auto expected_diff_3 = expected_diff_2 - 1;
+		constexpr auto expected_borrow_out_3 = expected_borrow_out_2;
+
+		cjm_assert(borrow_out_3 == expected_borrow_out_3 && result_3 == expected_diff_3);
+
+		constexpr auto ctime_res_1 = cjm::numerics::sub_with_borrow(minuend_1, subtrahend_1, borrow_in_1);
+		constexpr auto ctime_res_2 = cjm::numerics::sub_with_borrow(minuend_2, subtrahend_2, borrow_in_2);
+		constexpr auto ctime_res_3 =  cjm::numerics::sub_with_borrow(minuend_2, subtrahend_2, borrow_in_3);
+
+		cjm_assert(ctime_res_1.first == expected_diff_1 && ((ctime_res_1.second == 0) == (expected_borrow_out_1 == 0)));
+		cjm_assert(ctime_res_2.first == expected_diff_2 && ((ctime_res_2.second == 0) == (expected_borrow_out_2 == 0)));
+		cjm_assert(ctime_res_3.first == expected_diff_3 && ((ctime_res_3.second == 0) == (expected_borrow_out_3 == 0)));
 	}
 	else
 	{
