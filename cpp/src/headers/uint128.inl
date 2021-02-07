@@ -1788,7 +1788,7 @@ namespace cjm
                 int_t ret = minuend;
                 if (borrow_in)
                 {
-                	--ret;
+                    --ret;
                 }
                 ret -= subtrahend;
                 borrow_out = ret > minuend ? 0 : 1;
@@ -1815,7 +1815,51 @@ namespace cjm
                 }
             }
         }
+
 		
+        constexpr std::pair<uint128, unsigned char> sub_with_borrow(uint128 minuend,
+            uint128 subtrahend, unsigned char borrow_in) noexcept
+        {
+            if (std::is_constant_evaluated())
+            {
+                uint128 ret = minuend;
+                if (borrow_in)
+                    --ret;
+                ret -= subtrahend;
+                unsigned char borrow_out = ret > minuend  ? 1 : 0;
+                return std::make_pair(ret, borrow_out);
+            }
+            else
+            {
+                if constexpr (calculation_mode == uint128_calc_mode::msvc_x64)
+                {
+                    unsigned char borrow_1 = 0;
+                    unsigned char borrow_2 = 0;
+                    auto ret = uint128{};
+                    ret.m_low = sub_with_borrow(minuend.m_low, subtrahend.m_low, borrow_in, borrow_1);
+                    ret.m_high = sub_with_borrow(minuend.m_high, subtrahend.m_high, borrow_1, borrow_2);
+                    return std::make_pair(ret, borrow_2);
+                }
+                else if constexpr (calculation_mode == uint128_calc_mode::intrinsic_u128)
+                {
+                    unsigned char borrow_out = 0;
+                    auto temp = cjm::numerics::internal::sub_with_borrow(cjm::numerics::bit_cast<natuint128_t>(minuend),
+                        cjm::numerics::bit_cast<natuint128_t>(subtrahend),
+                        borrow_in, borrow_out);
+                    return std::make_pair(temp, borrow_out);
+                }
+                else
+                {
+                    uint128 ret = minuend;
+                    if (borrow_in)
+                        --ret;
+                    ret -= subtrahend;
+                    unsigned char borrow_out = ret > minuend ? 1 : 0;
+                    return std::make_pair(ret, borrow_out);
+                }
+            }
+        }
+
 
         constexpr uint128 operator/(uint128 lhs, uint128 rhs)
 		{
@@ -2694,6 +2738,18 @@ namespace cjm::numerics::internal
 		return ret;
 	}
 
+    template<concepts::builtin_128bit_unsigned_integer Ui128>
+    Ui128 sub_with_borrow(Ui128 minuend, Ui128 subtrahend, unsigned char borrow_in,
+        unsigned char& borrow_out) noexcept
+    {
+        Ui128 ret = minuend;
+        if (borrow_in)
+            --ret;
+        ret -= subtrahend;
+        borrow_out = ret > minuend ? 1 : 0;
+        return ret;
+    }
+	
     template<concepts::cjm_unsigned_integer Ui128>
 		requires (sizeof(Ui128) == 16 && !concepts::builtin_128bit_unsigned_integer<Ui128>)
 	Ui128 add_with_carry(Ui128 first_addend, Ui128 second_addend,
@@ -2704,6 +2760,19 @@ namespace cjm::numerics::internal
             ++ret;
         ret += second_addend;
         carry_out = ret < first_addend ? 1 : 0;
+        return ret;
+    }
+
+    template<concepts::cjm_unsigned_integer Ui128>
+		requires (sizeof(Ui128) == 16 && !concepts::builtin_128bit_unsigned_integer<Ui128>)
+    Ui128 sub_with_borrow(Ui128 minuend, Ui128 subtrahend,
+        unsigned char borrow_in, unsigned char& borrow_out) noexcept
+    {
+        Ui128 ret = minuend;
+        if (borrow_in)
+            --ret;
+        ret -= subtrahend;
+        borrow_out = ret > minuend ? 1 : 0;
         return ret;
     }
 	

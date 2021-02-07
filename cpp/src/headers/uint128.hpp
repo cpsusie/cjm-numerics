@@ -119,6 +119,16 @@ namespace cjm::numerics
     	template<concepts::builtin_128bit_unsigned_integer Ui128>
     	Ui128 add_with_carry(Ui128 first_addend, Ui128 second_addend, unsigned char carry_in,
 						  unsigned char& carry_out) noexcept;
+
+        template<concepts::builtin_128bit_unsigned_integer Ui128>
+        Ui128 sub_with_borrow(Ui128 minuend, Ui128 subtrahend, unsigned char borrow_in,
+            unsigned char& borrow_out) noexcept;
+    	
+        template<concepts::cjm_unsigned_integer Ui128>
+			requires (sizeof(Ui128) == 16 && !concepts::builtin_128bit_unsigned_integer<Ui128>)
+        Ui128 sub_with_borrow(Ui128 minuend, Ui128 subtrahend,
+            unsigned char borrow_in, unsigned char& borrow_out) noexcept;
+    	
         //Not intended to be used, made so untaken if constexpr branch of builtin test doesn't
     	//blow up ... even though it isn't taken
     	template<concepts::cjm_unsigned_integer Ui128>
@@ -411,6 +421,19 @@ namespace cjm::numerics
         friend constexpr std::pair<uint128, unsigned char>
     		add_with_carry(uint128 first_addend, uint128 second_addend, 
                 unsigned char carry_in) noexcept;
+
+        /// <summary>
+        /// Future function NOT TESTED
+        /// Perform sub with carry on two unsigned 128 bit integers
+        /// </summary>
+        /// <param name="minuend">minuend</param>
+        /// <param name="subtrahend">subtrahend</param>
+		/// <param name="borrow_in">0 for no borrow-in, 1 for borrow-in</param>
+        /// <returns>a pair whose first member is the difference and the second number
+        /// represents borrow_out.  borrow_out will be non-zero if the subtraction overflowed.</returns>
+        /// <remarks>This is present for future features and has not yet been fully tested.</remarks>
+        friend constexpr std::pair<uint128, unsigned char> sub_with_borrow(uint128 minuend, 
+            uint128 subtrahend, unsigned char borrow_in) noexcept;
     	
         /// <summary>
         /// future functionality -- add with carry

@@ -63,6 +63,8 @@
 #pragma intrinsic(_udiv128)  // NOLINT(clang-diagnostic-ignored-pragma-intrinsic)
 #pragma intrinsic(__shiftleft128)
 #pragma intrinsic(__shiftright128)
+#pragma intrinsic(_addcarry_u64)
+#pragma intrinsic(_subborrow_u64)
 #ifndef CJM_MSC_X64
 #define CJM_MSC_X64
 #define CJM_UMUL128 _umul128
