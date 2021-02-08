@@ -19,9 +19,7 @@ endif()
 add_executable(Int128
     cpp/src/cpp/program.cpp
     cpp/src/cpp/testing.cpp
-    cpp/src/cpp/istream_utils.cpp
     cpp/src/cpp/int128_tests.cpp
-    cpp/src/cpp/uint128.cpp
     cpp/src/cpp/int128_test_switches.cpp
     cpp/src/cpp/uint128_test_program.cpp
     )

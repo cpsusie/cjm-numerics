@@ -468,7 +468,7 @@ namespace cjm::numerics
     	static constexpr divmod_result_t div_mod(uint128 dividend, uint128 divisor);
         static constexpr divmod_result_t unsafe_div_mod(uint128 dividend, 
             uint128 divisor) noexcept; //NOLINT (bugprone-exception-escape)
-        static void instrumented_div_mod(std::basic_ostream<char>& stream, uint128 dividend, 
+        static inline void instrumented_div_mod(std::basic_ostream<char>& stream, uint128 dividend,
             uint128 divisor, uint128* quotient_ret, uint128* remainder_ret);
         static constexpr int_part int_part_bits{ sizeof(int_part) * CHAR_BIT };
         static constexpr int_part int_part_bottom_half_bits{ int_part_bits / 2 };
@@ -517,15 +517,15 @@ namespace cjm::numerics
         constexpr explicit operator std::uint32_t() const noexcept;
         constexpr explicit operator std::int64_t() const noexcept;
         constexpr explicit operator std::uint64_t() const noexcept;
-        explicit operator float() const;
-        explicit operator double() const;
-        explicit operator long double() const;
+        inline explicit operator float() const;
+        inline explicit operator double() const;
+        inline explicit operator long double() const;
 
         //ctor, assign op and explicit to-conversion for intrinsic unsigned __int128
 #ifdef CJM_HAVE_BUILTIN_128
-        uint128(unsigned __int128 other) noexcept;
-        uint128& operator=(unsigned __int128 other) noexcept;
-        explicit operator unsigned __int128() const noexcept;    	
+        inline uint128(unsigned __int128 other) noexcept;
+        inline uint128& operator=(unsigned __int128 other) noexcept;
+        inline explicit operator unsigned __int128() const noexcept;
 #endif
         //hash code function and comparison operators
         [[nodiscard]] constexpr size_t hash_code() const noexcept;
@@ -588,7 +588,7 @@ namespace cjm::numerics
         static constexpr void unsafe_constexpr_div_mod_impl(uint128 dividend, uint128 divisor,
             uint128 * quotient_ret, uint128 * remainder_ret) noexcept;
         static constexpr int fls(uint128 n) noexcept;
-        static void div_mod_msc_x64_impl(uint128 dividend, uint128 divisor,
+        inline static void div_mod_msc_x64_impl(uint128 dividend, uint128 divisor,
             uint128 * quotient_ret, uint128 * remainder_ret) noexcept;
         template<typename Char, typename CharTraits = std::char_traits<Char>,
     		typename Allocator = std::allocator<Char>>
