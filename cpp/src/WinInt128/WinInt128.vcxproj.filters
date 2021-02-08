@@ -24,12 +24,6 @@
     <ClCompile Include="..\cpp\testing.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\cpp\uint128.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\cpp\istream_utils.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\cpp\int128_test_switches.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>

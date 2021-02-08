@@ -174,10 +174,8 @@
   <ItemGroup>
     <ClCompile Include="..\cpp\int128_tests.cpp" />
     <ClCompile Include="..\cpp\int128_test_switches.cpp" />
-    <ClCompile Include="..\cpp\istream_utils.cpp" />
     <ClCompile Include="..\cpp\program.cpp" />
     <ClCompile Include="..\cpp\testing.cpp" />
-    <ClCompile Include="..\cpp\uint128.cpp" />
     <ClCompile Include="..\cpp\uint128_test_program.cpp" />
   </ItemGroup>
   <ItemGroup>
