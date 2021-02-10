@@ -616,11 +616,11 @@ namespace cjm::numerics
 
     };
 
-	//Ensure compliance with concepts
-    static_assert(concepts::nothrow_convertible<std::array<unsigned char, sizeof(uint128)>, typename uint128::byte_array>);
-    static_assert(concepts::cjm_unsigned_integer<uint128>, "Needs to comply with cjm_unsigned_integer concept.");
-    static_assert(concepts::integer<uint128>, "Needs to be an integer.");
-    static_assert(concepts::printable_subtractable_totally_ordered<uint128>,"Needs to comply with printable_subtractable_totally_ordered.");
+	//Ensure compliance with concepts if special development flag is set
+    static_assert(!internal::validate_uint128_concept_compliance_dev || concepts::nothrow_convertible<std::array<unsigned char, sizeof(uint128)>, typename uint128::byte_array>);
+    static_assert(!internal::validate_uint128_concept_compliance_dev || concepts::cjm_unsigned_integer<uint128>, "Needs to comply with cjm_unsigned_integer concept.");
+    static_assert(!internal::validate_uint128_concept_compliance_dev || concepts::integer<uint128>, "Needs to be an integer.");
+    static_assert(!internal::validate_uint128_concept_compliance_dev || concepts::printable_subtractable_totally_ordered<uint128>,"Needs to comply with printable_subtractable_totally_ordered.");
 }
 
 

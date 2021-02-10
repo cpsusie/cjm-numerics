@@ -1996,11 +1996,7 @@ constexpr std::array<typename cjm::numerics::u128_parsing_helper<Chars, CharTrai
     cjm::numerics::u128_parsing_helper<Chars, CharTraits>::
         get_hex_tags()
 {
-    static_assert(  std::is_same_v<char_t, char> ||
-                    std::is_same_v<char_t, wchar_t> ||
-                    std::is_same_v<char_t, char8_t> ||
-                    std::is_same_v<char_t, char16_t> ||
-                    std::is_same_v<char_t, char32_t>, "It needs to be a character.");
+
     using namespace std::string_view_literals;
     if constexpr (std::is_same_v<char_t, char>)
     {
@@ -2035,11 +2031,6 @@ constexpr typename cjm::numerics::u128_parsing_helper<Chars, CharTraits>::sv cjm
                                                                                                          CharTraits>::
 non_decimal_separator()
 {
-    static_assert(  std::is_same_v<char_t, char> ||
-                    std::is_same_v<char_t, wchar_t> ||
-                    std::is_same_v<char_t, char8_t> ||
-                    std::is_same_v<char_t, char16_t> ||
-                    std::is_same_v<char_t, char32_t>, "It needs to be a character.");
     using namespace std::string_view_literals;
 
     if constexpr (std::is_same_v<char_t, char>)
@@ -2069,11 +2060,6 @@ requires cjm::numerics::concepts::char_with_traits<Chars, CharTraits>
 constexpr typename cjm::numerics::u128_parsing_helper<Chars, CharTraits>::sv
     cjm::numerics::u128_parsing_helper<Chars, CharTraits>::decimal_separator()
 {
-    static_assert(  std::is_same_v<char_t, char> ||
-                    std::is_same_v<char_t, wchar_t> ||
-                    std::is_same_v<char_t, char8_t> ||
-                    std::is_same_v<char_t, char16_t> ||
-                    std::is_same_v<char_t, char32_t>, "It needs to be a character.");
     using namespace std::string_view_literals;
     if constexpr (std::is_same_v<char_t, char>)
     {
@@ -2101,14 +2087,8 @@ template<typename Chars, typename CharTraits>
 requires cjm::numerics::concepts::char_with_traits<Chars, CharTraits>
 constexpr std::uint8_t cjm::numerics::u128_parsing_helper<Chars, CharTraits>::get_value_hex(char_t c)
 {
-    static_assert(  std::is_same_v<char_t, char> ||
-                    std::is_same_v<char_t, wchar_t> ||
-                    std::is_same_v<char_t, char8_t> ||
-                    std::is_same_v<char_t, char16_t> ||
-                    std::is_same_v<char_t, char32_t>, "It needs to be a character.");
     using namespace std::string_view_literals;
-
-
+    
     if constexpr (std::is_same_v<char_t, char>)
     {
         switch (c)
@@ -2372,14 +2352,8 @@ template<typename Chars, typename CharTraits>
 requires cjm::numerics::concepts::char_with_traits<Chars, CharTraits>
 constexpr std::uint8_t cjm::numerics::u128_parsing_helper<Chars, CharTraits>::get_value_dec(char_t c)
 {
-    static_assert(  std::is_same_v<char_t, char> ||
-                    std::is_same_v<char_t, wchar_t> ||
-                    std::is_same_v<char_t, char8_t> ||
-                    std::is_same_v<char_t, char16_t> ||
-                    std::is_same_v<char_t, char32_t>, "It needs to be a character.");
     using namespace std::string_view_literals;
-
-
+    
     if constexpr (std::is_same_v<char_t, char>)
     {
         switch (c)
@@ -2529,11 +2503,7 @@ template<typename Chars, typename CharTraits>
 requires cjm::numerics::concepts::char_with_traits<Chars, CharTraits>
 constexpr bool cjm::numerics::u128_parsing_helper<Chars, CharTraits>::is_legal_hex_char(char_t c)
 {
-    static_assert(  std::is_same_v<char_t, char> ||
-                    std::is_same_v<char_t, wchar_t> ||
-                    std::is_same_v<char_t, char8_t> ||
-                    std::is_same_v<char_t, char16_t> ||
-                    std::is_same_v<char_t, char32_t>, "It needs to be a character.");
+
     if constexpr (std::is_same_v<char_t, char>)
     {
         switch (c)
