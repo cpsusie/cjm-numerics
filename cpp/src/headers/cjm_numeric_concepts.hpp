@@ -61,9 +61,7 @@ namespace cjm::numerics::concepts
     concept builtin_floating_point = std::floating_point<T>;
 
 
-    static_assert(builtin_floating_point<float>&& builtin_floating_point<double>&& builtin_floating_point<long double>);
-    static_assert(builtin_unsigned_integer<std::uint64_t>);
-    static_assert(builtin_unsigned_integer<std::uint8_t>);
+
 }
 
 namespace cjm::numerics
@@ -131,7 +129,6 @@ namespace std
 	constexpr size_t hash<cjm::numerics::divmod_result<Integer>>::operator()(
 		const cjm::numerics::divmod_result<Integer>& hash_me) const noexcept
 	{
-        static_assert(sizeof(size_t) == 8 || sizeof(size_t) == 4, "Only 32 and 64 bit architecture supported.");
         auto hash = size_t{ 0 };
 		size_t hash_quot = std::hash<Integer>{}(hash_me.quotient);
 		size_t hash_rem = std::hash<Integer>{}(hash_me.remainder);
@@ -271,10 +268,7 @@ namespace cjm::numerics::concepts
         {DivModResType{ it, it }}  noexcept;
     };
 	
-    static_assert(division_modulus_result<divmod_result<std::uint64_t>, std::uint64_t>);
-    static_assert(integer<std::uint64_t>);
-    static_assert(std::is_standard_layout_v<divmod_result<std::uint64_t>>);
-    static_assert(std::totally_ordered < divmod_result<std::uint64_t>>);
+
 
     ///<summary>
     /// Size of type is evenly divisible by CHAR_BIT

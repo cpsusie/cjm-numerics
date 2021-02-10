@@ -88,9 +88,9 @@ namespace cjm::uint128_tests
 	requires ((!std::numeric_limits<wchar_t>::is_signed))
 		std::wstring convert_wide_from_utf(std::basic_string_view<UtfChar> convert_me, wchar_t unknown = L'?');
 
-	std::wstring widen(std::string_view convert_me);
+	inline std::wstring widen(std::string_view convert_me);
 
-	std::string narrow(std::wstring_view convert_me, char unknown = '?');
+	inline std::string narrow(std::wstring_view convert_me, char unknown = '?');
 
 	
 
@@ -238,6 +238,34 @@ std::wstring cjm::uint128_tests::convert_wide_from_utf(std::basic_string_view<Ut
             });
     }
     return ret;
+}
+
+inline std::wstring cjm::uint128_tests::widen(std::string_view convert_me)
+{
+	std::wstring ret;
+	if (!convert_me.empty())
+	{
+		ret.reserve(convert_me.length());
+		std::transform(convert_me.cbegin(), convert_me.cend(), std::back_inserter(ret), [](char c) -> wchar_t
+		{
+			return convert_char<char, wchar_t>(c);
+		});
+	}
+	return ret;
+
+}
+
+inline std::string cjm::uint128_tests::narrow(std::wstring_view convert_me, char unknown)
+{
+	std::string ret;
+	if (!convert_me.empty())
+	{
+		ret.reserve(convert_me.length());
+		std::transform(convert_me.cbegin(), convert_me.cend(),
+		               std::back_inserter(ret),
+		               [=](wchar_t c) -> char { return convert_char<wchar_t, char>(c, unknown); });
+	}
+	return ret;
 }
 
 #endif

@@ -57,6 +57,7 @@
 #endif
 #if defined(_MSC_VER) && defined(_M_X64)
 #include <intrin.h>
+#include <immintrin.h>
 #pragma intrinsic(_umul128)
 #pragma intrinsic(_BitScanReverse64)
 #pragma intrinsic(__lzcnt64)
@@ -64,16 +65,26 @@
 #pragma intrinsic(__shiftleft128)
 #pragma intrinsic(__shiftright128)
 #pragma intrinsic(_addcarry_u64)
+#pragma intrinsic(_addcarryx_u64)
 #pragma intrinsic(_subborrow_u64)
+#pragma intrinsic(_mulx_u64)
 #ifndef CJM_MSC_X64
 #define CJM_MSC_X64
+#ifdef CJM_NUMERICS_UINT128_INTEL_BMI2
+#define CJM_UMUL128 _mulx_u64
+#else
 #define CJM_UMUL128 _umul128
+#endif
 #define CJM_BITSCAN_REV_64 _BitScanReverse64
 #define CJM_LZCNT_64 __lzcnt64
 #define CJM_UDIV128 _udiv128
 #define CJM_LSHIFT128 __shiftleft128
 #define CJM_RSHIFT128 __shiftright128
+#ifdef CJM_NUMERICS_UINT128_INTEL_ADX
+#define CJM_ADDCARRY64 _addcarryx_u64
+#else
 #define CJM_ADDCARRY64 _addcarry_u64
+#endif
 #define CJM_SUBBORROW_64 _subborrow_u64
 #endif
 #else
@@ -123,6 +134,8 @@
 #error "Unable to detect endianness of system."
 #endif
 
+
+
 namespace cjm
 {
 
@@ -155,7 +168,15 @@ namespace cjm
 			              "CJM NUMERICS requires definition of std::uint64_t to be a type 8 bytes long and with 64 binary digits.");
 			static_assert(sizeof(std::int64_t) == 8 && std::numeric_limits<std::int64_t>::digits == std::numeric_limits<std::uint64_t>::digits -1,
 			              "CJM NUMERICS requires definition of std::int64_t to be a type 8 bytes long and with 63 binary digits.");
+			static_assert(sizeof(size_t) == 8 || sizeof(size_t) == 4, "Only 32 and 64 bit architecture supported.");
 
+			constexpr bool validate_uint128_concept_compliance_dev =
+#ifndef CJM_NUMERICS_UINT128_VALIDATE_UINT128_CONCEPT_COMPLIANCE_DEV
+				false;
+#else
+				true;
+#endif
+			
 			//alternate declarations for cjm_intrinsic_macros ... never defined because never used but need something that won't blow compiler up
 			//when examining untaken if constexpr branch.
 			extern unsigned char cjm_badrev_bitscan_64(unsigned long* index, std::uint64_t mask);
@@ -186,6 +207,13 @@ namespace cjm
 		
 		class uint128;
 
+		constexpr bool is_windows_x64 =
+#ifdef CJM_MSC_X64
+			true;
+#else
+			false;
+#endif
+		
 		constexpr compiler_used compiler =
 #ifdef CJM_MSC
 			compiler_used::msvc;
@@ -252,8 +280,18 @@ namespace cjm
 #else
 			false;
 #endif
-
-
+		constexpr bool intel_adx_available =
+#if defined(CJM_NUMERICS_UINT128_INTEL_ADX)
+			is_windows_x64;
+#else
+			false;
+#endif
+		constexpr bool intel_bmi2_available =
+#if defined(CJM_NUMERICS_UINT128_INTEL_BMI2)
+			is_windows_x64;
+#else
+			false;
+#endif
 
 		enum class uint128_calc_mode : std::uint8_t
 		{
@@ -262,7 +300,20 @@ namespace cjm
 			intrinsic_u128,
 		};
 		constexpr uint128_calc_mode init_eval_mode() noexcept;
-	}	
+	}
+
+	namespace numerics::internal
+	{
+		static_assert(!validate_uint128_concept_compliance_dev || (numerics::concepts::builtin_floating_point<float> && numerics::concepts::builtin_floating_point<double> && numerics::concepts::builtin_floating_point<long double>));
+		static_assert(!validate_uint128_concept_compliance_dev || numerics::concepts::builtin_unsigned_integer<std::uint64_t>);
+		static_assert(!validate_uint128_concept_compliance_dev || numerics::concepts::builtin_unsigned_integer<std::uint8_t>);
+		static_assert(!validate_uint128_concept_compliance_dev || concepts::division_modulus_result<divmod_result<std::uint64_t>, std::uint64_t>);
+		static_assert(!validate_uint128_concept_compliance_dev || concepts::integer<std::uint64_t>);
+		static_assert(!validate_uint128_concept_compliance_dev || std::is_standard_layout_v<divmod_result<std::uint64_t>>);
+		static_assert(!validate_uint128_concept_compliance_dev || std::totally_ordered < divmod_result<std::uint64_t>>);
+		
+	}
+	
 }
 
 #endif

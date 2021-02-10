@@ -14,7 +14,13 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="8ab5edb8-7d60-4856-834e-1b0d4d4bfdec" name="Default Changelist" comment="Update add script file for libc++." />
+    <list default="true" id="8ab5edb8-7d60-4856-834e-1b0d4d4bfdec" name="Default Changelist" comment="Update add script file for libc++.">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/CMakeLists.txt" beforeDir="false" afterPath="$PROJECT_DIR$/CMakeLists.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cpp/src/cpp/uint128.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/cpp/src/headers/uint128.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/cpp/src/headers/uint128.hpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cpp/src/headers/uint128.inl" beforeDir="false" afterPath="$PROJECT_DIR$/cpp/src/headers/uint128.inl" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -24,7 +30,7 @@
   <component name="ClangdSettings">
     <option name="formatViaClangd" value="false" />
   </component>
-  <component name="ExecutionTargetManager" SELECTED_TARGET="CMakeBuildProfile:Release" />
+  <component name="ExecutionTargetManager" SELECTED_TARGET="CMakeBuildProfile:Release-Clang" />
   <component name="Git.Settings">
     <option name="RECENT_BRANCH_BY_REPOSITORY">
       <map>
@@ -326,5 +332,12 @@
     <MESSAGE value="Update cmake file to link abseil; update print_environ info to print info about built-in floating point types." />
     <MESSAGE value="Update add script file for libc++." />
     <option name="LAST_COMMIT_MESSAGE" value="Update add script file for libc++." />
+  </component>
+  <component name="XDebuggerManager">
+    <watches-manager>
+      <configuration name="CMakeRunConfiguration">
+        <watch expression="nat_subtrahend_1" language="ObjectiveC" />
+      </configuration>
+    </watches-manager>
   </component>
 </project>
