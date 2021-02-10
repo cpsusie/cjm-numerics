@@ -304,7 +304,7 @@ namespace cjm
 
 	namespace numerics::internal
 	{
-		static_assert(!validate_uint128_concept_compliance_dev || numerics::concepts::builtin_floating_point<float> && numerics::concepts::builtin_floating_point<double> && numerics::concepts::builtin_floating_point<long double>);
+		static_assert(!validate_uint128_concept_compliance_dev || (numerics::concepts::builtin_floating_point<float> && numerics::concepts::builtin_floating_point<double> && numerics::concepts::builtin_floating_point<long double>));
 		static_assert(!validate_uint128_concept_compliance_dev || numerics::concepts::builtin_unsigned_integer<std::uint64_t>);
 		static_assert(!validate_uint128_concept_compliance_dev || numerics::concepts::builtin_unsigned_integer<std::uint8_t>);
 		static_assert(!validate_uint128_concept_compliance_dev || concepts::division_modulus_result<divmod_result<std::uint64_t>, std::uint64_t>);
