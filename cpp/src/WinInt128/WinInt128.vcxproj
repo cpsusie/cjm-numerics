@@ -141,7 +141,7 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>CJM_NUMERICS_UINT128_VALIDATE_UINT128_CONCEPT_COMPLIANCE_DEV;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>CJM_NUMERICS_UINT128_VALIDATE_UINT128_CONCEPT_COMPLIANCE_DEV;_DEBUG;_CONSOLE;CJM_NUMERICS_UINT128_INTEL_BMI2;CJM_NUMERICS_UINT128_INTEL_ADX;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
@@ -158,7 +158,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>NDEBUG;_CONSOLE;CJM_NUMERICS_UINT128_VALIDATE_UINT128_CONCEPT_COMPLIANCE_DEV;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NDEBUG;_CONSOLE;CJM_NUMERICS_UINT128_VALIDATE_UINT128_CONCEPT_COMPLIANCE_DEV;CJM_NUMERICS_UINT128_INTEL_BMI2;CJM_NUMERICS_UINT128_INTEL_ADX;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
