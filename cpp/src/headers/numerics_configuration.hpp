@@ -207,7 +207,12 @@ namespace cjm
 		
 		class uint128;
 
-		
+		constexpr bool is_windows_x64 =
+#ifdef CJM_MSC_X64
+			true;
+#else
+			false;
+#endif
 		
 		constexpr compiler_used compiler =
 #ifdef CJM_MSC
@@ -277,13 +282,13 @@ namespace cjm
 #endif
 		constexpr bool intel_adx_available =
 #if defined(CJM_NUMERICS_UINT128_INTEL_ADX)
-			true;
+			is_windows_x64;
 #else
 			false;
 #endif
 		constexpr bool intel_bmi2_available =
 #if defined(CJM_NUMERICS_UINT128_INTEL_BMI2)
-			true;
+			is_windows_x64;
 #else
 			false;
 #endif
