@@ -534,6 +534,23 @@ void cjm::uint128_tests::print_environ_data()
     {
 	    cout << "SSE3: [NOT AVAILABLE]." << newl;
     }
+	if constexpr (numerics::intel_adx_available)
+	{
+        cout << "Intel ADX: [AVAILABLE]." << newl;
+	}
+	else
+	{
+        cout << "Intel ADX: [NOT AVAILABLE]." << newl;
+	}
+    if constexpr (numerics::intel_bmi2_available)
+    {
+        cout << "Intel BMI2: [AVAILABLE]." << newl;
+    }
+    else
+    {
+        cout << "Intel BMI2: [NOT AVAILABLE]." << newl;
+    }
+	
     print_sizes();
     print_alignments();
     print_floating_point_info();
@@ -541,7 +558,7 @@ void cjm::uint128_tests::print_environ_data()
     print_uint128_eval_mode();
     print_cpp20_bitops_available();
     print_builtin_uint128_data_if_present();
-	cout << "END ENVIRONMENT DATA" << newl << newl;
+    cout << "END ENVIRONMENT DATA" << newl << newl;
 }
 
 void cjm::uint128_tests::execute_ascii_char_interconversions()

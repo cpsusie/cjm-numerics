@@ -275,8 +275,18 @@ namespace cjm
 #else
 			false;
 #endif
-
-
+		constexpr bool intel_adx_available =
+#if defined(CJM_NUMERICS_UINT128_INTEL_ADX)
+			true;
+#else
+			false;
+#endif
+		constexpr bool intel_bmi2_available =
+#if defined(CJM_NUMERICS_UINT128_INTEL_BMI2)
+			true;
+#else
+			false;
+#endif
 
 		enum class uint128_calc_mode : std::uint8_t
 		{
