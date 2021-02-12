@@ -73,19 +73,19 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>$(SolutionDir)/headers/;$(VC_IncludePath);$(WindowsSDK_IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)/headers/;$(VC_IncludePath);$(WindowsSDK_IncludePath);C:\Users\Christopher Susie\Source\Repos\Int128\</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>$(SolutionDir)/headers/;$(VC_IncludePath);$(WindowsSDK_IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)/headers/;$(VC_IncludePath);$(WindowsSDK_IncludePath);C:\Users\Christopher Susie\Source\Repos\Int128\</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>$(SolutionDir)/headers/;$(VC_IncludePath);$(WindowsSDK_IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)/headers/;$(VC_IncludePath);$(WindowsSDK_IncludePath);C:\Users\Christopher Susie\Source\Repos\Int128\</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>$(SolutionDir)/headers/;$(VC_IncludePath);$(WindowsSDK_IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)/headers/;$(VC_IncludePath);$(WindowsSDK_IncludePath);C:\Users\Christopher Susie\Source\Repos\Int128\</IncludePath>
   </PropertyGroup>
   <PropertyGroup Label="Vcpkg" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <VcpkgUseStatic>true</VcpkgUseStatic>
@@ -179,23 +179,10 @@
     <ClCompile Include="..\cpp\uint128_test_program.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\headers\cjm_numeric_concepts.hpp" />
-    <ClInclude Include="..\headers\cjm_string.hpp" />
     <ClInclude Include="..\headers\int128_tests.hpp" />
     <ClInclude Include="..\headers\int128_test_switches.hpp" />
-    <ClInclude Include="..\headers\istream_utils.hpp" />
-    <ClInclude Include="..\headers\numerics.hpp" />
-    <ClInclude Include="..\headers\numerics_configuration.hpp" />
     <ClInclude Include="..\headers\testing.hpp" />
-    <ClInclude Include="..\headers\uint128.hpp" />
     <ClInclude Include="..\headers\uint128_test_program.hpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="..\headers\cjm_string.inl" />
-    <None Include="..\headers\int128_tests.inl" />
-    <None Include="..\headers\numerics.inl" />
-    <None Include="..\headers\numerics_configuration.inl" />
-    <None Include="..\headers\uint128.inl" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="..\cpp\llvm_int_typedefs.txt" />

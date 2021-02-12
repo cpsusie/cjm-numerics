@@ -317,4 +317,4 @@ namespace cjm
 }
 
 #endif
-#include "numerics_configuration.inl"
+#include <cjm/numerics/numerics_configuration.inl>

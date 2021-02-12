@@ -6,11 +6,11 @@
 #include <algorithm>
 #include <iostream>
 #include <iomanip>
-#include "numerics.hpp"
+#include <cjm/numerics/numerics.hpp>
 #include <sstream>
 #include <optional>
-#include "cjm_numeric_concepts.hpp"
-#include "cjm_string.hpp"
+#include <cjm/numerics/cjm_numeric_concepts.hpp>
+#include <cjm/string/cjm_string.hpp>
 namespace cjm
 {
 	namespace testing

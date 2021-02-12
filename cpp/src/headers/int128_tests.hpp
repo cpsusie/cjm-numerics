@@ -1,10 +1,10 @@
 #ifndef INT128_TESTS_HPP_
 #define INT128_TESTS_HPP_
 #include <iostream>
-#include "numerics.hpp"
-#include "uint128.hpp"
-#include "cjm_numeric_concepts.hpp"
-#include "cjm_string.hpp"
+#include <cjm/numerics/numerics.hpp>
+#include <cjm/numerics/uint128.hpp>
+#include <cjm/numerics/cjm_numeric_concepts.hpp>
+#include <cjm/string/cjm_string.hpp>
 #include "testing.hpp"
 #include <iostream>
 #include <iomanip>
@@ -33,7 +33,7 @@
 #include <tuple>
 #include <span>
 #include <unordered_set>
-#include "istream_utils.hpp"
+#include <cjm/string/istream_utils.hpp>
 #include "int128_test_switches.hpp"
 #include <absl/numeric/int128.h>
 

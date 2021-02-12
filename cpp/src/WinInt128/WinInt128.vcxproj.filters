@@ -32,25 +32,10 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\headers\cjm_numeric_concepts.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\headers\cjm_string.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\headers\int128_tests.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\headers\numerics.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\headers\testing.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\headers\uint128.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\headers\istream_utils.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\headers\int128_test_switches.hpp">
@@ -59,26 +44,6 @@
     <ClInclude Include="..\headers\uint128_test_program.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\headers\numerics_configuration.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="..\headers\cjm_string.inl">
-      <Filter>Header Files</Filter>
-    </None>
-    <None Include="..\headers\numerics.inl">
-      <Filter>Header Files</Filter>
-    </None>
-    <None Include="..\headers\uint128.inl">
-      <Filter>Header Files</Filter>
-    </None>
-    <None Include="..\headers\int128_tests.inl">
-      <Filter>Header Files</Filter>
-    </None>
-    <None Include="..\headers\numerics_configuration.inl">
-      <Filter>Header Files</Filter>
-    </None>
   </ItemGroup>
   <ItemGroup>
     <Text Include="..\cpp\llvm_int_typedefs.txt">

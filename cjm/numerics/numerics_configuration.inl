@@ -1,6 +1,6 @@
 #ifndef CJM_NUMERICS_CONFIGURATION_INL_
 #define CJM_NUMERICS_CONFIGURATION_INL_
-#include <numerics_configuration.hpp>
+#include <cjm/numerics/numerics_configuration.hpp>
 
 namespace cjm::numerics
 {

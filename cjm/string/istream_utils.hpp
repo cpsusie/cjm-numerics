@@ -10,8 +10,8 @@
 #include <algorithm>
 #include <optional>
 #include <locale>
-#include "numerics.hpp"
-#include "cjm_numeric_concepts.hpp"
+#include <cjm/numerics/numerics.hpp>
+#include <cjm/numerics/cjm_numeric_concepts.hpp>
 #include <utility>
 
 

@@ -15,14 +15,14 @@
 #include <exception>
 #include <stdexcept>
 #include <filesystem>
-#include "cjm_string.hpp"
+#include <cjm/string/cjm_string.hpp>
 #include <boost/container_hash/hash.hpp>
 #include <functional>
 #include <utility>
 #include <span>
-#include "numerics.hpp"
-#include "cjm_numeric_concepts.hpp"
-#include "istream_utils.hpp"
+#include <cjm/numerics/numerics.hpp>
+#include <cjm/numerics/cjm_numeric_concepts.hpp>
+#include <cjm/string/istream_utils.hpp>
 namespace cjm::uint128_tests::switches
 {
 	class test_switch;
