@@ -15,11 +15,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="8ab5edb8-7d60-4856-834e-1b0d4d4bfdec" name="Default Changelist" comment="Update add script file for libc++.">
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/CMakeLists.txt" beforeDir="false" afterPath="$PROJECT_DIR$/CMakeLists.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cpp/src/cpp/uint128.cpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/cpp/src/headers/uint128.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/cpp/src/headers/uint128.hpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cpp/src/headers/uint128.inl" beforeDir="false" afterPath="$PROJECT_DIR$/cpp/src/headers/uint128.inl" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -69,7 +67,7 @@
     <property name="node.js.selected.package.eslint" value="(autodetect)" />
     <property name="node.js.selected.package.tslint" value="(autodetect)" />
     <property name="nodejs_package_manager_path" value="npm" />
-    <property name="settings.editor.selected.configurable" value="CMakeSettings" />
+    <property name="settings.editor.selected.configurable" value="language.cpp" />
   </component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
@@ -127,6 +125,7 @@
       <workItem from="1611960190087" duration="186000" />
       <workItem from="1612019703218" duration="10452000" />
       <workItem from="1612071114648" duration="7523000" />
+      <workItem from="1613155108132" duration="716000" />
     </task>
     <task id="LOCAL-00001" summary="Add stream extraction operator for vector of bin_op_uint128_t's.  Add unit test.">
       <created>1610297106627</created>
@@ -339,5 +338,9 @@
         <watch expression="nat_subtrahend_1" language="ObjectiveC" />
       </configuration>
     </watches-manager>
+  </component>
+  <component name="XSLT-Support.FileAssociations.UIState">
+    <expand />
+    <select />
   </component>
 </project>
