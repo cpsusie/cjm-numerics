@@ -14,8 +14,7 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="8ab5edb8-7d60-4856-834e-1b0d4d4bfdec" name="Default Changelist" comment="Update add script file for libc++.">
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+    <list default="true" id="8ab5edb8-7d60-4856-834e-1b0d4d4bfdec" name="Default Changelist" comment="Update CMakeLists.txt to reflect new library include location.">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/CMakeLists.txt" beforeDir="false" afterPath="$PROJECT_DIR$/CMakeLists.txt" afterDir="false" />
     </list>
@@ -28,7 +27,7 @@
   <component name="ClangdSettings">
     <option name="formatViaClangd" value="false" />
   </component>
-  <component name="ExecutionTargetManager" SELECTED_TARGET="CMakeBuildProfile:Release-Clang" />
+  <component name="ExecutionTargetManager" SELECTED_TARGET="CMakeBuildProfile:Release" />
   <component name="Git.Settings">
     <option name="RECENT_BRANCH_BY_REPOSITORY">
       <map>
@@ -125,7 +124,7 @@
       <workItem from="1611960190087" duration="186000" />
       <workItem from="1612019703218" duration="10452000" />
       <workItem from="1612071114648" duration="7523000" />
-      <workItem from="1613155108132" duration="716000" />
+      <workItem from="1613155108132" duration="3115000" />
     </task>
     <task id="LOCAL-00001" summary="Add stream extraction operator for vector of bin_op_uint128_t's.  Add unit test.">
       <created>1610297106627</created>
@@ -288,7 +287,14 @@
       <option name="project" value="LOCAL" />
       <updated>1612118386702</updated>
     </task>
-    <option name="localTasksCounter" value="24" />
+    <task id="LOCAL-00024" summary="Update CMakeLists.txt to reflect new library include location.">
+      <created>1613156051733</created>
+      <option name="number" value="00024" />
+      <option name="presentableId" value="LOCAL-00024" />
+      <option name="project" value="LOCAL" />
+      <updated>1613156051733</updated>
+    </task>
+    <option name="localTasksCounter" value="25" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -330,7 +336,8 @@
     <MESSAGE value="Fix several minor problems with safe float conversion tests." />
     <MESSAGE value="Update cmake file to link abseil; update print_environ info to print info about built-in floating point types." />
     <MESSAGE value="Update add script file for libc++." />
-    <option name="LAST_COMMIT_MESSAGE" value="Update add script file for libc++." />
+    <MESSAGE value="Update CMakeLists.txt to reflect new library include location." />
+    <option name="LAST_COMMIT_MESSAGE" value="Update CMakeLists.txt to reflect new library include location." />
   </component>
   <component name="XDebuggerManager">
     <watches-manager>
