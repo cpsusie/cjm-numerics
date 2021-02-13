@@ -65,7 +65,25 @@ void cjm::clang::test_program::test_program()
 		cout << "Is uint128_t an arithmetic type?: [" << environment::is_intrin_u128_arithmetic << "]." << newl;
 		cout << "uint128_t size: [" << sizeof(environment::uint128_t) << "]." << newl;
 		cout << "uint128_t align: [" << alignof(environment::uint128_t) << "]." << newl;
-		cout << "uint128_t digit count: [" << std::numeric_limits<environment::uint128_t>::digits << "]." << newl;
+		constexpr bool is_uint128_t_specialized = std::numeric_limits<environment::uint128_t>::is_specialized;
+		if constexpr (is_uint128_t_specialized)
+		{
+			cout << "Is numeric_limits specialized for uint128_t?: [YES]." << newl;
+			cout << "uint128_t digit count: [" << std::numeric_limits<environment::uint128_t>::digits << "]." << newl;
+		}
+		else
+		{
+			cout << "Is numeric_limits specialized for uint128_t?: [NO]." << newl;
+		}
+		using environment::uint128_t;
+#ifdef __SIZEOF_INT128__
+		constexpr std::uint64_t high = 0xc0de'd00d'fea2'cafe;
+		constexpr std::uint64_t low = 0xb00b'600d'f00d'bad0;
+		constexpr uint128_t combined = (uint128_t{ high } << 64) | (uint128_t{low});
+		constexpr uint128_t result_1 = combined - static_cast<uint128_t>(low);
+		constexpr uint128_t result_2 = result_1 >> 64;
+		static_assert(static_cast<std::uint64_t>(result_2) == high);
+#endif
 	}
 	
 }
