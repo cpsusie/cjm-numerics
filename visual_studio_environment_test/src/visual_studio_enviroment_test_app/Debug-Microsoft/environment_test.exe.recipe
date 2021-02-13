@@ -2,7 +2,7 @@
 <Project>
   <ProjectOutputs>
     <ProjectOutput>
-      <FullPath>C:\Users\Christopher Susie\Source\Repos\Int128\visual_studio_environment_test\src\visual_studio_enviroment_test_app\Release-Microsoft\environment_test.exe</FullPath>
+      <FullPath>C:\Users\Christopher Susie\Source\Repos\Int128\visual_studio_environment_test\src\visual_studio_enviroment_test_app\Debug-Microsoft\environment_test.exe</FullPath>
     </ProjectOutput>
   </ProjectOutputs>
   <ContentFiles />
