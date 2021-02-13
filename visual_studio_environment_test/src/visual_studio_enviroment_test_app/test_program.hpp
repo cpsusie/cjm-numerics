@@ -10,6 +10,9 @@
 #include <cstdint>
 #include <limits>
 #include <type_traits>
+#include <climits>
+#include <bit>
+#include <span>
 
 namespace cjm::clang::test_program
 {
@@ -64,9 +67,10 @@ namespace cjm::clang::test_program
 #else
 			false;
 #endif
-		constexpr bool is_x64 =
+		constexpr bool is_x64 = sizeof(std::uintptr_t) == 8;
+		constexpr bool is_windows_x64 =
 #if defined(_M_X64)
-			true;
+			is_x64;
 #else
 			false;
 #endif
