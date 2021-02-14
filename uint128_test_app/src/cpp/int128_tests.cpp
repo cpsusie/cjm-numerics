@@ -3263,6 +3263,10 @@ cjm::uint128_tests::binary_op_u128_vect_t cjm::uint128_tests::generate_divmod_op
             uint128_t second = generator::create_random_in_range<std::uint64_t>(rgen);
             auto* dividend = first >= second ? &first : &second;
             auto* divisor = dividend == &first ? &second : &first;
+        	while (*divisor == 0 )
+        	{
+        		*divisor = generator::create_random_in_range<std::uint64_t>(rgen);
+        	}
             assert(dividend != divisor);
             ret.emplace_back(binary_op::divide, *dividend, *divisor);
             ret.emplace_back(binary_op::modulus, *dividend, *divisor);
@@ -3277,12 +3281,15 @@ cjm::uint128_tests::binary_op_u128_vect_t cjm::uint128_tests::generate_divmod_op
             uint128_t first_high = generator::create_random_in_range<std::uint32_t>(rgen);
             first_high <<= 64;
             uint128_t first = first_high | first_low;
-            const uint128_t second = generator::create_random_in_range<std::uint64_t>(rgen);
+            uint128_t second = generator::create_random_in_range<std::uint64_t>(rgen);
 
             const uint128_t* dividend = first >= second ? &first : &second;
-            const uint128_t* divisor = dividend == &first ? &second : &first;
+            uint128_t* divisor = dividend == &first ? &second : &first;
             assert(dividend != divisor);
-
+            while (*divisor == 0)
+            {
+	            *divisor = generator::create_random_in_range<std::uint32_t>(rgen);
+            }
             ret.emplace_back(binary_op::divide, *dividend, *divisor);
             ret.emplace_back(binary_op::modulus, *dividend, *divisor);
             added_this_range += 2;        	
@@ -3296,12 +3303,16 @@ cjm::uint128_tests::binary_op_u128_vect_t cjm::uint128_tests::generate_divmod_op
             uint128_t first_high = generator::create_random_in_range<std::uint32_t>(rgen);
             first_high <<= 64;
             uint128_t first = first_high | first_low;
-            const uint128_t second = generator::create_random_in_range<std::uint16_t>(rgen);
+            uint128_t second = generator::create_random_in_range<std::uint16_t>(rgen);
 
             const uint128_t* dividend = first >= second ? &first : &second;
-            const uint128_t* divisor = dividend == &first ? &second : &first;
+            uint128_t* divisor = dividend == &first ? &second : &first;
             assert(dividend != divisor);
-
+            while (*divisor == 0)
+            {
+	            *divisor = generator::create_random_in_range<std::uint16_t>(rgen);
+            }
+        	
             ret.emplace_back(binary_op::divide, *dividend, *divisor);
             ret.emplace_back(binary_op::modulus, *dividend, *divisor);
             added_this_range += 2;
