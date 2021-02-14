@@ -606,9 +606,11 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="program.cpp" />
+    <ClCompile Include="test_intrinsics.cpp" />
     <ClCompile Include="test_program.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="test_intrinsics.hpp" />
     <ClInclude Include="test_program.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

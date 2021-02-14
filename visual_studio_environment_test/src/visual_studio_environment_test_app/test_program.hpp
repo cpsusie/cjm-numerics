@@ -13,6 +13,7 @@
 #include <climits>
 #include <bit>
 #include <span>
+#include "test_intrinsics.hpp"
 
 namespace cjm::clang::test_program
 {
@@ -188,6 +189,19 @@ namespace cjm::clang::test_program
 			false;
 #endif
 	}
+
+	namespace intrinsics_test
+	{
+		extern unsigned char cjm_test_badrev_bitscan_64(unsigned long* index, std::uint64_t mask);
+		extern std::uint64_t cjm_test_bad_lzcnt_64(std::uint64_t mask);
+		extern std::uint64_t cjm_test_bad_umul128(std::uint64_t multiplicand, std::uint64_t multiplicand_two, std::uint64_t* carry);
+		extern std::uint64_t cjm_test_bad_udiv128(std::uint64_t high_dividend, std::uint64_t low_dividend, std::uint64_t divisor, std::uint64_t* remainder);
+		extern std::uint64_t cjm_test_bad_shiftleft128(std::uint64_t low, std::uint64_t high, unsigned char shift_amount);
+		extern std::uint64_t cjm_test_bad_shiftright128(std::uint64_t low, std::uint64_t high, unsigned char shift_amount);
+		extern unsigned char cjm_test_bad_addc64(unsigned char c_in, std::uint64_t x, std::uint64_t y, std::uint64_t* sum) noexcept;
+		extern unsigned char cjm_test_bad_subb64(unsigned char b_in, std::uint64_t minuend, std::uint64_t subtrahend, std::uint64_t* difference) noexcept;
+	}
+	
 }
 #endif
 

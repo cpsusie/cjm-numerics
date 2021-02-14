@@ -5,7 +5,9 @@
 int cjm::clang::test_program::execute_test_program() noexcept
 {
 	int ok = execute_subroutine_log_exception(test_program, "test_program"sv, -1);
-
+	
+	if (ok == 0) 
+		ok = execute_subroutine_log_exception(intrinsics_test::print_intrinsic_availability_info, "print_intrinsic_availability_info"sv);
 	return ok;	
 }
 
