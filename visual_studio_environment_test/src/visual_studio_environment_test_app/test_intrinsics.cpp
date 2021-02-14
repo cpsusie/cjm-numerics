@@ -48,6 +48,7 @@ void cjm::clang::test_program::intrinsics_test::print_intrinsic_availability_inf
 #else
 void cjm::clang::test_program::intrinsics_test::print_intrinsic_availability_info()
 {
+	constexpr auto newl = '\n';
 	std::cout << "Intrinsics not available in this environment." << newl;
 }
 #endif
