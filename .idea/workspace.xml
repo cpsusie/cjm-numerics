@@ -15,10 +15,9 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="8ab5edb8-7d60-4856-834e-1b0d4d4bfdec" name="Default Changelist" comment="Rename visual studio sln and vcxproj files (and related).">
+    <list default="true" id="8ab5edb8-7d60-4856-834e-1b0d4d4bfdec" name="Default Changelist" comment="Added support for linux (cmake) build of the visual_studio_environment_test_app.">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/CMakeLists.txt" beforeDir="false" afterPath="$PROJECT_DIR$/CMakeLists.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/visual_studio_environment_test/src/visual_studio_enviroment_test_app/test_program.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/visual_studio_environment_test/src/visual_studio_enviroment_test_app/test_program.hpp" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -29,7 +28,7 @@
   <component name="ClangdSettings">
     <option name="formatViaClangd" value="false" />
   </component>
-  <component name="ExecutionTargetManager" SELECTED_TARGET="CMakeBuildProfile:Debug" />
+  <component name="ExecutionTargetManager" SELECTED_TARGET="CMakeBuildProfile:Release" />
   <component name="Git.Settings">
     <option name="RECENT_BRANCH_BY_REPOSITORY">
       <map>
@@ -78,18 +77,18 @@
       <recent name="$PROJECT_DIR$/cmake-build-debug" />
     </key>
   </component>
-  <component name="RunManager" selected="CMake Application.EnvironTest">
+  <component name="RunManager" selected="CMake Application.Int128">
+    <configuration default="true" type="CLionExternalRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" PASS_PARENT_ENVS_2="true">
+      <method v="2">
+        <option name="CLION.EXTERNAL.BUILD" enabled="true" />
+      </method>
+    </configuration>
     <configuration name="EnvironTest" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="Int128" TARGET_NAME="EnvironTest" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="Int128" RUN_TARGET_NAME="EnvironTest">
       <method v="2">
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
       </method>
     </configuration>
     <configuration name="Int128" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="Int128" TARGET_NAME="Int128" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="Int128" RUN_TARGET_NAME="Int128">
-      <method v="2">
-        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
-      </method>
-    </configuration>
-    <configuration default="true" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" PASS_PARENT_ENVS_2="true">
       <method v="2">
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
       </method>
@@ -135,7 +134,8 @@
       <workItem from="1611960190087" duration="186000" />
       <workItem from="1612019703218" duration="10452000" />
       <workItem from="1612071114648" duration="7523000" />
-      <workItem from="1613155108132" duration="5137000" />
+      <workItem from="1613155108132" duration="7004000" />
+      <workItem from="1613279849410" duration="341000" />
     </task>
     <task id="LOCAL-00001" summary="Add stream extraction operator for vector of bin_op_uint128_t's.  Add unit test.">
       <created>1610297106627</created>
@@ -319,7 +319,14 @@
       <option name="project" value="LOCAL" />
       <updated>1613237582161</updated>
     </task>
-    <option name="localTasksCounter" value="27" />
+    <task id="LOCAL-00027" summary="Added support for linux (cmake) build of the visual_studio_environment_test_app.">
+      <created>1613241286662</created>
+      <option name="number" value="00027" />
+      <option name="presentableId" value="LOCAL-00027" />
+      <option name="project" value="LOCAL" />
+      <updated>1613241286662</updated>
+    </task>
+    <option name="localTasksCounter" value="28" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -338,7 +345,6 @@
     <option name="oldMeFiltersMigrated" value="true" />
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Improve generation test to include serializing to file, then deserializing, deleting and checking round-trip identicalness." />
     <MESSAGE value="Move compile-time addition test out of header into single translation unit." />
     <MESSAGE value="Remove all but semi-random selection of compile-time bit shift tests.  Add parentheses to tests so clang is happy and doesn't warn me about something I would have never suspected would be the case to begin with .... (I would have assumed that shift ops have higher precedence than comparison op)." />
     <MESSAGE value="Fix friend class declaration to properly identify namespace of friend class: compiled on MSVC not on gcc / clang." />
@@ -363,7 +369,8 @@
     <MESSAGE value="Update CMakeLists.txt to reflect new library include location." />
     <MESSAGE value="Fix CMakeLists.txt." />
     <MESSAGE value="Rename visual studio sln and vcxproj files (and related)." />
-    <option name="LAST_COMMIT_MESSAGE" value="Rename visual studio sln and vcxproj files (and related)." />
+    <MESSAGE value="Added support for linux (cmake) build of the visual_studio_environment_test_app." />
+    <option name="LAST_COMMIT_MESSAGE" value="Added support for linux (cmake) build of the visual_studio_environment_test_app." />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />

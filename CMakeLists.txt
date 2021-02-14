@@ -27,4 +27,5 @@ target_link_libraries(Int128 absl::numeric)
 
 add_executable(EnvironTest
         visual_studio_environment_test/src/visual_studio_environment_test_app/program.cpp
-        visual_studio_environment_test/src/visual_studio_environment_test_app/test_program.cpp)
+        visual_studio_environment_test/src/visual_studio_environment_test_app/test_program.cpp
+        visual_studio_environment_test/src/visual_studio_environment_test_app/test_intrinsics.cpp)
