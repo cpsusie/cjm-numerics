@@ -21,7 +21,7 @@ void cjm::clang::test_program::test_program()
 	cout << "Is x64 windows?: [" << environment::is_windows_x64 << "]." << newl;
 	cout << "Is clang?: [" << environment::is_clang << "]." << newl;
 	cout << "Is intel classic?: [" << environment::is_intel_classic << "]." << newl;
-	cout << "Is intel?: [" << environment::is_intel_compiler << "]." << newl;
+	cout << "Is intel?: [" << environment::is_intel_llvm_compiler << "]." << newl;
 	cout << "Is GCC?: [" << environment::is_gcc << "]." << newl;
 	cout << newl;
 	
