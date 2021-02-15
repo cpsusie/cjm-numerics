@@ -1,0 +1,678 @@
+Rebuild started...
+------ Rebuild All started: Project: environment_test, Configuration: Release-LLVM-Intel Win32 ------
+Build started 2/14/2021 8:56:28 PM.
+Target PrepareForBuild:
+  Creating directory "Release-LLVM-Intel\environment_test.tlog\".
+Target InitializeBuildStatus:
+  Creating "Release-LLVM-Intel\environment_test.tlog\unsuccessfulbuild" because "AlwaysCreate" was specified.
+Target MessageBuildingWithCompiler:
+  Building with Intel(R) C++ Compiler 2021.1
+Target VcpkgTripletSelection:
+  Not using Vcpkg because VcpkgEnabled is "false"
+Target ClCompile:
+  ***** ClCompile (Win32 - Intel C++)
+  clang-cl: : warning : argument unused during compilation: '-std:c++latest' [-Wunused-command-line-argument]
+Done building target "ClCompile" in project "environ_test.vcxproj".
+Target Link:
+  environ_test.vcxproj -> C:\Users\Christopher Susie\Source\Repos\Int128\visual_studio_environment_test\src\visual_studio_environment_test_app\Release-LLVM-Intel\environment_test.exe
+Target FinalizeBuildStatus:
+  Deleting file "Release-LLVM-Intel\environment_test.tlog\unsuccessfulbuild".
+  Touching "Release-LLVM-Intel\environment_test.tlog\environment_test.lastbuildstate".
+
+Done building project "environ_test.vcxproj".
+
+Build succeeded.
+
+clang-cl: : warning : argument unused during compilation: '-std:c++latest' [-Wunused-command-line-argument]
+    1 Warning(s)
+    0 Error(s)
+
+Time Elapsed 00:00:07.90
+------ Rebuild All started: Project: environment_test, Configuration: Release-LLVM-Intel x64 ------
+Build started 2/14/2021 8:56:36 PM.
+Target InitializeBuildStatus:
+  Creating "x64\Release-LLVM-Intel\environment_test.tlog\unsuccessfulbuild" because "AlwaysCreate" was specified.
+Target MessageBuildingWithCompiler:
+  Building with Intel(R) C++ Compiler 2021.1
+Target VcpkgTripletSelection:
+  Not using Vcpkg because VcpkgEnabled is "false"
+Target ClCompile:
+  ***** ClCompile (x64 - Intel C++)
+  clang-cl: : warning : argument unused during compilation: '-arch:SSE2' [-Wunused-command-line-argument]
+  clang-cl: : warning : argument unused during compilation: '-std:c++latest' [-Wunused-command-line-argument]
+  In file included from program.cpp:1:
+  In file included from ./test_program.hpp:16:
+  ./test_intrinsics.hpp(23,19): : warning : '_udiv128' is not a recognized builtin [-Wignored-pragma-intrinsic]
+  #pragma intrinsic(_udiv128)  // NOLINT(clang-diagnostic-ignored-pragma-intrinsic)
+                    ^
+  ./test_intrinsics.hpp(26,19): : warning : '_addcarry_u64' is not a recognized builtin [-Wignored-pragma-intrinsic]
+  #pragma intrinsic(_addcarry_u64)
+                    ^
+  ./test_intrinsics.hpp(27,19): : warning : '_addcarryx_u64' is not a recognized builtin [-Wignored-pragma-intrinsic]
+  #pragma intrinsic(_addcarryx_u64)
+                    ^
+  ./test_intrinsics.hpp(28,19): : warning : '_subborrow_u64' is not a recognized builtin [-Wignored-pragma-intrinsic]
+  #pragma intrinsic(_subborrow_u64)
+                    ^
+  ./test_intrinsics.hpp(29,19): : warning : '_mulx_u64' is not a recognized builtin [-Wignored-pragma-intrinsic]
+  #pragma intrinsic(_mulx_u64)
+                    ^
+  5 warnings generated.
+  In file included from test_intrinsics.cpp:1:
+  ./test_intrinsics.hpp(23,19): : warning : '_udiv128' is not a recognized builtin [-Wignored-pragma-intrinsic]
+  #pragma intrinsic(_udiv128)  // NOLINT(clang-diagnostic-ignored-pragma-intrinsic)
+                    ^
+  ./test_intrinsics.hpp(26,19): : warning : '_addcarry_u64' is not a recognized builtin [-Wignored-pragma-intrinsic]
+  #pragma intrinsic(_addcarry_u64)
+                    ^
+  ./test_intrinsics.hpp(27,19): : warning : '_addcarryx_u64' is not a recognized builtin [-Wignored-pragma-intrinsic]
+  #pragma intrinsic(_addcarryx_u64)
+                    ^
+  ./test_intrinsics.hpp(28,19): : warning : '_subborrow_u64' is not a recognized builtin [-Wignored-pragma-intrinsic]
+  #pragma intrinsic(_subborrow_u64)
+                    ^
+  ./test_intrinsics.hpp(29,19): : warning : '_mulx_u64' is not a recognized builtin [-Wignored-pragma-intrinsic]
+  #pragma intrinsic(_mulx_u64)
+                    ^
+  test_intrinsics.cpp(39,3): : warning : expression result unused [-Wunused-value]
+           0;
+           ^
+  6 warnings generated.
+  In file included from test_program.cpp:1:
+  In file included from ./test_program.hpp:16:
+  ./test_intrinsics.hpp(23,19): : warning : '_udiv128' is not a recognized builtin [-Wignored-pragma-intrinsic]
+  #pragma intrinsic(_udiv128)  // NOLINT(clang-diagnostic-ignored-pragma-intrinsic)
+                    ^
+  ./test_intrinsics.hpp(26,19): : warning : '_addcarry_u64' is not a recognized builtin [-Wignored-pragma-intrinsic]
+  #pragma intrinsic(_addcarry_u64)
+                    ^
+  ./test_intrinsics.hpp(27,19): : warning : '_addcarryx_u64' is not a recognized builtin [-Wignored-pragma-intrinsic]
+  #pragma intrinsic(_addcarryx_u64)
+                    ^
+  ./test_intrinsics.hpp(28,19): : warning : '_subborrow_u64' is not a recognized builtin [-Wignored-pragma-intrinsic]
+  #pragma intrinsic(_subborrow_u64)
+                    ^
+  ./test_intrinsics.hpp(29,19): : warning : '_mulx_u64' is not a recognized builtin [-Wignored-pragma-intrinsic]
+  #pragma intrinsic(_mulx_u64)
+                    ^
+  5 warnings generated.
+Done building target "ClCompile" in project "environ_test.vcxproj".
+Target Link:
+  environ_test.vcxproj -> C:\Users\Christopher Susie\Source\Repos\Int128\visual_studio_environment_test\src\visual_studio_environment_test_app\x64\Release-LLVM-Intel\environment_test.exe
+Target FinalizeBuildStatus:
+  Deleting file "x64\Release-LLVM-Intel\environment_test.tlog\unsuccessfulbuild".
+  Touching "x64\Release-LLVM-Intel\environment_test.tlog\environment_test.lastbuildstate".
+
+Done building project "environ_test.vcxproj".
+
+Build succeeded.
+
+clang-cl: : warning : argument unused during compilation: '-arch:SSE2' [-Wunused-command-line-argument]
+clang-cl: : warning : argument unused during compilation: '-std:c++latest' [-Wunused-command-line-argument]
+./test_intrinsics.hpp(23,19): : warning : '_udiv128' is not a recognized builtin [-Wignored-pragma-intrinsic]
+./test_intrinsics.hpp(26,19): : warning : '_addcarry_u64' is not a recognized builtin [-Wignored-pragma-intrinsic]
+./test_intrinsics.hpp(27,19): : warning : '_addcarryx_u64' is not a recognized builtin [-Wignored-pragma-intrinsic]
+./test_intrinsics.hpp(28,19): : warning : '_subborrow_u64' is not a recognized builtin [-Wignored-pragma-intrinsic]
+./test_intrinsics.hpp(29,19): : warning : '_mulx_u64' is not a recognized builtin [-Wignored-pragma-intrinsic]
+./test_intrinsics.hpp(23,19): : warning : '_udiv128' is not a recognized builtin [-Wignored-pragma-intrinsic]
+./test_intrinsics.hpp(26,19): : warning : '_addcarry_u64' is not a recognized builtin [-Wignored-pragma-intrinsic]
+./test_intrinsics.hpp(27,19): : warning : '_addcarryx_u64' is not a recognized builtin [-Wignored-pragma-intrinsic]
+./test_intrinsics.hpp(28,19): : warning : '_subborrow_u64' is not a recognized builtin [-Wignored-pragma-intrinsic]
+./test_intrinsics.hpp(29,19): : warning : '_mulx_u64' is not a recognized builtin [-Wignored-pragma-intrinsic]
+test_intrinsics.cpp(39,3): : warning : expression result unused [-Wunused-value]
+./test_intrinsics.hpp(23,19): : warning : '_udiv128' is not a recognized builtin [-Wignored-pragma-intrinsic]
+./test_intrinsics.hpp(26,19): : warning : '_addcarry_u64' is not a recognized builtin [-Wignored-pragma-intrinsic]
+./test_intrinsics.hpp(27,19): : warning : '_addcarryx_u64' is not a recognized builtin [-Wignored-pragma-intrinsic]
+./test_intrinsics.hpp(28,19): : warning : '_subborrow_u64' is not a recognized builtin [-Wignored-pragma-intrinsic]
+./test_intrinsics.hpp(29,19): : warning : '_mulx_u64' is not a recognized builtin [-Wignored-pragma-intrinsic]
+    18 Warning(s)
+    0 Error(s)
+
+Time Elapsed 00:00:06.37
+------ Rebuild All started: Project: environment_test, Configuration: Release-Clang x64 ------
+Build started 2/14/2021 8:56:42 PM.
+Target InitializeBuildStatus:
+  Creating "x64\Release-Clang\environment_test.tlog\unsuccessfulbuild" because "AlwaysCreate" was specified.
+Target VcpkgTripletSelection:
+  Not using Vcpkg because VcpkgEnabled is "false"
+Target ClCompile:
+  clang-cl : warning : argument unused during compilation: '/arch:SSE2' [-Wunused-command-line-argument]
+  In file included from program.cpp:1:
+  In file included from ./test_program.hpp:16:
+  ./test_intrinsics.hpp(23,19): warning : '_udiv128' is not a recognized builtin [-Wignored-pragma-intrinsic]
+  ./test_intrinsics.hpp(26,19): warning : '_addcarry_u64' is not a recognized builtin [-Wignored-pragma-intrinsic]
+  ./test_intrinsics.hpp(27,19): warning : '_addcarryx_u64' is not a recognized builtin [-Wignored-pragma-intrinsic]
+  ./test_intrinsics.hpp(28,19): warning : '_subborrow_u64' is not a recognized builtin [-Wignored-pragma-intrinsic]
+  ./test_intrinsics.hpp(29,19): warning : '_mulx_u64' is not a recognized builtin [-Wignored-pragma-intrinsic]
+  In file included from test_intrinsics.cpp:1:
+  ./test_intrinsics.hpp(23,19): warning : '_udiv128' is not a recognized builtin [-Wignored-pragma-intrinsic]
+  ./test_intrinsics.hpp(26,19): warning : '_addcarry_u64' is not a recognized builtin [-Wignored-pragma-intrinsic]
+  ./test_intrinsics.hpp(27,19): warning : '_addcarryx_u64' is not a recognized builtin [-Wignored-pragma-intrinsic]
+  ./test_intrinsics.hpp(28,19): warning : '_subborrow_u64' is not a recognized builtin [-Wignored-pragma-intrinsic]
+  ./test_intrinsics.hpp(29,19): warning : '_mulx_u64' is not a recognized builtin [-Wignored-pragma-intrinsic]
+  test_intrinsics.cpp(39,3): warning : expression result unused [-Wunused-value]
+  In file included from test_program.cpp:1:
+  In file included from ./test_program.hpp:16:
+  ./test_intrinsics.hpp(23,19): warning : '_udiv128' is not a recognized builtin [-Wignored-pragma-intrinsic]
+  ./test_intrinsics.hpp(26,19): warning : '_addcarry_u64' is not a recognized builtin [-Wignored-pragma-intrinsic]
+  ./test_intrinsics.hpp(27,19): warning : '_addcarryx_u64' is not a recognized builtin [-Wignored-pragma-intrinsic]
+  ./test_intrinsics.hpp(28,19): warning : '_subborrow_u64' is not a recognized builtin [-Wignored-pragma-intrinsic]
+  ./test_intrinsics.hpp(29,19): warning : '_mulx_u64' is not a recognized builtin [-Wignored-pragma-intrinsic]
+Done building target "ClCompile" in project "environ_test.vcxproj".
+Target Link:
+  environ_test.vcxproj -> C:\Users\Christopher Susie\Source\Repos\Int128\visual_studio_environment_test\src\visual_studio_environment_test_app\x64\Release-Clang\environment_test.exe
+Target FinalizeBuildStatus:
+  Deleting file "x64\Release-Clang\environment_test.tlog\unsuccessfulbuild".
+  Touching "x64\Release-Clang\environment_test.tlog\environment_test.lastbuildstate".
+
+Done building project "environ_test.vcxproj".
+
+Build succeeded.
+
+clang-cl : warning : argument unused during compilation: '/arch:SSE2' [-Wunused-command-line-argument]
+./test_intrinsics.hpp(23,19): warning : '_udiv128' is not a recognized builtin [-Wignored-pragma-intrinsic]
+./test_intrinsics.hpp(26,19): warning : '_addcarry_u64' is not a recognized builtin [-Wignored-pragma-intrinsic]
+./test_intrinsics.hpp(27,19): warning : '_addcarryx_u64' is not a recognized builtin [-Wignored-pragma-intrinsic]
+./test_intrinsics.hpp(28,19): warning : '_subborrow_u64' is not a recognized builtin [-Wignored-pragma-intrinsic]
+./test_intrinsics.hpp(29,19): warning : '_mulx_u64' is not a recognized builtin [-Wignored-pragma-intrinsic]
+./test_intrinsics.hpp(23,19): warning : '_udiv128' is not a recognized builtin [-Wignored-pragma-intrinsic]
+./test_intrinsics.hpp(26,19): warning : '_addcarry_u64' is not a recognized builtin [-Wignored-pragma-intrinsic]
+./test_intrinsics.hpp(27,19): warning : '_addcarryx_u64' is not a recognized builtin [-Wignored-pragma-intrinsic]
+./test_intrinsics.hpp(28,19): warning : '_subborrow_u64' is not a recognized builtin [-Wignored-pragma-intrinsic]
+./test_intrinsics.hpp(29,19): warning : '_mulx_u64' is not a recognized builtin [-Wignored-pragma-intrinsic]
+test_intrinsics.cpp(39,3): warning : expression result unused [-Wunused-value]
+./test_intrinsics.hpp(23,19): warning : '_udiv128' is not a recognized builtin [-Wignored-pragma-intrinsic]
+./test_intrinsics.hpp(26,19): warning : '_addcarry_u64' is not a recognized builtin [-Wignored-pragma-intrinsic]
+./test_intrinsics.hpp(27,19): warning : '_addcarryx_u64' is not a recognized builtin [-Wignored-pragma-intrinsic]
+./test_intrinsics.hpp(28,19): warning : '_subborrow_u64' is not a recognized builtin [-Wignored-pragma-intrinsic]
+./test_intrinsics.hpp(29,19): warning : '_mulx_u64' is not a recognized builtin [-Wignored-pragma-intrinsic]
+    17 Warning(s)
+    0 Error(s)
+
+Time Elapsed 00:00:05.28
+------ Rebuild All started: Project: environment_test, Configuration: Release-Clang Win32 ------
+Build started 2/14/2021 8:56:48 PM.
+Target PrepareForBuild:
+  Creating directory "Release-Clang\environment_test.tlog\".
+Target InitializeBuildStatus:
+  Creating "Release-Clang\environment_test.tlog\unsuccessfulbuild" because "AlwaysCreate" was specified.
+Target VcpkgTripletSelection:
+  Not using Vcpkg because VcpkgEnabled is "false"
+Target Link:
+  environ_test.vcxproj -> C:\Users\Christopher Susie\Source\Repos\Int128\visual_studio_environment_test\src\visual_studio_environment_test_app\Release-Clang\environment_test.exe
+Target FinalizeBuildStatus:
+  Deleting file "Release-Clang\environment_test.tlog\unsuccessfulbuild".
+  Touching "Release-Clang\environment_test.tlog\environment_test.lastbuildstate".
+
+Build succeeded.
+    0 Warning(s)
+    0 Error(s)
+
+Time Elapsed 00:00:04.76
+------ Rebuild All started: Project: environment_test, Configuration: Debug-LLVM-Intel x64 ------
+Build started 2/14/2021 8:56:53 PM.
+Target PrepareForBuild:
+  Creating directory "x64\Debug-LLVM-Intel\environment_test.tlog\".
+Target InitializeBuildStatus:
+  Creating "x64\Debug-LLVM-Intel\environment_test.tlog\unsuccessfulbuild" because "AlwaysCreate" was specified.
+Target MessageBuildingWithCompiler:
+  Building with Intel(R) C++ Compiler 2021.1
+Target VcpkgTripletSelection:
+  Not using Vcpkg because VcpkgEnabled is "false"
+Target ClCompile:
+  ***** ClCompile (x64 - Intel C++)
+  clang-cl: : warning : argument unused during compilation: '-arch:SSE2' [-Wunused-command-line-argument]
+  clang-cl: : warning : argument unused during compilation: '-std:c++latest' [-Wunused-command-line-argument]
+  In file included from program.cpp:1:
+  In file included from ./test_program.hpp:16:
+  ./test_intrinsics.hpp(23,19): : warning : '_udiv128' is not a recognized builtin [-Wignored-pragma-intrinsic]
+  #pragma intrinsic(_udiv128)  // NOLINT(clang-diagnostic-ignored-pragma-intrinsic)
+                    ^
+  ./test_intrinsics.hpp(26,19): : warning : '_addcarry_u64' is not a recognized builtin [-Wignored-pragma-intrinsic]
+  #pragma intrinsic(_addcarry_u64)
+                    ^
+  ./test_intrinsics.hpp(27,19): : warning : '_addcarryx_u64' is not a recognized builtin [-Wignored-pragma-intrinsic]
+  #pragma intrinsic(_addcarryx_u64)
+                    ^
+  ./test_intrinsics.hpp(28,19): : warning : '_subborrow_u64' is not a recognized builtin [-Wignored-pragma-intrinsic]
+  #pragma intrinsic(_subborrow_u64)
+                    ^
+  ./test_intrinsics.hpp(29,19): : warning : '_mulx_u64' is not a recognized builtin [-Wignored-pragma-intrinsic]
+  #pragma intrinsic(_mulx_u64)
+                    ^
+  5 warnings generated.
+  In file included from test_intrinsics.cpp:1:
+  ./test_intrinsics.hpp(23,19): : warning : '_udiv128' is not a recognized builtin [-Wignored-pragma-intrinsic]
+  #pragma intrinsic(_udiv128)  // NOLINT(clang-diagnostic-ignored-pragma-intrinsic)
+                    ^
+  ./test_intrinsics.hpp(26,19): : warning : '_addcarry_u64' is not a recognized builtin [-Wignored-pragma-intrinsic]
+  #pragma intrinsic(_addcarry_u64)
+                    ^
+  ./test_intrinsics.hpp(27,19): : warning : '_addcarryx_u64' is not a recognized builtin [-Wignored-pragma-intrinsic]
+  #pragma intrinsic(_addcarryx_u64)
+                    ^
+  ./test_intrinsics.hpp(28,19): : warning : '_subborrow_u64' is not a recognized builtin [-Wignored-pragma-intrinsic]
+  #pragma intrinsic(_subborrow_u64)
+                    ^
+  ./test_intrinsics.hpp(29,19): : warning : '_mulx_u64' is not a recognized builtin [-Wignored-pragma-intrinsic]
+  #pragma intrinsic(_mulx_u64)
+                    ^
+  test_intrinsics.cpp(39,3): : warning : expression result unused [-Wunused-value]
+           0;
+           ^
+  6 warnings generated.
+  In file included from test_program.cpp:1:
+  In file included from ./test_program.hpp:16:
+  ./test_intrinsics.hpp(23,19): : warning : '_udiv128' is not a recognized builtin [-Wignored-pragma-intrinsic]
+  #pragma intrinsic(_udiv128)  // NOLINT(clang-diagnostic-ignored-pragma-intrinsic)
+                    ^
+  ./test_intrinsics.hpp(26,19): : warning : '_addcarry_u64' is not a recognized builtin [-Wignored-pragma-intrinsic]
+  #pragma intrinsic(_addcarry_u64)
+                    ^
+  ./test_intrinsics.hpp(27,19): : warning : '_addcarryx_u64' is not a recognized builtin [-Wignored-pragma-intrinsic]
+  #pragma intrinsic(_addcarryx_u64)
+                    ^
+  ./test_intrinsics.hpp(28,19): : warning : '_subborrow_u64' is not a recognized builtin [-Wignored-pragma-intrinsic]
+  #pragma intrinsic(_subborrow_u64)
+                    ^
+  ./test_intrinsics.hpp(29,19): : warning : '_mulx_u64' is not a recognized builtin [-Wignored-pragma-intrinsic]
+  #pragma intrinsic(_mulx_u64)
+                    ^
+  5 warnings generated.
+Done building target "ClCompile" in project "environ_test.vcxproj".
+Target FinalizeBuildStatus:
+  Deleting file "x64\Debug-LLVM-Intel\environment_test.tlog\unsuccessfulbuild".
+  Touching "x64\Debug-LLVM-Intel\environment_test.tlog\environment_test.lastbuildstate".
+
+Done building project "environ_test.vcxproj".
+
+Build succeeded.
+
+clang-cl: : warning : argument unused during compilation: '-arch:SSE2' [-Wunused-command-line-argument]
+clang-cl: : warning : argument unused during compilation: '-std:c++latest' [-Wunused-command-line-argument]
+./test_intrinsics.hpp(23,19): : warning : '_udiv128' is not a recognized builtin [-Wignored-pragma-intrinsic]
+./test_intrinsics.hpp(26,19): : warning : '_addcarry_u64' is not a recognized builtin [-Wignored-pragma-intrinsic]
+./test_intrinsics.hpp(27,19): : warning : '_addcarryx_u64' is not a recognized builtin [-Wignored-pragma-intrinsic]
+./test_intrinsics.hpp(28,19): : warning : '_subborrow_u64' is not a recognized builtin [-Wignored-pragma-intrinsic]
+./test_intrinsics.hpp(29,19): : warning : '_mulx_u64' is not a recognized builtin [-Wignored-pragma-intrinsic]
+./test_intrinsics.hpp(23,19): : warning : '_udiv128' is not a recognized builtin [-Wignored-pragma-intrinsic]
+./test_intrinsics.hpp(26,19): : warning : '_addcarry_u64' is not a recognized builtin [-Wignored-pragma-intrinsic]
+./test_intrinsics.hpp(27,19): : warning : '_addcarryx_u64' is not a recognized builtin [-Wignored-pragma-intrinsic]
+./test_intrinsics.hpp(28,19): : warning : '_subborrow_u64' is not a recognized builtin [-Wignored-pragma-intrinsic]
+./test_intrinsics.hpp(29,19): : warning : '_mulx_u64' is not a recognized builtin [-Wignored-pragma-intrinsic]
+test_intrinsics.cpp(39,3): : warning : expression result unused [-Wunused-value]
+./test_intrinsics.hpp(23,19): : warning : '_udiv128' is not a recognized builtin [-Wignored-pragma-intrinsic]
+./test_intrinsics.hpp(26,19): : warning : '_addcarry_u64' is not a recognized builtin [-Wignored-pragma-intrinsic]
+./test_intrinsics.hpp(27,19): : warning : '_addcarryx_u64' is not a recognized builtin [-Wignored-pragma-intrinsic]
+./test_intrinsics.hpp(28,19): : warning : '_subborrow_u64' is not a recognized builtin [-Wignored-pragma-intrinsic]
+./test_intrinsics.hpp(29,19): : warning : '_mulx_u64' is not a recognized builtin [-Wignored-pragma-intrinsic]
+    18 Warning(s)
+    0 Error(s)
+
+Time Elapsed 00:00:05.18
+------ Rebuild All started: Project: environment_test, Configuration: Debug-LLVM-Intel Win32 ------
+Build started 2/14/2021 8:56:58 PM.
+Target PrepareForBuild:
+  Creating directory "Debug-LLVM-Intel\environment_test.tlog\".
+Target InitializeBuildStatus:
+  Creating "Debug-LLVM-Intel\environment_test.tlog\unsuccessfulbuild" because "AlwaysCreate" was specified.
+Target MessageBuildingWithCompiler:
+  Building with Intel(R) C++ Compiler 2021.1
+Target VcpkgTripletSelection:
+  Not using Vcpkg because VcpkgEnabled is "false"
+Target ClCompile:
+  ***** ClCompile (Win32 - Intel C++)
+  clang-cl: : warning : argument unused during compilation: '-std:c++latest' [-Wunused-command-line-argument]
+Done building target "ClCompile" in project "environ_test.vcxproj".
+Target FinalizeBuildStatus:
+  Deleting file "Debug-LLVM-Intel\environment_test.tlog\unsuccessfulbuild".
+  Touching "Debug-LLVM-Intel\environment_test.tlog\environment_test.lastbuildstate".
+
+Done building project "environ_test.vcxproj".
+
+Build succeeded.
+
+clang-cl: : warning : argument unused during compilation: '-std:c++latest' [-Wunused-command-line-argument]
+    1 Warning(s)
+    0 Error(s)
+
+Time Elapsed 00:00:06.12
+------ Rebuild All started: Project: environment_test, Configuration: Debug-Clang x64 ------
+Build started 2/14/2021 8:57:04 PM.
+Target InitializeBuildStatus:
+  Creating "x64\Debug-Clang\environment_test.tlog\unsuccessfulbuild" because "AlwaysCreate" was specified.
+Target VcpkgTripletSelection:
+  Not using Vcpkg because VcpkgEnabled is "false"
+Target ClCompile:
+  clang-cl : warning : argument unused during compilation: '/arch:SSE2' [-Wunused-command-line-argument]
+  In file included from program.cpp:1:
+  In file included from ./test_program.hpp:16:
+  ./test_intrinsics.hpp(23,19): warning : '_udiv128' is not a recognized builtin [-Wignored-pragma-intrinsic]
+  ./test_intrinsics.hpp(26,19): warning : '_addcarry_u64' is not a recognized builtin [-Wignored-pragma-intrinsic]
+  ./test_intrinsics.hpp(27,19): warning : '_addcarryx_u64' is not a recognized builtin [-Wignored-pragma-intrinsic]
+  ./test_intrinsics.hpp(28,19): warning : '_subborrow_u64' is not a recognized builtin [-Wignored-pragma-intrinsic]
+  ./test_intrinsics.hpp(29,19): warning : '_mulx_u64' is not a recognized builtin [-Wignored-pragma-intrinsic]
+  In file included from test_intrinsics.cpp:1:
+  ./test_intrinsics.hpp(23,19): warning : '_udiv128' is not a recognized builtin [-Wignored-pragma-intrinsic]
+  ./test_intrinsics.hpp(26,19): warning : '_addcarry_u64' is not a recognized builtin [-Wignored-pragma-intrinsic]
+  ./test_intrinsics.hpp(27,19): warning : '_addcarryx_u64' is not a recognized builtin [-Wignored-pragma-intrinsic]
+  ./test_intrinsics.hpp(28,19): warning : '_subborrow_u64' is not a recognized builtin [-Wignored-pragma-intrinsic]
+  ./test_intrinsics.hpp(29,19): warning : '_mulx_u64' is not a recognized builtin [-Wignored-pragma-intrinsic]
+  test_intrinsics.cpp(39,3): warning : expression result unused [-Wunused-value]
+  In file included from test_program.cpp:1:
+  In file included from ./test_program.hpp:16:
+  ./test_intrinsics.hpp(23,19): warning : '_udiv128' is not a recognized builtin [-Wignored-pragma-intrinsic]
+  ./test_intrinsics.hpp(26,19): warning : '_addcarry_u64' is not a recognized builtin [-Wignored-pragma-intrinsic]
+  ./test_intrinsics.hpp(27,19): warning : '_addcarryx_u64' is not a recognized builtin [-Wignored-pragma-intrinsic]
+  ./test_intrinsics.hpp(28,19): warning : '_subborrow_u64' is not a recognized builtin [-Wignored-pragma-intrinsic]
+  ./test_intrinsics.hpp(29,19): warning : '_mulx_u64' is not a recognized builtin [-Wignored-pragma-intrinsic]
+Done building target "ClCompile" in project "environ_test.vcxproj".
+Target Link:
+  environ_test.vcxproj -> C:\Users\Christopher Susie\Source\Repos\Int128\visual_studio_environment_test\src\visual_studio_environment_test_app\x64\Debug-Clang\environment_test.exe
+Target FinalizeBuildStatus:
+  Deleting file "x64\Debug-Clang\environment_test.tlog\unsuccessfulbuild".
+  Touching "x64\Debug-Clang\environment_test.tlog\environment_test.lastbuildstate".
+
+Done building project "environ_test.vcxproj".
+
+Build succeeded.
+
+clang-cl : warning : argument unused during compilation: '/arch:SSE2' [-Wunused-command-line-argument]
+./test_intrinsics.hpp(23,19): warning : '_udiv128' is not a recognized builtin [-Wignored-pragma-intrinsic]
+./test_intrinsics.hpp(26,19): warning : '_addcarry_u64' is not a recognized builtin [-Wignored-pragma-intrinsic]
+./test_intrinsics.hpp(27,19): warning : '_addcarryx_u64' is not a recognized builtin [-Wignored-pragma-intrinsic]
+./test_intrinsics.hpp(28,19): warning : '_subborrow_u64' is not a recognized builtin [-Wignored-pragma-intrinsic]
+./test_intrinsics.hpp(29,19): warning : '_mulx_u64' is not a recognized builtin [-Wignored-pragma-intrinsic]
+./test_intrinsics.hpp(23,19): warning : '_udiv128' is not a recognized builtin [-Wignored-pragma-intrinsic]
+./test_intrinsics.hpp(26,19): warning : '_addcarry_u64' is not a recognized builtin [-Wignored-pragma-intrinsic]
+./test_intrinsics.hpp(27,19): warning : '_addcarryx_u64' is not a recognized builtin [-Wignored-pragma-intrinsic]
+./test_intrinsics.hpp(28,19): warning : '_subborrow_u64' is not a recognized builtin [-Wignored-pragma-intrinsic]
+./test_intrinsics.hpp(29,19): warning : '_mulx_u64' is not a recognized builtin [-Wignored-pragma-intrinsic]
+test_intrinsics.cpp(39,3): warning : expression result unused [-Wunused-value]
+./test_intrinsics.hpp(23,19): warning : '_udiv128' is not a recognized builtin [-Wignored-pragma-intrinsic]
+./test_intrinsics.hpp(26,19): warning : '_addcarry_u64' is not a recognized builtin [-Wignored-pragma-intrinsic]
+./test_intrinsics.hpp(27,19): warning : '_addcarryx_u64' is not a recognized builtin [-Wignored-pragma-intrinsic]
+./test_intrinsics.hpp(28,19): warning : '_subborrow_u64' is not a recognized builtin [-Wignored-pragma-intrinsic]
+./test_intrinsics.hpp(29,19): warning : '_mulx_u64' is not a recognized builtin [-Wignored-pragma-intrinsic]
+    17 Warning(s)
+    0 Error(s)
+
+Time Elapsed 00:00:04.10
+------ Rebuild All started: Project: environment_test, Configuration: Debug-Clang Win32 ------
+Build started 2/14/2021 8:57:09 PM.
+Target PrepareForBuild:
+  Creating directory "Debug-Clang\environment_test.tlog\".
+Target InitializeBuildStatus:
+  Creating "Debug-Clang\environment_test.tlog\unsuccessfulbuild" because "AlwaysCreate" was specified.
+Target VcpkgTripletSelection:
+  Not using Vcpkg because VcpkgEnabled is "false"
+Target Link:
+  environ_test.vcxproj -> C:\Users\Christopher Susie\Source\Repos\Int128\visual_studio_environment_test\src\visual_studio_environment_test_app\Debug-Clang\environment_test.exe
+Target FinalizeBuildStatus:
+  Deleting file "Debug-Clang\environment_test.tlog\unsuccessfulbuild".
+  Touching "Debug-Clang\environment_test.tlog\environment_test.lastbuildstate".
+
+Build succeeded.
+    0 Warning(s)
+    0 Error(s)
+
+Time Elapsed 00:00:03.98
+------ Rebuild All started: Project: environment_test, Configuration: Release-Microsoft Win32 ------
+Build started 2/14/2021 8:57:13 PM.
+Target PrepareForBuild:
+  Creating directory "Release-Microsoft\environment_test.tlog\".
+Target InitializeBuildStatus:
+  Creating "Release-Microsoft\environment_test.tlog\unsuccessfulbuild" because "AlwaysCreate" was specified.
+Target VcpkgTripletSelection:
+  Not using Vcpkg because VcpkgEnabled is "false"
+Target ClCompile:
+  program.cpp
+  test_intrinsics.cpp
+  test_program.cpp
+Target Link:
+  Generating code
+  Previous IPDB not found, fall back to full compilation.
+  All 413 functions were compiled because no usable IPDB/IOBJ from previous compilation was found.
+  Finished generating code
+  environ_test.vcxproj -> C:\Users\Christopher Susie\Source\Repos\Int128\visual_studio_environment_test\src\visual_studio_environment_test_app\Release-Microsoft\environment_test.exe
+Target FinalizeBuildStatus:
+  Deleting file "Release-Microsoft\environment_test.tlog\unsuccessfulbuild".
+  Touching "Release-Microsoft\environment_test.tlog\environment_test.lastbuildstate".
+
+Build succeeded.
+    0 Warning(s)
+    0 Error(s)
+
+Time Elapsed 00:00:02.83
+------ Rebuild All started: Project: environment_test, Configuration: Release-Microsoft x64 ------
+Build started 2/14/2021 8:57:16 PM.
+Target InitializeBuildStatus:
+  Creating "x64\Release-Microsoft\environment_test.tlog\unsuccessfulbuild" because "AlwaysCreate" was specified.
+Target VcpkgTripletSelection:
+  Not using Vcpkg because VcpkgEnabled is "false"
+Target ClCompile:
+  cl : command line warning D9002: ignoring unknown option '/arch:SSE2'
+  program.cpp
+  test_intrinsics.cpp
+  test_program.cpp
+Done building target "ClCompile" in project "environ_test.vcxproj".
+Target Link:
+  Generating code
+  Previous IPDB not found, fall back to full compilation.
+  All 423 functions were compiled because no usable IPDB/IOBJ from previous compilation was found.
+  Finished generating code
+  environ_test.vcxproj -> C:\Users\Christopher Susie\Source\Repos\Int128\visual_studio_environment_test\src\visual_studio_environment_test_app\x64\Release-Microsoft\environment_test.exe
+Target FinalizeBuildStatus:
+  Deleting file "x64\Release-Microsoft\environment_test.tlog\unsuccessfulbuild".
+  Touching "x64\Release-Microsoft\environment_test.tlog\environment_test.lastbuildstate".
+
+Done building project "environ_test.vcxproj".
+
+Build succeeded.
+
+cl : command line warning D9002: ignoring unknown option '/arch:SSE2'
+    1 Warning(s)
+    0 Error(s)
+
+Time Elapsed 00:00:02.97
+------ Rebuild All started: Project: environment_test, Configuration: Release-Classic-Intel Win32 ------
+Build started 2/14/2021 8:57:19 PM.
+Target PrepareForBuild:
+  Creating directory "Release-Classic-Intel\environment_test.tlog\".
+Target InitializeBuildStatus:
+  Creating "Release-Classic-Intel\environment_test.tlog\unsuccessfulbuild" because "AlwaysCreate" was specified.
+Target MessageBuildingWithCompiler:
+  Building with Intel(R) C++ Compiler Classic 19.2
+Target VcpkgTripletSelection:
+  Not using Vcpkg because VcpkgEnabled is "false"
+Target ClCompile:
+  ***** ClCompile (Win32 - Intel C++)
+  icl: : warning #10428: '/Qstd:<arg>' conflicts with '/std:<arg>'; using '/Qstd:<arg>'
+  program.cpp
+  The contents of <bit> are available only with C++20 or later.
+  The contents of <span> are available only with C++20 or later.
+  test_intrinsics.cpp
+  The contents of <bit> are available only with C++20 or later.
+  The contents of <span> are available only with C++20 or later.
+  test_program.cpp
+  The contents of <bit> are available only with C++20 or later.
+  The contents of <span> are available only with C++20 or later.
+Done building target "ClCompile" in project "environ_test.vcxproj".
+Target Link:
+  environ_test.vcxproj -> C:\Users\Christopher Susie\Source\Repos\Int128\visual_studio_environment_test\src\visual_studio_environment_test_app\Release-Classic-Intel\environment_test.exe
+Target FinalizeBuildStatus:
+  Deleting file "Release-Classic-Intel\environment_test.tlog\unsuccessfulbuild".
+  Touching "Release-Classic-Intel\environment_test.tlog\environment_test.lastbuildstate".
+
+Done building project "environ_test.vcxproj".
+
+Build succeeded.
+
+icl: : warning #10428: '/Qstd:<arg>' conflicts with '/std:<arg>'; using '/Qstd:<arg>'
+    1 Warning(s)
+    0 Error(s)
+
+Time Elapsed 00:00:04.48
+------ Rebuild All started: Project: environment_test, Configuration: Release-Classic-Intel x64 ------
+Build started 2/14/2021 8:57:23 PM.
+Target InitializeBuildStatus:
+  Creating "x64\Release-Classic-Intel\environment_test.tlog\unsuccessfulbuild" because "AlwaysCreate" was specified.
+Target MessageBuildingWithCompiler:
+  Building with Intel(R) C++ Compiler Classic 19.2
+Target VcpkgTripletSelection:
+  Not using Vcpkg because VcpkgEnabled is "false"
+Target ClCompile:
+  ***** ClCompile (x64 - Intel C++)
+  icl: : warning #10428: '/Qstd:<arg>' conflicts with '/std:<arg>'; using '/Qstd:<arg>'
+  program.cpp
+  The contents of <bit> are available only with C++20 or later.
+  The contents of <span> are available only with C++20 or later.
+  test_intrinsics.cpp
+  The contents of <bit> are available only with C++20 or later.
+  The contents of <span> are available only with C++20 or later.
+  test_program.cpp
+  The contents of <bit> are available only with C++20 or later.
+  The contents of <span> are available only with C++20 or later.
+Done building target "ClCompile" in project "environ_test.vcxproj".
+Target Link:
+  environ_test.vcxproj -> C:\Users\Christopher Susie\Source\Repos\Int128\visual_studio_environment_test\src\visual_studio_environment_test_app\x64\Release-Classic-Intel\environment_test.exe
+Target FinalizeBuildStatus:
+  Deleting file "x64\Release-Classic-Intel\environment_test.tlog\unsuccessfulbuild".
+  Touching "x64\Release-Classic-Intel\environment_test.tlog\environment_test.lastbuildstate".
+
+Done building project "environ_test.vcxproj".
+
+Build succeeded.
+
+icl: : warning #10428: '/Qstd:<arg>' conflicts with '/std:<arg>'; using '/Qstd:<arg>'
+    1 Warning(s)
+    0 Error(s)
+
+Time Elapsed 00:00:04.23
+------ Rebuild All started: Project: environment_test, Configuration: Debug-Microsoft Win32 ------
+Build started 2/14/2021 8:57:28 PM.
+Target PrepareForBuild:
+  Creating directory "Debug-Microsoft\environment_test.tlog\".
+Target InitializeBuildStatus:
+  Creating "Debug-Microsoft\environment_test.tlog\unsuccessfulbuild" because "AlwaysCreate" was specified.
+Target VcpkgTripletSelection:
+  Not using Vcpkg because VcpkgEnabled is "false"
+Target ClCompile:
+  program.cpp
+  test_intrinsics.cpp
+  test_program.cpp
+  Generating Code...
+Target Link:
+  environ_test.vcxproj -> C:\Users\Christopher Susie\Source\Repos\Int128\visual_studio_environment_test\src\visual_studio_environment_test_app\Debug-Microsoft\environment_test.exe
+Target FinalizeBuildStatus:
+  Deleting file "Debug-Microsoft\environment_test.tlog\unsuccessfulbuild".
+  Touching "Debug-Microsoft\environment_test.tlog\environment_test.lastbuildstate".
+
+Build succeeded.
+    0 Warning(s)
+    0 Error(s)
+
+Time Elapsed 00:00:03.05
+------ Rebuild All started: Project: environment_test, Configuration: Debug-Microsoft x64 ------
+Build started 2/14/2021 8:57:31 PM.
+Target PrepareForBuild:
+  Creating directory "x64\Debug-Microsoft\environment_test.tlog\".
+Target InitializeBuildStatus:
+  Creating "x64\Debug-Microsoft\environment_test.tlog\unsuccessfulbuild" because "AlwaysCreate" was specified.
+Target VcpkgTripletSelection:
+  Not using Vcpkg because VcpkgEnabled is "false"
+Target ClCompile:
+  cl : command line warning D9002: ignoring unknown option '/arch:SSE2'
+  program.cpp
+  test_intrinsics.cpp
+  test_program.cpp
+  Generating Code...
+Done building target "ClCompile" in project "environ_test.vcxproj".
+Target Link:
+  environ_test.vcxproj -> C:\Users\Christopher Susie\Source\Repos\Int128\visual_studio_environment_test\src\visual_studio_environment_test_app\x64\Debug-Microsoft\environment_test.exe
+Target FinalizeBuildStatus:
+  Deleting file "x64\Debug-Microsoft\environment_test.tlog\unsuccessfulbuild".
+  Touching "x64\Debug-Microsoft\environment_test.tlog\environment_test.lastbuildstate".
+
+Done building project "environ_test.vcxproj".
+
+Build succeeded.
+
+cl : command line warning D9002: ignoring unknown option '/arch:SSE2'
+    1 Warning(s)
+    0 Error(s)
+
+Time Elapsed 00:00:03.21
+------ Rebuild All started: Project: environment_test, Configuration: Debug-Classic-Intel Win32 ------
+Build started 2/14/2021 8:57:34 PM.
+Target PrepareForBuild:
+  Creating directory "Debug-Classic-Intel\environment_test.tlog\".
+Target InitializeBuildStatus:
+  Creating "Debug-Classic-Intel\environment_test.tlog\unsuccessfulbuild" because "AlwaysCreate" was specified.
+Target MessageBuildingWithCompiler:
+  Building with Intel(R) C++ Compiler Classic 19.2
+Target VcpkgTripletSelection:
+  Not using Vcpkg because VcpkgEnabled is "false"
+Target ClCompile:
+  ***** ClCompile (Win32 - Intel C++)
+  icl: : warning #10428: '/Qstd:<arg>' conflicts with '/std:<arg>'; using '/Qstd:<arg>'
+  program.cpp
+  The contents of <bit> are available only with C++20 or later.
+  The contents of <span> are available only with C++20 or later.
+  test_intrinsics.cpp
+  The contents of <bit> are available only with C++20 or later.
+  The contents of <span> are available only with C++20 or later.
+  test_program.cpp
+  The contents of <bit> are available only with C++20 or later.
+  The contents of <span> are available only with C++20 or later.
+Done building target "ClCompile" in project "environ_test.vcxproj".
+Target FinalizeBuildStatus:
+  Deleting file "Debug-Classic-Intel\environment_test.tlog\unsuccessfulbuild".
+  Touching "Debug-Classic-Intel\environment_test.tlog\environment_test.lastbuildstate".
+
+Done building project "environ_test.vcxproj".
+
+Build succeeded.
+
+icl: : warning #10428: '/Qstd:<arg>' conflicts with '/std:<arg>'; using '/Qstd:<arg>'
+    1 Warning(s)
+    0 Error(s)
+
+Time Elapsed 00:00:03.09
+------ Rebuild All started: Project: environment_test, Configuration: Debug-Classic-Intel x64 ------
+Build started 2/14/2021 8:57:38 PM.
+Target PrepareForBuild:
+  Creating directory "x64\Debug-Classic-Intel\environment_test.tlog\".
+Target InitializeBuildStatus:
+  Creating "x64\Debug-Classic-Intel\environment_test.tlog\unsuccessfulbuild" because "AlwaysCreate" was specified.
+Target MessageBuildingWithCompiler:
+  Building with Intel(R) C++ Compiler Classic 19.2
+Target VcpkgTripletSelection:
+  Not using Vcpkg because VcpkgEnabled is "false"
+Target ClCompile:
+  ***** ClCompile (x64 - Intel C++)
+  icl: : warning #10428: '/Qstd:<arg>' conflicts with '/std:<arg>'; using '/Qstd:<arg>'
+  program.cpp
+  The contents of <bit> are available only with C++20 or later.
+  The contents of <span> are available only with C++20 or later.
+  test_intrinsics.cpp
+  The contents of <bit> are available only with C++20 or later.
+  The contents of <span> are available only with C++20 or later.
+  test_program.cpp
+  The contents of <bit> are available only with C++20 or later.
+  The contents of <span> are available only with C++20 or later.
+Done building target "ClCompile" in project "environ_test.vcxproj".
+Target FinalizeBuildStatus:
+  Deleting file "x64\Debug-Classic-Intel\environment_test.tlog\unsuccessfulbuild".
+  Touching "x64\Debug-Classic-Intel\environment_test.tlog\environment_test.lastbuildstate".
+
+Done building project "environ_test.vcxproj".
+
+Build succeeded.
+
+icl: : warning #10428: '/Qstd:<arg>' conflicts with '/std:<arg>'; using '/Qstd:<arg>'
+    1 Warning(s)
+    0 Error(s)
+
+Time Elapsed 00:00:02.98
+========== Rebuild All: 16 succeeded, 0 failed, 0 skipped ==========
