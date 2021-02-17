@@ -72,9 +72,13 @@ namespace cjm::numerics
 		{
 			return cjm::numerics::uint128_calc_mode::intrinsic_u128;
 		}
-		else if constexpr (cjm::numerics::has_msc_x64)
+		else if constexpr (cjm::numerics::is_microsoft_windows_x64)
 		{
 			return cjm::numerics::uint128_calc_mode::msvc_x64;
+		}
+		else if constexpr (cjm::numerics::is_clang_or_intel_llvm_msvc_x64)
+		{
+			return uint128_calc_mode::msvc_x64_clang_or_intel_llvm;
 		}
 		else
 		{

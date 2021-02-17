@@ -208,6 +208,12 @@ namespace cjm
 		constexpr compiler_used value_or_other_ifndef(compiler_used v) noexcept;
 		
 		class uint128;
+		constexpr bool is_windows =
+#if defined (CJM_DETECTED_WINDOWS)
+			true;
+#else
+			false;
+#endif
 		constexpr bool is_x64 =
 #if defined (CJM_DETECTED_X64)
 			true;
@@ -215,12 +221,8 @@ namespace cjm
 			false;
 #endif
 		
-		constexpr bool is_windows_x64 =
-#if defined (CJM_DETECTED_WINDOWS) 
-			is_x64;
-#else
-			false;
-#endif
+		constexpr bool is_windows_x64 = is_x64 && is_windows;
+
 		
 		constexpr compiler_used compiler =
 #ifdef CJM_DETECTED_WINDOWS
@@ -311,11 +313,14 @@ namespace cjm
 #else
 			false;
 #endif
-
+		constexpr bool is_clang_or_intel_llvm_msvc_x64 =
+			is_windows_x64 && (compiler == compiler_used::msvc_clang || compiler == compiler_used::msvc_intel_llvm);
+		constexpr bool is_microsoft_windows_x64 = is_windows_x64 && (compiler == compiler_used::msvc);
 		enum class uint128_calc_mode : std::uint8_t
 		{
 			default_eval = 0x00,
 			msvc_x64,
+			msvc_x64_clang_or_intel_llvm,
 			intrinsic_u128,
 		};
 		constexpr uint128_calc_mode init_eval_mode() noexcept;

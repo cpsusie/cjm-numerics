@@ -376,7 +376,7 @@ namespace cjm
                 is.setstate(std::ios_base::failbit);
         	}
             std::basic_string<Char, CharTraits> str;
-        	if constexpr ( (!cjm::numerics::has_msc) && cjm::numerics::concepts::utf_character<Char>)
+        	if constexpr ( (!cjm::numerics::is_windows) && cjm::numerics::concepts::utf_character<Char>)
             {
         	    Char c{};
         	    do
@@ -434,7 +434,7 @@ namespace cjm
         requires (cjm::numerics::concepts::utf_character<Char>) && (cjm::numerics::concepts::char_with_traits_and_allocator<Char, CharTraits, Allocator>)
         std::basic_string<Char, CharTraits, Allocator> uint128::to_string(uint128 item, std::ios_base::fmtflags flags)
         {
-            if constexpr (has_msc)
+            if constexpr (is_windows)
             {
                 constexpr char zero_char_temp = '0';
                 constexpr Char zero_char = static_cast<Char>(zero_char_temp);

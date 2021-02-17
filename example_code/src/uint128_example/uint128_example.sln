@@ -25,8 +25,8 @@ Global
 		{BC6CB9EA-3979-42D9-9930-851B25F34BAA}.Debug-Microsoft|x64.Build.0 = Debug-Microsoft|x64
 		{BC6CB9EA-3979-42D9-9930-851B25F34BAA}.Debug-Microsoft|x86.ActiveCfg = Debug-Microsoft|Win32
 		{BC6CB9EA-3979-42D9-9930-851B25F34BAA}.Debug-Microsoft|x86.Build.0 = Debug-Microsoft|Win32
-		{BC6CB9EA-3979-42D9-9930-851B25F34BAA}.Release-Clang|x64.ActiveCfg = Release-Microsoft|x64
-		{BC6CB9EA-3979-42D9-9930-851B25F34BAA}.Release-Clang|x64.Build.0 = Release-Microsoft|x64
+		{BC6CB9EA-3979-42D9-9930-851B25F34BAA}.Release-Clang|x64.ActiveCfg = Release-Clang|x64
+		{BC6CB9EA-3979-42D9-9930-851B25F34BAA}.Release-Clang|x64.Build.0 = Release-Clang|x64
 		{BC6CB9EA-3979-42D9-9930-851B25F34BAA}.Release-Clang|x86.ActiveCfg = Release-Clang|Win32
 		{BC6CB9EA-3979-42D9-9930-851B25F34BAA}.Release-Clang|x86.Build.0 = Release-Clang|Win32
 		{BC6CB9EA-3979-42D9-9930-851B25F34BAA}.Release-Microsoft|x64.ActiveCfg = Release-Microsoft|x64
