@@ -1371,10 +1371,10 @@ namespace cjm
                 {
                     return -static_cast<natuint128_t>(operand);
                 }
-//		        else if constexpr (calculation_mode == uint128_calc_mode::msvc_x64)
-//      	    {
-//
-//      	    }
+                else if constexpr (calculation_mode == uint128_calc_mode::msvc_x64 || calculation_mode == uint128_calc_mode::msvc_x64_clang_or_intel_llvm)
+                {
+                    return (uint128{ ~operand.high_part(), ~operand.low_part() } += uint128{1});      
+		  	    }
                 else // constexpr (calculation_mode == uint128_calc_mode::default_eval)
                 {
                     using intpart = uint128::int_part;
@@ -1553,7 +1553,7 @@ namespace cjm
                 {
                     return static_cast<natuint128_t>(lhs) + static_cast<natuint128_t>(rhs);
                 }
-	            else if constexpr (calculation_mode == uint128_calc_mode::msvc_x64)
+	            else if constexpr (calculation_mode == uint128_calc_mode::msvc_x64 || calculation_mode == uint128_calc_mode::msvc_x64_clang_or_intel_llvm)
 				{
                     uint128 ret = 0;
                     unsigned char carry_in = 0;
@@ -1718,7 +1718,7 @@ namespace cjm
 	        }
 			else
 			{
-                if constexpr (calculation_mode == uint128_calc_mode::msvc_x64)
+                if constexpr (calculation_mode == uint128_calc_mode::msvc_x64 || calculation_mode == uint128_calc_mode::msvc_x64_clang_or_intel_llvm)
                 {
                     int_t ret = 0;
                     carry_out = CJM_ADDCARRY64(carry_in, lhs, rhs, &ret);
@@ -1752,7 +1752,7 @@ namespace cjm
 	        }
         	else
         	{
-                if constexpr (calculation_mode == uint128_calc_mode::msvc_x64)
+                if constexpr (calculation_mode == uint128_calc_mode::msvc_x64 || calculation_mode == uint128_calc_mode::msvc_x64_clang_or_intel_llvm)
                 {
                     unsigned char carry_1 = 0;
                     unsigned char carry_2 = 0;
@@ -1798,7 +1798,7 @@ namespace cjm
             }
             else
             {
-                if constexpr (calculation_mode == uint128_calc_mode::msvc_x64)
+                if constexpr (calculation_mode == uint128_calc_mode::msvc_x64 || calculation_mode == uint128_calc_mode::msvc_x64_clang_or_intel_llvm)
                 {
                     int_t ret = 0;
                     borrow_out = CJM_SUBBORROW_64(borrow_in, minuend, subtrahend, &ret);
@@ -1833,7 +1833,7 @@ namespace cjm
             }
             else
             {
-                if constexpr (calculation_mode == uint128_calc_mode::msvc_x64)
+                if constexpr (calculation_mode == uint128_calc_mode::msvc_x64 || calculation_mode == uint128_calc_mode::msvc_x64_clang_or_intel_llvm)
                 {
                     unsigned char borrow_1 = 0;
                     unsigned char borrow_2 = 0;
@@ -1880,6 +1880,11 @@ namespace cjm
 					if (rhs == 0) { throw std::domain_error("Division by zero is illegal."); }
 					return static_cast<natuint128_t>(lhs) / static_cast<natuint128_t>(rhs);
 				}
+                else if constexpr (calculation_mode == uint128_calc_mode::msvc_x64_clang_or_intel_llvm)
+                {
+	                if (rhs == 0) { throw std::domain_error("Division by zero is illegal."); }
+                    return bit_cast<uint128>(bit_cast<divonlynatuint128_t>(lhs) / bit_cast<divonlynatuint128_t>(rhs));
+                }
 				else if constexpr (calculation_mode == uint128_calc_mode::msvc_x64)  // NOLINT(readability-misleading-indentation)
 				{
 					if (rhs == 0) { throw std::domain_error("Division by zero is illegal."); }
@@ -2932,7 +2937,7 @@ inline void uint128::best_safe_div_mod(uint128 dividend, uint128 divisor, uint12
 	*remainder = result.remainder;
 }
 
-#ifdef CJM_HAVE_BUILTIN_128
+#ifdef CJM_USE_INTRINSIC_U128
 inline cjm::numerics::uint128& cjm::numerics::uint128::operator=(__uint128_t other) noexcept
 {
 	return (*this = cjm::numerics::bit_cast<uint128, unsigned __int128>(other));
@@ -2954,6 +2959,23 @@ inline cjm::numerics::uint128::uint128(__uint128_t other) noexcept
 	m_low = 0;
 	*this = cjm::numerics::bit_cast<uint128, unsigned __int128>(other);
 }
+#elif defined (CJM_DIV_ONLY_INTRINSIC_U128)
+inline cjm::numerics::uint128::uint128(divonlynatuint128_t other) noexcept
+{
+    m_high = 0;
+    m_low = 0;
+    *this = cjm::numerics::bit_cast<uint128, divonlynatuint128_t>(other);
+}
+inline cjm::numerics::uint128& cjm::numerics::uint128::operator=(divonlynatuint128_t other) noexcept
+{
+	return (*this = cjm::numerics::bit_cast<uint128, divonlynatuint128_t>(other));
+}
+inline cjm::numerics::uint128::operator divonlynatuint128_t() const noexcept
+{
+    return cjm::numerics::bit_cast<divonlynatuint128_t, uint128>(*this);
+}
+
+
 #endif
 
 //This method is based on the 128-bit unsigned integer division
@@ -2976,7 +2998,7 @@ inline cjm::numerics::uint128::uint128(__uint128_t other) noexcept
 //If the optimized path from clang cannot be taken, I revert
 //to using abseil's shift with subtract algorithm as elsewhere
 //rather than using the slow-case handler from clang.
-#if defined(_MSC_VER) && defined(_M_X64)
+#ifdef CJM_UDIV_INTRINSIC_AVAILABLE
 inline void uint128::div_mod_msc_x64_impl(uint128 dividend, uint128 divisor, uint128* quotient_ret, uint128* remainder_ret) noexcept
 {
 	constexpr size_t n_utword_bits = sizeof(uint128) * CHAR_BIT;

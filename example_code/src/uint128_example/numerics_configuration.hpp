@@ -96,8 +96,8 @@
 #pragma intrinsic(_addcarryx_u64)
 #define CJM_ADDCARRY64 _addcarryx_u64
 #else
-#pragma intrinsic(__addcarry_u64)
-#define CJM_ADDCARRY64 __addcarry_u64
+#pragma intrinsic(_addcarry_u64)
+#define CJM_ADDCARRY64 _addcarry_u64
 #endif
 #ifdef CJM_NUMERICS_UINT128_INTEL_BMI2
 #pragma intrinsic(_mulx_u64)
@@ -226,9 +226,7 @@ namespace cjm
 		
 		constexpr compiler_used compiler =
 #ifdef CJM_DETECTED_WINDOWS
-#ifdef CJM_DETECTED_GCC //no idea what to do with GCC + windows
-			compiler_used::other;
-#elif defined (CJM_DETECTED_INTEL_CLASSIC)
+#if defined (CJM_DETECTED_INTEL_CLASSIC)
 			compiler_used::msvc_intel_classic;
 #elif defined (CJM_DETECTED_INTEL_LLVM)
 			compiler_used::msvc_intel_llvm;

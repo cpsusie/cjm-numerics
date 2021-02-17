@@ -53,6 +53,7 @@ namespace cjm::uint128::example_code
 	void demonstrate_constexpr_addition();
 	void say_hello();
 	void say_goodbye();
+	void demonstrate_runtime_division();
 }
 
 int main()
@@ -157,4 +158,11 @@ void cjm::uint128::example_code::say_hello()
 void cjm::uint128::example_code::say_goodbye()
 {
 	cout << newl << "The demonstration of CJM's uint128 type has completed.  We hope you found it useful." << std::endl;
+}
+
+void cjm::uint128::example_code::demonstrate_runtime_division()
+{
+	cout << newl << "This is the simple runtime division demonstration." << newl;
+	uint128_t quotient = 0xc0de'd00d'fea2'b00b'cafe'babe'600d'f00d_u128 / 0xbadd'f00d_u128;
+	cout << "Division result: [" << quotient << "]." << newl;
 }
