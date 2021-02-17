@@ -16,6 +16,7 @@
 #include <optional>
 #include <compare>
 #include <climits>
+#include "numerics_configuration.hpp"
 
 namespace cjm::numerics::concepts
 {

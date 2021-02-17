@@ -53,77 +53,12 @@
 #ifndef __cpp_lib_starts_ends_with
 #error	"CJM NUMERICS UINT128 requires standard library support for starts_with and ends_with in std::string and std::string_view."
 #endif
-#ifdef _MSC_VER
-#define CJM_MSC
-#endif
-#if defined(_MSC_VER) && defined(_M_X64)
-#include <intrin.h>
-#include <immintrin.h>
-#pragma intrinsic(_umul128)
-#pragma intrinsic(_BitScanReverse64)
-#pragma intrinsic(__lzcnt64)
-#pragma intrinsic(_udiv128)  // NOLINT(clang-diagnostic-ignored-pragma-intrinsic)
-#pragma intrinsic(__shiftleft128)
-#pragma intrinsic(__shiftright128)
-#pragma intrinsic(_addcarry_u64)
-#pragma intrinsic(_addcarryx_u64)
-#pragma intrinsic(_subborrow_u64)
-#pragma intrinsic(_mulx_u64)
-#ifndef CJM_MSC_X64
-#define CJM_MSC_X64
-#ifdef CJM_NUMERICS_UINT128_INTEL_BMI2
-#define CJM_UMUL128 _mulx_u64
-#else
-#define CJM_UMUL128 _umul128
-#endif
-#define CJM_BITSCAN_REV_64 _BitScanReverse64
-#define CJM_LZCNT_64 __lzcnt64
-#define CJM_UDIV128 _udiv128
-#define CJM_LSHIFT128 __shiftleft128
-#define CJM_RSHIFT128 __shiftright128
-#ifdef CJM_NUMERICS_UINT128_INTEL_ADX
-#define CJM_ADDCARRY64 _addcarryx_u64
-#else
-#define CJM_ADDCARRY64 _addcarry_u64
-#endif
-#define CJM_SUBBORROW_64 _subborrow_u64
-#endif
-#else
-#define CJM_UMUL128 internal::cjm_bad_umul128
-#define CJM_BITSCAN_REV_64 internal::cjm_badrev_bitscan_64
-#define CJM_LZCNT_64 internal::cjm_bad_lzcnt_64
-#define CJM_UDIV128 internal::cjm_bad_udiv128
-#define CJM_LSHIFT128 internal::cjm_bad_shiftleft128
-#define CJM_RSHIFT128 internal::cjm_bad_shiftright128
-#define CJM_ADDCARRY64 internal::cjm_bad_addc64
-#define CJM_SUBBORROW_64 internal::cjm_bad_subb64
-#endif
 
-
-#ifdef __cpp_lib_bit_cast
-#define CJM_BIT_CAST_CONST constexpr
-#else
-#define CJM_BIT_CAST_CONST inline
+//detect endian
+#ifdef CJM_NUMERICS_LITTLE_ENDIAN
+#error "CJM_NUMERIC_LITTLE_ENDIAN should not be set directly."
 #endif
-#ifdef __cpp_lib_bitops
-#define CJM_HAS_BITOPS
-#endif
-#if defined (__GNUG__) || defined(__GNUC__)
-#define CJM_IS_GCC 1
-#endif
-#if defined (CJM_IS_GCC) && !defined(__clang__)
-#define CJM_IS_GCC_NOT_CLANG 1
-#endif
-#if defined (__clang__)
-#define CJM_IS_CLANG
-#endif
-#if defined (CJM_IS_CLANG) && !defined(CJM_IS_GCC)
-#define CJM_IS_CLANG_NOT_GCC
-#endif
-#if defined (CJM_NUMERICS_LITTLE_ENDIAN)
-#error "CJM_NUMERICS_LITTLE_ENDIAN should not be set directly"
-#endif
-#if defined(CJM_MSC)
+#ifdef CJM_DETECTED_WINDOWS
 #define CJM_NUMERICS_LITTLE_ENDIAN true
 #elif !defined(CJM_NUMERICS_LITTLE_ENDIAN) && (!defined(__BYTE_ORDER__) || ( !defined(__ORDER_LITTLE_ENDIAN__) && !defined(__ORDER_BIG_ENDIAN__)))
 #error "Unable to detect endianness of system."
@@ -133,7 +68,70 @@
 #define CJM_NUMERICS_LITTLE_ENDIAN false
 #else
 #error "Unable to detect endianness of system."
+#endif 
+
+//detect availability/suitability of intrinsic uint128 for all purposes
+#if !defined(CJM_DETECTED_WINDOWS) && defined (CJM_DETECTED_INTRINSIC_U128) && defined (CJM_DETECTED_X64)
+#define CJM_USE_INTRINSIC_U128
 #endif
+#if (defined (CJM_DETECTED_CLANG) || defined(CJM_DETECTED_INTEL_LLVM)) && defined(CJM_DETECTED_WINDOWS) && defined(CJM_DETECTED_X64)
+#define CJM_DIV_ONLY_INTRINSIC_U128
+#endif
+
+#ifdef CJM_BASE_INTRINSICS_AVAILABLE
+#include <intrin.h>
+#include <immintrin.h>
+#pragma intrinsic(_umul128)
+#pragma intrinsic(_BitScanReverse64)
+#pragma intrinsic(__lzcnt64)
+#pragma intrinsic(__shiftleft128)
+#pragma intrinsic(__shiftright128)
+#pragma intrinsic(_subborrow_u64)
+#define CJM_BITSCAN_REV_64 _BitScanReverse64
+#define CJM_LZCNT_64 __lzcnt64
+#define CJM_LSHIFT128 __shiftleft128
+#define CJM_RSHIFT128 __shiftright128
+#define CJM_SUBBORROW_64 _subborrow_u64
+#ifdef CJM_NUMERICS_UINT128_INTEL_ADX
+#pragma intrinsic(_addcarryx_u64)
+#define CJM_ADDCARRY64 _addcarryx_u64
+#else
+#pragma intrinsic(__addcarry_u64)
+#define CJM_ADDCARRY64 __addcarry_u64
+#endif
+#ifdef CJM_NUMERICS_UINT128_INTEL_BMI2
+#pragma intrinsic(_mulx_u64)
+#define CJM_UMUL128 _mulx_u64
+#else
+#pragma intrinsic (_umul128)
+#define CJM_UMUL128 _umul128
+#endif
+#ifdef CJM_UDIV_INTRINSIC_AVAILABLE
+#pragma intrinsic (_udiv128)
+#define CJM_UDIV128 _udiv128
+#else
+#define CJM_UDIV128 internal::cjm_bad_udiv128
+#endif
+#else
+#define CJM_UMUL128 internal::cjm_bad_umul128
+#define CJM_BITSCAN_REV_64 internal::cjm_badrev_bitscan_64
+#define CJM_LZCNT_64 internal::cjm_bad_lzcnt_64
+#define CJM_LSHIFT128 internal::cjm_bad_shiftleft128
+#define CJM_RSHIFT128 internal::cjm_bad_shiftright128
+#define CJM_ADDCARRY64 internal::cjm_bad_addc64
+#define CJM_SUBBORROW_64 internal::cjm_bad_subb64
+#define CJM_UDIV128 internal::cjm_bad_udiv128
+#endif
+
+#ifdef __cpp_lib_bit_cast
+#define CJM_BIT_CAST_CONST constexpr
+#else
+#define CJM_BIT_CAST_CONST inline
+#endif
+#ifdef __cpp_lib_bitops
+#define CJM_HAS_BITOPS
+#endif
+
 
 
 
@@ -194,6 +192,9 @@ namespace cjm
 		{
 			other = 0,
 			msvc,
+			msvc_clang,
+			msvc_intel_classic,
+			msvc_intel_llvm,
 			clang_gcc,
 			gcc,
 			clang,			
@@ -207,22 +208,38 @@ namespace cjm
 		constexpr compiler_used value_or_other_ifndef(compiler_used v) noexcept;
 		
 		class uint128;
-
-		constexpr bool is_windows_x64 =
-#ifdef CJM_MSC_X64
+		constexpr bool is_x64 =
+#if defined (CJM_DETECTED_X64)
 			true;
 #else
 			false;
 #endif
 		
+		constexpr bool is_windows_x64 =
+#if defined (CJM_DETECTED_WINDOWS) 
+			is_x64;
+#else
+			false;
+#endif
+		
 		constexpr compiler_used compiler =
-#ifdef CJM_MSC
+#ifdef CJM_DETECTED_WINDOWS
+#ifdef CJM_DETECTED_GCC //no idea what to do with GCC + windows
+			compiler_used::other;
+#elif defined (CJM_DETECTED_INTEL_CLASSIC)
+			compiler_used::msvc_intel_classic;
+#elif defined (CJM_DETECTED_INTEL_LLVM)
+			compiler_used::msvc_intel_llvm;
+#elif defined (CJM_DETECTED_CLANG)
+			compiler_used::msvc_clang;
+#else
 			compiler_used::msvc;
-#elif defined (CJM_IS_GCC_NOT_CLANG)
+#endif                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              
+#elif defined (CJM_DETECTED_GCC) && !defined(CJM_DETECTED_CLANG) 
 			compiler_used::gcc;
-#elif defined (CJM_IS_CLANG_NOT_GCC)
+#elif defined (CJM_DETECTED_CLANG) && !defined(CJM_DETECTED_GCC)
 			compiler_used::clang;
-#elif defined (CJM_IS_GCC)
+#elif defined (CJM_IS_GCC) && defined(CJM_DETECTED_CLANG)
 			compiler_used::clang_gcc;
 #else
 			compiler_used::other;
@@ -239,41 +256,42 @@ namespace cjm
 #else
 			false;
 #endif
-		constexpr bool has_msc_x64 =
-#ifdef CJM_MSC_X64
-			true;
-#else
-			false;
-#endif
-		constexpr bool has_msc =
-#ifdef CJM_MSC
-			true;
-#else
-			false;
-#endif
+	
 		constexpr bool has_intrinsic_u128 =
-#ifdef __SIZEOF_INT128__
+#ifdef CJM_USE_INTRINSIC_U128
 			true;
 		using uint128_align_t = unsigned __int128;
 		using natuint128_t = unsigned __int128;
-#ifndef CJM_HAVE_BUILTIN_128
-#define CJM_HAVE_BUILTIN_128
-#endif
-#else
+		using divonlynatuint128_t = unsigned __int128;
+#elif defined(CJM_DIV_ONLY_INTRINSIC_U128)
 			false;
 		namespace internal
 		{
-			struct alignas(alignof(std::uint64_t) * 2) cjm_align {
+			struct alignas(alignof(std::uint64_t) * 2) cjm_align
+			{
 				std::uint64_t m_low;
 				std::uint64_t m_high;
 			};
 		}
-		using uint128_align_t = std::conditional_t<has_msc_x64, internal::cjm_align, std::uint64_t>;
+
+		using uint128_align_t = internal::cjm_align;
 		using natuint128_t = uint128;
-#ifdef CJM_HAVE_BUILTIN_128
-#undef CJM_HAVE_BUILTIN_128
+		using divonlynatuint128_t = unsigned __int128;
+#else
+			false;
+		namespace internal
+		{
+			struct alignas(alignof(std::uint64_t) * 2) cjm_align
+			{
+				std::uint64_t m_low;
+				std::uint64_t m_high;
+			};
+		}
+		using uint128_align_t = std::conditional_t<is_x64, internal::cjm_align, std::uint64_t>;
+		using natuint128_t = uint128;
+		using divonlynatuint128_t = uint128;
 #endif
-#endif
+
 		constexpr size_t uint128_align = alignof(uint128_align_t);
 		constexpr bool sse3_available =
 #if defined(__SSE3__)
@@ -283,13 +301,13 @@ namespace cjm
 #endif
 		constexpr bool intel_adx_available =
 #if defined(CJM_NUMERICS_UINT128_INTEL_ADX)
-			is_windows_x64;
+			is_x64 && (compiler == compiler_used::msvc || compiler == compiler_used::msvc_clang || compiler == compiler_used::msvc_intel_llvm);
 #else
 			false;
 #endif
 		constexpr bool intel_bmi2_available =
 #if defined(CJM_NUMERICS_UINT128_INTEL_BMI2)
-			is_windows_x64;
+			is_x64 && (compiler == compiler_used::msvc || compiler == compiler_used::msvc_clang || compiler == compiler_used::msvc_intel_llvm);
 #else
 			false;
 #endif
@@ -316,7 +334,8 @@ namespace cjm
 	}*/
 	
 }
-#include "numerics_configuration.inl"
-#endif
 
+
+#endif
+#include "numerics_configuration.inl"
 //#include <cjm/numerics/numerics_configuration.inl>

@@ -12,6 +12,7 @@
 #include<functional>
 #include <utility>
 #include <algorithm>
+#include "numerics_configuration.hpp"
 #include "numerics.hpp"
 #include "cjm_numeric_concepts.hpp"
 #include "cjm_string.hpp"

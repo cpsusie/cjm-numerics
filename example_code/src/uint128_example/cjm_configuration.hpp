@@ -35,6 +35,16 @@
 #ifdef __INTEL_LLVM_COMPILER
 #define CJM_DETECTED_INTEL_LLVM
 #endif
+#if defined (CJM_DETECTED_WINDOWS) && defined(CJM_DETECTED_X64) && !defined(CJM_DETECTED_GCC) && !defined(CJM_DETECTED_INTEL_CLASSIC) && !defined(CJM_DETECTED_INTEL_LLVM) && !defined(CJM_DETECTED_CLANG)
+#define CJM_UDIV_INTRINSIC_AVAILABLE
+#endif
+#if defined (CJM_DETECTED_WINDOWS) && defined(CJM_DETECTED_X64) && !defined(CJM_DETECTED_GCC)
+#define CJM_BASE_INTRINSICS_AVAILABLE
+#endif
+
+
+
+
 
 
 #endif
