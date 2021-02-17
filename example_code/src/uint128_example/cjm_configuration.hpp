@@ -14,7 +14,7 @@
 #include <bit>
 #include <span>
 
-#ifdef (__clang__)
+#ifdef __clang__
 #define CJM_DETECTED_CLANG
 #endif
 #ifdef __SIZEOF_INT128__

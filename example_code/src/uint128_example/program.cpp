@@ -1,3 +1,4 @@
+#include "cjm_configuration.hpp"
 #include "uint128.hpp"
 #include "cjm_numeric_concepts.hpp"
 //#include <cjm/numerics/uint128.hpp>
@@ -133,6 +134,24 @@ void cjm::uint128::example_code::demonstrate_constexpr_addition()
 void cjm::uint128::example_code::say_hello()
 {
 	cout << "Hello, welcome to the demonstration of CJM's uint128 type!" << newl << newl;
+	cout << "Detected compiler: [" << get_text_narrow(compiler) << "]." << newl;
+	cout << "Calculation mode: [";
+	if constexpr (calculation_mode == uint128_calc_mode::intrinsic_u128)
+	{
+		cout << "IntrinsicU128]." << newl;
+	}
+	else if constexpr (calculation_mode == uint128_calc_mode::msvc_x64_clang_or_intel_llvm)
+	{
+		cout << "msvc_x64_clang_or_llvm_intel]." << newl;
+	}
+	else if constexpr (calculation_mode == uint128_calc_mode::msvc_x64)
+	{
+		cout << "msvc_x64]." << newl;
+	}
+	else
+	{
+		cout << "fallback]." << newl;
+	}
 }
 
 void cjm::uint128::example_code::say_goodbye()
