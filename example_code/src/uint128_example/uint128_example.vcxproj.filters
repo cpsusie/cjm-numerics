@@ -55,5 +55,11 @@
     <ClInclude Include="cjm_configuration.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\visual_studio_environment_test\src\visual_studio_environment_test_app\test_program.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="oldv.txt">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

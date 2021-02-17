@@ -1,6 +1,5 @@
 #ifndef CJM_NUMERICS_CONFIGURATION_HPP_
 #define CJM_NUMERICS_CONFIGURATION_HPP_
-#include "cjm_configuration.hpp"
 #include <climits>
 #include <cmath>
 #include <limits>
@@ -8,7 +7,7 @@
 #include <numeric>
 #include <cstring>
 #include <functional>
-//#include "cjm_numeric_concepts.hpp"
+#include "cjm_numeric_concepts.hpp"
 #include <bit>
 #include <array>
 #include <string_view>
@@ -303,7 +302,7 @@ namespace cjm
 		constexpr uint128_calc_mode init_eval_mode() noexcept;
 	}
 
-	/*namespace numerics::internal
+	namespace numerics::internal
 	{
 		static_assert(!validate_uint128_concept_compliance_dev || (numerics::concepts::builtin_floating_point<float> && numerics::concepts::builtin_floating_point<double> && numerics::concepts::builtin_floating_point<long double>));
 		static_assert(!validate_uint128_concept_compliance_dev || numerics::concepts::builtin_unsigned_integer<std::uint64_t>);
@@ -313,7 +312,7 @@ namespace cjm
 		static_assert(!validate_uint128_concept_compliance_dev || std::is_standard_layout_v<divmod_result<std::uint64_t>>);
 		static_assert(!validate_uint128_concept_compliance_dev || std::totally_ordered < divmod_result<std::uint64_t>>);
 		
-	}*/
+	}
 	
 }
 #include "numerics_configuration.inl"

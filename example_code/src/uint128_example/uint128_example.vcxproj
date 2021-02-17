@@ -187,9 +187,11 @@
     <None Include="uint128.inl" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\..\visual_studio_environment_test\src\visual_studio_environment_test_app\test_program.hpp" />
     <ClInclude Include="cjm_configuration.hpp" />
     <ClInclude Include="cjm_numeric_concepts.hpp" />
     <ClInclude Include="cjm_string.hpp" />
+    <ClInclude Include="oldv.txt" />
     <ClInclude Include="istream_utils.hpp" />
     <ClInclude Include="numerics.hpp" />
     <ClInclude Include="numerics_configuration.hpp" />

@@ -1,6 +1,7 @@
 #ifndef CJM_NUMERICS_HPP_
 #define CJM_NUMERICS_HPP_
 #include "numerics_configuration.hpp"
+#include "cjm_numeric_concepts.hpp"
 //#include <cjm/numerics/numerics_configuration.hpp>
 
 namespace cjm
