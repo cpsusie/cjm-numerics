@@ -1016,7 +1016,6 @@ namespace cjm
 			}
 			else // ReSharper disable once CppUnreachableCode
 			{
-				//todo fixit examine this .... something is fishy here
 				size_t hi_hi = static_cast<size_t>(hi >> 32);
 				size_t hi_low = static_cast<size_t>(hi & 0xffff'ffff);
 				size_t low_hi = static_cast<size_t>(low >> 32);
@@ -1281,7 +1280,7 @@ namespace cjm
 			}
 			else // ReSharper disable once CppUnreachableCode				
 			{
-				if constexpr (calculation_mode == uint128_calc_mode::msvc_x64)
+				if constexpr (calculation_mode == uint128_calc_mode::msvc_x64 || calculation_mode == uint128_calc_mode::msvc_x64_clang_or_intel_llvm)
 				{
 					assert(n != 0);
 					unsigned long result = 0;
