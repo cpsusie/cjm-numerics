@@ -70,7 +70,7 @@
 #endif 
 
 //detect availability/suitability of intrinsic uint128 for all purposes
-#if !defined(CJM_DETECTED_WINDOWS) && defined (CJM_DETECTED_INTRINSIC_U128) && defined (CJM_DETECTED_X64)
+#if !defined(CJM_DETECTED_WINDOWS) && defined (CJM_DETECTED_INTRINSIC_U128)
 #define CJM_USE_INTRINSIC_U128
 #endif
 #if (defined (CJM_DETECTED_CLANG) || defined(CJM_DETECTED_INTEL_LLVM)) && defined(CJM_DETECTED_WINDOWS) && defined(CJM_DETECTED_X64)
@@ -217,7 +217,7 @@ namespace cjm
 #if defined (CJM_DETECTED_X64)
 			true;
 #else
-			false;
+			CHAR_BIT * sizeof(std::uintptr_t) == 64;
 #endif
 		
 		constexpr bool is_windows_x64 = is_x64 && is_windows;
@@ -238,7 +238,7 @@ namespace cjm
 			compiler_used::gcc;
 #elif defined (CJM_DETECTED_CLANG) && !defined(CJM_DETECTED_GCC)
 			compiler_used::clang;
-#elif defined (CJM_IS_GCC) && defined(CJM_DETECTED_CLANG)
+#elif defined (CJM_DETECTED_GCC) && defined(CJM_DETECTED_CLANG)
 			compiler_used::clang_gcc;
 #else
 			compiler_used::other;

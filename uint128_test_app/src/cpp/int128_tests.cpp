@@ -1664,6 +1664,9 @@ void cjm::uint128_tests::print_uint128_eval_mode()
         case uint128_calc_mode::msvc_x64:
             eval_text = "Microsoft x64 Compiler-Intrinsic Optimized Arithmetic"sv;
             break;
+    	case uint128_calc_mode::msvc_x64_clang_or_intel_llvm:
+    		eval_text = "Intel-LLVM or Clang x64 Compiler-Intrinsic Optimized Arithmetic (Windows)"sv;
+    		break;
         case uint128_calc_mode::default_eval:
             eval_text = "Fallback Arithmetic"sv;
             break;

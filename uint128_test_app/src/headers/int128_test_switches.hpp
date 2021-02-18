@@ -304,7 +304,7 @@ constexpr bool cjm::uint128_tests::switches::is_unspecified_or_combo_of_known_fl
 	return  (mode & inverse_mask) == test_mode::unspecified;	
 }
 
-#ifdef CJM_IS_GCC
+#ifdef CJM_DETECTED_GCC
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wswitch"
 #endif
@@ -352,7 +352,7 @@ constexpr std::optional<std::string_view> cjm::uint128_tests::switches::get_text
 		// ReSharper restore CppRedundantParentheses
 	}
 }
-#ifdef CJM_IS_GCC
+#ifdef CJM_DETECTED_GCC
 #pragma GCC diagnostic pop
 #endif
 
