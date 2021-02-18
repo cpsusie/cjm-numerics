@@ -1443,7 +1443,7 @@ namespace cjm
                 {
                     return static_cast<natuint128_t>(lhs) >> amount;
                 }
-		        else if constexpr (calculation_mode == uint128_calc_mode::msvc_x64)
+		        else if constexpr (calculation_mode == uint128_calc_mode::msvc_x64 || calculation_mode == uint128_calc_mode::msvc_x64_clang_or_intel_llvm)
       			{
 					return uint128::rshift_msvc_x64(lhs, amount);
       			}
@@ -1496,7 +1496,7 @@ namespace cjm
                 {
                     return bit_cast<natuint128_t>(lhs) << amount;
                 }
-		        else if constexpr (calculation_mode == uint128_calc_mode::msvc_x64)
+		        else if constexpr (calculation_mode == uint128_calc_mode::msvc_x64 || calculation_mode == uint128_calc_mode::msvc_x64_clang_or_intel_llvm)
       			{
 					assert(amount < std::numeric_limits<uint128>::digits && amount > -1);
 					return uint128::lshift_msvc_x64(lhs, amount);
@@ -1591,7 +1591,7 @@ namespace cjm
                 {
                     return static_cast<natuint128_t>(lhs) - static_cast<natuint128_t>(rhs);
                 }
-	            else if constexpr (calculation_mode == uint128_calc_mode::msvc_x64)
+	            else if constexpr (calculation_mode == uint128_calc_mode::msvc_x64 || calculation_mode == uint128_calc_mode::msvc_x64_clang_or_intel_llvm)
 				{
                     uint128 ret = 0;
                     unsigned char carry_in = 0;
@@ -1637,7 +1637,7 @@ namespace cjm
 				{
 				    return static_cast<natuint128_t>(lhs) * static_cast<natuint128_t>(rhs);
 				}
-				else if constexpr (calculation_mode == uint128_calc_mode::msvc_x64)
+				else if constexpr (calculation_mode == uint128_calc_mode::msvc_x64 || calculation_mode == uint128_calc_mode::msvc_x64_clang_or_intel_llvm)
 	            {
 					std::uint64_t carry = 0;
 					std::uint64_t low_product = CJM_UMUL128(lhs.low_part(), rhs.low_part(), &carry);
