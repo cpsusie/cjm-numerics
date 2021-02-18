@@ -12,10 +12,8 @@
 #include<functional>
 #include <utility>
 #include <algorithm>
-#include <cjm/numerics/cjm_configuration.hpp>
-#include <cjm/numerics/numerics_configuration.hpp>
-#include <cjm/numerics/cjm_numeric_concepts.hpp>
 #include <cjm/numerics/numerics.hpp>
+#include <cjm/numerics/cjm_numeric_concepts.hpp>
 #include <cjm/string/cjm_string.hpp>
 #include <cmath>
 #include <cjm/string/istream_utils.hpp>
@@ -732,6 +730,5 @@ namespace cjm
         
 	}
 }
-#include <cjm/numerics/uint128.inl>
 #endif
-
+#include <cjm/numerics/uint128.inl>
