@@ -1,8 +1,4 @@
-#include "cjm_configuration.hpp"
-#include "uint128.hpp"
-#include "cjm_numeric_concepts.hpp"
-//#include <cjm/numerics/uint128.hpp>
-//#include <cjm/numerics/cjm_numeric_concepts.hpp>
+#include <cjm/numerics/uint128.hpp>
 #include <iostream>
 #include <iomanip>
 #include <string>

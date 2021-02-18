@@ -13,6 +13,9 @@ namespace cjm::numerics
 		{
 				"Other"sv,
 				"Microsoft"sv,
+				"Microsoft-Clang"sv,
+				"Microsoft-Intel-Classic"sv,
+				"Microsoft-Intel-LLVM"sv,
 				"Clang-GCC"sv,
 				"GCC"sv,
 				"Clang"sv
@@ -21,8 +24,11 @@ namespace cjm::numerics
 
 		constexpr auto compiler_name_lookup_wide = std::array<std::wstring_view, static_cast<enum_type_t>(max_value) + 1>
 		{
-			L"Other"sv,
+				L"Other"sv,
 				L"Microsoft"sv,
+				L"Microsoft-Clang"sv,
+				L"Microsoft-Intel-Classic"sv,
+				L"Microsoft-Intel-LLVM"sv,
 				L"Clang-GCC"sv,
 				L"GCC"sv,
 				L"Clang"sv
@@ -65,9 +71,13 @@ namespace cjm::numerics
 		{
 			return cjm::numerics::uint128_calc_mode::intrinsic_u128;
 		}
-		else if constexpr (cjm::numerics::has_msc_x64)
+		else if constexpr (cjm::numerics::is_microsoft_windows_x64)
 		{
 			return cjm::numerics::uint128_calc_mode::msvc_x64;
+		}
+		else if constexpr (cjm::numerics::is_clang_or_intel_llvm_msvc_x64)
+		{
+			return uint128_calc_mode::msvc_x64_clang_or_intel_llvm;
 		}
 		else
 		{

@@ -12,8 +12,10 @@
 #include<functional>
 #include <utility>
 #include <algorithm>
-#include <cjm/numerics/numerics.hpp>
+#include <cjm/numerics/cjm_configuration.hpp>
+#include <cjm/numerics/numerics_configuration.hpp>
 #include <cjm/numerics/cjm_numeric_concepts.hpp>
+#include <cjm/numerics/numerics.hpp>
 #include <cjm/string/cjm_string.hpp>
 #include <cmath>
 #include <cjm/string/istream_utils.hpp>
@@ -522,10 +524,14 @@ namespace cjm::numerics
         inline explicit operator long double() const;
 
         //ctor, assign op and explicit to-conversion for intrinsic unsigned __int128
-#ifdef CJM_HAVE_BUILTIN_128
+#ifdef CJM_USE_INTRINSIC_U128
         inline uint128(unsigned __int128 other) noexcept;
         inline uint128& operator=(unsigned __int128 other) noexcept;
         inline explicit operator unsigned __int128() const noexcept;
+#elif defined (CJM_DIV_ONLY_INTRINSIC_U128)
+        inline uint128(divonlynatuint128_t other) noexcept;
+        inline uint128& operator=(divonlynatuint128_t other) noexcept;
+        inline explicit operator divonlynatuint128_t() const noexcept;
 #endif
         //hash code function and comparison operators
         [[nodiscard]] constexpr size_t hash_code() const noexcept;
@@ -726,5 +732,6 @@ namespace cjm
         
 	}
 }
-#endif
 #include <cjm/numerics/uint128.inl>
+#endif
+

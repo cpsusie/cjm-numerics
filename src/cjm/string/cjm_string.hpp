@@ -9,8 +9,10 @@
 #include <fstream>
 #include <algorithm>
 #include <locale>
-#include <cjm/numerics/cjm_numeric_concepts.hpp>
+#include <cjm/numerics/cjm_configuration.hpp>
+#include <cjm/numerics/numerics_configuration.hpp>
 #include <cjm/numerics/numerics.hpp>
+#include <cjm/numerics/cjm_numeric_concepts.hpp>
 #include <cjm/string/istream_utils.hpp>
 namespace cjm::string
 {
@@ -130,7 +132,5 @@ namespace cjm::string
 
 	
 }
-#endif // ! CJM_STRING_HPP_
 #include <cjm/string/cjm_string.inl>
-
-
+#endif // ! CJM_STRING_HPP_

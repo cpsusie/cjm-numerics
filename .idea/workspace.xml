@@ -12,7 +12,31 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="8ab5edb8-7d60-4856-834e-1b0d4d4bfdec" name="Default Changelist" comment="Update CMakeLists.txt to include visual_studio_environment_test/src/visual_studio_environment_test_app/test_intrinsics.cpp." />
+    <list default="true" id="8ab5edb8-7d60-4856-834e-1b0d4d4bfdec" name="Default Changelist" comment="Update CMakeLists.txt to include visual_studio_environment_test/src/visual_studio_environment_test_app/test_intrinsics.cpp.">
+      <change beforePath="$PROJECT_DIR$/.idea/.name" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.name" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/example_code/src/uint128_example/cjm_configuration.hpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/example_code/src/uint128_example/cjm_numeric_concepts.hpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/example_code/src/uint128_example/cjm_string.hpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/example_code/src/uint128_example/cjm_string.inl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/example_code/src/uint128_example/istream_utils.hpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/example_code/src/uint128_example/numerics.hpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/example_code/src/uint128_example/numerics.inl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/example_code/src/uint128_example/numerics_configuration.hpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/example_code/src/uint128_example/numerics_configuration.inl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/example_code/src/uint128_example/uint128.hpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/example_code/src/uint128_example/uint128.inl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/cjm/numerics/cjm_numeric_concepts.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/cjm/numerics/cjm_numeric_concepts.hpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/cjm/numerics/numerics.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/cjm/numerics/numerics.hpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/cjm/numerics/numerics.inl" beforeDir="false" afterPath="$PROJECT_DIR$/src/cjm/numerics/numerics.inl" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/cjm/numerics/numerics_configuration.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/cjm/numerics/numerics_configuration.hpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/cjm/numerics/numerics_configuration.inl" beforeDir="false" afterPath="$PROJECT_DIR$/src/cjm/numerics/numerics_configuration.inl" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/cjm/numerics/uint128.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/cjm/numerics/uint128.hpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/cjm/numerics/uint128.inl" beforeDir="false" afterPath="$PROJECT_DIR$/src/cjm/numerics/uint128.inl" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/cjm/string/cjm_string.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/cjm/string/cjm_string.hpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/cjm/string/cjm_string.inl" beforeDir="false" afterPath="$PROJECT_DIR$/src/cjm/string/cjm_string.inl" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/cjm/string/istream_utils.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/cjm/string/istream_utils.hpp" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -84,9 +108,9 @@
     </key>
   </component>
   <component name="RunManager">
-    <configuration default="true" type="CLionExternalRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" PASS_PARENT_ENVS_2="true">
+    <configuration default="true" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" PASS_PARENT_ENVS_2="true">
       <method v="2">
-        <option name="CLION.EXTERNAL.BUILD" enabled="true" />
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
       </method>
     </configuration>
     <configuration default="true" type="GradleAppRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" PASS_PARENT_ENVS_2="true">
@@ -130,6 +154,7 @@
       <workItem from="1613279849410" duration="341000" />
       <workItem from="1613345873628" duration="5040000" />
       <workItem from="1613566300086" duration="39000" />
+      <workItem from="1613679310669" duration="878000" />
     </task>
     <task id="LOCAL-00001" summary="Add stream extraction operator for vector of bin_op_uint128_t's.  Add unit test.">
       <created>1610297106627</created>
