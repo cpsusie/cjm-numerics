@@ -9,10 +9,16 @@ Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug-Clang|x64 = Debug-Clang|x64
 		Debug-Clang|x86 = Debug-Clang|x86
+		Debug-Llvm-Intel|x64 = Debug-Llvm-Intel|x64
+		Debug-Llvm-Intel|x86 = Debug-Llvm-Intel|x86
 		Debug-Microsoft|x64 = Debug-Microsoft|x64
 		Debug-Microsoft|x86 = Debug-Microsoft|x86
 		Release-Clang|x64 = Release-Clang|x64
 		Release-Clang|x86 = Release-Clang|x86
+		Release-Llvm-Clang|x64 = Release-Llvm-Clang|x64
+		Release-Llvm-Clang|x86 = Release-Llvm-Clang|x86
+		Release-Llvm-Intel|x64 = Release-Llvm-Intel|x64
+		Release-Llvm-Intel|x86 = Release-Llvm-Intel|x86
 		Release-Microsoft|x64 = Release-Microsoft|x64
 		Release-Microsoft|x86 = Release-Microsoft|x86
 	EndGlobalSection
@@ -21,6 +27,10 @@ Global
 		{BC6CB9EA-3979-42D9-9930-851B25F34BAA}.Debug-Clang|x64.Build.0 = Debug-Clang|x64
 		{BC6CB9EA-3979-42D9-9930-851B25F34BAA}.Debug-Clang|x86.ActiveCfg = Debug-Clang|Win32
 		{BC6CB9EA-3979-42D9-9930-851B25F34BAA}.Debug-Clang|x86.Build.0 = Debug-Clang|Win32
+		{BC6CB9EA-3979-42D9-9930-851B25F34BAA}.Debug-Llvm-Intel|x64.ActiveCfg = Debug-Llvm-Intel|x64
+		{BC6CB9EA-3979-42D9-9930-851B25F34BAA}.Debug-Llvm-Intel|x64.Build.0 = Debug-Llvm-Intel|x64
+		{BC6CB9EA-3979-42D9-9930-851B25F34BAA}.Debug-Llvm-Intel|x86.ActiveCfg = Debug-Llvm-Intel|Win32
+		{BC6CB9EA-3979-42D9-9930-851B25F34BAA}.Debug-Llvm-Intel|x86.Build.0 = Debug-Llvm-Intel|Win32
 		{BC6CB9EA-3979-42D9-9930-851B25F34BAA}.Debug-Microsoft|x64.ActiveCfg = Debug-Microsoft|x64
 		{BC6CB9EA-3979-42D9-9930-851B25F34BAA}.Debug-Microsoft|x64.Build.0 = Debug-Microsoft|x64
 		{BC6CB9EA-3979-42D9-9930-851B25F34BAA}.Debug-Microsoft|x86.ActiveCfg = Debug-Microsoft|Win32
@@ -29,6 +39,13 @@ Global
 		{BC6CB9EA-3979-42D9-9930-851B25F34BAA}.Release-Clang|x64.Build.0 = Release-Clang|x64
 		{BC6CB9EA-3979-42D9-9930-851B25F34BAA}.Release-Clang|x86.ActiveCfg = Release-Clang|Win32
 		{BC6CB9EA-3979-42D9-9930-851B25F34BAA}.Release-Clang|x86.Build.0 = Release-Clang|Win32
+		{BC6CB9EA-3979-42D9-9930-851B25F34BAA}.Release-Llvm-Clang|x64.ActiveCfg = Release-Llvm-Intel|x64
+		{BC6CB9EA-3979-42D9-9930-851B25F34BAA}.Release-Llvm-Clang|x64.Build.0 = Release-Llvm-Intel|x64
+		{BC6CB9EA-3979-42D9-9930-851B25F34BAA}.Release-Llvm-Clang|x86.ActiveCfg = Release-Llvm-Intel|Win32
+		{BC6CB9EA-3979-42D9-9930-851B25F34BAA}.Release-Llvm-Intel|x64.ActiveCfg = Release-Llvm-Intel|x64
+		{BC6CB9EA-3979-42D9-9930-851B25F34BAA}.Release-Llvm-Intel|x64.Build.0 = Release-Llvm-Intel|x64
+		{BC6CB9EA-3979-42D9-9930-851B25F34BAA}.Release-Llvm-Intel|x86.ActiveCfg = Release-Llvm-Intel|Win32
+		{BC6CB9EA-3979-42D9-9930-851B25F34BAA}.Release-Llvm-Intel|x86.Build.0 = Release-Llvm-Intel|Win32
 		{BC6CB9EA-3979-42D9-9930-851B25F34BAA}.Release-Microsoft|x64.ActiveCfg = Release-Microsoft|x64
 		{BC6CB9EA-3979-42D9-9930-851B25F34BAA}.Release-Microsoft|x64.Build.0 = Release-Microsoft|x64
 		{BC6CB9EA-3979-42D9-9930-851B25F34BAA}.Release-Microsoft|x86.ActiveCfg = Release-Microsoft|Win32
