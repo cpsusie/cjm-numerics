@@ -17,10 +17,6 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="8ab5edb8-7d60-4856-834e-1b0d4d4bfdec" name="Default Changelist" comment="Update CMakeLists.txt to include visual_studio_environment_test/src/visual_studio_environment_test_app/test_intrinsics.cpp.">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/cjm/numerics/cjm_configuration.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/cjm/numerics/cjm_configuration.hpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/cjm/numerics/numerics_configuration.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/cjm/numerics/numerics_configuration.hpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/uint128_test_app/src/cpp/int128_test_switches.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/uint128_test_app/src/cpp/int128_test_switches.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/uint128_test_app/src/cpp/int128_tests.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/uint128_test_app/src/cpp/int128_tests.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/uint128_test_app/src/headers/int128_test_switches.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/uint128_test_app/src/headers/int128_test_switches.hpp" afterDir="false" />
     </list>
@@ -33,7 +29,7 @@
   <component name="ClangdSettings">
     <option name="formatViaClangd" value="false" />
   </component>
-  <component name="ExecutionTargetManager" SELECTED_TARGET="CMakeBuildProfile:Release-Clang" />
+  <component name="ExecutionTargetManager" SELECTED_TARGET="CMakeBuildProfile:Debug-Clang" />
   <component name="Git.Settings">
     <favorite-branches>
       <branch-storage>
@@ -95,7 +91,7 @@
       <recent name="$PROJECT_DIR$/cmake-build-debug" />
     </key>
   </component>
-  <component name="RunManager" selected="CMake Application.Int128">
+  <component name="RunManager" selected="CMake Application.ExampleCode">
     <configuration default="true" type="CLionExternalRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" PASS_PARENT_ENVS_2="true">
       <method v="2">
         <option name="CLION.EXTERNAL.BUILD" enabled="true" />
