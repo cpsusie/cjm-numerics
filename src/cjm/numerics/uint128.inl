@@ -1878,7 +1878,7 @@ namespace cjm
 					return static_cast<natuint128_t>(lhs) / static_cast<natuint128_t>(rhs);
 				}
 		    	//restore when figure out problem linking clang unsigned int stuff in ms environment
-                /*  else if constexpr (calculation_mode == uint128_calc_mode::msvc_x64_clang_or_intel_llvm)
+                /* else if constexpr (calculation_mode == uint128_calc_mode::msvc_x64_clang_or_intel_llvm)
                 {
 	                if (rhs == 0) { throw std::domain_error("Division by zero is illegal."); }
                     return bit_cast<uint128>(bit_cast<divonlynatuint128_t>(lhs) / bit_cast<divonlynatuint128_t>(rhs));

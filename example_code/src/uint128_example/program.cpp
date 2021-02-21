@@ -60,6 +60,7 @@ int main()
 		say_hello();
 		demonstrate_addition();
 		demonstrate_constexpr_addition();
+		demonstrate_runtime_division();
 		say_goodbye();		
 	}
 	catch (const std::exception& ex)

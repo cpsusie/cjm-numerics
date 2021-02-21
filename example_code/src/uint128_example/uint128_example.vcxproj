@@ -224,7 +224,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release-Clang|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>$(SolutionDir)/../../../src;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)/../../../src;$(VC_IncludePath);$(WindowsSDK_IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Label="Vcpkg">
     <VcpkgEnabled>false</VcpkgEnabled>
@@ -265,7 +265,7 @@
     <VcpkgUseStatic>true</VcpkgUseStatic>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release-Clang|x64'" Label="Vcpkg">
-    <VcpkgUseStatic>true</VcpkgUseStatic>
+    <VcpkgUseStatic>false</VcpkgUseStatic>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug-Microsoft|Win32'">
     <ClCompile>
@@ -393,6 +393,7 @@
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <EnforceTypeConversionRules>true</EnforceTypeConversionRules>
       <DisableLanguageExtensions>true</DisableLanguageExtensions>
+      <AdditionalIncludeDirectories />
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -410,6 +411,7 @@
       <EnforceTypeConversionRules>true</EnforceTypeConversionRules>
       <DisableLanguageExtensions>true</DisableLanguageExtensions>
       <CCppSupport>Cpp20Support</CCppSupport>
+      <AdditionalIncludeDirectories />
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -426,6 +428,7 @@
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <EnforceTypeConversionRules>true</EnforceTypeConversionRules>
       <DisableLanguageExtensions>true</DisableLanguageExtensions>
+      <AdditionalIncludeDirectories />
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -445,6 +448,7 @@
       <EnforceTypeConversionRules>true</EnforceTypeConversionRules>
       <DisableLanguageExtensions>true</DisableLanguageExtensions>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <AdditionalIncludeDirectories />
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -468,6 +472,7 @@
       <DisableLanguageExtensions>true</DisableLanguageExtensions>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <CCppSupport>Cpp20Support</CCppSupport>
+      <AdditionalIncludeDirectories />
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -490,6 +495,7 @@
       <EnforceTypeConversionRules>true</EnforceTypeConversionRules>
       <DisableLanguageExtensions>true</DisableLanguageExtensions>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <AdditionalIncludeDirectories />
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
