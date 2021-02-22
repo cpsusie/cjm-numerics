@@ -1,6 +1,8 @@
 #ifndef CJM_NUMERICS_HPP_
 #define CJM_NUMERICS_HPP_
+#include <cjm/numerics/cjm_configuration.hpp>
 #include <cjm/numerics/numerics_configuration.hpp>
+#include <cjm/numerics/cjm_numeric_concepts.hpp>
 
 namespace cjm
 {
@@ -29,7 +31,7 @@ namespace cjm
 		///		To and From must be trivially copyable.
 		/// </remarks>
 		template<typename To, typename From>
-		requires cjm::numerics::concepts::bit_castable<To, From>
+			requires cjm::numerics::concepts::bit_castable<To, From>
 		CJM_BIT_CAST_CONST To bit_cast(const From& f) noexcept;
 
 		namespace literals

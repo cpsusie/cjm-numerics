@@ -1,7 +1,7 @@
 #ifndef CJM_STRING_INL_
 #define CJM_STRING_INL_
 
-#include "cjm_string.hpp"
+#include <cjm/string/cjm_string.hpp>
 
 template<typename Char, typename CharTraits, typename Allocator>
 requires cjm::numerics::concepts::char_with_traits_and_allocator<Char, CharTraits, Allocator>
@@ -44,7 +44,7 @@ void cjm::string::string_helper::ltrim(std::basic_string_view<Char, CharTraits>&
         {
             bool is_space;
         	
-            if constexpr (!cjm::numerics::has_msc && cjm::numerics::concepts::utf_character<char_t>)
+            if constexpr (!cjm::numerics::is_windows && cjm::numerics::concepts::utf_character<char_t>)
             {
                  is_space = cjm::uint128_tests::istream_utils::is_space<char_t>(c, locale);
             }
@@ -85,7 +85,7 @@ void cjm::string::string_helper::rtrim(std::basic_string_view<Char, CharTraits>&
             auto locale = std::locale("");
             char_t c = *it;
             bool is_space;
-            if constexpr (!cjm::numerics::has_msc && cjm::numerics::concepts::utf_character<char_t>)
+            if constexpr (!cjm::numerics::is_windows && cjm::numerics::concepts::utf_character<char_t>)
             {
                 is_space = cjm::uint128_tests::istream_utils::is_space<char_t>(c, locale);
             }

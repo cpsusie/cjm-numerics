@@ -1,6 +1,6 @@
 #ifndef CJM_NUMERICS_INL
 #define CJM_NUMERICS_INL
-
+#include <cjm/numerics/numerics.hpp>
 namespace cjm::numerics
 {
 		

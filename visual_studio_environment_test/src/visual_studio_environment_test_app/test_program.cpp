@@ -21,7 +21,7 @@ void cjm::clang::test_program::test_program()
 	cout << "Is x64 windows?: [" << environment::is_windows_x64 << "]." << newl;
 	cout << "Is clang?: [" << environment::is_clang << "]." << newl;
 	cout << "Is intel classic?: [" << environment::is_intel_classic << "]." << newl;
-	cout << "Is intel?: [" << environment::is_intel_compiler << "]." << newl;
+	cout << "Is intel?: [" << environment::is_intel_llvm_compiler << "]." << newl;
 	cout << "Is GCC?: [" << environment::is_gcc << "]." << newl;
 	cout << newl;
 	
@@ -86,6 +86,11 @@ void cjm::clang::test_program::test_program()
 		constexpr uint128_t result_1 = combined - static_cast<uint128_t>(low);
 		constexpr uint128_t result_2 = result_1 >> 64;
 		static_assert(static_cast<std::uint64_t>(result_2) == high);
+		auto division_result = result_1 / result_2;
+		std::uint64_t low_division_result = static_cast<std::uint64_t>(division_result);
+		std::uint64_t high_division_result = static_cast<std::uint64_t>(division_result >> 64);
+		cout << "Division result: [0x" << std::hex << high_division_result << std::setw(16) << std::setfill('0') << low_division_result << "]." << newl;
+		cout << std::dec;
 #endif
 	}
 	

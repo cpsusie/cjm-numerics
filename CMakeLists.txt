@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.17)
 project(Int128)
 
 set(CMAKE_CXX_STANDARD 20)
-set(GCC_COVERAGE_COMPILE_FLAGS "-Wall -Werror -Wextra -Wstrict-aliasing -Wno-unknown-pragmas -Wstrict-overflow")
+set(GCC_COVERAGE_COMPILE_FLAGS "-Wall -Werror -Wextra -Wstrict-aliasing -Wno-unknown-pragmas -Wstrict-overflow -madx -mbmi2 -msse3")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${GCC_COVERAGE_COMPILE_FLAGS}" )
 set(CMAKE_VERBOSE_MAKEFILE ON)
 include_directories(uint128_test_app/src/headers)
@@ -29,3 +29,6 @@ add_executable(EnvironTest
         visual_studio_environment_test/src/visual_studio_environment_test_app/program.cpp
         visual_studio_environment_test/src/visual_studio_environment_test_app/test_program.cpp
         visual_studio_environment_test/src/visual_studio_environment_test_app/test_intrinsics.cpp)
+
+add_executable(ExampleCode
+        example_code/src/uint128_example/program.cpp)

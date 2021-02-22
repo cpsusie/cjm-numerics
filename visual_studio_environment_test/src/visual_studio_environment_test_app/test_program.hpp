@@ -87,8 +87,8 @@ namespace cjm::clang::test_program
 #else
 			false;
 #endif
-		constexpr bool is_intel_compiler =
-#ifdef __INTEL_COMPILER
+		constexpr bool is_intel_llvm_compiler =
+#ifdef __INTEL_LLVM_COMPILER
 			true;
 #else
 			false;

@@ -480,7 +480,7 @@ namespace cjm::uint128_tests
         logical_negation = 8,
     };	
 	
-    static_assert(!cjm::numerics::has_msc || std::is_unsigned_v<wchar_t>);
+    static_assert(!cjm::numerics::is_windows || std::is_unsigned_v<wchar_t>);
     constexpr binary_op first_op = binary_op::left_shift;
     constexpr binary_op last_op = binary_op::compare;
 
@@ -731,7 +731,7 @@ U"UnaryPlus"sv, U"UnaryMinus"sv, U"BitwiseNot"sv, U"BoolCast"sv, U"LogicalNegati
         using string_t = std::basic_string<Char>;
         using lsv_t = std::basic_string_view<Char>;
         string_t temp;
-        if constexpr (cjm::numerics::has_msc || !cjm::numerics::concepts::utf_character<Char>)
+        if constexpr (cjm::numerics::is_windows || !cjm::numerics::concepts::utf_character<Char>)
         {
             is >> temp;
         }
@@ -784,7 +784,7 @@ U"UnaryPlus"sv, U"UnaryMinus"sv, U"BitwiseNot"sv, U"BoolCast"sv, U"LogicalNegati
         using string_t = std::basic_string<Char>;
         using lsv_t = std::basic_string_view<Char>;
         string_t temp;
-        if constexpr (cjm::numerics::has_msc || !cjm::numerics::concepts::utf_character<Char>)
+        if constexpr (cjm::numerics::is_windows || !cjm::numerics::concepts::utf_character<Char>)
         {
             is >> temp;
         }

@@ -10,10 +10,11 @@
 #include <algorithm>
 #include <optional>
 #include <locale>
+#include <cjm/numerics/cjm_configuration.hpp>
+#include <cjm/numerics/numerics_configuration.hpp>
 #include <cjm/numerics/numerics.hpp>
 #include <cjm/numerics/cjm_numeric_concepts.hpp>
 #include <utility>
-
 
 namespace cjm::uint128_tests::istream_utils
 {
