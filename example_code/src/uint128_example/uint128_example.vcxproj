@@ -262,7 +262,7 @@
     <VcpkgUseStatic>true</VcpkgUseStatic>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release-Llvm-Intel|x64'" Label="Vcpkg">
-    <VcpkgUseStatic>true</VcpkgUseStatic>
+    <VcpkgUseStatic>false</VcpkgUseStatic>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release-Clang|x64'" Label="Vcpkg">
     <VcpkgUseStatic>false</VcpkgUseStatic>
@@ -413,6 +413,7 @@
       <DisableLanguageExtensions>true</DisableLanguageExtensions>
       <CCppSupport>Cpp20Support</CCppSupport>
       <AdditionalIncludeDirectories />
+      <AdditionalOptions>-madx -mbmi2 -msse3 %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -423,7 +424,7 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_DEBUG;_CONSOLE;CJM_NUMERICS_UINT128_INTEL_ADX;CJM_NUMERICS_UINT128_INTEL_BMI2;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
@@ -475,6 +476,7 @@
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <CCppSupport>Cpp20Support</CCppSupport>
       <AdditionalIncludeDirectories />
+      <AdditionalOptions>-madx -mbmi2 -msse3 %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -490,7 +492,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>NDEBUG;_CONSOLE;CJM_NUMERICS_UINT128_INTEL_ADX;CJM_NUMERICS_UINT128_INTEL_BMI2;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>

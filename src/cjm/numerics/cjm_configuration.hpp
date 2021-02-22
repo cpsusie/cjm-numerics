@@ -41,10 +41,11 @@
 #if defined (CJM_DETECTED_WINDOWS) && defined(CJM_DETECTED_X64) && !defined(CJM_DETECTED_GCC)
 #define CJM_BASE_INTRINSICS_AVAILABLE
 #endif
-
-
-
-
-
+#if defined (CJM_DETECTED_WINDOWS) && defined(CJM_DETECTED_X64) && defined(CJM_DETECTED_CLANG) && defined(__ADX__) && !defined(CJM_NUMERICS_UINT128_INTEL_ADX)
+#define CJM_NUMERICS_UINT128_INTEL_ADX
+#endif
+#if defined (CJM_DETECTED_WINDOWS) && defined(CJM_DETECTED_X64) && defined(CJM_DETECTED_CLANG) && defined(__BMI2__) && !defined(CJM_NUMERICS_UINT128_INTEL_BMI2)
+#define CJM_NUMERICS_UINT128_INTEL_BMI2
+#endif
 
 #endif
