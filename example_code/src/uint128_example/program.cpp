@@ -60,6 +60,7 @@ int main()
 		say_hello();
 		demonstrate_addition();
 		demonstrate_constexpr_addition();
+		demonstrate_runtime_division();
 		say_goodbye();		
 	}
 	catch (const std::exception& ex)
@@ -149,6 +150,9 @@ void cjm::uint128::example_code::say_hello()
 	{
 		cout << "fallback]." << newl;
 	}
+	cout << "Intel Adx Available: [" << std::boolalpha << intel_adx_available << "]." << newl;
+	cout << "Intel BMI2 Available: [" << std::boolalpha << intel_bmi2_available << "]." << newl;
+	cout << "Sse3 available: [" << std::boolalpha << sse3_available << "]." << newl;
 }
 
 void cjm::uint128::example_code::say_goodbye()

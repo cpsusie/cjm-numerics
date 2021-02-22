@@ -36,8 +36,7 @@ void cjm::clang::test_program::intrinsics_test::print_intrinsic_availability_inf
 
 	res = CJM_TEST_RSHIFT128(first_operand, second_operand, 63);
 	std::cout << "Rshift128 res: [0x" << std::hex << std::setw(16) << std::setfill('0') << res << "]." << newl;
-	 0;
-
+	
 	unsigned char carry_out = CJM_TEST_ADDCARRY64(0, first_operand, second_operand, &high_result);
 	std::cout << "Adc res: [0x" << std::hex << std::setw(16) << std::setfill('0') << high_result << "]; carry_out: [" << std::dec << +carry_out << "]." << newl;
 
