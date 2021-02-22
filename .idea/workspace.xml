@@ -18,6 +18,7 @@
   <component name="ChangeListManager">
     <list default="true" id="8ab5edb8-7d60-4856-834e-1b0d4d4bfdec" name="Default Changelist" comment="Fix problems uncovered when switching from Windows/VS environment to GCC/Clang/CMAke/Linux environment. ... again .... today.  Sigh.">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/CMakeLists.txt" beforeDir="false" afterPath="$PROJECT_DIR$/CMakeLists.txt" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -80,7 +81,7 @@
     <property name="node.js.selected.package.eslint" value="(autodetect)" />
     <property name="node.js.selected.package.tslint" value="(autodetect)" />
     <property name="nodejs_package_manager_path" value="npm" />
-    <property name="settings.editor.selected.configurable" value="language.cpp" />
+    <property name="settings.editor.selected.configurable" value="CMakeSettings" />
   </component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
@@ -90,7 +91,7 @@
       <recent name="$PROJECT_DIR$/cmake-build-debug" />
     </key>
   </component>
-  <component name="RunManager" selected="CMake Application.Int128">
+  <component name="RunManager" selected="CMake Application.EnvironTest">
     <configuration name="EnvironTest" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="Int128" TARGET_NAME="EnvironTest" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="Int128" RUN_TARGET_NAME="EnvironTest">
       <method v="2">
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
@@ -102,6 +103,11 @@
       </method>
     </configuration>
     <configuration name="Int128" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="Int128" TARGET_NAME="Int128" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="Int128" RUN_TARGET_NAME="Int128">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration default="true" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" PASS_PARENT_ENVS_2="true">
       <method v="2">
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
       </method>
@@ -155,6 +161,7 @@
       <workItem from="1613679310669" duration="878000" />
       <workItem from="1613682151279" duration="77000" />
       <workItem from="1613682239612" duration="1981000" />
+      <workItem from="1614033563893" duration="1641000" />
     </task>
     <task id="LOCAL-00001" summary="Add stream extraction operator for vector of bin_op_uint128_t's.  Add unit test.">
       <created>1610297106627</created>
@@ -352,7 +359,14 @@
       <option name="project" value="LOCAL" />
       <updated>1613687557997</updated>
     </task>
-    <option name="localTasksCounter" value="29" />
+    <task id="LOCAL-00029" summary="Update workspace.xml">
+      <created>1614033673433</created>
+      <option name="number" value="00029" />
+      <option name="presentableId" value="LOCAL-00029" />
+      <option name="project" value="LOCAL" />
+      <updated>1614033673433</updated>
+    </task>
+    <option name="localTasksCounter" value="30" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -371,7 +385,6 @@
     <option name="oldMeFiltersMigrated" value="true" />
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Remove all but semi-random selection of compile-time bit shift tests.  Add parentheses to tests so clang is happy and doesn't warn me about something I would have never suspected would be the case to begin with .... (I would have assumed that shift ops have higher precedence than comparison op)." />
     <MESSAGE value="Fix friend class declaration to properly identify namespace of friend class: compiled on MSVC not on gcc / clang." />
     <MESSAGE value="Add compile time divmod tests." />
     <MESSAGE value="binary operation now also tests compound variants of binary operations (except for compare)." />
@@ -396,7 +409,8 @@
     <MESSAGE value="Rename visual studio sln and vcxproj files (and related)." />
     <MESSAGE value="Added support for linux (cmake) build of the visual_studio_environment_test_app." />
     <MESSAGE value="Fix problems uncovered when switching from Windows/VS environment to GCC/Clang/CMAke/Linux environment. ... again .... today.  Sigh." />
-    <option name="LAST_COMMIT_MESSAGE" value="Fix problems uncovered when switching from Windows/VS environment to GCC/Clang/CMAke/Linux environment. ... again .... today.  Sigh." />
+    <MESSAGE value="Update workspace.xml" />
+    <option name="LAST_COMMIT_MESSAGE" value="Update workspace.xml" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />
