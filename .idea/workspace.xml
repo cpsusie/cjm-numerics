@@ -17,8 +17,15 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="8ab5edb8-7d60-4856-834e-1b0d4d4bfdec" name="Default Changelist" comment="Update CMakeLists.txt to include visual_studio_environment_test/src/visual_studio_environment_test_app/test_intrinsics.cpp.">
-      <change beforePath="$PROJECT_DIR$/uint128_test_app/src/cpp/int128_tests.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/uint128_test_app/src/cpp/int128_tests.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/uint128_test_app/src/headers/int128_test_switches.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/uint128_test_app/src/headers/int128_test_switches.hpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/example_code/src/uint128_example/Debug-Clang/uint128_example.exe.recipe" beforeDir="false" afterPath="$PROJECT_DIR$/example_code/src/uint128_example/Debug-Clang/uint128_example.exe.recipe" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/example_code/src/uint128_example/Debug-Clang/uint128_example.vcxproj.FileListAbsolute.txt" beforeDir="false" afterPath="$PROJECT_DIR$/example_code/src/uint128_example/Debug-Clang/uint128_example.vcxproj.FileListAbsolute.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/example_code/src/uint128_example/Debug-Microsoft/uint128_example.exe.recipe" beforeDir="false" afterPath="$PROJECT_DIR$/example_code/src/uint128_example/Debug-Microsoft/uint128_example.exe.recipe" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/example_code/src/uint128_example/Debug-Microsoft/uint128_example.vcxproj.FileListAbsolute.txt" beforeDir="false" afterPath="$PROJECT_DIR$/example_code/src/uint128_example/Debug-Microsoft/uint128_example.vcxproj.FileListAbsolute.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/example_code/src/uint128_example/Release-Clang/uint128_example.exe.recipe" beforeDir="false" afterPath="$PROJECT_DIR$/example_code/src/uint128_example/Release-Clang/uint128_example.exe.recipe" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/example_code/src/uint128_example/Release-Clang/uint128_example.vcxproj.FileListAbsolute.txt" beforeDir="false" afterPath="$PROJECT_DIR$/example_code/src/uint128_example/Release-Clang/uint128_example.vcxproj.FileListAbsolute.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/example_code/src/uint128_example/Release-Microsoft/uint128_example.exe.recipe" beforeDir="false" afterPath="$PROJECT_DIR$/example_code/src/uint128_example/Release-Microsoft/uint128_example.exe.recipe" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/example_code/src/uint128_example/Release-Microsoft/uint128_example.vcxproj.FileListAbsolute.txt" beforeDir="false" afterPath="$PROJECT_DIR$/example_code/src/uint128_example/Release-Microsoft/uint128_example.vcxproj.FileListAbsolute.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/cjm/numerics/uint128.inl" beforeDir="false" afterPath="$PROJECT_DIR$/src/cjm/numerics/uint128.inl" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -29,7 +36,6 @@
   <component name="ClangdSettings">
     <option name="formatViaClangd" value="false" />
   </component>
-  <component name="ExecutionTargetManager" SELECTED_TARGET="CMakeBuildProfile:Debug-Clang" />
   <component name="Git.Settings">
     <favorite-branches>
       <branch-storage>
@@ -92,11 +98,6 @@
     </key>
   </component>
   <component name="RunManager" selected="CMake Application.ExampleCode">
-    <configuration default="true" type="CLionExternalRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" PASS_PARENT_ENVS_2="true">
-      <method v="2">
-        <option name="CLION.EXTERNAL.BUILD" enabled="true" />
-      </method>
-    </configuration>
     <configuration name="EnvironTest" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="Int128" TARGET_NAME="EnvironTest" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="Int128" RUN_TARGET_NAME="EnvironTest">
       <method v="2">
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
@@ -161,6 +162,7 @@
       <workItem from="1613679310669" duration="878000" />
       <workItem from="1613682151279" duration="77000" />
       <workItem from="1613682239612" duration="1981000" />
+      <workItem from="1614023278330" duration="6000" />
     </task>
     <task id="LOCAL-00001" summary="Add stream extraction operator for vector of bin_op_uint128_t's.  Add unit test.">
       <created>1610297106627</created>
