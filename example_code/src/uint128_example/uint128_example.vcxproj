@@ -414,6 +414,7 @@
       <CCppSupport>Cpp20Support</CCppSupport>
       <AdditionalIncludeDirectories />
       <AdditionalOptions>-madx -mbmi2 -msse3 %(AdditionalOptions)</AdditionalOptions>
+      <OptimizeForWindowsApplication>true</OptimizeForWindowsApplication>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -477,6 +478,7 @@
       <CCppSupport>Cpp20Support</CCppSupport>
       <AdditionalIncludeDirectories />
       <AdditionalOptions>-madx -mbmi2 -msse3 %(AdditionalOptions)</AdditionalOptions>
+      <OptimizeForWindowsApplication>true</OptimizeForWindowsApplication>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>

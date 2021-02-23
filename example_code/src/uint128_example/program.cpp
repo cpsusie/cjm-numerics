@@ -45,8 +45,12 @@ namespace cjm::uint128::example_code
 	constexpr auto newl = '\n';
 	//constexpr auto wnewl = L'\n';
 
+	void demonstrate_subtraction();
+	void demonstrate_constexpr_subtraction();
 	void demonstrate_addition();
 	void demonstrate_constexpr_addition();
+	void demonstrate_multiplication();
+	void demonstrate_constexpr_multiplication();
 	void say_hello();
 	void say_goodbye();
 	void demonstrate_runtime_division();
@@ -60,6 +64,10 @@ int main()
 		say_hello();
 		demonstrate_addition();
 		demonstrate_constexpr_addition();
+		demonstrate_subtraction();
+		demonstrate_constexpr_subtraction();
+		demonstrate_multiplication();
+		demonstrate_constexpr_multiplication();
 		demonstrate_runtime_division();
 		say_goodbye();		
 	}
@@ -90,6 +98,43 @@ int main()
 	return 0;
 }
 
+void cjm::uint128::example_code::demonstrate_constexpr_subtraction()
+{
+	cout << newl << "This is the compile-time subtraction demonstration." << newl;
+	constexpr auto minuend = std::numeric_limits<uint128_t>::max();
+	constexpr auto subtrahend = 256'368'684'943'268'248'658'307'433'575'740'207'117_u128;
+	constexpr auto difference = minuend - subtrahend;
+
+	//subtraction with borrow takes a carry-in argument and returns a pair, the first of which is the difference and the second of which is borrow_out
+	//(unsigned char) which if there was overflow will be non-zero.
+	//If this were constexpr, you could not use the structured bindings to make it more convenient.
+	constexpr auto sbb_res = sub_with_borrow(minuend, subtrahend, 0);
+	cout
+		<< "Subtracting [" << subtrahend << "] from [" << minuend << "] yields difference: [" << difference << "].  "
+		<< "Subtracting with borrow (no borrow-in) yielded [" << sbb_res.first << "] as the difference and indicated that "
+		<< (sbb_res.second == 0 ? "there was no borrow-out meaning the operation did not overflow/underflow."
+			: "there was borrow due to overflow/underflow.") << newl;
+}
+
+
+void cjm::uint128::example_code::demonstrate_subtraction()
+{
+	cout << newl << "This is the runtime subtraction demonstration." << newl;
+	const auto minuend = std::numeric_limits<uint128_t>::max();
+	const auto subtrahend = 256'368'684'943'268'248'658'307'433'575'740'207'117_u128;
+	const auto difference = minuend - subtrahend;
+
+	//subtraction with borrow takes a carry-in argument and returns a pair, the first of which is the difference and the second of which is borrow_out
+	//(unsigned char) which if there was overflow will be non-zero.
+	//If this were constexpr, you could not use the structured bindings to make it more convenient.
+	auto [diff_result, borrow_out] = sub_with_borrow(minuend, subtrahend, 0);
+	cout
+		<< "Subtracting [" << subtrahend << "] from [" << minuend << "] yields difference: [" << difference << "].  "
+		<< "Subtracting with borrow (no borrow-in) yielded [" << diff_result << "] as the difference and indicated that "
+		<< (borrow_out == 0 ? "there was no borrow-out meaning the operation did not overflow/underflow."
+			: "there was borrow due to overflow/underflow.") << newl;
+}
+
 void cjm::uint128::example_code::demonstrate_addition()
 {
 	cout << newl << "This is the runtime addition demonstration." << newl;
@@ -112,7 +157,7 @@ void cjm::uint128::example_code::demonstrate_addition()
 
 void cjm::uint128::example_code::demonstrate_constexpr_addition()
 {
-	cout << newl << "This is the constexpr addition demonstration." << newl;
+	cout << newl << "This is the compile-time addition demonstration." << newl;
 	//123 septillion, 792 sextillion ... etc
 	constexpr auto first_addend =	123'792'321'010'356'001'641'481'971_u128;
 	//888 octillion, 911 septillion ... etc
@@ -127,6 +172,24 @@ void cjm::uint128::example_code::demonstrate_constexpr_addition()
 	cout
 		<< "Adding [" << first_addend << "] to [" << second_addend << "] yields sum: [" << sum << "].  "
 		<< "There was" << (add_with_carry_res.second == 0 ? " no overflow." : " overflow.") << newl;
+}
+
+void cjm::uint128::example_code::demonstrate_multiplication()
+{
+	cout << newl << "This is the runtime multiplication demonstration." << newl;
+	const auto first_factor = 1'693'490'369'045_u128;
+	const auto second_factor = 2'309'948'587'417'034'374'169_u128;
+	auto product = first_factor * second_factor;
+	cout << "Multiplying [" << first_factor << "] by [" << second_factor << "] yields [" << product << "]." << newl;	
+}
+
+void cjm::uint128::example_code::demonstrate_constexpr_multiplication()
+{
+	cout << newl << "This is the compile-time multiplication demonstration." << newl;
+	constexpr auto first_factor = 1'693'490'369'045_u128;
+	constexpr auto second_factor = 2'309'948'587'417'034'374'169_u128;
+	constexpr auto product = first_factor * second_factor;
+	cout << "Multiplying [" << first_factor << "] by [" << second_factor << "] yields [" << product << "]." << newl;
 }
 
 void cjm::uint128::example_code::say_hello()
