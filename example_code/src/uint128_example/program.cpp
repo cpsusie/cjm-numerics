@@ -1,4 +1,5 @@
 #include <cjm/numerics/uint128.hpp>
+#include <cjm/numerics/cjm_numeric_concepts.hpp>
 #include <iostream>
 #include <iomanip>
 #include <string>
@@ -13,6 +14,9 @@
 #include <exception>
 #include <stdexcept>
 #include <optional>
+#include <concepts>
+#include <compare>
+
 //The purpose of this EXAMPLE_CODE is to demonstrate the functionality of the CJM uint128 type,
 //show how it works, and talk somewhat about its strategies on various systems. It does NOT attempt
 //to prove correctness.  Proof of correctness is available through the uint128_test_app
@@ -59,6 +63,7 @@ namespace cjm::uint128::example_code
 	void demonstrate_nonthrowing_runtime_division_and_modulus();
 	void demonstrate_constexpr_division_and_modulus();
 	void print_optional_divmod_result(const std::optional<divmod_result_t>& print_me);
+	std::string_view ordering_text(std::strong_ordering ordering);
 }
 
 int main()
@@ -227,7 +232,7 @@ void cjm::uint128::example_code::say_hello()
 
 void cjm::uint128::example_code::say_goodbye()
 {
-	cout << newl << "The demonstration of CJM's uint128 type has completed.  We hope you found it useful." << std::endl;
+	cout << newl << newl << "The demonstration of CJM's uint128 type has completed.  We hope you found it useful." << std::endl;
 }
 
 void cjm::uint128::example_code::demonstrate_runtime_division_and_modulus()
@@ -245,6 +250,9 @@ void cjm::uint128::example_code::demonstrate_runtime_division_and_modulus()
 
 	cout << "[" << dividend << "] / [" << divisor << "] == [" << quotient << "] with a remainder of [" << remainder << "]." << newl;
 	cout << "Obtained via divmod function: == [" << quotient_2 << "] with a remainder of [" << remainder_2 << "]." << newl;
+
+	//for the characteristics of divmod_result_t, consult demonstrate_constexpr_division_and_modulus, or the header
+	//at <cjm/numerics/cjm_numeric_concepts.hpp>
 
 	//Division and modulus are somewhat unique because they will throw std::domain_error on a divisor of 0
 	//rather than exhibiting undefined behavior.  Most other operations (such as shift by >= number of binary digits)
@@ -350,10 +358,12 @@ void cjm::uint128::example_code::demonstrate_constexpr_division_and_modulus()
 	constexpr auto quotient = dividend / divisor;
 	constexpr auto remainder = dividend % divisor;
 	constexpr divmod_result_t quo_rem_2 = uint128_t::div_mod(dividend, divisor);
+	constexpr divmod_result_t quo_rem_3 = uint128_t::div_mod(4_u128, 2_u128);
 
 	cout << "[" << dividend << "] / [" << divisor << "] == [" << quotient << "] with a remainder of [" << remainder << "]." << newl;
 	cout << "Obtained via divmod function: == [" << quo_rem_2.quotient << "] with a remainder of [" << quo_rem_2.remainder << "]." << newl;
 	static_assert(quotient == quo_rem_2.quotient && remainder == quo_rem_2.remainder, "In a constexpr context calculation results can be used in static assertion.");
+	static_assert(quo_rem_3.quotient == 2_u128 && quo_rem_3.remainder == 0_u128, "4/2 == 2, no remainder");
 
 	//unlike with a non-constexpr context, attempting to divide by zero in a constexpr context will generate a compilation error
 	//because of a lack of constant expression
@@ -366,5 +376,31 @@ void cjm::uint128::example_code::demonstrate_constexpr_division_and_modulus()
 	constexpr std::optional<divmod_result_t> divide_by_zero = uint128_t::try_div_mod(dividend, 0);
 	static_assert(divide_by_zero == std::nullopt, "Divide by zero yields std::nullopt.");
 	print_optional_divmod_result(divide_by_zero);
+	cout << newl;
 
+	//note that div_mod_t is constexpr hashable and constexpr totally ordered
+	constexpr size_t hash_1 = std::hash<divmod_result_t>{}(quo_rem_2);
+	constexpr size_t hash_2 = std::hash<divmod_result_t>{}(quo_rem_3);
+	constexpr std::strong_ordering comp_res = quo_rem_2 <=> quo_rem_3;
+	cout << "Constexpr hash of first divmod_result_t: [0x" << std::hex << std::setw(std::numeric_limits<size_t>::digits / 4) << std::setfill('0') << hash_1 << "]." << newl;
+	cout << "Constexpr hash of second divmod_result_t: [0x" << std::hex << std::setw(std::numeric_limits<size_t>::digits / 4) << std::setfill('0') << hash_2 << "]." << newl;
+	cout << "Their ordering: [" << ordering_text(comp_res) << "]." << newl;
+	static_assert(concepts::nothrow_hashable<divmod_result_t> && std::totally_ordered<divmod_result_t>, "Meet nothrow hashable and totally ordered concepts.");
+}
+
+std::string_view cjm::uint128::example_code::ordering_text(std::strong_ordering ordering)
+{
+	using namespace std::string_view_literals;
+	if (ordering == std::strong_ordering::equal || ordering == std::strong_ordering::equivalent)
+	{
+		return "EQUAL"sv;
+	}
+	else if (ordering == std::strong_ordering::greater)
+	{
+		return "GREATER"sv;
+	}
+	else
+	{
+		return "LESS"sv;
+	}
 }
