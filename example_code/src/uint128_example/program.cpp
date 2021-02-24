@@ -12,6 +12,7 @@
 #include <optional>
 #include <exception>
 #include <stdexcept>
+#include <optional>
 //The purpose of this EXAMPLE_CODE is to demonstrate the functionality of the CJM uint128 type,
 //show how it works, and talk somewhat about its strategies on various systems. It does NOT attempt
 //to prove correctness.  Proof of correctness is available through the uint128_test_app
@@ -38,6 +39,7 @@
 namespace cjm::uint128::example_code
 {
 	using uint128_t = numerics::uint128;
+	using divmod_result_t = typename uint128_t ::divmod_result_t;
 	using namespace uint128_literals;
 	using namespace std::string_literals;
 	using namespace std::string_view_literals;
@@ -53,7 +55,10 @@ namespace cjm::uint128::example_code
 	void demonstrate_constexpr_multiplication();
 	void say_hello();
 	void say_goodbye();
-	void demonstrate_runtime_division();
+	void demonstrate_runtime_division_and_modulus();
+	void demonstrate_nonthrowing_runtime_division_and_modulus();
+	void demonstrate_constexpr_division_and_modulus();
+	void print_optional_divmod_result(const std::optional<divmod_result_t>& print_me);
 }
 
 int main()
@@ -68,7 +73,9 @@ int main()
 		demonstrate_constexpr_subtraction();
 		demonstrate_multiplication();
 		demonstrate_constexpr_multiplication();
-		demonstrate_runtime_division();
+		demonstrate_runtime_division_and_modulus();
+		demonstrate_nonthrowing_runtime_division_and_modulus();
+		demonstrate_constexpr_division_and_modulus();
 		say_goodbye();		
 	}
 	catch (const std::exception& ex)
@@ -223,9 +230,141 @@ void cjm::uint128::example_code::say_goodbye()
 	cout << newl << "The demonstration of CJM's uint128 type has completed.  We hope you found it useful." << std::endl;
 }
 
-void cjm::uint128::example_code::demonstrate_runtime_division()
+void cjm::uint128::example_code::demonstrate_runtime_division_and_modulus()
 {
 	cout << newl << "This is the simple runtime division demonstration." << newl;
-	uint128_t quotient = 0xc0de'd00d'fea2'b00b'cafe'babe'600d'f00d_u128 / 0xbadd'f00d_u128;
-	cout << "Division result: [" << quotient << "]." << newl;
+	constexpr auto dividend = 256'368'684'943'268'121'395'391'016'720'575'361'037_u128;
+	constexpr auto divisor = 3'135'107'085_u128;
+	//note that numeric limits is specialized appropriately.
+	constexpr auto zero = std::numeric_limits<uint128_t>::min();
+	uint128_t quotient = dividend / divisor;
+	uint128_t remainder = dividend % divisor;
+
+	//division and modulus can also be done together.
+	auto [quotient_2, remainder_2] = uint128_t::div_mod(dividend, divisor);
+
+	cout << "[" << dividend << "] / [" << divisor << "] == [" << quotient << "] with a remainder of [" << remainder << "]." << newl;
+	cout << "Obtained via divmod function: == [" << quotient_2 << "] with a remainder of [" << remainder_2 << "]." << newl;
+
+	//Division and modulus are somewhat unique because they will throw std::domain_error on a divisor of 0
+	//rather than exhibiting undefined behavior.  Most other operations (such as shift by >= number of binary digits)
+	//exhibit undefined behavior to avoid the expense of input validation.  Operations like shift etc however
+	//are very fast operations and I did not want to introduce an additional branch.  Division, however,
+	//is a slow operation already and one doubts that a precondition check is going to add much if anything to it.
+
+	//Example -- just division:
+	std::optional<uint128_t> res;
+	std::optional<typename uint128_t::divmod_result_t> divmod_res;
+	try
+	{
+		res = dividend / zero;
+		auto strm = std::stringstream{};
+		strm << "The foregoing was supposed to throw an exception but instead yielded a quotient of [" << res.value() << "]." << newl;
+		throw std::logic_error{strm.str()};
+	}
+	catch (const std::domain_error& ex)
+	{
+		std::cout << "This is correct behavior. Division and modulus operators and the divmod function will throw on divisor == 0.  Message: [" << ex.what() << "]." << newl;
+	}
+	catch (const std::logic_error&)
+	{
+		throw;
+	}
+	catch (...)
+	{
+		throw std::logic_error{"The exception was supposed to be a domain error."};
+	}
+
+	//Example: divmod
+	try
+	{
+		divmod_res = uint128_t::div_mod(dividend, zero);
+		auto strm = std::stringstream{};
+		strm << "The foregoing was supposed to throw an exception but instead yielded a quotient of [" << divmod_res.value().quotient << "] and a remainder of [" << divmod_res.value().remainder << "]." << newl;
+		throw std::logic_error{strm.str()};
+	}
+	catch (const std::domain_error& ex)
+	{
+		std::cout << "This is correct behavior. Division and modulus operators and the divmod function will throw on divisor == 0.  Message: [" << ex.what() << "]." << newl;
+	}
+	catch (const std::logic_error&)
+	{
+		throw;
+	}
+	catch (...)
+	{
+		throw std::logic_error{"The exception was supposed to be a domain error."};
+	}
+}
+
+void cjm::uint128::example_code::demonstrate_nonthrowing_runtime_division_and_modulus()
+{
+
+	cout << newl << "This is the nonthrowing runtime division demonstration." << newl;
+	//Im sure some people will worry about the performance for checking zero so I have provided non-throwing
+	//alternatives.
+
+	constexpr auto dividend = 256'368'684'943'268'121'395'391'016'720'575'361'037_u128;
+	constexpr auto divisor = 3'135'107'085_u128;
+	//note that numeric limits is specialized appropriately.
+	constexpr auto zero = std::numeric_limits<uint128_t>::min();
+
+	//the following if supplied a zero divisor will exhibit undefined behavior:
+	//no precondition check made
+	auto [quotient, remainder] = uint128_t::unsafe_div_mod(dividend, divisor);
+	cout << "[" << dividend << "] / [" << divisor << "] == [" << quotient << "] with a remainder of [" << remainder << "]." << newl;
+
+	//if you would like a way to have precondition-checked division but do not like exceptions for some fool reason,
+	//the following works too.
+	std::optional<divmod_result_t> safe_divmod_result = uint128_t::try_div_mod(dividend, divisor);
+	cout << "Here is the result -- success case try_divmod:\t";
+	print_optional_divmod_result(safe_divmod_result);
+	cout << newl;
+
+	//zero divisor will yield error signaled by nullopt return value:
+	safe_divmod_result = uint128_t::try_div_mod(dividend, zero);
+	cout << "Here is the result -- failure case try_divmod:\t";
+	print_optional_divmod_result(safe_divmod_result);
+	cout << newl;
+}
+
+void cjm::uint128::example_code::print_optional_divmod_result(const std::optional<divmod_result_t>& print_me)
+{
+	if (print_me.has_value())
+	{
+		cout << "Quotient: [" << print_me->quotient << "]; Remainder: [" << print_me->remainder << "]";
+	}
+	else
+	{
+		cout << "NullOpt/ErrorResult";
+	}
+}
+
+void cjm::uint128::example_code::demonstrate_constexpr_division_and_modulus()
+{
+	cout << newl << "This is the compile-time division demonstration." << newl;
+	constexpr auto dividend = 256'368'684'943'268'121'395'391'016'720'575'361'037_u128;
+	constexpr auto divisor = 3'135'107'085_u128;
+
+	//You can use division or modulus or the compound function uint128_t::div_mod in a constexpr context.
+	constexpr auto quotient = dividend / divisor;
+	constexpr auto remainder = dividend % divisor;
+	constexpr divmod_result_t quo_rem_2 = uint128_t::div_mod(dividend, divisor);
+
+	cout << "[" << dividend << "] / [" << divisor << "] == [" << quotient << "] with a remainder of [" << remainder << "]." << newl;
+	cout << "Obtained via divmod function: == [" << quo_rem_2.quotient << "] with a remainder of [" << quo_rem_2.remainder << "]." << newl;
+	static_assert(quotient == quo_rem_2.quotient && remainder == quo_rem_2.remainder, "In a constexpr context calculation results can be used in static assertion.");
+
+	//unlike with a non-constexpr context, attempting to divide by zero in a constexpr context will generate a compilation error
+	//because of a lack of constant expression
+	//if it were bad_quotient/bad_remainder were not constexpr, computation would be deferred to runtime and then throw an exception
+	//(following two lines will not compile):
+	//constexpr auto bad_quotient = dividend / 0_u128;
+	//constexpr auto bad_remainder = dividend % 0_u128;
+
+	//another constexpr division / modulus option is try_div_mod
+	constexpr std::optional<divmod_result_t> divide_by_zero = uint128_t::try_div_mod(dividend, 0);
+	static_assert(divide_by_zero == std::nullopt, "Divide by zero yields std::nullopt.");
+	print_optional_divmod_result(divide_by_zero);
+
 }
