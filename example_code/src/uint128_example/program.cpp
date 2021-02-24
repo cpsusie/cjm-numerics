@@ -28,6 +28,9 @@
 // x64 system.  x86 has not been tested.)  Hopefully, the dependency free nature of this header-only library
 // and example code application will be convenient for learning about the library.
 
+//NOTE: Intel Classic compiler is not currently supported.  Support will be added when/if Intel Classic
+//adds sufficient support for C++20.
+
 //By contrast, the UNIT TEST APPLICATION carries with it dependencies including:
 	//boost (https://github.com/boostorg)
 	//abseil[cxx17] (https://github.com/abseil/abseil-cpp)
