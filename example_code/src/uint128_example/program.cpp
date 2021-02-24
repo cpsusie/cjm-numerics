@@ -60,6 +60,7 @@ namespace cjm::uint128::example_code
 	void demonstrate_constexpr_addition();
 	void demonstrate_multiplication();
 	void demonstrate_constexpr_multiplication();
+	void demonstrate_binary_bitwise_operations();
 	void say_hello();
 	void say_goodbye();
 	void demonstrate_runtime_division_and_modulus();
@@ -84,6 +85,7 @@ int main()
 		demonstrate_runtime_division_and_modulus();
 		demonstrate_nonthrowing_runtime_division_and_modulus();
 		demonstrate_constexpr_division_and_modulus();
+		demonstrate_binary_bitwise_operations();
 		say_goodbye();		
 	}
 	catch (const std::exception& ex)
@@ -205,6 +207,34 @@ void cjm::uint128::example_code::demonstrate_constexpr_multiplication()
 	constexpr auto second_factor = 2'309'948'587'417'034'374'169_u128;
 	constexpr auto product = first_factor * second_factor;
 	cout << "Multiplying [" << first_factor << "] by [" << second_factor << "] yields [" << product << "]." << newl;
+}
+
+void cjm::uint128::example_code::demonstrate_binary_bitwise_operations()
+{
+	cout << newl << "This is the binary bitwise operations demonstration." << newl;
+	
+	constexpr auto left_operand =	256'368'684'943'268'248'658'307'433'575'740'207'117_u128;
+	constexpr auto right_operand =	295'990'755'043'860'794'295'278'260'016'730'001'421_u128;
+
+	auto print_result = [=](uint128_t val, bool runtime, std::string_view op_name) -> void
+	{
+		cout << "Performing bitwise " << op_name << " on left and right operands yields [0x" << std::hex << std::setw(std::numeric_limits<uint128_t>::digits / 4) << std::setfill('0') << val << "] at " << (runtime ? " run-time." : "compile-time.") << std::dec << newl;
+	};
+	
+	auto runtime_or_res = left_operand | right_operand;
+	auto runtime_and_res = left_operand & right_operand;
+	auto runtime_xor_res = left_operand ^ right_operand;
+	constexpr auto ctime_or_res = left_operand | right_operand;
+	constexpr auto ctime_and_res = left_operand & right_operand;
+	constexpr auto ctime_xor_res = left_operand ^ right_operand;
+
+	print_result(runtime_or_res, true, "or"sv);
+	print_result(runtime_and_res, true, "and"sv);
+	print_result(runtime_xor_res, true, "xor"sv);
+
+	print_result(ctime_or_res, false, "or"sv);
+	print_result(ctime_and_res, false, "and"sv);
+	print_result(ctime_xor_res, false, "xor"sv);
 }
 
 void cjm::uint128::example_code::say_hello()
