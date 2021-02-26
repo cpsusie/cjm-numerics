@@ -61,6 +61,7 @@ namespace cjm::uint128::example_code
 	void demonstrate_multiplication();
 	void demonstrate_constexpr_multiplication();
 	void demonstrate_binary_bitwise_operations();
+	void demonstrate_bitshift_operations();
 	void say_hello();
 	void say_goodbye();
 	void demonstrate_runtime_division_and_modulus();
@@ -86,6 +87,7 @@ int main()
 		demonstrate_nonthrowing_runtime_division_and_modulus();
 		demonstrate_constexpr_division_and_modulus();
 		demonstrate_binary_bitwise_operations();
+		demonstrate_bitshift_operations();
 		say_goodbye();		
 	}
 	catch (const std::exception& ex)
@@ -235,6 +237,64 @@ void cjm::uint128::example_code::demonstrate_binary_bitwise_operations()
 	print_result(ctime_or_res, false, "or"sv);
 	print_result(ctime_and_res, false, "and"sv);
 	print_result(ctime_xor_res, false, "xor"sv);
+}
+
+void cjm::uint128::example_code::demonstrate_bitshift_operations()
+{
+	cout << newl << "This is the bitshifting operations demonstration." << newl;
+	
+	constexpr auto shift_me = 0x5aa5'a55a'5aa5'a55a'a55a'5aa5'a55a'5aa5_u128;
+
+	auto print_result = [=](uint128_t val, bool runtime, unsigned shift_amount, std::string_view op_name) -> void
+	{
+		std::cout
+			<< "Shifting [0x" << std::hex << std::setw(std::numeric_limits<uint128_t>::digits / 4)
+			<< std::setfill('0') << shift_me << "] " << op_name << " by " << std::dec
+			<< shift_amount << " at " << (runtime ? "run-time" : "compile-time")
+			<< " yields: [0x" << std::hex << std::setw(std::numeric_limits<uint128_t>::digits / 4)
+			<< std::setfill('0') << val << "]." << std::dec << newl;
+	};
+	
+	auto runtime_lshift_4 = shift_me << 4;
+	constexpr auto ctime_lshift_4 = shift_me << 4;
+	auto runtime_rshift_4 = shift_me >> 4;
+	constexpr auto ctime_rshift_4 = shift_me >> 4;
+
+	auto runtime_lshift_65 = shift_me << 65;
+	constexpr auto ctime_lshift_65 = shift_me << 65;
+	auto runtime_rshift_65 = shift_me >> 65;
+	constexpr auto ctime_rshift_65 = shift_me >> 65;
+
+	//the max shift without undefined behavior is 127 (see std::numeric_limits<uint128_t>::digits, subtract one to get max shift (here 127)
+	//an attempt to shift by more than 127 or less than 0 (with a signed right hand operand) results in undefined behavior
+	//for built-ins and it does for uint128_t too!
+	auto runtime_lshift_127 = shift_me << 127;
+	constexpr auto ctime_lshift_127 = shift_me << 127;
+	auto runtime_rshift_127 = shift_me >> 127;
+	constexpr auto ctime_rshift_127 = shift_me >> 127;
+
+	//any of the following four lines would cause undefined behavior if uncommented --
+	//there may be a precondition assertion failure in debug builds
+	//auto illegal_lshift_1 = shift_me << -1;
+	//auto illegal_rshift_1 = shift_me >> -1;
+	//auto illegal_lshift_2 = shift_me << 128;
+	//auto illegal_rshift_2 = shift_me >> 128;
+
+	print_result(runtime_lshift_4, true, 4, "LEFT"sv);
+	print_result(ctime_lshift_4, false, 4, "LEFT"sv);
+	print_result(runtime_rshift_4, true, 4, "RIGHT"sv);
+	print_result(ctime_rshift_4, false, 4, "RIGHT"sv);
+
+	print_result(runtime_lshift_65, true, 65, "LEFT"sv);
+	print_result(ctime_lshift_65, false, 65, "LEFT"sv);
+	print_result(runtime_rshift_65, true, 65, "RIGHT"sv);
+	print_result(ctime_rshift_65, false, 65, "RIGHT"sv);
+
+	print_result(runtime_lshift_127, true, 127, "LEFT"sv);
+	print_result(ctime_lshift_127, false, 127, "LEFT"sv);
+	print_result(runtime_rshift_127, true, 127, "RIGHT"sv);
+	print_result(ctime_rshift_127, false, 127, "RIGHT"sv);
+	
 }
 
 void cjm::uint128::example_code::say_hello()
