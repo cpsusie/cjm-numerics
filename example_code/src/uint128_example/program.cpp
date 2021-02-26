@@ -353,8 +353,9 @@ void cjm::uint128::example_code::demonstrate_unary_operations()
 			<< std::setw(std::numeric_limits<uint128_t>::digits / 4) << std::setfill('0')
 			<< operand << "] yields [0x" << std::hex
 			<< std::setw(std::numeric_limits<uint128_t>::digits / 4)
-			<< std::setfill('0') << result << "] at "
-			<< (runtime ? " run-time" : " compile-time") << "." << std::dec << newl;
+			<< std::setfill('0') << result << "] at " << std::dec
+			<< (runtime ? " run-time."sv : " compile-time."sv);
+		cout << newl;
 	};
 
 	//UNARY MINUS SUPPLIES 2's complement
