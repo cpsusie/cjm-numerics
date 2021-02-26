@@ -68,6 +68,10 @@ namespace cjm::uint128::example_code
 	void demonstrate_runtime_division_and_modulus();
 	void demonstrate_nonthrowing_runtime_division_and_modulus();
 	void demonstrate_constexpr_division_and_modulus();
+	constexpr std::pair<uint128_t, uint128_t> demo_constexpr_pre_increment(uint128_t pre_inc_me) noexcept;
+	constexpr std::pair<uint128_t, uint128_t> demo_constexpr_pre_decrement(uint128_t pre_inc_me) noexcept;
+	constexpr std::pair<uint128_t, uint128_t> demo_constexpr_post_increment(uint128_t post_inc_me) noexcept;
+	constexpr std::pair<uint128_t, uint128_t> demo_constexpr_post_decrement(uint128_t post_dec_me) noexcept;
 	void print_optional_divmod_result(const std::optional<divmod_result_t>& print_me);
 	std::string_view ordering_text(std::strong_ordering ordering);
 }
@@ -118,7 +122,33 @@ int main()
 	}
 	return 0;
 }
+constexpr std::pair<cjm::uint128::example_code::uint128_t, cjm::uint128::example_code::uint128_t>
+cjm::uint128::example_code::demo_constexpr_pre_increment(cjm::uint128::example_code::uint128_t pre_inc_me) noexcept
+{
+	auto evaluated = ++pre_inc_me;
+	return std::make_pair(evaluated, pre_inc_me);
+}
 
+constexpr std::pair<cjm::uint128::example_code::uint128_t, cjm::uint128::example_code::uint128_t>
+cjm::uint128::example_code::demo_constexpr_pre_decrement(cjm::uint128::example_code::uint128_t pre_dec_me) noexcept
+{
+	auto evaluated = --pre_dec_me;
+	return std::make_pair(evaluated, pre_dec_me);
+}
+
+constexpr std::pair<cjm::uint128::example_code::uint128_t, cjm::uint128::example_code::uint128_t>
+cjm::uint128::example_code::demo_constexpr_post_increment(cjm::uint128::example_code::uint128_t post_inc_me) noexcept
+{
+	auto evaluated = post_inc_me++;
+	return std::make_pair(evaluated, post_inc_me);
+}
+
+constexpr std::pair<cjm::uint128::example_code::uint128_t, cjm::uint128::example_code::uint128_t>
+cjm::uint128::example_code::demo_constexpr_post_decrement(cjm::uint128::example_code::uint128_t post_dec_me) noexcept
+{
+	auto evaluated = post_dec_me--;
+	return std::make_pair(evaluated, post_dec_me);
+}
 void cjm::uint128::example_code::demonstrate_constexpr_subtraction()
 {
 	cout << newl << "This is the compile-time subtraction demonstration." << newl;
@@ -275,6 +305,7 @@ void cjm::uint128::example_code::demonstrate_bitshift_operations()
 	auto runtime_rshift_127 = shift_me >> 127;
 	constexpr auto ctime_rshift_127 = shift_me >> 127;
 
+	//UB ALERT!!!!! (though this isn't any different from the case with built-in arithmetic types)
 	//any of the following four lines would cause undefined behavior if uncommented --
 	//there may be a precondition assertion failure in debug builds
 	//auto illegal_lshift_1 = shift_me << -1;
@@ -356,6 +387,19 @@ void cjm::uint128::example_code::demonstrate_unary_operations()
 	print_result(max_value_operand, ctime_result_max, false, "UNARY-MINUS"sv);
 	print_result(max_value_operand, rtime_result_max, true, "UNARY-MINUS"sv);
 
+	//UNARY PLUS:
+	//compile time or runtime, it's a no-op for uint128_t
+	constexpr auto ctime_plus_zero = +0_u128;
+	constexpr auto ctime_plus_max = +(std::numeric_limits<uint128_t>::max());
+	uint128_t zero = 0;
+	uint128_t max = std::numeric_limits<uint128_t>::max();
+	auto rtime_plus_zero = +zero;
+	auto rtime_plus_max = +max;
+	cout << "Compile-time plus zero: [" << std::dec << ctime_plus_zero << "]." << newl;
+	cout << "Compile-time plus max: [" << std::dec << ctime_plus_max << "]." << newl;
+	cout << "Run-time plus zero: [" << std::dec << rtime_plus_zero << "]." << newl;
+	cout << "Run-time plus max: [" << std::dec << rtime_plus_max << "]." << newl;
+
 	//BOOLEAN CONVERSION operations
 	//zero is false, anything else is true
 	if constexpr (original_operand) //constexpr or runtime if ok
@@ -404,7 +448,44 @@ void cjm::uint128::example_code::demonstrate_unary_operations()
 	uint128_t and_back = !help;
 	cout << "Don't be fooled into thinking any numeric value (besides 0 or 1) can survive a cast to bool (via cast or with negation via !): [" << help << "] or any kind of roundtrip: [" << and_back << "]." << newl;
 
-	//PRE-INCREMENT AND PRE-DECREMENT
+	//PRE AND POST INCREMENT / DECREMENT (runtime)
+	//cannot apply an operator with side effect directly to constexpr value
+	auto orig_operand_copy_0 = original_operand;
+	auto orig_operand_copy_1 = original_operand;
+	auto orig_operand_copy_2 = original_operand;
+	auto orig_operand_copy_3 = original_operand;
+	//works just as you'd expect (well, I hope you'd expect these work the way they do anyways....)
+	std::cout << "Pre-incremented original operand: [" << std::dec << ++orig_operand_copy_0 << "]." << newl;
+	std::cout << "After application of pre-increment: [" << std::dec << orig_operand_copy_0 << "]." << newl;
+	std::cout << "Post-incremented original operand: [" << std::dec << orig_operand_copy_1++ << "]." << newl;
+	std::cout << "After application of post-increment: [" << std::dec << orig_operand_copy_1 << "]." << newl;
+	std::cout << "Pre-decremented original operand: [" << std::dec << --orig_operand_copy_2 << "]." << newl;
+	std::cout << "After application of pre-decrement: [" << std::dec << orig_operand_copy_2 << "]." << newl;
+	std::cout << "Post-decremented original operand: [" << std::dec << orig_operand_copy_3-- << "]." << newl;
+	std::cout << "After application of post-decrement: [" << std::dec << orig_operand_copy_3 << "]." << newl;
+
+	//PRE AND POST INCREMENT / DECREMENT (compile-time)
+	//Although you cannot apply these operations to a constexpr VARIABLE
+	//because they cause mutation to the original, pre and post increment can
+	//be used in constexpr FUNCTIONS AND OPERATORS without voiding their constexprness.
+	//This same state of affairs holds with compound assignment operators ... the
+	//mutating effect means they cannot be used with constexpr variables, but they can certainly
+	//be used in constexpr functions without voiding the constexprness thereof.
+	//Note that the return value pair's first value is an evaluation of the operator applied to the variable and the second is the version after that application
+
+	constexpr auto ctime_pre_inc_res = demo_constexpr_pre_increment(original_operand);
+	constexpr auto ctime_post_inc_res = demo_constexpr_post_increment(original_operand);
+	constexpr auto ctime_pre_dec_res = demo_constexpr_pre_decrement(original_operand);
+	constexpr auto ctime_post_dec_res = demo_constexpr_post_decrement(original_operand);
+	std::cout << "COMPILE TIME Pre-incremented original operand: [" << std::dec << ctime_pre_inc_res.first << "]." << newl;
+	std::cout << "COMPILE TIME After application of pre-increment: [" << std::dec << ctime_pre_inc_res.second << "]." << newl;
+	std::cout << "COMPILE TIME Post-incremented original operand: [" << std::dec << ctime_post_inc_res.first << "]." << newl;
+	std::cout << "COMPILE TIME After application of post-increment: [" << std::dec << ctime_post_inc_res.second << "]." << newl;
+	std::cout << "COMPILE TIME Pre-decremented original operand: [" << std::dec << ctime_pre_dec_res.first << "]." << newl;
+	std::cout << "COMPILE TIME After application of pre-decrement: [" << std::dec << ctime_pre_dec_res.second << "]." << newl;
+	std::cout << "COMPILE TIME Post-decremented original operand: [" << std::dec << ctime_post_dec_res.first << "]." << newl;
+	std::cout << "COMPILE TIME After application of post-decrement: [" << std::dec << ctime_post_dec_res.second << "]." << newl;
+
 
 }
 
@@ -608,3 +689,4 @@ std::string_view cjm::uint128::example_code::ordering_text(std::strong_ordering 
 		return "LESS"sv;
 	}
 }
+
