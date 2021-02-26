@@ -355,7 +355,57 @@ void cjm::uint128::example_code::demonstrate_unary_operations()
 	print_result(0_u128, rtime_result_2czero, true, "UNARY-MINUS"sv);
 	print_result(max_value_operand, ctime_result_max, false, "UNARY-MINUS"sv);
 	print_result(max_value_operand, rtime_result_max, true, "UNARY-MINUS"sv);
-	
+
+	//BOOLEAN CONVERSION operations
+	//zero is false, anything else is true
+	if constexpr (original_operand) //constexpr or runtime if ok
+	{
+		cout << "Conditional context implicit bool conversion of [" << std::dec <<  original_operand << "]: [" << std::boolalpha << true << "]." << newl;
+	}
+	else
+	{
+		cout << "Conditional context implicit bool conversion of [" << std::dec <<  original_operand << "]: [" << std::boolalpha << false << "]." << newl;
+	}
+	if constexpr (std::numeric_limits<uint128_t>::min()) //constexpr or runtime if ok
+	{
+		cout << "Conditional context implicit bool conversion of [" << std::dec <<  std::numeric_limits<uint128_t>::min() << "]: [" << std::boolalpha << true << "]." << newl;
+	}
+	else
+	{
+		cout << "Conditional context implicit bool conversion of [" << std::dec <<  std::numeric_limits<uint128_t>::min() << "]: [" << std::boolalpha << false << "]." << newl;
+	}
+	//a conversion to a boolean is narrowing so must be explicit outside a boolean/conditional context
+	//neither of the following two lines will compile for that reason
+	//bool help_runtime = original_operand;
+	//constexpr bool help_compiletime = original_operand;
+	//to do the foregoing, a static cast is required:
+	bool help_runtime = static_cast<bool>(original_operand);
+	constexpr bool help_compiletime = static_cast<bool>(original_operand);
+	cout << "Explicit cast of [" << std::dec << original_operand << "] to boolean at runtime: [" << std::boolalpha << help_runtime << "]." << newl;
+	cout << "Explicit cast of [" << std::dec << original_operand << "] to boolean at compile-time: [" << std::boolalpha << help_compiletime << "]." << newl;
+	//conversion TO uint128_t is possible implicitly but there is no guarantee that casting uint128_t -> bool then bool -> uint128_t
+	//will preserve original value
+	uint128_t runtime_roundtrip_attempt = help_runtime;
+	constexpr uint128_t compiletime_roundtrip_attempt = help_compiletime;
+	cout << "Result of casting [" << std::dec << original_operand << "] to boolean, then casting back to uint128_t at runtime: [" << runtime_roundtrip_attempt << "]." << newl;
+	cout << "Result of casting [" << std::dec << original_operand << "] to boolean, then casting back to uint128_t at compile-time: [" << compiletime_roundtrip_attempt << "]." << newl;
+
+	//operator ! converts to boolean then negates
+	//you do not need to static_cast because the operator ! removes implicit nature of cast
+	bool runtime_neg_result = !original_operand;
+	constexpr bool ctime_neg_result = !original_operand;
+	uint128_t runtine_neg_rtattempt = !runtime_neg_result;
+	constexpr uint128_t ctime_neg_rtattempt = !ctime_neg_result;
+	cout << "Result of logical negating [" << std::dec << original_operand << "] at runtime: [" << std::boolalpha << runtime_neg_result << "]." << newl;
+	cout << "Result of logical negating [" << std::dec << original_operand << "] at compile-time: [" << std::boolalpha << ctime_neg_result << "]." << newl;
+	cout << "Attempted roundtrip of negated value back to uint128_t at runtime: [" << std::dec << runtine_neg_rtattempt << "]." << newl;
+	cout << "Attempted roundtrip of negated value back to uint128_t at compile-time: [" << std::dec << ctime_neg_rtattempt << "]." << newl;
+	uint128_t help = !original_operand;
+	uint128_t and_back = !help;
+	cout << "Don't be fooled into thinking any numeric value (besides 0 or 1) can survive a cast to bool (via cast or with negation via !): [" << help << "] or any kind of roundtrip: [" << and_back << "]." << newl;
+
+	//PRE-INCREMENT AND PRE-DECREMENT
+
 }
 
 void cjm::uint128::example_code::say_hello()
