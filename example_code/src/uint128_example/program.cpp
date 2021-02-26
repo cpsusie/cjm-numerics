@@ -62,6 +62,7 @@ namespace cjm::uint128::example_code
 	void demonstrate_constexpr_multiplication();
 	void demonstrate_binary_bitwise_operations();
 	void demonstrate_bitshift_operations();
+	void demonstrate_unary_operations();
 	void say_hello();
 	void say_goodbye();
 	void demonstrate_runtime_division_and_modulus();
@@ -88,6 +89,7 @@ int main()
 		demonstrate_constexpr_division_and_modulus();
 		demonstrate_binary_bitwise_operations();
 		demonstrate_bitshift_operations();
+		demonstrate_unary_operations();
 		say_goodbye();		
 	}
 	catch (const std::exception& ex)
@@ -294,6 +296,41 @@ void cjm::uint128::example_code::demonstrate_bitshift_operations()
 	print_result(ctime_lshift_127, false, 127, "LEFT"sv);
 	print_result(runtime_rshift_127, true, 127, "RIGHT"sv);
 	print_result(ctime_rshift_127, false, 127, "RIGHT"sv);
+	
+}
+
+void cjm::uint128::example_code::demonstrate_unary_operations()
+{
+	constexpr auto original_operand = 123'890'567'234'901'678'346'012'789'456'123_u128;
+
+	cout << newl << "This is the unary operations demonstration." << newl;
+	
+	//BITWISE NEGATION
+	//bitwise negation works at both compile time and runtime as expected ... all 0 bits flipped to 1
+	//all 1 bits flipped to zero
+	constexpr auto ctime_not_result = ~original_operand;
+	auto rtime_not_result = ~original_operand;
+
+	auto  print_result = [](uint128_t operand, uint128_t result, bool runtime, std::string_view op_name) -> void
+	{
+		cout
+			<< "Applying [" << op_name << " to [0x" << std::hex
+			<< std::setw(std::numeric_limits<uint128_t>::digits / 4) << std::setfill('0')
+			<< operand << "] yields [0x" << std::hex
+			<< std::setw(std::numeric_limits<uint128_t>::digits / 4)
+			<< std::setfill('0') << result << "] at "
+			<< (runtime ? " run-time" : " compile-time") << "." << std::dec << newl;
+	};
+
+	//UNARY MINUS SUPPLIES 2's complement
+	constexpr auto ctime_unmin_result = -original_operand;
+	auto rtime_unmin_result = -original_operand;
+
+	print_result(original_operand, ctime_not_result, false, "BITWISE-NOT"sv);
+	print_result(original_operand, rtime_not_result, true, "BITWISE-NOT"sv);
+
+	print_result(original_operand, ctime_unmin_result, false, "UNARY-MINUS"sv);
+	print_result(original_operand, rtime_unmin_result, true, "UNARY-MINUS"sv);
 	
 }
 
