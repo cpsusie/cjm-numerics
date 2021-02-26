@@ -302,7 +302,11 @@ void cjm::uint128::example_code::demonstrate_bitshift_operations()
 void cjm::uint128::example_code::demonstrate_unary_operations()
 {
 	constexpr auto original_operand = 123'890'567'234'901'678'346'012'789'456'123_u128;
-
+	//note use of numeric limits to get max value (all 1's in binary, all f's in hexadecimal)
+	constexpr auto max_value_operand = std::numeric_limits<uint128_t>::max();
+	//if this were a signed (2's complement) representation, the following would be the min value
+	//that is in hex: 0x8000.....0000; 0r binary (a 1 followed by 127 zeroes)
+	constexpr auto min_value_if_were_signed = 0x01_u128 << 127;
 	cout << newl << "This is the unary operations demonstration." << newl;
 	
 	//BITWISE NEGATION
@@ -314,7 +318,7 @@ void cjm::uint128::example_code::demonstrate_unary_operations()
 	auto  print_result = [](uint128_t operand, uint128_t result, bool runtime, std::string_view op_name) -> void
 	{
 		cout
-			<< "Applying [" << op_name << " to [0x" << std::hex
+			<< "Applying [" << op_name << "] to [0x" << std::hex
 			<< std::setw(std::numeric_limits<uint128_t>::digits / 4) << std::setfill('0')
 			<< operand << "] yields [0x" << std::hex
 			<< std::setw(std::numeric_limits<uint128_t>::digits / 4)
@@ -323,14 +327,34 @@ void cjm::uint128::example_code::demonstrate_unary_operations()
 	};
 
 	//UNARY MINUS SUPPLIES 2's complement
-	constexpr auto ctime_unmin_result = -original_operand;
-	auto rtime_unmin_result = -original_operand;
-
+	//typical example
+	constexpr auto ctime_unmin_result_normal = -original_operand;
+	auto rtime_unmin_result_normal = -original_operand;
+	//example using min 2's complement value
+	//note this value is itself in two's complement
+	constexpr auto ctime_unmin_result_2cmin = -min_value_if_were_signed;
+	auto rtime_unmin_result_2cmin = -min_value_if_were_signed;
+	//example using zero
+	//two's complement of zero is also zero
+	constexpr auto ctime_result_2czero = -(0_u128);
+	auto rtime_result_2czero = -(0_u128);
+	//example using max value
+	//result should be 1 
+	constexpr auto ctime_result_max = -max_value_operand;
+	auto rtime_result_max = -max_value_operand;
+	
+	
 	print_result(original_operand, ctime_not_result, false, "BITWISE-NOT"sv);
 	print_result(original_operand, rtime_not_result, true, "BITWISE-NOT"sv);
 
-	print_result(original_operand, ctime_unmin_result, false, "UNARY-MINUS"sv);
-	print_result(original_operand, rtime_unmin_result, true, "UNARY-MINUS"sv);
+	print_result(original_operand, ctime_unmin_result_normal, false, "UNARY-MINUS"sv);
+	print_result(original_operand, rtime_unmin_result_normal, true, "UNARY-MINUS"sv);
+	print_result(min_value_if_were_signed, ctime_unmin_result_2cmin, false, "UNARY-MINUS"sv);
+	print_result(min_value_if_were_signed, rtime_unmin_result_2cmin, true, "UNARY-MINUS"sv);
+	print_result(0_u128, ctime_result_2czero, false, "UNARY-MINUS"sv);
+	print_result(0_u128, rtime_result_2czero, true, "UNARY-MINUS"sv);
+	print_result(max_value_operand, ctime_result_max, false, "UNARY-MINUS"sv);
+	print_result(max_value_operand, rtime_result_max, true, "UNARY-MINUS"sv);
 	
 }
 
