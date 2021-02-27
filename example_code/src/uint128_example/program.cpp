@@ -17,6 +17,7 @@
 #include <optional>
 #include <concepts>
 #include <compare>
+#include <cmath>
 
 //The purpose of this EXAMPLE_CODE is to demonstrate the functionality of the CJM uint128 type,
 //show how it works, and talk somewhat about its strategies on various systems. It does NOT attempt
@@ -71,6 +72,7 @@ namespace cjm::uint128::example_code
 	void demonstrate_conversions_to_from_signed_integral();
 	void demonstrate_compare_and_hash();
 	void demonstrate_conversions_to_from_unsigned_integral();
+	void demonstrate_conversions_to_from_floating_points();
 
 	//utility / helpers
 	void print_compare_results(std::string left_operand, std::string right_operand,
@@ -121,6 +123,7 @@ int main()
 		demonstrate_compare_and_hash();
 		demonstrate_conversions_to_from_signed_integral();
 		demonstrate_conversions_to_from_unsigned_integral();
+		demonstrate_conversions_to_from_floating_points();
 		say_goodbye();		
 	}
 	catch (const std::exception& ex)
@@ -891,7 +894,7 @@ void cjm::uint128::example_code::demonstrate_conversions_to_from_signed_integral
 	};
 
 	constexpr signed char a_char = 0x61;
-	constexpr signed char neg_a_char = 0x9f;
+	constexpr signed char neg_a_char{ -97 };
 	constexpr std::int16_t neg_short_9 = -9;
 	constexpr std::int16_t short_9 = 9;
 	constexpr std::int32_t int_12 = 12;
@@ -1043,5 +1046,124 @@ void cjm::uint128::example_code::demonstrate_conversions_to_from_unsigned_integr
 	static_assert(back_biggest_ushort == std::numeric_limits<std::uint16_t>::max());
 	static_assert(back_biggest_uint == std::numeric_limits<std::uint32_t>::max());
 	static_assert(back_biggest_ulong == std::numeric_limits<std::uint64_t>::max());
+}
+
+void cjm::uint128::example_code::demonstrate_conversions_to_from_floating_points()
+{
+	cout << newl << "This is the to-from floating point example." << newl;
+
+	//cjm::concepts::builtin_floating_point means float, double and long double
+	auto print_three_way_convert = []<concepts::builtin_floating_point Float>
+		(Float orig, uint128_t converted, Float back,
+			std::string_view float_type_name) -> void
+	{
+		cout
+			<< "Value [" << std::dec << std::setw(8) << std::fixed << orig << "] of type "
+			<< float_type_name << " as converted to uint128 yields: [" << std::dec
+			<< converted << "] and converted back to " << float_type_name << " yields: ["
+			<< std::dec << std::setw(8) << std::fixed << back << "]." << newl;
+	};
+
+	auto optional_to_str = [](std::optional<uint128_t> v) -> std::string
+	{
+		auto strm = std::stringstream{};
+		if (v.has_value())
+			strm << std::dec << *v;
+		else
+			strm << "std::nullopt"sv;
+		return strm.str();
+	};
+	
+	constexpr float tiny_positive_float = 0.0001f;
+	constexpr float one_plus_a_tad_float = 1.0001f;
+	constexpr float big_ole_number_float = 1'000'000'000'000.1f;
+
+	constexpr double tiny_positive_dbl = 0.0001;
+	constexpr double one_plus_a_tad_dbl = 1.0001;
+	constexpr double big_ole_number_dbl = 1'000'000'000'000.1;
+
+	constexpr long double tiny_positive_ln_dbl = 0.0001L;
+	constexpr long double one_plus_a_tad_ln_dbl = 1.0001L;
+	constexpr long double big_ole_number_ln_dbl = 1'000'000'000'000.1L;
+
+	//unlike built-in integer <-> uint128_t conversions,
+	//conversions to and from floating point numbers are
+	//runtime-only and always require explicit static_cast.
+	//It causes undefined behavior (perhaps caught
+	//in debug mode by an assertion) to try to convert a negative
+	//float
+	
+	const auto from_tp_fl = static_cast<uint128_t>(tiny_positive_float);
+	const auto from_opt_fl = static_cast<uint128_t>(one_plus_a_tad_float);
+	const auto from_big_ole_fl = static_cast<uint128_t>(big_ole_number_float);
+	
+	const auto fl_tp_rt = static_cast<float>(from_tp_fl);
+	const auto fl_opt_rt = static_cast<float>(from_opt_fl);
+	const auto fl_big_rt = static_cast<float>(from_big_ole_fl);
+
+
+	const auto from_tp_db = static_cast<uint128_t>(tiny_positive_dbl);
+	const auto from_opt_db = static_cast<uint128_t>(one_plus_a_tad_dbl);
+	const auto from_big_ole_db = static_cast<uint128_t>(big_ole_number_dbl);
+
+	const auto db_tp_rt = static_cast<double>(from_tp_db);
+	const auto db_opt_rt = static_cast<double>(from_opt_db);
+	const auto db_big_rt = static_cast<double>(from_big_ole_db);
+
+	const auto from_tp_ln_db = static_cast<uint128_t>(tiny_positive_ln_dbl);
+	const auto from_opt_ln_db = static_cast<uint128_t>(one_plus_a_tad_ln_dbl);
+	const auto from_big_ole_ln_db = static_cast<uint128_t>(big_ole_number_ln_dbl);
+
+	const auto ln_db_tp_rt = static_cast<long double>(from_tp_ln_db);
+	const auto ln_db_opt_rt = static_cast<long double>(from_opt_ln_db);
+	const auto ln_db_big_rt = static_cast<long double>(from_big_ole_ln_db);
+	
+	print_three_way_convert(tiny_positive_float, from_tp_fl, fl_tp_rt, "float"sv);
+	print_three_way_convert(one_plus_a_tad_float, from_opt_fl, fl_opt_rt, "float"sv);
+	print_three_way_convert(big_ole_number_float, from_big_ole_fl, fl_big_rt, "float"sv);
+		
+	print_three_way_convert(tiny_positive_dbl, from_tp_db, db_tp_rt, "double"sv);
+	print_three_way_convert(one_plus_a_tad_dbl, from_opt_db, db_opt_rt, "double"sv);
+	print_three_way_convert(big_ole_number_dbl, from_big_ole_db, db_big_rt, "double"sv);
+			
+	print_three_way_convert(tiny_positive_ln_dbl, from_tp_ln_db, ln_db_tp_rt, "long double"sv);
+	print_three_way_convert(one_plus_a_tad_ln_dbl, from_opt_ln_db, ln_db_opt_rt, "long double"sv);
+	print_three_way_convert(big_ole_number_ln_dbl, from_big_ole_ln_db, ln_db_big_rt, "long double"sv);
+
+	//remember there will usually be loss of information due to rounding errors.
+
+	//If you don't want undefined behavior for failed conversions, the library provides other options
+	//from floating point, use the safe_from_floating_or_throw function or the safe_from_floating function (returns std::
+	//nullopt on failure).
+
+	//for example, if you tried a static cast with this, it would be UB. but safe_from_floating_or_throw
+	try
+	{
+		uint128_t res = safe_from_floating_or_throw(-2.1f);
+		std::cerr << "You should never see this: [" << res << "]." << newl;
+		throw std::logic_error{ "Last statement should have thrown." };
+	}
+	catch (const std::invalid_argument& ex)
+	{
+		std::cout
+			<< "Correct behavior: invalid_argument thrown for float "
+			<< "that would cause UB if static_cast to uint128_t.  Msg: ["
+			<< ex.what() << "]." << newl;
+	}
+	catch (...)
+	{
+		std::cerr << "Did not throw or threw the wrong thing!" << newl;
+	}
+
+	std::optional<uint128_t> result = safe_from_floating(std::numeric_limits<long double>::quiet_NaN());
+	cout << "Converting nan to uint128_t: [" << optional_to_str(result) << "]." << newl;
+	cout
+		<< "Converting long double max to uint128_t: ["
+		<< optional_to_str(safe_from_floating(std::numeric_limits<long double>::max()))
+		<< "]." << newl;
+	cout
+		<< "Converting float max to uint128_t: ["
+		<< optional_to_str(safe_from_floating(std::numeric_limits<float>::max()))
+		<< "]." << newl;
 }
 
