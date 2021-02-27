@@ -68,7 +68,9 @@ namespace cjm::uint128::example_code
 	void demonstrate_runtime_division_and_modulus();
 	void demonstrate_nonthrowing_runtime_division_and_modulus();
 	void demonstrate_constexpr_division_and_modulus();
+	void demonstrate_conversions_to_from_signed_integral();
 	void demonstrate_compare_and_hash();
+	void demonstrate_conversions_to_from_unsigned_integral();
 
 	//utility / helpers
 	void print_compare_results(std::string left_operand, std::string right_operand,
@@ -117,6 +119,8 @@ int main()
 		demonstrate_bitshift_operations();
 		demonstrate_unary_operations();
 		demonstrate_compare_and_hash();
+		demonstrate_conversions_to_from_signed_integral();
+		demonstrate_conversions_to_from_unsigned_integral();
 		say_goodbye();		
 	}
 	catch (const std::exception& ex)
@@ -855,5 +859,189 @@ std::string_view cjm::uint128::example_code::ordering_text(std::strong_ordering 
 	{
 		return "LESS"sv;
 	}
+}
+
+void cjm::uint128::example_code::demonstrate_conversions_to_from_signed_integral()
+{
+	constexpr auto u128_max = std::numeric_limits<uint128_t>::max();
+
+	cout
+		<< newl << "This is the demonstration of conversion to and from built-in SIGNED integral types.  "
+		<< "All demonstrated with compile-time computation, but runtime is exactly same." << newl;
+
+	auto print = []<typename SourceType>
+			(SourceType orig, uint128_t converted,
+		SourceType round_tripped, std::string_view source_type_name) -> void
+	{
+		cout
+			<< std::dec << "Original value (of type " << source_type_name
+			<< "): [" << +orig << "], converted to uint128_t: [" << converted
+			<< "]; converted back: [" << +round_tripped << "]." << newl;
+	};
+
+	auto print_start_too_big = [=]<typename TargetType>
+			(TargetType converted, uint128_t round_tripped,
+		std::string_view target_type_name) -> void
+	{
+		cout
+			<< std::dec << "Original uint128_t maximum value [" << u128_max
+			<< "], converted to type " << target_type_name << " yielded ["
+			<< +converted << "]; Converted back yielded: ["
+			<< round_tripped << "]." << newl;
+	};
+
+	constexpr signed char a_char = 0x61;
+	constexpr signed char neg_a_char = 0x9f;
+	constexpr std::int16_t neg_short_9 = -9;
+	constexpr std::int16_t short_9 = 9;
+	constexpr std::int32_t int_12 = 12;
+	constexpr std::int32_t int_neg_12 = -12;
+	constexpr std::int64_t i64_million = 1'000'000;
+	constexpr std::int64_t i64_neg_million = -i64_million;
+
+	//all the basic signed integer types implicitly nothrow convert to uint128_t
+	//if they are negative, they will end up being positive unsigned value with same bit pattern
+	constexpr uint128_t  from_signed_char = a_char;
+	constexpr uint128_t  from_neg_a_char = neg_a_char;
+	constexpr uint128_t from_short = short_9;
+	constexpr uint128_t from_neg_short = neg_short_9;
+	constexpr uint128_t from_int_12 = int_12;
+	constexpr uint128_t from_neg_int_12 = int_neg_12;
+	constexpr uint128_t from_i64_mill = i64_million;
+	constexpr uint128_t from_i64_neg_mill = i64_neg_million;
+
+	//narrowing implicit conversions from uint128_t will not work for the typical signed built-ins
+	//none of the following four lines will compile:
+	//constexpr signed char back_char = from_signed_char;
+	//constexpr std::int16_t back_short = from_short;
+	//constexpr std::int32_t back_int = from_int_12;
+	//constexpr std::int64_t back_int64 = from_i64_mill;
+
+	//instead, you need to use static_cast for narrowing conversions
+	constexpr signed char back_char = static_cast<signed char>(from_signed_char);
+	constexpr std::int16_t back_short = static_cast<std::int16_t>(from_short);
+	constexpr std::int32_t back_int = static_cast<std::int32_t>(from_int_12);
+	constexpr std::int64_t back_int64 =static_cast<std::int64_t>(from_i64_mill);
+
+	//the negatives
+	constexpr signed char neg_back_char = static_cast<signed char>(from_neg_a_char);
+	constexpr std::int16_t neg_back_short = static_cast<std::int16_t>(from_neg_short);
+	constexpr std::int32_t neg_back_int = static_cast<std::int32_t>(from_neg_int_12);
+	constexpr std::int64_t neg_back_int64 =static_cast<std::int64_t>(from_i64_neg_mill);
+
+	print(a_char, from_signed_char, back_char, "signed char"sv);
+	print(neg_a_char, from_neg_a_char, neg_back_char, "signed char"sv);
+	print(short_9, from_short, back_short, "std::int16_t"sv);
+	print(neg_short_9, from_neg_short, neg_back_short, "std::int16_t"sv);
+	print(int_12, from_int_12, back_int, "std::int32_t"sv);
+	print(int_neg_12, from_neg_int_12, neg_back_int, "std::int32_t"sv);
+	print(i64_million, from_i64_mill, back_int64, "std::int64_t"sv);
+	print(i64_neg_million, from_i64_neg_mill, neg_back_int64, "std::int64_t"sv);
+
+	//working with values too big to fit in the built-in type
+	constexpr signed char char_biggest_u128 = static_cast<signed char>(u128_max);
+	constexpr std::int16_t short_biggest_u128 = static_cast<std::int16_t>(u128_max);
+	constexpr std::int32_t int_biggest_u128 = static_cast<std::int32_t>(u128_max);
+	constexpr std::int64_t long_biggest_u128 = static_cast<std::int64_t>(u128_max);
+
+	constexpr uint128_t back_biggest_char = char_biggest_u128;
+	constexpr uint128_t back_biggest_short = short_biggest_u128;
+	constexpr uint128_t back_biggest_int = int_biggest_u128;
+	constexpr uint128_t back_biggest_long = long_biggest_u128;
+
+	//show conversion back WITH DATA LOSS (no sign extension available as with signed example)
+	// .. bit pattern left filled with zeroes:
+	print_start_too_big(char_biggest_u128, back_biggest_char, "signed char"sv);
+	print_start_too_big(short_biggest_u128, back_biggest_short, "std::int16_t"sv);
+	print_start_too_big(int_biggest_u128, back_biggest_int, "std::int32_t"sv);
+	print_start_too_big(long_biggest_u128, back_biggest_long, "std::int64_t"sv);
+
+}
+
+void cjm::uint128::example_code::demonstrate_conversions_to_from_unsigned_integral()
+{
+	constexpr auto u128_max = std::numeric_limits<uint128_t>::max();
+
+	cout
+			<< newl << "This is the demonstration of conversion to and from built-in UNSIGNED integral types.  "
+			<< "All demonstrated with compile-time computation, but runtime is exactly same." << newl;
+
+	auto print = []<typename SourceType>
+			(SourceType orig, uint128_t converted,
+			 SourceType round_tripped, std::string_view source_type_name) -> void
+	{
+		cout
+				<< std::dec << "Original value (of type " << source_type_name
+				<< "): [" << +orig << "], converted to uint128_t: [" << converted
+				<< "]; converted back: [" << +round_tripped << "]." << newl;
+	};
+
+	auto print_start_too_big = [=]<typename TargetType>
+			(TargetType converted, uint128_t round_tripped,
+			 std::string_view target_type_name) -> void
+	{
+		cout
+				<< std::dec << "Original uint128_t maximum value [" << u128_max
+				<< "], converted to type " << target_type_name << " yielded ["
+				<< +converted << "]; Converted back yielded: ["
+				<< round_tripped << "]." << newl;
+	};
+
+
+	constexpr unsigned char a_char = 0x61;
+	constexpr std::uint16_t ushort_9 = 9;
+	constexpr std::uint32_t uint_12 = 12;
+	constexpr std::uint64_t ui64_million = 1'000'000;
+
+
+	//all the basic signed integer types implicitly nothrow convert to uint128_t
+	//if they are negative, they will end up being positive unsigned value with same bit pattern
+	constexpr uint128_t from_unsigned_char = a_char;
+	constexpr uint128_t from_ushort_9 = ushort_9;
+	constexpr uint128_t from_uint_12 = uint_12;
+	constexpr uint128_t from_ui64_mill = ui64_million;
+
+
+	//narrowing implicit conversions from uint128_t will not work for the typical unsigned built-ins
+	//none of the following four lines will compile:
+//	constexpr unsigned char back_char = from_unsigned_char;
+//	constexpr std::uint16_t back_short = from_ushort_9;
+//	constexpr std::uint32_t back_int = from_uint_12;
+//	constexpr std::uint64_t back_int64 = from_ui64_mill;
+
+	//instead, you need to use static_cast for narrowing conversions
+	constexpr auto back_uchar = static_cast<unsigned char>(from_unsigned_char);
+	constexpr auto back_ushort = static_cast<std::uint16_t>(from_ushort_9);
+	constexpr auto back_uint = static_cast<std::uint32_t>(from_uint_12);
+	constexpr auto back_uint64 =static_cast<std::uint64_t>(from_ui64_mill);
+
+	print(a_char, from_unsigned_char, back_uchar, "unsigned char"sv);
+	print(ushort_9, from_ushort_9, back_ushort, "std::uint16_t"sv);
+	print(uint_12, from_uint_12, back_uint, "std::uint32_t"sv);
+	print(ui64_million, from_ui64_mill, back_uint64, "std::uint64_t"sv);
+
+
+	//working with values too big to fit in the built-in type
+	constexpr auto uchar_biggest_u128 = static_cast<unsigned char>(u128_max);
+	constexpr auto ushort_biggest_u128 = static_cast<std::uint16_t>(u128_max);
+	constexpr auto uint_biggest_u128 = static_cast<std::uint32_t>(u128_max);
+	constexpr auto ulong_biggest_u128 = static_cast<std::uint64_t>(u128_max);
+
+	constexpr uint128_t back_biggest_uchar = uchar_biggest_u128;
+	constexpr uint128_t back_biggest_ushort = ushort_biggest_u128;
+	constexpr uint128_t back_biggest_uint = uint_biggest_u128;
+	constexpr uint128_t back_biggest_ulong = ulong_biggest_u128;
+
+	//show conversion back (works because sign extended during conversion):
+	print_start_too_big(uchar_biggest_u128, back_biggest_uchar, "unsigned char"sv);
+	print_start_too_big(ushort_biggest_u128, back_biggest_ushort, "std::uint16_t"sv);
+	print_start_too_big(uint_biggest_u128, back_biggest_uint, "std::uint32_t"sv);
+	print_start_too_big(ulong_biggest_u128, back_biggest_ulong, "std::uint64_t"sv);
+
+	//each above should equal max value of smaller type with zeroes filled in when converting to uint128_t:
+	static_assert(back_biggest_uchar == std::numeric_limits<unsigned char>::max());
+	static_assert(back_biggest_ushort == std::numeric_limits<std::uint16_t>::max());
+	static_assert(back_biggest_uint == std::numeric_limits<std::uint32_t>::max());
+	static_assert(back_biggest_ulong == std::numeric_limits<std::uint64_t>::max());
 }
 
