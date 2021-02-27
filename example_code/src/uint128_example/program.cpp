@@ -1,5 +1,6 @@
 #include <cjm/numerics/uint128.hpp>
 #include <cjm/numerics/cjm_numeric_concepts.hpp>
+#include <array>
 #include <iostream>
 #include <iomanip>
 #include <string>
@@ -46,14 +47,13 @@
 namespace cjm::uint128::example_code
 {
 	using uint128_t = numerics::uint128;
-	using divmod_result_t = typename uint128_t ::divmod_result_t;
+	using divmod_result_t = uint128_t ::divmod_result_t;
 	using namespace uint128_literals;
 	using namespace std::string_literals;
 	using namespace std::string_view_literals;
 	using std::cout;
 	constexpr auto newl = '\n';
-	//constexpr auto wnewl = L'\n';
-
+	
 	void demonstrate_subtraction();
 	void demonstrate_constexpr_subtraction();
 	void demonstrate_addition();
@@ -68,12 +68,34 @@ namespace cjm::uint128::example_code
 	void demonstrate_runtime_division_and_modulus();
 	void demonstrate_nonthrowing_runtime_division_and_modulus();
 	void demonstrate_constexpr_division_and_modulus();
+	void demonstrate_compare_and_hash();
+
+	//utility / helpers
+	void print_compare_results(std::string left_operand, std::string right_operand,
+		std::strong_ordering ordering, bool greater_than, bool less_than, bool equal, 
+		bool not_equal, bool greater_or_equal, bool less_or_equal, 
+		size_t left_hash, size_t right_hash, bool runtime);
 	constexpr std::pair<uint128_t, uint128_t> demo_constexpr_pre_increment(uint128_t pre_inc_me) noexcept;
-	constexpr std::pair<uint128_t, uint128_t> demo_constexpr_pre_decrement(uint128_t pre_inc_me) noexcept;
+	constexpr std::pair<uint128_t, uint128_t> demo_constexpr_pre_decrement(uint128_t pre_dec_me) noexcept;
 	constexpr std::pair<uint128_t, uint128_t> demo_constexpr_post_increment(uint128_t post_inc_me) noexcept;
 	constexpr std::pair<uint128_t, uint128_t> demo_constexpr_post_decrement(uint128_t post_dec_me) noexcept;
 	void print_optional_divmod_result(const std::optional<divmod_result_t>& print_me);
 	std::string_view ordering_text(std::strong_ordering ordering);
+
+	//supporting types
+	struct alignas(uint128_t) just_like_uint128_t final
+	{
+		std::uint64_t m_low{};
+		std::uint64_t m_high{};
+
+		constexpr just_like_uint128_t() noexcept = default;
+		constexpr just_like_uint128_t(const just_like_uint128_t& other) noexcept = default;
+		constexpr just_like_uint128_t(just_like_uint128_t&& other) noexcept = default;
+		constexpr just_like_uint128_t& operator=(const just_like_uint128_t& other) noexcept = default;
+		constexpr just_like_uint128_t& operator=(just_like_uint128_t&& other) noexcept = default;
+		~just_like_uint128_t() = default;
+	};
+	static_assert(std::is_default_constructible_v<just_like_uint128_t>&& std::is_trivially_copyable_v<just_like_uint128_t>, "To be bit-castable, gotta be at least this.");
 }
 
 int main()
@@ -94,6 +116,7 @@ int main()
 		demonstrate_binary_bitwise_operations();
 		demonstrate_bitshift_operations();
 		demonstrate_unary_operations();
+		demonstrate_compare_and_hash();
 		say_goodbye();		
 	}
 	catch (const std::exception& ex)
@@ -532,7 +555,7 @@ void cjm::uint128::example_code::demonstrate_runtime_division_and_modulus()
 	uint128_t remainder = dividend % divisor;
 
 	//division and modulus can also be done together.
-	auto [quotient_2, remainder_2] = uint128_t::div_mod(dividend, divisor);
+	auto&& [quotient_2, remainder_2] = uint128_t::div_mod(dividend, divisor);
 
 	cout << "[" << dividend << "] / [" << divisor << "] == [" << quotient << "] with a remainder of [" << remainder << "]." << newl;
 	cout << "Obtained via divmod function: == [" << quotient_2 << "] with a remainder of [" << remainder_2 << "]." << newl;
@@ -548,7 +571,7 @@ void cjm::uint128::example_code::demonstrate_runtime_division_and_modulus()
 
 	//Example -- just division:
 	std::optional<uint128_t> res;
-	std::optional<typename uint128_t::divmod_result_t> divmod_res;
+	std::optional<uint128_t::divmod_result_t> divmod_res;
 	try
 	{
 		res = dividend / zero;
@@ -605,7 +628,7 @@ void cjm::uint128::example_code::demonstrate_nonthrowing_runtime_division_and_mo
 
 	//the following if supplied a zero divisor will exhibit undefined behavior:
 	//no precondition check made
-	auto [quotient, remainder] = uint128_t::unsafe_div_mod(dividend, divisor);
+	auto&& [quotient, remainder] = uint128_t::unsafe_div_mod(dividend, divisor);
 	cout << "[" << dividend << "] / [" << divisor << "] == [" << quotient << "] with a remainder of [" << remainder << "]." << newl;
 
 	//if you would like a way to have precondition-checked division but do not like exceptions for some fool reason,
@@ -672,6 +695,149 @@ void cjm::uint128::example_code::demonstrate_constexpr_division_and_modulus()
 	cout << "Constexpr hash of second divmod_result_t: [0x" << std::hex << std::setw(std::numeric_limits<size_t>::digits / 4) << std::setfill('0') << hash_2 << "]." << newl;
 	cout << "Their ordering: [" << ordering_text(comp_res) << "]." << newl;
 	static_assert(concepts::nothrow_hashable<divmod_result_t> && std::totally_ordered<divmod_result_t>, "Meet nothrow hashable and totally ordered concepts.");
+}
+
+void cjm::uint128::example_code::demonstrate_compare_and_hash()
+{
+	cout << newl << "This is the hasher and comparison demonstration." << newl;
+
+	auto decimal_stringify = [](uint128_t v) -> std::string
+	{
+		auto strm = std::stringstream{};
+		strm << std::dec << v;
+		return strm.str();
+	};
+	
+	
+	//default hasher for uint128_t
+	constexpr auto hasher = std::hash<uint128_t>{};
+	
+	constexpr auto smallest = std::numeric_limits<uint128_t>::min(); //i.e. zero
+	constexpr auto middle = 256'368'684'943'268'248'658'307'433'575'740'207'117_u128;
+	constexpr auto biggest = std::numeric_limits<uint128_t>::max(); //i.e. a big-ass number, all f's in hex
+	constexpr auto biggest_plus_one = biggest + 1_u128; //also zero
+
+	//hashes computable at compile time
+	constexpr size_t ctime_small_hash = hasher(smallest);
+	constexpr size_t ctime_middle_hash = hasher(middle);
+	constexpr size_t ctime_big_hash = hasher(biggest);
+	constexpr size_t ctime_biggest_plus_one_hash = hasher(biggest_plus_one);
+
+	//or runtime
+	const size_t rtime_small_hash = hasher(smallest);
+	const size_t rtime_middle_hash = hasher(middle);
+	const size_t rtime_big_hash = hasher(biggest);
+	const size_t rtime_biggest_plus_one_hash = hasher(biggest_plus_one);
+	
+	//compile time compare smallest to biggest:
+	constexpr std::strong_ordering ctime_small_big_ordering = smallest <=> biggest;
+	constexpr bool ctime_small_big_equal = smallest == biggest;
+	constexpr bool ctime_small_big_not_equal = smallest != biggest;
+	constexpr bool ctime_small_big_greater = smallest > biggest;
+	constexpr bool ctime_small_big_greater_or_equal = smallest >= biggest;
+	constexpr bool ctime_small_big_less = smallest < biggest;
+	constexpr bool ctime_small_big_less_or_equal = smallest <= biggest;
+
+	//compile time compare biggest to middle
+	constexpr std::strong_ordering ctime_big_middle_ordering = biggest <=> middle;
+	constexpr bool ctime_big_middle_equal = biggest == middle;
+	constexpr bool ctime_big_middle_not_equal = biggest != middle;
+	constexpr bool ctime_big_middle_greater = biggest > middle;
+	constexpr bool ctime_big_middle_greater_or_equal = biggest >= middle;
+	constexpr bool ctime_big_middle_less = biggest < middle;
+	constexpr bool ctime_big_middle_less_or_equal = biggest <= middle;
+
+	//compile time compare biggest_plus_one to smallest
+	constexpr std::strong_ordering ctime_biggest_plus_one_smallest_ordering = biggest_plus_one <=> smallest;
+	constexpr bool ctime_biggest_plus_one_smallest_equal = biggest_plus_one == smallest;
+	constexpr bool ctime_biggest_plus_one_smallest_not_equal = biggest_plus_one != smallest;
+	constexpr bool ctime_biggest_plus_one_smallest_greater = biggest_plus_one > smallest;
+	constexpr bool ctime_biggest_plus_one_smallest_greater_or_equal = biggest_plus_one >= smallest;
+	constexpr bool ctime_biggest_plus_one_smallest_less = biggest_plus_one < smallest;
+	constexpr bool ctime_biggest_plus_one_smallest_less_or_equal = biggest_plus_one <= smallest;
+
+	//(potentially) run time compare smallest to biggest:
+	const std::strong_ordering rtime_small_big_ordering = smallest <=> biggest;
+	const bool rtime_small_big_equal = smallest == biggest;
+	const bool rtime_small_big_not_equal = smallest != biggest;
+	const bool rtime_small_big_greater = smallest > biggest;
+	const bool rtime_small_big_greater_or_equal = smallest >= biggest;
+	const bool rtime_small_big_less = smallest < biggest;
+	const bool rtime_small_big_less_or_equal = smallest <= biggest;
+
+	//(potentially) run time compare biggest to middle
+	const std::strong_ordering rtime_big_middle_ordering = biggest <=> middle;
+	const bool rtime_big_middle_equal = biggest == middle;
+	const bool rtime_big_middle_not_equal = biggest != middle;
+	const bool rtime_big_middle_greater = biggest > middle;
+	const bool rtime_big_middle_greater_or_equal = biggest >= middle;
+	const bool rtime_big_middle_less = biggest < middle;
+	const bool rtime_big_middle_less_or_equal = biggest <= middle;
+
+	//(potentially) run time compare biggest_plus_one to smallest
+	const std::strong_ordering rtime_biggest_plus_one_smallest_ordering = biggest_plus_one <=> smallest;
+	const bool rtime_biggest_plus_one_smallest_equal = biggest_plus_one == smallest;
+	const bool rtime_biggest_plus_one_smallest_not_equal = biggest_plus_one != smallest;
+	const bool rtime_biggest_plus_one_smallest_greater = biggest_plus_one > smallest;
+	const bool rtime_biggest_plus_one_smallest_greater_or_equal = biggest_plus_one >= smallest;
+	const bool rtime_biggest_plus_one_smallest_less = biggest_plus_one < smallest;
+	const bool rtime_biggest_plus_one_smallest_less_or_equal = biggest_plus_one <= smallest;
+
+	//print compile time results
+	print_compare_results(decimal_stringify(smallest), decimal_stringify(biggest),
+		ctime_small_big_ordering, ctime_small_big_greater, ctime_small_big_less, 
+		ctime_small_big_equal, ctime_small_big_not_equal, ctime_small_big_greater_or_equal, 
+		ctime_small_big_less_or_equal, ctime_small_hash, ctime_big_hash, false);
+	print_compare_results(decimal_stringify(biggest), decimal_stringify(middle),
+		ctime_big_middle_ordering, ctime_big_middle_greater, ctime_big_middle_less,
+		ctime_big_middle_equal, ctime_big_middle_not_equal, ctime_big_middle_greater_or_equal,
+		ctime_big_middle_less_or_equal, ctime_big_hash, ctime_middle_hash, false);
+	print_compare_results(decimal_stringify(biggest_plus_one), decimal_stringify(smallest),
+		ctime_biggest_plus_one_smallest_ordering, ctime_biggest_plus_one_smallest_greater, ctime_biggest_plus_one_smallest_less,
+		ctime_biggest_plus_one_smallest_equal, ctime_biggest_plus_one_smallest_not_equal, ctime_biggest_plus_one_smallest_greater_or_equal,
+		ctime_biggest_plus_one_smallest_less_or_equal, ctime_biggest_plus_one_hash, ctime_small_hash, false); 
+
+	//print runtime results
+	print_compare_results(decimal_stringify(smallest), decimal_stringify(biggest),
+		rtime_small_big_ordering, rtime_small_big_greater, rtime_small_big_less,
+		rtime_small_big_equal, rtime_small_big_not_equal, rtime_small_big_greater_or_equal,
+		rtime_small_big_less_or_equal, rtime_small_hash, rtime_big_hash, true);
+	print_compare_results(decimal_stringify(biggest), decimal_stringify(middle),
+		rtime_big_middle_ordering, rtime_big_middle_greater, rtime_big_middle_less,
+		rtime_big_middle_equal, rtime_big_middle_not_equal, rtime_big_middle_greater_or_equal,
+		rtime_big_middle_less_or_equal, rtime_big_hash, rtime_middle_hash, true);
+	print_compare_results(decimal_stringify(biggest_plus_one), decimal_stringify(smallest),
+		rtime_biggest_plus_one_smallest_ordering, rtime_biggest_plus_one_smallest_greater, rtime_biggest_plus_one_smallest_less,
+		rtime_biggest_plus_one_smallest_equal, rtime_biggest_plus_one_smallest_not_equal, rtime_biggest_plus_one_smallest_greater_or_equal,
+		rtime_biggest_plus_one_smallest_less_or_equal, rtime_biggest_plus_one_hash, rtime_small_hash, true); 
+	
+}
+
+void cjm::uint128::example_code::print_compare_results(std::string left_operand, std::string right_operand,
+                                                       std::strong_ordering ordering, bool greater_than, bool less_than, bool equal, bool not_equal, bool greater_or_equal,
+                                                       bool less_or_equal, size_t left_hash, size_t right_hash, bool runtime)
+{
+	auto get_ordering_text = [](std::strong_ordering v) -> std::string_view
+	{
+		if (v == std::strong_ordering::equal || v == std::strong_ordering::equivalent)
+			return "EQUAL"sv;
+		if (v == std::strong_ordering::greater)
+			return "GREATER"sv;
+		return "LESSER"sv;
+	};
+	std::string_view compute_time = runtime ? "run-time"sv : "compile-time"sv;
+	auto strm = std::stringstream{};
+	strm << "Comparison (computed at " << compute_time << ") results for [" << left_operand << "] compared to [" << right_operand << "]:" << newl;
+	strm << "\t<=>: [" << get_ordering_text(ordering) << "]." << newl;
+	strm << "\t: Equal?: [" << std::boolalpha << equal << "]." << newl;
+	strm << "\t: Not Equal?: [" << std::boolalpha << not_equal << "]." << newl;
+	strm << "\t: Greater?: [" << std::boolalpha << greater_than << "]." << newl;
+	strm << "\t: Greater or Equal?: [" << std::boolalpha << greater_or_equal << "]." << newl;
+	strm << "\t: Lesser?: [" << std::boolalpha << less_than << "]." << newl;
+	strm << "\t: Less than or equal?: [" << std::boolalpha << less_or_equal << "]." << newl;
+	strm << "\t: LHS Hash: [0x" << std::hex << std::setw(std::numeric_limits<size_t>::digits / 4) << std::setfill('0') << left_hash << "]." << newl << std::dec;
+	strm << "\t: RHS Hash: [0x" << std::hex << std::setw(std::numeric_limits<size_t>::digits / 4) << std::setfill('0') << right_hash << "]." << newl << std::dec;
+	cout << strm.str() << std::endl;
 }
 
 std::string_view cjm::uint128::example_code::ordering_text(std::strong_ordering ordering)
