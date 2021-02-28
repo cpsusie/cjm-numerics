@@ -694,6 +694,8 @@ void cjm::uint128_tests::execute_uint128_tests()
     execute_test(execute_basic_u128_sbb_test, "basic_u128_sbb_test"sv);
     execute_test(execute_builtin_sub_with_borrow_test, "builtin_sub_with_borrow_test"sv);
 
+    //execute_test(execute_umult_spec_tests, "umult_spec_tests"sv);
+
 	cout << "STANDARD TEST BATTERY: All tests PASSED." << newl;
     static_assert(most_sign_set_bit(2_u128) == 1);
 }
@@ -4212,6 +4214,22 @@ void cjm::uint128_tests::execute_basic_u128_sbb_test()
     cjm_assert(actual_diff_4_no_bin == ctime_res_4_no_bin.first && ((act_bout_4_no_bin != 0) == (ctime_res_4_no_bin.second != 0)));
     cjm_assert(actual_diff_4_bin == ctime_res_4_bin.first && ((act_bout_4_bin != 0) == (ctime_res_4_bin.second != 0)));
 }
+
+void cjm::uint128_tests::execute_umult_spec_tests()
+{
+    constexpr std::uint64_t factor_1 = 0xc0de'd00d'fea2'cafeull;
+    constexpr std::uint64_t factor_2 = 0xbabe'b00b'600d'f00dull;
+
+    constexpr uint128_t factor_1_u128 = factor_1;
+    constexpr uint128_t factor_2_u128 = factor_2;
+
+    constexpr auto result = internal::umult(factor_1, factor_2);
+    constexpr auto ctrl = factor_1_u128 * factor_2_u128;
+
+    auto final_res = bit_cast<uint128_t>(result);
+    cjm_assert(final_res == ctrl);
+}
+
 
 #ifdef CJM_HAVE_BUILTIN_128
 void cjm::uint128_tests::execute_builtin_u128fls_test_if_avail()

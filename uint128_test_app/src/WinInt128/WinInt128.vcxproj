@@ -183,6 +183,7 @@
     <ClInclude Include="..\headers\int128_test_switches.hpp" />
     <ClInclude Include="..\headers\testing.hpp" />
     <ClInclude Include="..\headers\uint128_test_program.hpp" />
+    <ClInclude Include="..\headers\umult.hpp" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="..\cpp\llvm_int_typedefs.txt" />

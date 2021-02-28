@@ -162,6 +162,9 @@ namespace cjm::numerics
 		requires cjm::numerics::concepts::char_with_traits<Char, CharTraits>
 	std::basic_istream<Char, CharTraits>& operator>>(std::basic_istream<Char, CharTraits>& is, uint128& v);
 
+	constexpr std::uint64_t add_with_carry_u64(std::uint64_t addend_1, std::uint64_t addend_2, 
+        unsigned char carry_in, unsigned char& carry_out) noexcept;
+
 	//Comparison operators
 	constexpr std::strong_ordering operator <=>(uint128 lhs, uint128 rhs) noexcept; 
     constexpr bool operator==(uint128 lhs, uint128 rhs) noexcept;

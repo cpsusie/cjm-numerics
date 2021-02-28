@@ -1698,8 +1698,7 @@ namespace cjm
             }
         }
 
-
-        constexpr uint128::int_part add_with_carry(uint128::int_part lhs, uint128::int_part rhs,
+		constexpr uint128::int_part add_with_carry(uint128::int_part lhs, uint128::int_part rhs,
 	        unsigned char carry_in, unsigned char& carry_out) noexcept
         {
             using int_t = typename uint128::int_part;
@@ -1734,6 +1733,14 @@ namespace cjm
         	}
         }
 
+        constexpr std::uint64_t add_with_carry_u64(std::uint64_t lhs, std::uint64_t rhs,
+            unsigned char carry_in, unsigned char& carry_out) noexcept
+        {
+            return add_with_carry(bit_cast<typename uint128::int_part>(lhs), 
+                bit_cast<typename uint128::int_part>(rhs), carry_in,  carry_out);
+        }
+
+		
         constexpr std::pair<uint128, unsigned char>
             add_with_carry(uint128 first_addend, uint128 second_addend,
                 unsigned char carry_in) noexcept
