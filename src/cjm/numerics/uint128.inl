@@ -1736,8 +1736,7 @@ namespace cjm
         constexpr std::uint64_t add_with_carry_u64(std::uint64_t lhs, std::uint64_t rhs,
             unsigned char carry_in, unsigned char& carry_out) noexcept
         {
-            return add_with_carry(bit_cast<typename uint128::int_part>(lhs), 
-                bit_cast<typename uint128::int_part>(rhs), carry_in,  carry_out);
+            return add_with_carry(lhs, rhs, carry_in,  carry_out);
         }
 
 		
