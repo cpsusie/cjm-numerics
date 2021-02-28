@@ -16,14 +16,14 @@ For this example we will be multipling two 16 bit unsigned integers by splitting
 * let const full_shift := 16 (mult_size)
 * using add_c_size_t = std::uint32_t (unsigned int of size add_c_size)
 * using split_size_t = std::uint8_t (unsigned int of size base_shift)
-* using mult_size_t = std::uint16_t (unsigned int of size full_shift)
-* let const low_bit_mask = max value of usigned integer of same size as base_shift, zero extended to size mult_size_t  
+* using multiplicand_t = std::uint16_t (unsigned int of size full_shift)
+* let const low_bit_mask = max value of usigned integer of same size as base_shift, zero extended to size multiplicand_t  
 
 ## Split up factors
-* let factor_1_low := factor_1 & low_bit_mask (0x00a2 : mult_size_t) 
-* let factor_1_high := factor_1 >> base_shift (0x00fe : mult_size_t)
-* let factor_2_low := factor_2 & low_bit_mask (0x000f : mult_size_t)
-* let factor_2_high := factor_2 >> base_shift (0x00f0 : mult_size_t)    
+* let factor_1_low := factor_1 & low_bit_mask (0x00a2 : multiplicand_t) 
+* let factor_1_high := factor_1 >> base_shift (0x00fe : multiplicand_t)
+* let factor_2_low := factor_2 & low_bit_mask (0x000f : multiplicand_t)
+* let factor_2_high := factor_2 >> base_shift (0x00f0 : multiplicand_t)    
 ## Peform 4 split-up multiplications 
 * let product_f1_low_f2_low := add_c_size_t(factor_1_low * factor_2_low)      ( ((0x00a2 * 0x000f) -> add_c_size_t) == 0x0000_097e)
 * let product_f1_high_f2_low := add_c_size_t(factor_1_high * factor_2_low)    ( ((0x00fe * 0x000f) -> add_c_size_t) == 0x0000_0ee2)
@@ -47,14 +47,14 @@ For this example we will be multipling two 16 bit unsigned integers by splitting
 * let const full_shift := 16 (mult_size)
 * using add_c_size_t = std::uint32_t (unsigned int of size add_c_size)
 * using split_size_t = std::uint8_t (unsigned int of size base_shift)
-* using mult_size_t = std::uint16_t (unsigned int of size full_shift)
-* let const low_bit_mask = max value of usigned integer of same size as base_shift, zero extended to size mult_size_t  
+* using multiplicand_t = std::uint16_t (unsigned int of size full_shift)
+* let const low_bit_mask = max value of usigned integer of same size as base_shift, zero extended to size multiplicand_t  
 
 ## Split up factors
-* let factor_1_low := factor_1 & low_bit_mask (0x00ff : mult_size_t) 
-* let factor_1_high := factor_1 >> base_shift (0x00ff : mult_size_t)
-* let factor_2_low := factor_2 & low_bit_mask (0x00ff : mult_size_t)
-* let factor_2_high := factor_2 >> base_shift (0x00ff : mult_size_t)   
+* let factor_1_low := factor_1 & low_bit_mask (0x00ff : multiplicand_t) 
+* let factor_1_high := factor_1 >> base_shift (0x00ff : multiplicand_t)
+* let factor_2_low := factor_2 & low_bit_mask (0x00ff : multiplicand_t)
+* let factor_2_high := factor_2 >> base_shift (0x00ff : multiplicand_t)   
 
 ## Peform 4 split-up multiplications 
 * let product_f1_low_f2_low := add_c_size_t(factor_1_low * factor_2_low)      ( ((0x00ff * 0x00ff) -> add_c_size_t) == 0x0000_fe01)

@@ -16,9 +16,11 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="8ab5edb8-7d60-4856-834e-1b0d4d4bfdec" name="Default Changelist" comment="Fix problems uncovered when switching from Windows/VS environment to GCC/Clang/CMAke/Linux environment. ... again .... today.  Sigh.">
+    <list default="true" id="8ab5edb8-7d60-4856-834e-1b0d4d4bfdec" name="Default Changelist" comment="Add demonstration of signed and unsigned built-in integral conversions to and from uint128 in the example code.">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/CMakeLists.txt" beforeDir="false" afterPath="$PROJECT_DIR$/CMakeLists.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/uint128_test_app/src/cpp/int128_tests.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/uint128_test_app/src/cpp/int128_tests.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/uint128_test_app/src/headers/umult.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/uint128_test_app/src/headers/umult.hpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/uint128_test_app/src/headers/umult_extended_mult_algo_explanation.md" beforeDir="false" afterPath="$PROJECT_DIR$/uint128_test_app/src/headers/umult_extended_mult_algo_explanation.md" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -29,7 +31,7 @@
   <component name="ClangdSettings">
     <option name="formatViaClangd" value="false" />
   </component>
-  <component name="ExecutionTargetManager" SELECTED_TARGET="CMakeBuildProfile:Release" />
+  <component name="ExecutionTargetManager" SELECTED_TARGET="CMakeBuildProfile:Debug-Clang" />
   <component name="Git.Settings">
     <favorite-branches>
       <branch-storage>
@@ -91,7 +93,7 @@
       <recent name="$PROJECT_DIR$/cmake-build-debug" />
     </key>
   </component>
-  <component name="RunManager" selected="CMake Application.EnvironTest">
+  <component name="RunManager" selected="CMake Application.Int128">
     <configuration name="EnvironTest" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="Int128" TARGET_NAME="EnvironTest" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="Int128" RUN_TARGET_NAME="EnvironTest">
       <method v="2">
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
@@ -103,11 +105,6 @@
       </method>
     </configuration>
     <configuration name="Int128" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="Int128" TARGET_NAME="Int128" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="Int128" RUN_TARGET_NAME="Int128">
-      <method v="2">
-        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
-      </method>
-    </configuration>
-    <configuration default="true" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" PASS_PARENT_ENVS_2="true">
       <method v="2">
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
       </method>
@@ -162,6 +159,8 @@
       <workItem from="1613682151279" duration="77000" />
       <workItem from="1613682239612" duration="1981000" />
       <workItem from="1614033563893" duration="1641000" />
+      <workItem from="1614492460025" duration="995000" />
+      <workItem from="1614533256544" duration="14817000" />
     </task>
     <task id="LOCAL-00001" summary="Add stream extraction operator for vector of bin_op_uint128_t's.  Add unit test.">
       <created>1610297106627</created>
@@ -366,7 +365,56 @@
       <option name="project" value="LOCAL" />
       <updated>1614033673433</updated>
     </task>
-    <option name="localTasksCounter" value="30" />
+    <task id="LOCAL-00030" summary="Elaborate division and modulus demo in example code.">
+      <created>1614178018195</created>
+      <option name="number" value="00030" />
+      <option name="presentableId" value="LOCAL-00030" />
+      <option name="project" value="LOCAL" />
+      <updated>1614178018195</updated>
+    </task>
+    <task id="LOCAL-00031" summary="Elaborate constexpr div mod and nature of result struct.">
+      <created>1614182556629</created>
+      <option name="number" value="00031" />
+      <option name="presentableId" value="LOCAL-00031" />
+      <option name="project" value="LOCAL" />
+      <updated>1614182556629</updated>
+    </task>
+    <task id="LOCAL-00032" summary="Update spacing/tab trivia in cjm_numeric_concepts.hpp.">
+      <created>1614187472768</created>
+      <option name="number" value="00032" />
+      <option name="presentableId" value="LOCAL-00032" />
+      <option name="project" value="LOCAL" />
+      <updated>1614187472768</updated>
+    </task>
+    <task id="LOCAL-00033" summary="Add boolean conversion (including !) to example code.">
+      <created>1614367594301</created>
+      <option name="number" value="00033" />
+      <option name="presentableId" value="LOCAL-00033" />
+      <option name="project" value="LOCAL" />
+      <updated>1614367594301</updated>
+    </task>
+    <task id="LOCAL-00034" summary="Add pre/post inc/dec to example code.  Also add section showing unary+ (a no-op for uint128_t).">
+      <created>1614374444080</created>
+      <option name="number" value="00034" />
+      <option name="presentableId" value="LOCAL-00034" />
+      <option name="project" value="LOCAL" />
+      <updated>1614374444080</updated>
+    </task>
+    <task id="LOCAL-00035" summary="Add demonstration of signed and unsigned built-in integral conversions to and from uint128 in the example code.">
+      <created>1614444980791</created>
+      <option name="number" value="00035" />
+      <option name="presentableId" value="LOCAL-00035" />
+      <option name="project" value="LOCAL" />
+      <updated>1614444980791</updated>
+    </task>
+    <task id="LOCAL-00036" summary="Removed bitcast (which is not constexpr in gcc / clang) from constexpr add_with_carry_u64 function.">
+      <created>1614492832052</created>
+      <option name="number" value="00036" />
+      <option name="presentableId" value="LOCAL-00036" />
+      <option name="project" value="LOCAL" />
+      <updated>1614492832052</updated>
+    </task>
+    <option name="localTasksCounter" value="37" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -385,13 +433,6 @@
     <option name="oldMeFiltersMigrated" value="true" />
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Fix friend class declaration to properly identify namespace of friend class: compiled on MSVC not on gcc / clang." />
-    <MESSAGE value="Add compile time divmod tests." />
-    <MESSAGE value="binary operation now also tests compound variants of binary operations (except for compare)." />
-    <MESSAGE value="Add unary operation test facilities -- in particular, enum value related functions and lookups." />
-    <MESSAGE value="Add unary operation test facilities -- in particular, unary op enum related parse methods." />
-    <MESSAGE value="Add stream insertion and extraction operators for unary_op enum class.  Add unit test confirming round-tripped serialization thereof." />
-    <MESSAGE value="Begin work on unary_operation struct." />
     <MESSAGE value="Continue work on unary_operation struct." />
     <MESSAGE value="Add ctors to unary operation struct.  Add basic unit test for unary operation struct." />
     <MESSAGE value="Add compile time post-increment test.  Add test to generate static assertions for compile-time test." />
@@ -410,7 +451,45 @@
     <MESSAGE value="Added support for linux (cmake) build of the visual_studio_environment_test_app." />
     <MESSAGE value="Fix problems uncovered when switching from Windows/VS environment to GCC/Clang/CMAke/Linux environment. ... again .... today.  Sigh." />
     <MESSAGE value="Update workspace.xml" />
-    <option name="LAST_COMMIT_MESSAGE" value="Update workspace.xml" />
+    <MESSAGE value="Elaborate division and modulus demo in example code." />
+    <MESSAGE value="Elaborate constexpr div mod and nature of result struct." />
+    <MESSAGE value="Update spacing/tab trivia in cjm_numeric_concepts.hpp." />
+    <MESSAGE value="Add boolean conversion (including !) to example code." />
+    <MESSAGE value="Add pre/post inc/dec to example code.  Also add section showing unary+ (a no-op for uint128_t)." />
+    <MESSAGE value="Add demonstration of signed and unsigned built-in integral conversions to and from uint128 in the example code." />
+    <MESSAGE value="Removed bitcast (which is not constexpr in gcc / clang) from constexpr add_with_carry_u64 function." />
+    <option name="LAST_COMMIT_MESSAGE" value="Removed bitcast (which is not constexpr in gcc / clang) from constexpr add_with_carry_u64 function." />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
+          <url>file://$PROJECT_DIR$/uint128_test_app/src/cpp/int128_tests.cpp</url>
+          <line>4223</line>
+          <option name="timeStamp" value="2" />
+        </line-breakpoint>
+        <line-breakpoint type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
+          <url>file://$PROJECT_DIR$/uint128_test_app/src/headers/umult.hpp</url>
+          <line>247</line>
+          <option name="timeStamp" value="3" />
+        </line-breakpoint>
+        <line-breakpoint type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
+          <url>file://$PROJECT_DIR$/uint128_test_app/src/headers/umult.hpp</url>
+          <line>191</line>
+          <option name="timeStamp" value="4" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
+          <url>file://$PROJECT_DIR$/uint128_test_app/src/cpp/int128_tests.cpp</url>
+          <line>4263</line>
+          <option name="timeStamp" value="5" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
+    <watches-manager>
+      <configuration name="CMakeRunConfiguration">
+        <watch expression="left_product" />
+      </configuration>
+    </watches-manager>
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />
