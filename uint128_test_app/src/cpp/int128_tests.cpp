@@ -4277,6 +4277,31 @@ void cjm::uint128_tests::execute_umult_spec_tests()
 	//compile-time assert
 	static_assert(actual_ctime_product_64 == expected_product_64,
 	              "Should be same if evaluated during compilation.");
+
+
+    constexpr std::uint64_t left_factor_64 = 0xc0de'd00d'fea2'cafeull;
+    constexpr std::uint64_t right_factor_64 = 0xbabe'b00b'600d'f00dull;
+    constexpr auto expected_product_128 = static_cast<uint128_t>(left_factor_64) * right_factor_64;
+    auto actual_product_128
+		= internal::umult(left_factor_64, right_factor_64);
+    constexpr auto actual_ctime_product_128 = internal::umult(left_factor_64, right_factor_64);
+    constexpr auto converted_ctime = uint128_t{ actual_ctime_product_128.m_high, actual_ctime_product_128.m_low };
+    auto converted_rtime = bit_cast<uint128_t>(actual_product_128);
+
+	std::cout
+        << "[0x" << std::hex << std::setw(std::numeric_limits<decltype(left_factor_64)>::digits / 4)
+        << std::setfill('0') << left_factor_64 << "] * [0x" << std::hex
+        << std::setw(std::numeric_limits<decltype(right_factor_64)>::digits / 4) << std::setfill('0')
+        << right_factor_64 << "] == [0x" << std::hex
+        << std::setw(std::numeric_limits<decltype(converted_rtime)>::digits / 4)
+        << std::setfill('0') << converted_rtime << "]." << newl;
+
+    //runtime assert
+    cjm_assert(converted_rtime == expected_product_128);
+	//compile-time assert
+    static_assert(converted_ctime == expected_product_128);
+	
+
 //    constexpr std::uint64_t factor_1 = 0xc0de'd00d'fea2'cafeull;
 //    constexpr std::uint64_t factor_2 = 0xbabe'b00b'600d'f00dull;
 //

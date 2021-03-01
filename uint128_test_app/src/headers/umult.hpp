@@ -15,10 +15,10 @@ namespace cjm::numerics::internal
 	namespace concepts
 	{
 		template<typename UInt16Or32>
-		concept is_uint_16_or_32_t
-		=(std::is_nothrow_convertible_v<UInt16Or32, std::uint16_t> ||
-		  std::is_nothrow_convertible_v<UInt16Or32, std::uint32_t>)
-		 && cjm::numerics::concepts::builtin_unsigned_integer<UInt16Or32>;
+		concept is_uint_16_or_32_t = cjm::numerics::concepts::builtin_unsigned_integer<UInt16Or32> && 
+				((sizeof(UInt16Or32) == sizeof(std::uint32_t) && std::numeric_limits<UInt16Or32>::digits == std::numeric_limits<std::uint32_t>::digits) || 
+					(sizeof(UInt16Or32) == sizeof(std::uint16_t) && std::numeric_limits<UInt16Or32>::digits == std::numeric_limits<std::uint16_t>::digits));
+		
 	}
 
 	template<cjm::numerics::concepts::unsigned_integer UnsignedInteger>
@@ -41,6 +41,7 @@ namespace cjm::numerics::internal
 			constexpr uint64_t_mult_helper(const std::array<std::uint64_t, 2u>& arr ) noexcept : m_low{arr[0]}, m_high{arr[1]} {}
 			constexpr uint64_t_mult_helper(std::uint64_t high, std::uint64_t low) noexcept : m_low{low}, m_high{high} {}
 			constexpr uint64_t_mult_helper(std::uint64_t low) noexcept : m_low{low}, m_high{} {}
+			constexpr uint64_t_mult_helper(std::uint32_t low) noexcept : m_low{ low }, m_high{} {}
 			constexpr uint64_t_mult_helper() noexcept = default;
 			constexpr uint64_t_mult_helper(const uint64_t_mult_helper& other) noexcept = default;
 			constexpr uint64_t_mult_helper(uint64_t_mult_helper&& other) noexcept = default;
@@ -63,6 +64,7 @@ namespace cjm::numerics::internal
 			constexpr uint64_t_mult_helper(const std::array<std::uint64_t, 2u>& arr ) noexcept :  m_high{arr[0]}, m_low{arr[1]} {}
 			constexpr uint64_t_mult_helper(std::uint64_t high, std::uint64_t low) noexcept :  m_high{high}, m_low{low} {}
 			constexpr uint64_t_mult_helper(std::uint64_t low) noexcept : m_high{}, m_low{low} {}
+			constexpr uint64_t_mult_helper(std::uint32_t low) noexcept : m_high{}, m_low{ low } {}
 			constexpr uint64_t_mult_helper() noexcept = default;
 			constexpr uint64_t_mult_helper(const uint64_t_mult_helper& other) noexcept = default;
 			constexpr uint64_t_mult_helper(uint64_t_mult_helper&& other) noexcept = default;
@@ -115,6 +117,47 @@ namespace cjm::numerics::internal
 			return fallback_split_up(split_me);
 		}
 
+		static constexpr add_c_size_t& lshift(add_c_size_t& val, size_t amount) noexcept
+		{
+			[[maybe_unused]] constexpr size_t max_shift = 64;
+			assert(amount <= max_shift);
+			if (amount == 64)
+			{
+				val.m_high = val.m_low;
+				val.m_low = 0;
+			}
+			else if (amount > 0)
+			{
+				val.m_high <<= amount;
+				const auto carryover_mask = (std::numeric_limits<std::uint64_t>::max() << (64 - amount));
+				const auto remaining_low = (val.m_low & carryover_mask) >> (64 - amount);
+				val.m_low <<= amount;
+				val.m_high &= ~(carryover_mask >> (64 - amount));
+				val.m_high |= remaining_low;
+			}
+
+			return val;
+		}
+
+		static constexpr std::uint64_t add_with_carry(std::uint64_t lhs, std::uint64_t rhs, unsigned char carry_in, unsigned char& carry_out) noexcept
+		{
+			carry_out = 0;
+			auto sum = lhs + rhs + (static_cast<bool>(carry_in) ? 1 : 0);
+			carry_out = sum < lhs;
+			return sum;			
+		}
+
+		static constexpr x64_mult_helper_t& add(x64_mult_helper_t& lhs, const x64_mult_helper_t& rhs) noexcept
+		{
+			unsigned char carry_in = 0;
+			unsigned char carry_out = 0;
+			lhs.m_low = add_with_carry(lhs.m_low, rhs.m_low, carry_in, carry_out);
+			carry_in = carry_out;
+			lhs.m_high = add_with_carry(lhs.m_high, rhs.m_high, carry_in, carry_out);
+			assert(carry_out == 0); //shouldn't be overflowing on high unless we did something wrong
+			return lhs;
+		}
+		
 		static constexpr split_product_array_t get_adjusted_products(const split_array_t& lhs_arr, const split_array_t& rhs_arr) noexcept
 		{
 			auto factor_1_low = get_low(lhs_arr);
@@ -127,12 +170,12 @@ namespace cjm::numerics::internal
 			assert(factor_1_high <= max_split_value);
 			assert(factor_2_high <= max_split_value);
 
-			auto product_f1_low_f2_low = static_cast<add_c_size_t>(factor_1_low * factor_2_low);
+			const auto product_f1_low_f2_low = static_cast<add_c_size_t>(factor_1_low * factor_2_low);
 			auto product_f1_high_f2_low = static_cast<add_c_size_t>(factor_1_high * factor_2_low);
 			auto product_f1_low_f2_high = static_cast<add_c_size_t>(factor_1_low * factor_2_high);
 			auto product_f1_high_f2_high = static_cast<add_c_size_t>(factor_1_high * factor_2_high);
 
-			return split_product_array_t{product_f1_low_f2_low, (product_f1_high_f2_low << base_shift), (product_f1_low_f2_high << base_shift), (product_f1_high_f2_high << full_shift)};
+			return split_product_array_t{product_f1_low_f2_low, lshift( product_f1_high_f2_low, base_shift), lshift(product_f1_low_f2_high, base_shift), lshift(product_f1_high_f2_high ,full_shift)};
 
 //			let product_f1_low_f2_low := add_c_size_t(factor_1_low * factor_2_low) ( ((0x00a2 * 0x000f) -> add_c_size_t) == 0x0000_097e)
 //			let product_f1_high_f2_low := add_c_size_t(factor_1_high * factor_2_low) ( ((0x00fe * 0x000f) -> add_c_size_t) == 0x0000_0ee2)
@@ -254,50 +297,19 @@ namespace cjm::numerics::internal
 		return static_cast<result_t>(sum);
 
 	}
-	constexpr std::array<std::uint64_t, 2u> umult(std::uint64_t first_factor, std::uint64_t second_factor) noexcept;
+	constexpr uint_ext_mult_helper<std::uint64_t>::return_val_t umult(std::uint64_t first_factor, std::uint64_t second_factor) noexcept;
 }
 
-constexpr std::array<std::uint64_t, 2u> cjm::numerics::internal::umult(std::uint64_t first_factor, std::uint64_t second_factor) noexcept
+constexpr cjm::numerics::internal::uint_ext_mult_helper<std::uint64_t>::return_val_t cjm::numerics::internal::umult(std::uint64_t first_factor, std::uint64_t second_factor) noexcept
 {
-	constexpr std::uint64_t high_32_mask = 0xffff'ffff'0000'0000ull;
-	
-	constexpr auto base_shift_amount = std::numeric_limits<std::uint32_t>::digits;
-	auto left_high = static_cast<std::uint32_t>(first_factor >> base_shift_amount);
-	auto left_low = static_cast<std::uint32_t>(first_factor);
+	using helper_t = uint_ext_mult_helper<std::uint64_t>;
 
-	auto right_high = static_cast<std::uint32_t>(second_factor >> base_shift_amount);
-	auto right_low = static_cast<std::uint32_t>(second_factor);
-
-	auto llow_rlow_product_low = static_cast<std::uint64_t>(left_low) * static_cast<std::uint64_t>(right_low);
-	std::uint64_t llow_rlow_product_high = 0ull;
-	
-	auto lhigh_rlow_product_low = static_cast<std::uint64_t>(left_high) * static_cast<std::uint64_t>(right_low);
-	auto lhigh_rlow_product_high = (high_32_mask & lhigh_rlow_product_low) >> base_shift_amount;
-	lhigh_rlow_product_low <<= base_shift_amount;
-
-	std::uint64_t llow_righ_product_low = 0;
-	auto llow_rhigh_product_high = static_cast<std::uint64_t>(left_low) * static_cast<std::uint64_t>(left_high);
-
-	auto lhigh_rhigh_product_high = (static_cast<std::uint64_t>(left_high) * static_cast<std::uint64_t>(right_high)) << base_shift_amount;
-	std::uint64_t lhigh_rhigh_product_low = 0;
-
-	std::uint64_t high_sum = llow_rlow_product_high;
-	unsigned char carry_out = 0;
-	auto low_sum = 
-		add_with_carry_u64(llow_rlow_product_low, lhigh_rlow_product_low, 0, carry_out);
-	if (carry_out)
-		++high_sum;
-	high_sum += lhigh_rlow_product_high;
-	low_sum = add_with_carry_u64(low_sum, llow_righ_product_low, 0, carry_out);
-	if (carry_out)
-		++high_sum;
-	high_sum += llow_rhigh_product_high;
-	low_sum = add_with_carry_u64(low_sum, lhigh_rhigh_product_low, 0, carry_out);
-	if (carry_out)
-		++high_sum;
-	high_sum += lhigh_rhigh_product_high;
-
-	return std::array<std::uint64_t, 2u>{low_sum, high_sum};
+	auto products = helper_t::get_adjusted_products(helper_t::split_up(first_factor), helper_t::split_up(second_factor));
+	auto sum = products[0];
+	sum = helper_t::add(sum, products[1]);
+	sum = helper_t::add(sum, products[2]);
+	sum = helper_t::add(sum, products[3]);
+	return sum;
 }
 
 
