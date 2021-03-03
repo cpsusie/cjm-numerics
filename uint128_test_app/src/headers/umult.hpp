@@ -18,6 +18,14 @@ namespace cjm::numerics::internal
 		concept is_uint_16_or_32_t = cjm::numerics::concepts::builtin_unsigned_integer<UInt16Or32> && 
 				((sizeof(UInt16Or32) == sizeof(std::uint32_t) && std::numeric_limits<UInt16Or32>::digits == std::numeric_limits<std::uint32_t>::digits) || 
 					(sizeof(UInt16Or32) == sizeof(std::uint16_t) && std::numeric_limits<UInt16Or32>::digits == std::numeric_limits<std::uint16_t>::digits));
+
+		template<typename SomeUInt128>
+		concept is_real_builtin_u128 =
+#ifdef CJM_USE_INTRINSIC_U128
+			std::is_same_v<unsigned __int128, std::remove_cvref_t<std::remove_const_t<SomeUInt128>>;
+#else
+			false;
+#endif
 		
 	}
 
@@ -32,6 +40,9 @@ namespace cjm::numerics::internal
 		template<bool LittleEndian>
 		struct uint64_t_mult_helper;
 
+		template<concepts::is_real_builtin_u128 BuiltInU128, bool LittleEndian>
+		struct builtin_u128_mult_helper;
+		
 		template<>
 		struct alignas(uint128_align) uint64_t_mult_helper<true> final
 		{
