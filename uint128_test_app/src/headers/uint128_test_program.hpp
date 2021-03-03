@@ -18,6 +18,7 @@
 #include <locale>
 #include <tuple>
 #include "int128_test_switches.hpp"
+#include "fixed_uint_container.hpp"
 
 namespace cjm::base_test_program
 {

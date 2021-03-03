@@ -179,6 +179,7 @@
     <ClCompile Include="..\cpp\uint128_test_program.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\headers\fixed_uint_container.hpp" />
     <ClInclude Include="..\headers\int128_tests.hpp" />
     <ClInclude Include="..\headers\int128_test_switches.hpp" />
     <ClInclude Include="..\headers\testing.hpp" />
