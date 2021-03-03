@@ -18,6 +18,12 @@ namespace cjm::numerics::fixed_uint_container
 			false;
 #endif
 
+		template<typename Ui>
+		concept is_full_builtin_u128 = is_builtin_u128<Ui> && std::is_arithmetic_v<Ui> && std::numeric_limits<Ui>::is_specialized;
+
+		template<typename Ui>
+		concept is_partial_builtin_u128 = is_builtin_u128<Ui> && !is_full_builtin_u128<Ui>;
+
 		constexpr bool exits_builtin_u128 = is_builtin_u128<natuint128_t>;
 		
 		template<typename Ui, size_t Digits>
@@ -35,12 +41,34 @@ namespace cjm::numerics::fixed_uint_container
 		static_assert(is_unsigned_int_with_digits<std::uint64_t, 64>);
 		static_assert(!exits_builtin_u128 || is_unsigned_int_with_digits<natuint128_t, 128>);
 
-		template<typename UnsignedInteger, bool LittleEndian>
-			requires (is_unsigned_int_with_digits<UnsignedInteger, 64u> || is_builtin_u128<UnsignedInteger>)
+		template<typename Ui128LimbContainer>
+		concept ui128_limb_container_split = requires(Ui128LimbContainer x)
+		{
+			{x.m_high}	noexcept	->	concepts::nothrow_convertible<std::uint64_t>;
+			{x.m_low}	noexcept	->	concepts::nothrow_convertible<std::uint64_t>;
+		};
+
+		template<typename Ui128LimbContainer>
+		concept ui128_limb_container_builtin = !ui128_limb_container_split<Ui128LimbContainer>
+			&& exits_builtin_u128 && ((sizeof(Ui128LimbContainer) * 2u) == (sizeof(std::uint64_t) * 2u))
+			&& requires (Ui128LimbContainer x)
+		{
+			{x.m_value}	noexcept	->	concepts::nothrow_convertible<natuint128_t>;
+		};
+
+		template<typename Ui128LimbContainer>
+		concept ui128_limb_container = ui128_limb_container_split<Ui128LimbContainer> || ui128_limb_container_builtin<Ui128LimbContainer>;
+		
+		template<ui128_limb_container_split UnsignedInteger, bool LittleEndian>
 		constexpr std::uint64_t get_low(const uint128_limb_container<UnsignedInteger, LittleEndian>& val) noexcept;
 
-		template<typename UnsignedInteger, bool LittleEndian>
-			requires (is_unsigned_int_with_digits<UnsignedInteger, 64u> || is_builtin_u128<UnsignedInteger>)
+		template<ui128_limb_container_split UnsignedInteger, bool LittleEndian>
+		constexpr std::uint64_t get_high(const uint128_limb_container<UnsignedInteger, LittleEndian>& val) noexcept;
+
+		template<ui128_limb_container_builtin UnsignedInteger, bool LittleEndian>
+		constexpr std::uint64_t get_low(const uint128_limb_container<UnsignedInteger, LittleEndian>& val) noexcept;
+
+		template<ui128_limb_container_builtin UnsignedInteger, bool LittleEndian>
 		constexpr std::uint64_t get_high(const uint128_limb_container<UnsignedInteger, LittleEndian>& val) noexcept;
 		
 		template<>
@@ -235,34 +263,45 @@ namespace cjm::numerics::fixed_uint_container
 
 		static constexpr bool is_little_endian = std::endian::native != std::endian::big;
 
-		template<typename UnsignedInteger, bool LittleEndian>
-		requires (is_unsigned_int_with_digits<UnsignedInteger, 64u> || is_builtin_u128<UnsignedInteger>)
+		template<ui128_limb_container_split UnsignedInteger, bool LittleEndian>
 		constexpr std::uint64_t get_low(const uint128_limb_container<UnsignedInteger, LittleEndian>& val) noexcept
 		{
-			if constexpr (is_builtin_u128<UnsignedInteger>)
-			{
-				return static_cast<std::uint64_t>(val.m_value);
-			}
-			else
-			{
-				return val.m_low;
-			}
+			return val.m_low;
 		}
 
-		template<typename UnsignedInteger, bool LittleEndian>
-		requires (is_unsigned_int_with_digits<UnsignedInteger, 64u> || is_builtin_u128<UnsignedInteger>)
+		template<ui128_limb_container_builtin UnsignedInteger, bool LittleEndian>
+		constexpr std::uint64_t get_low(const uint128_limb_container<UnsignedInteger, LittleEndian>& val) noexcept
+		{
+			return static_cast<std::uint64_t>(val.m_value);
+		}
+
+		template<ui128_limb_container_split UnsignedInteger, bool LittleEndian>
 		constexpr std::uint64_t get_high(const uint128_limb_container<UnsignedInteger, LittleEndian>& val) noexcept
 		{
-			if constexpr (is_builtin_u128<UnsignedInteger>)
-			{
-				return static_cast<std::uint64_t>(val.m_value >> 64);				
-			}
-			else
-			{
-				return val.m_high;
-			}
+			return val.m_high;
 		}
+
+		template<ui128_limb_container_builtin UnsignedInteger, bool LittleEndian>
+		constexpr std::uint64_t get_high
+			(const uint128_limb_container<UnsignedInteger, LittleEndian>& val) noexcept
+		{
+			return static_cast<std::uint64_t>(val.m_value >> 64);
+		}
+		using ui128_split_limb = std::uint64_t;
+		using ui128_limb = std::conditional_t<is_full_builtin_u128<natuint128_t>, natuint128_t, ui128_split_limb>;
+		
+		using ui128_partial_builtin_limb = std::conditional_t<is_partial_builtin_u128<natuint128_t> || is_full_builtin_u128<natuint128_t>, natuint128_t, std::uint64_t>;
 	}
+
+	using uint128_limb_container_t = std::conditional_t<internal::is_full_builtin_u128<internal::ui128_limb>,
+		internal::uint128_limb_container<internal::ui128_limb, internal::is_little_endian>,
+		internal::uint128_limb_container<internal::ui128_split_limb, internal::is_little_endian>>;
+
+	using uint128_always_split_container_t = internal::uint128_limb_container<internal::ui128_split_limb, internal::is_little_endian>;
+
+	using uint128_limited_builtin_container_t = std::conditional_t<internal::is_partial_builtin_u128<internal::ui128_limb>,
+		internal::uint128_limb_container<internal::ui128_partial_builtin_limb, internal::is_little_endian>, uint128_always_split_container_t>;
+	
 }
 
 #endif
