@@ -50,6 +50,9 @@
     <ClInclude Include="..\headers\fixed_uint_container.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\headers\fixed_uint_container_math.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="..\cpp\llvm_int_typedefs.txt">

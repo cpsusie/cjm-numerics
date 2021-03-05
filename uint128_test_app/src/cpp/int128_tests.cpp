@@ -695,6 +695,7 @@ void cjm::uint128_tests::execute_uint128_tests()
     execute_test(execute_builtin_sub_with_borrow_test, "builtin_sub_with_borrow_test"sv);
 
     execute_test(execute_umult_spec_tests, "umult_spec_tests"sv);
+    execute_test(execute_uintcontainer_adc_tests, "uintcontainer_adc_tests"sv);
 
 	cout << "STANDARD TEST BATTERY: All tests PASSED." << newl;
     static_assert(most_sign_set_bit(2_u128) == 1);
@@ -4313,6 +4314,30 @@ void cjm::uint128_tests::execute_umult_spec_tests()
 //
 //    auto final_res = bit_cast<uint128_t>(result);
 //    cjm_assert(final_res == ctrl);
+}
+
+constexpr uint128_t to_uint128_t(const fixed_uint_container::add_carry_result_t<std::uint64_t>& input) noexcept
+{
+    auto value = static_cast<uint128_t>(fixed_uint_container::get_carry_out<std::uint64_t>(input));
+    value <<= 64;
+    value |= fixed_uint_container::get_sum<std::uint64_t>(input);
+    return value;
+}
+
+void cjm::uint128_tests::execute_uintcontainer_adc_tests()
+{
+    constexpr std::uint64_t first_addend  = 13'897'774'258'637'163'262ull;
+    constexpr std::uint64_t second_addend = 13'456'386'308'122'210'317ull;
+    constexpr uint128_t sum = static_cast<uint128_t>(first_addend) + second_addend;
+    static_assert(sum == 27'354'160'566'759'373'579_u128);
+    constexpr auto res = cjm::numerics::fixed_uint_container::add_with_carry(first_addend, second_addend, 0);
+    static_assert(sum == to_uint128_t(res));
+    auto res_runtime = cjm::numerics::fixed_uint_container::add_with_carry(first_addend, second_addend, 0);
+    auto widened = bit_cast<uint128_t>(res_runtime);
+    cjm_assert(widened == sum);
+    auto saver = cout_saver{ cout };
+    std::cout << "[" << std::dec << first_addend << "] + [" << second_addend << "] == [" << widened << "]." << newl;
+    
 }
 
 

@@ -109,17 +109,17 @@
 #pragma intrinsic (_udiv128)
 #define CJM_UDIV128 _udiv128
 #else
-#define CJM_UDIV128 internal::cjm_bad_udiv128
+#define CJM_UDIV128 cjm::numerics::internal::cjm_bad_udiv128
 #endif
 #else
-#define CJM_UMUL128 internal::cjm_bad_umul128
-#define CJM_BITSCAN_REV_64 internal::cjm_badrev_bitscan_64
-#define CJM_LZCNT_64 internal::cjm_bad_lzcnt_64
-#define CJM_LSHIFT128 internal::cjm_bad_shiftleft128
-#define CJM_RSHIFT128 internal::cjm_bad_shiftright128
-#define CJM_ADDCARRY64 internal::cjm_bad_addc64
-#define CJM_SUBBORROW_64 internal::cjm_bad_subb64
-#define CJM_UDIV128 internal::cjm_bad_udiv128
+#define CJM_UMUL128 cjm::numerics::internal::cjm_bad_umul128
+#define CJM_BITSCAN_REV_64 cjm::numerics::internal::cjm_badrev_bitscan_64
+#define CJM_LZCNT_64 cjm::numerics::internal::cjm_bad_lzcnt_64
+#define CJM_LSHIFT128 cjm::numerics::internal::cjm_bad_shiftleft128
+#define CJM_RSHIFT128 cjm::numerics::internal::cjm_bad_shiftright128
+#define CJM_ADDCARRY64 cjm::numerics::internal::cjm_bad_addc64
+#define CJM_SUBBORROW_64 cjm::numerics::internal::cjm_bad_subb64
+#define CJM_UDIV128 cjm::numerics::internal::cjm_bad_udiv128
 #endif
 
 #ifdef __cpp_lib_bit_cast

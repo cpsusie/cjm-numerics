@@ -118,8 +118,8 @@ namespace cjm::numerics::fixed_uint_container
 		template<>
 		struct alignas(uint128_alignment) uint128_limb_container<std::uint64_t, false> final
 		{
-			std::uint64_t m_high;
-			std::uint64_t m_low;
+			std::uint64_t m_high{};
+			std::uint64_t m_low{};
 			constexpr uint128_limb_container() noexcept = default;
 			constexpr uint128_limb_container(const uint128_limb_container & other) noexcept = default;
 			constexpr uint128_limb_container(uint128_limb_container && other) noexcept = default;
@@ -301,6 +301,12 @@ namespace cjm::numerics::fixed_uint_container
 
 	using uint128_limited_builtin_container_t = std::conditional_t<internal::is_partial_builtin_u128<internal::ui128_limb>,
 		internal::uint128_limb_container<internal::ui128_partial_builtin_limb, internal::is_little_endian>, uint128_always_split_container_t>;
+
+	using bi_ui128_t = std::conditional_t<internal::exits_builtin_u128, natuint128_t, std::uint64_t>;
+	
+	constexpr uint128_calc_mode calculation_mode = numerics::calculation_mode;
+
+	constexpr bool is_little_endian = std::endian::native != std::endian::big;
 	
 }
 
