@@ -13,7 +13,7 @@ namespace cjm::numerics::fixed_uint_container
 		template<typename Ui>
 		concept is_builtin_u128 =
 #if (defined (CJM_DIV_ONLY_INTRINSIC_U128)) || (defined(CJM_USE_INTRINSIC_U128))
-			sizeof(Ui) == 128 && std::is_same_v<unsigned __int128, std::remove_cvref_t<std::remove_const_t<Ui>>;
+			(sizeof(Ui) == sizeof(std::uint64_t) * 2) && std::is_same_v<unsigned __int128, std::remove_cvref_t<std::remove_const_t<Ui>>>;
 #else
 			false;
 #endif
@@ -162,7 +162,6 @@ namespace cjm::numerics::fixed_uint_container
 		template<is_builtin_u128 UnsignedInteger, bool LittleEndian>
 		constexpr std::array<std::uint64_t, 2u> to_native_array(UnsignedInteger val) noexcept
 		{
-			using uint_t = std::remove_cvref_t<std::remove_const_t<UnsignedInteger>>;
 			const auto low = static_cast<std::uint64_t>(val);
 			const auto high = static_cast<std::uint64_t>(val >> 64);
 			if constexpr (LittleEndian)

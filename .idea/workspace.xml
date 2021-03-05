@@ -16,11 +16,8 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="8ab5edb8-7d60-4856-834e-1b0d4d4bfdec" name="Default Changelist" comment="Add demonstration of signed and unsigned built-in integral conversions to and from uint128 in the example code.">
+    <list default="true" id="8ab5edb8-7d60-4856-834e-1b0d4d4bfdec" name="Default Changelist" comment="Working on new extended precision multiplication code.">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/uint128_test_app/src/cpp/int128_tests.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/uint128_test_app/src/cpp/int128_tests.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/uint128_test_app/src/headers/umult.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/uint128_test_app/src/headers/umult.hpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/uint128_test_app/src/headers/umult_extended_mult_algo_explanation.md" beforeDir="false" afterPath="$PROJECT_DIR$/uint128_test_app/src/headers/umult_extended_mult_algo_explanation.md" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -31,7 +28,7 @@
   <component name="ClangdSettings">
     <option name="formatViaClangd" value="false" />
   </component>
-  <component name="ExecutionTargetManager" SELECTED_TARGET="CMakeBuildProfile:Debug-Clang" />
+  <component name="ExecutionTargetManager" SELECTED_TARGET="CMakeBuildProfile:Release-Clang" />
   <component name="Git.Settings">
     <favorite-branches>
       <branch-storage>
@@ -93,7 +90,7 @@
       <recent name="$PROJECT_DIR$/cmake-build-debug" />
     </key>
   </component>
-  <component name="RunManager" selected="CMake Application.Int128">
+  <component name="RunManager" selected="CMake Application.ExampleCode">
     <configuration name="EnvironTest" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="Int128" TARGET_NAME="EnvironTest" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="Int128" RUN_TARGET_NAME="EnvironTest">
       <method v="2">
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
@@ -160,7 +157,7 @@
       <workItem from="1613682239612" duration="1981000" />
       <workItem from="1614033563893" duration="1641000" />
       <workItem from="1614492460025" duration="995000" />
-      <workItem from="1614533256544" duration="14817000" />
+      <workItem from="1614533256544" duration="16495000" />
     </task>
     <task id="LOCAL-00001" summary="Add stream extraction operator for vector of bin_op_uint128_t's.  Add unit test.">
       <created>1610297106627</created>
@@ -414,7 +411,14 @@
       <option name="project" value="LOCAL" />
       <updated>1614492832052</updated>
     </task>
-    <option name="localTasksCounter" value="37" />
+    <task id="LOCAL-00037" summary="Working on new extended precision multiplication code.">
+      <created>1614548121338</created>
+      <option name="number" value="00037" />
+      <option name="presentableId" value="LOCAL-00037" />
+      <option name="project" value="LOCAL" />
+      <updated>1614548121338</updated>
+    </task>
+    <option name="localTasksCounter" value="38" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -433,7 +437,6 @@
     <option name="oldMeFiltersMigrated" value="true" />
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Continue work on unary_operation struct." />
     <MESSAGE value="Add ctors to unary operation struct.  Add basic unit test for unary operation struct." />
     <MESSAGE value="Add compile time post-increment test.  Add test to generate static assertions for compile-time test." />
     <MESSAGE value="Suppress warnings regarding flags enumeration in switch." />
@@ -458,7 +461,8 @@
     <MESSAGE value="Add pre/post inc/dec to example code.  Also add section showing unary+ (a no-op for uint128_t)." />
     <MESSAGE value="Add demonstration of signed and unsigned built-in integral conversions to and from uint128 in the example code." />
     <MESSAGE value="Removed bitcast (which is not constexpr in gcc / clang) from constexpr add_with_carry_u64 function." />
-    <option name="LAST_COMMIT_MESSAGE" value="Removed bitcast (which is not constexpr in gcc / clang) from constexpr add_with_carry_u64 function." />
+    <MESSAGE value="Working on new extended precision multiplication code." />
+    <option name="LAST_COMMIT_MESSAGE" value="Working on new extended precision multiplication code." />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -470,26 +474,21 @@
         </line-breakpoint>
         <line-breakpoint type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
           <url>file://$PROJECT_DIR$/uint128_test_app/src/headers/umult.hpp</url>
-          <line>247</line>
+          <line>118</line>
           <option name="timeStamp" value="3" />
         </line-breakpoint>
         <line-breakpoint type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
           <url>file://$PROJECT_DIR$/uint128_test_app/src/headers/umult.hpp</url>
-          <line>191</line>
+          <line>61</line>
           <option name="timeStamp" value="4" />
         </line-breakpoint>
-        <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
+        <line-breakpoint type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
           <url>file://$PROJECT_DIR$/uint128_test_app/src/cpp/int128_tests.cpp</url>
           <line>4263</line>
           <option name="timeStamp" value="5" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
-    <watches-manager>
-      <configuration name="CMakeRunConfiguration">
-        <watch expression="left_product" />
-      </configuration>
-    </watches-manager>
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />

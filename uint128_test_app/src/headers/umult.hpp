@@ -22,7 +22,7 @@ namespace cjm::numerics::internal
 		template<typename SomeUInt128>
 		concept is_real_builtin_u128 =
 #ifdef CJM_USE_INTRINSIC_U128
-			std::is_same_v<unsigned __int128, std::remove_cvref_t<std::remove_const_t<SomeUInt128>>;
+			std::is_same_v<unsigned __int128, std::remove_cvref_t<std::remove_const_t<SomeUInt128>>>;
 #else
 			false;
 #endif
