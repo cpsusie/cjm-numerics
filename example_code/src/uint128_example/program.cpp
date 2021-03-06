@@ -6,6 +6,7 @@
 #include <string>
 #include <string_view>
 #include <sstream>
+#include <sstream>
 #include <limits>
 #include <type_traits>
 #include <climits>
@@ -54,6 +55,9 @@ namespace cjm::uint128::example_code
 	using namespace std::string_view_literals;
 	using std::cout;
 	constexpr auto newl = '\n';
+
+	template<concepts::character Char>
+	std::basic_stringstream<Char, std::char_traits<Char>, std::allocator<Char>> make_throwing_sstream();
 	
 	void demonstrate_subtraction();
 	void demonstrate_constexpr_subtraction();
@@ -107,11 +111,21 @@ namespace cjm::uint128::example_code
 	{
 		return val + 1;
 	}
+
+	template<concepts::character Char>
+	std::basic_stringstream<Char, std::char_traits<Char>, std::allocator<Char>> make_throwing_sstream()
+	{
+		auto ret = std::basic_stringstream<Char>{};
+		ret.exceptions(std::ios::failbit | std::ios::badbit);
+		return ret;
+	}
+	
 }
 
 int main()
 {
 	using namespace cjm::uint128::example_code;
+	std::ios::sync_with_stdio(false);
 	try
 	{
 		constexpr std::uint64_t five = 5;
@@ -135,6 +149,7 @@ int main()
 		demonstrate_conversions_to_from_unsigned_integral();
 		demonstrate_conversions_to_from_floating_points();
 		demonstrate_literals();
+		demonstrate_stream_insertion_and_extraction();
 		say_goodbye();		
 	}
 	catch (const std::exception& ex)
@@ -1292,5 +1307,83 @@ void cjm::uint128::example_code::demonstrate_literals()
 	//constexpr auto b = 340'282'366'920'938'463'463'374'607'431'768'211'456_u128;
 	//constexpr auto a = 001_u128; //Illegal: octal is not supported
 	//std::cout << "b: " << b << " a:" << a << "." << newl;
+}
+
+void cjm::uint128::example_code::demonstrate_stream_insertion_and_extraction()
+{
+	constexpr auto wnewl = L'\n';
+	std::cout << newl << "This is the stream insertion and extraction demonstration." << newl;
+	{
+		std::cout << "First, we demonstrate decimal format: " << newl;
+		constexpr auto expected_value = 256'368'684'943'268'121'395'391'016'720'575'361'037_u128;
+		constexpr auto narrow_text = "256,368,684,943,268,121,395,391,016,720,575,361,037"sv;
+		constexpr auto wide_text = L"256,368,684,943,268,121,395,391,016,720,575,361,037"sv;
+
+		std::cout << "Going to stream insert the following narrow text then extract it into a uint128_t: \"" << narrow_text << "\"." << newl;
+
+		std::wcout << L"Going to stream insert the following wide text then extract it into a uint128_t: \"" << wide_text << L"\"." << wnewl;
+		auto narrow_stream = make_throwing_sstream<char>();
+		auto wide_stream = make_throwing_sstream<wchar_t>();
+
+		narrow_stream << narrow_text;
+		wide_stream << wide_text;
+
+		uint128_t narrow, wide;
+
+		narrow_stream >> narrow;
+		wide_stream >> wide;
+
+		bool narrow_equal = narrow == expected_value;
+		bool wide_equal = wide == expected_value;
+
+		if (!narrow_equal)
+		{
+			throw std::logic_error{ "Narrow isn't equal!" };
+		}
+		if (!wide_equal)
+		{
+			throw std::logic_error{ "Wide isn't equal!" };
+		}
+
+		cout << "Narrow uint128_t: [" << std::dec << narrow << "]." << newl;
+		std::wcout << L"Wide uint128_t: [" << std::dec << wide << L"]." << wnewl;
+				 
+	}
+	{
+		std::cout << "Next, we demonstrate hexadecimal format: " << newl;
+		constexpr auto expected_value = 0xc0de'd00d'ea75'dead'beef'600d'f00d_u128;
+		constexpr auto narrow_text = "0xc0ded00dea75deadbeef600df00d"sv;
+		constexpr auto wide_text =  L"0xc0ded00dea75deadbeef600df00d"sv;
+
+		std::cout << "Going to stream insert the following narrow text then extract it into a uint128_t: \"" << narrow_text << "\"." << newl;
+
+		std::wcout << L"Going to stream insert the following wide text then extract it into a uint128_t: \"" << wide_text << L"\"." << wnewl;
+		auto narrow_stream = make_throwing_sstream<char>();
+		auto wide_stream = make_throwing_sstream<wchar_t>();
+
+		narrow_stream << narrow_text;
+		wide_stream << wide_text;
+
+		uint128_t narrow, wide;
+
+		narrow_stream >> narrow;
+		wide_stream >> wide;
+
+		bool narrow_equal = narrow == expected_value;
+		bool wide_equal = wide == expected_value;
+
+		if (!narrow_equal)
+		{
+			throw std::logic_error{ "Narrow isn't equal!" };
+		}
+		if (!wide_equal)
+		{
+			throw std::logic_error{ "Wide isn't equal!" };
+		}
+
+		cout << "Narrow uint128_t: [" << std::hex << narrow << "]." << newl;
+		std::wcout << L"Wide uint128_t: [" << std::hex << wide << L"]." << wnewl;
+
+	}
 }
 
