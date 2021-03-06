@@ -73,6 +73,8 @@ namespace cjm::uint128::example_code
 	void demonstrate_compare_and_hash();
 	void demonstrate_conversions_to_from_unsigned_integral();
 	void demonstrate_conversions_to_from_floating_points();
+	void demonstrate_literals();
+	void demonstrate_stream_insertion_and_extraction();
 
 	//utility / helpers
 	void print_compare_results(std::string left_operand, std::string right_operand,
@@ -124,6 +126,7 @@ int main()
 		demonstrate_conversions_to_from_signed_integral();
 		demonstrate_conversions_to_from_unsigned_integral();
 		demonstrate_conversions_to_from_floating_points();
+		demonstrate_literals();
 		say_goodbye();		
 	}
 	catch (const std::exception& ex)
@@ -194,7 +197,7 @@ void cjm::uint128::example_code::demonstrate_constexpr_subtraction()
 		<< "Subtracting [" << subtrahend << "] from [" << minuend << "] yields difference: [" << difference << "].  "
 		<< "Subtracting with borrow (no borrow-in) yielded [" << sbb_res.first << "] as the difference and indicated that "
 		<< (sbb_res.second == 0 ? "there was no borrow-out meaning the operation did not overflow/underflow."
-			: "there was borrow due to overflow/underflow.") << newl;
+			: "there was borrow due to overflow/underflow.") << newl;  // NOLINT(clang-diagnostic-unreachable-code) -- it's a demonstration!
 }
 
 
@@ -252,7 +255,7 @@ void cjm::uint128::example_code::demonstrate_constexpr_addition()
 	static_assert(add_with_carry_res.first == sum && add_with_carry_res.second == 0, "They really ought to match and not overflow!");
 	cout
 		<< "Adding [" << first_addend << "] to [" << second_addend << "] yields sum: [" << sum << "].  "
-		<< "There was" << (add_with_carry_res.second == 0 ? " no overflow." : " overflow.") << newl;
+		<< "There was" << (add_with_carry_res.second == 0 ? " no overflow." : " overflow.") << newl;  // NOLINT(clang-diagnostic-unreachable-code) it's a demonstration!
 }
 
 void cjm::uint128::example_code::demonstrate_multiplication()
@@ -439,11 +442,13 @@ void cjm::uint128::example_code::demonstrate_unary_operations()
 	}
 	else
 	{
-		cout << "Conditional context implicit bool conversion of [" << std::dec <<  original_operand << "]: [" << std::boolalpha << false << "]." << newl;
+		cout << "Conditional context implicit bool conversion of [" << std::dec <<  original_operand << "]: [" << std::boolalpha
+			<< false << "]." << newl;  // NOLINT(clang-diagnostic-unreachable-code) it's a demonstration!
 	}
 	if constexpr (std::numeric_limits<uint128_t>::min()) //constexpr or runtime if ok
 	{
-		cout << "Conditional context implicit bool conversion of [" << std::dec <<  std::numeric_limits<uint128_t>::min() << "]: [" << std::boolalpha << true << "]." << newl;
+		cout << "Conditional context implicit bool conversion of [" << std::dec <<  std::numeric_limits<uint128_t>::min() <<  // NOLINT(clang-diagnostic-unreachable-code) demonstration!
+			"]: [" << std::boolalpha << true << "]." << newl;
 	}
 	else
 	{
@@ -1165,5 +1170,81 @@ void cjm::uint128::example_code::demonstrate_conversions_to_from_floating_points
 		<< "Converting float max to uint128_t: ["
 		<< optional_to_str(safe_from_floating(std::numeric_limits<float>::max()))
 		<< "]." << newl;
+}
+
+void cjm::uint128::example_code::demonstrate_literals()
+{
+	//if we hadn't already imported the namespace, you would need to import
+	//the uint128_literals such as by doing
+	//using namespace cjm::numerics::uint128_literals; // OR
+	//using cjm::numerics::uint128_literals::operator ""_u128;
+
+	//Decimal and hex literals are supported.
+	//Full support for separator char "'" in literals
+	//Octal and binary literals not supported.
+
+	//Do not use the literal operator with runtime data:
+	//when msvc, clang, intel and gcc all support consteval,
+	//the literal operators will all be changed.  In
+	//short use the literals for literals.
+
+	cout << newl << "This is the literals demonstration." << newl;
+		
+	{
+		cout << "Here are some hexadecimal literals: " << newl;
+		//hex examples
+		constexpr auto a = 0x123456789ABCDEF0123456789ABCDEF0_u128;
+		auto b = 0x1234'5678'9ABC'DEF0'1234'5678'9ABC'DEF0_u128;
+		auto c = 0x1234'5678'9abc'def0'1234'5678'9abc'def0_u128;
+		auto d = 0X1234'5678'9abc'def0'1234'5678'9abc'def0_u128;
+		auto e = 0X1234'5678'9abc'def0'1234'5678'9abc'def0_u128;
+		auto f = 0x1'23'456'789ABCDEF012345678'9AB'C'DEF'0_u128; //stupid but legal
+		auto g = 0x0_u128;
+		auto h = 0xaBcD_u128; //mix up capital lowercase
+
+		cout
+			<< std::hex
+			<< a << " " << b << newl
+			<< c << " " << d << newl
+			<< e << " " << f << newl
+			<< g << " " << h << newl;
+	}
+
+	{
+		constexpr uint128_t x = 340282366920938463463374607431768211455_u128; //(i.e.max value)
+		static_assert(x == std::numeric_limits<uint128_t>::max());
+		auto a = 340'282'366'920'938'463'463'374'607'431'768'211'455_u128; //thousands separators
+		auto b = 0_u128; //0 is ok too
+		auto c = 00_u128; //even multiple leading zeros if all are 0
+
+		cout << newl << "Here are some decimal literals: " << newl;
+		cout
+			<< std::dec 
+			<< a << " " << b << newl
+			<< c << newl;
+	}
+	//Where things get a little tricky to handle is with illegal literals
+	//The ONLY  intended use case for literals is for compile-time constants
+	//If an illegal literal is detected, a compiler error should be emitted (e.g. throwing an exception)
+	//Throwing an exception causes a constexpr function to have its evaluation deferred to runtime
+	//This is not good: there is no reason to want an exception to be thrown at runtime for something
+	//that can be determined erroneous at compile time.
+	//
+	//It follows, therefore, that literal operators should be consteval, not constexpr,
+	//but between MSVC, Clang, GCC and Intel, not all compilers fully support consteval at this time.
+	//
+	//To resolve this problem, I have TRIED introducing otherwise unnecessary temporary variables
+	//marked constexpr into the literal operator code.  If the exception is thrown,
+	//a compiler error indicating that the function did not evaluate to a constant 
+	//will be emitted. (MSVC: Error C2131) -- but on clang the code will not compile AT ALL when so written
+	//
+	//Thus, even if not assigned to a constexpr variable in your code, an illegal literal will not
+	//compile.
+	auto a = 001_u128; //Illegal: octal is not supported
+	auto b = 340'282'366'920'938'463'463'374'607'431'768'211'456_u128;  //illegal: (too big by one)
+
+	//cout << "You will never see this: " << a << " " << a << "." << newl;
+	
+	
 }
 
