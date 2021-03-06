@@ -694,6 +694,9 @@ void cjm::uint128_tests::execute_uint128_tests()
     execute_test(execute_basic_u128_sbb_test, "basic_u128_sbb_test"sv);
     execute_test(execute_builtin_sub_with_borrow_test, "builtin_sub_with_borrow_test"sv);
 
+    execute_test(execute_umult_spec_tests, "umult_spec_tests"sv);
+    execute_test(execute_uintcontainer_adc_tests, "uintcontainer_adc_tests"sv);
+
 	cout << "STANDARD TEST BATTERY: All tests PASSED." << newl;
     static_assert(most_sign_set_bit(2_u128) == 1);
 }
@@ -4212,6 +4215,131 @@ void cjm::uint128_tests::execute_basic_u128_sbb_test()
     cjm_assert(actual_diff_4_no_bin == ctime_res_4_no_bin.first && ((act_bout_4_no_bin != 0) == (ctime_res_4_no_bin.second != 0)));
     cjm_assert(actual_diff_4_bin == ctime_res_4_bin.first && ((act_bout_4_bin != 0) == (ctime_res_4_bin.second != 0)));
 }
+
+void cjm::uint128_tests::execute_umult_spec_tests()
+{
+	constexpr std::uint16_t left_factor_16 = 0xfe'a2;
+	constexpr std::uint16_t right_factor_16 = 0xf0'0f;
+	constexpr std::uint32_t expected_product_32 = 0xeec6'cb7e;
+	static_assert(internal::concepts::is_uint_16_or_32_t<std::uint16_t>);
+	auto actual_product_32 = internal::umult(left_factor_16, right_factor_16);
+	constexpr auto actual_ctime_product_32 = internal::umult(left_factor_16, right_factor_16);
+	auto saver = testing::cout_saver{std::cout};
+	std::cout
+		<< "[0x" << std::hex << std::setw(std::numeric_limits<decltype(left_factor_16)>::digits / 4)
+		<< std::setfill('0') << left_factor_16 << "] * [0x" << std::hex
+		<< std::setw(std::numeric_limits<decltype(right_factor_16)>::digits / 4) << std::setfill('0')
+		<< right_factor_16 << "] == [0x" << std::hex
+		<< std::setw(std::numeric_limits<decltype(actual_product_32)>::digits / 4)
+		<< std::setfill('0') << actual_product_32 << "]." << newl;
+
+	//runtime assert
+	cjm_assert(actual_product_32 == expected_product_32);
+	//compile-time assert
+	static_assert(actual_ctime_product_32 == expected_product_32,
+			"Should be same if evaluated during compilation.");
+
+	constexpr std::uint8_t left_factor_8 = 0xff;
+	constexpr std::uint8_t right_factor_8 = 0xff;
+	constexpr std::uint16_t expected_product_16 = 0xfe01;
+	auto actual_product_16 = internal::umult(left_factor_8, right_factor_8);
+	constexpr auto actual_ctime_product_16 = internal::umult(left_factor_8, right_factor_8);
+
+	std::cout
+			<< "[0x" << std::hex << std::setw(std::numeric_limits<decltype(left_factor_8)>::digits / 4)
+			<< std::setfill('0') << (+left_factor_8) << "] * [0x" << std::hex
+			<< std::setw(std::numeric_limits<decltype(right_factor_8)>::digits / 4) << std::setfill('0')
+			<< (+right_factor_8) << "] == [0x" << std::hex
+			<< std::setw(std::numeric_limits<decltype(actual_product_16)>::digits / 4)
+			<< std::setfill('0') << actual_product_16 << "]." << newl;
+
+	//runtime assert
+	cjm_assert(actual_product_16 == expected_product_16);
+	//compile-time assert
+	static_assert(actual_ctime_product_16 == expected_product_16,
+	              "Should be same if evaluated during compilation.");
+
+	constexpr std::uint32_t left_factor_32 = 0xffff'ffff;
+	constexpr std::uint32_t right_factor_32 = 0xffff'ffff;
+	constexpr std::uint64_t expected_product_64 = 0xffff'fffe'0000'0001;
+	auto actual_product_64 = internal::umult(left_factor_32, right_factor_32);
+	constexpr auto actual_ctime_product_64 = internal::umult(left_factor_32, right_factor_32);
+
+	std::cout
+			<< "[0x" << std::hex << std::setw(std::numeric_limits<decltype(left_factor_32)>::digits / 4)
+			<< std::setfill('0') << left_factor_32 << "] * [0x" << std::hex
+			<< std::setw(std::numeric_limits<decltype(right_factor_32)>::digits / 4) << std::setfill('0')
+			<< right_factor_32 << "] == [0x" << std::hex
+			<< std::setw(std::numeric_limits<decltype(actual_product_64)>::digits / 4)
+			<< std::setfill('0') << actual_product_64 << "]." << newl;
+
+	//runtime assert
+	cjm_assert(actual_product_64 == expected_product_64);
+	//compile-time assert
+	static_assert(actual_ctime_product_64 == expected_product_64,
+	              "Should be same if evaluated during compilation.");
+
+
+    constexpr std::uint64_t left_factor_64 = 0xc0de'd00d'fea2'cafeull;
+    constexpr std::uint64_t right_factor_64 = 0xbabe'b00b'600d'f00dull;
+    constexpr auto expected_product_128 = static_cast<uint128_t>(left_factor_64) * right_factor_64;
+    auto actual_product_128
+		= internal::umult(left_factor_64, right_factor_64);
+    constexpr auto actual_ctime_product_128 = internal::umult(left_factor_64, right_factor_64);
+    constexpr auto converted_ctime = uint128_t{ actual_ctime_product_128.m_high, actual_ctime_product_128.m_low };
+    auto converted_rtime = bit_cast<uint128_t>(actual_product_128);
+
+	std::cout
+        << "[0x" << std::hex << std::setw(std::numeric_limits<decltype(left_factor_64)>::digits / 4)
+        << std::setfill('0') << left_factor_64 << "] * [0x" << std::hex
+        << std::setw(std::numeric_limits<decltype(right_factor_64)>::digits / 4) << std::setfill('0')
+        << right_factor_64 << "] == [0x" << std::hex
+        << std::setw(std::numeric_limits<decltype(converted_rtime)>::digits / 4)
+        << std::setfill('0') << converted_rtime << "]." << newl;
+
+    //runtime assert
+    cjm_assert(converted_rtime == expected_product_128);
+	//compile-time assert
+    static_assert(converted_ctime == expected_product_128);
+	
+
+//    constexpr std::uint64_t factor_1 = 0xc0de'd00d'fea2'cafeull;
+//    constexpr std::uint64_t factor_2 = 0xbabe'b00b'600d'f00dull;
+//
+//    constexpr uint128_t factor_1_u128 = factor_1;
+//    constexpr uint128_t factor_2_u128 = factor_2;
+//
+//    constexpr auto result = internal::umult(factor_1, factor_2);
+//    constexpr auto ctrl = factor_1_u128 * factor_2_u128;
+//
+//    auto final_res = bit_cast<uint128_t>(result);
+//    cjm_assert(final_res == ctrl);
+}
+
+constexpr uint128_t to_uint128_t(const fixed_uint_container::add_carry_result_t<std::uint64_t>& input) noexcept
+{
+    auto value = static_cast<uint128_t>(fixed_uint_container::get_carry_out<std::uint64_t>(input));
+    value <<= 64;
+    value |= fixed_uint_container::get_sum<std::uint64_t>(input);
+    return value;
+}
+
+void cjm::uint128_tests::execute_uintcontainer_adc_tests()
+{
+    constexpr std::uint64_t first_addend  = 13'897'774'258'637'163'262ull;
+    constexpr std::uint64_t second_addend = 13'456'386'308'122'210'317ull;
+    constexpr uint128_t sum = static_cast<uint128_t>(first_addend) + second_addend;
+    static_assert(sum == 27'354'160'566'759'373'579_u128);
+    constexpr auto res = cjm::numerics::fixed_uint_container::add_with_carry(first_addend, second_addend, 0);
+    static_assert(sum == to_uint128_t(res));
+    auto res_runtime = cjm::numerics::fixed_uint_container::add_with_carry(first_addend, second_addend, 0);
+    auto widened = bit_cast<uint128_t>(res_runtime);
+    cjm_assert(widened == sum);
+    auto saver = cout_saver{ cout };
+    std::cout << "[" << std::dec << first_addend << "] + [" << second_addend << "] == [" << widened << "]." << newl;
+    
+}
+
 
 #ifdef CJM_HAVE_BUILTIN_128
 void cjm::uint128_tests::execute_builtin_u128fls_test_if_avail()

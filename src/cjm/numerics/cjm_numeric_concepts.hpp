@@ -405,13 +405,13 @@ namespace cjm::numerics::concepts
         //implements all binary arithmetic operators.  Only division and modulus may throw exception.
         {x_const + y_const}                 noexcept    ->  nothrow_convertible<T>;
         {x_const - y_const}                 noexcept    ->  nothrow_convertible<T>;
-        {x_const * y_const}                  noexcept    ->  nothrow_convertible<T>;
+        {x_const * y_const}                 noexcept    ->  nothrow_convertible<T>;
         {x_const / y_const}                             ->  nothrow_convertible<T>;
-        {x_const % y_const}                              ->  nothrow_convertible<T>;
+        {x_const % y_const}                             ->  nothrow_convertible<T>;
         //implements binary bitwise operators all nothrow
-        {x_const & y_const}                  noexcept    ->  nothrow_convertible<T>;
+        {x_const & y_const}                 noexcept    ->  nothrow_convertible<T>;
         {x_const | y_const}                 noexcept    ->  nothrow_convertible<T>;
-        {x_const ^ y_const}                  noexcept    ->  nothrow_convertible<T>;
+        {x_const ^ y_const}                 noexcept    ->  nothrow_convertible<T>;
         //implements binary bit-shift operators with both a T operand and and int operand none throw exceptions
         {x_const << y_const}                noexcept    ->  nothrow_convertible<T>;
         {x_const >> y_const}                noexcept    ->  nothrow_convertible<T>;

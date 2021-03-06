@@ -101,7 +101,6 @@ int cjm::base_test_program::execute_test_program(int argc, char* argv[]) noexcep
         using testing::cjm_assert;
         using namespace std::string_view_literals;
 
-
         static_assert(cjm::numerics::concepts::unsigned_integer<uint128_t>);
         std::vector<uint128_tests::test_switch> switch_vector;
         try

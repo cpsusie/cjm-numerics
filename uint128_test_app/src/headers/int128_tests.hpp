@@ -36,7 +36,8 @@
 #include <cjm/string/istream_utils.hpp>
 #include "int128_test_switches.hpp"
 #include <absl/numeric/int128.h>
-
+#include "fixed_uint_container_math.hpp"
+#include "umult.hpp"
 
 namespace cjm::uint128_tests
 {
@@ -157,7 +158,7 @@ namespace cjm::uint128_tests
     void execute_safe_float_conversions_test();
     void execute_controlled_from_float_conversion_test();
     void execute_controlled_float_rt_conversion_test();
-
+    	
     void execute_hash_dx();
     void execute_issue_10_strm_insrt_test();
     void execute_issue_10_showbase_test();
@@ -177,7 +178,10 @@ namespace cjm::uint128_tests
     void execute_basic_u128_adc_test();
     void execute_basic_u128_sbb_test();
 	void execute_builtin_sub_with_borrow_test();
-    	
+
+    void execute_umult_spec_tests();
+    void execute_uintcontainer_adc_tests();
+	
     [[maybe_unused]] void print_n_static_assertions(const binary_op_u128_vect_t& op_vec, size_t n);
     [[maybe_unused]] void print_n_static_assertions(const unary_op_u128_vect_t& op_vec, size_t n);
     constexpr auto base_un_op_filename = "unary_ops"sv;

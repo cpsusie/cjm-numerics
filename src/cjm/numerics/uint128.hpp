@@ -162,6 +162,9 @@ namespace cjm::numerics
 		requires cjm::numerics::concepts::char_with_traits<Char, CharTraits>
 	std::basic_istream<Char, CharTraits>& operator>>(std::basic_istream<Char, CharTraits>& is, uint128& v);
 
+	constexpr std::uint64_t add_with_carry_u64(std::uint64_t addend_1, std::uint64_t addend_2, 
+        unsigned char carry_in, unsigned char& carry_out) noexcept;
+
 	//Comparison operators
 	constexpr std::strong_ordering operator <=>(uint128 lhs, uint128 rhs) noexcept; 
     constexpr bool operator==(uint128 lhs, uint128 rhs) noexcept;
@@ -656,7 +659,7 @@ namespace cjm
 			 *                  */
 			/************************************************************************/
 			template<char... Chars>
-			constexpr uint128 operator"" _u128();
+			CJM_LIT_CONST uint128 operator"" _u128();
 
 			enum class lit_type
 			{
@@ -681,42 +684,42 @@ namespace cjm
 				friend class cjm::numerics::fixed_uint_literals::fixed_uint_lit_helper; 
 
 				template<char... Chars>
-				friend constexpr uint128 operator"" _u128();
+				friend CJM_LIT_CONST uint128 operator"" _u128();
 				
 				template<size_t Size>
-				static constexpr lit_type get_lit_type(std::array<char, Size> arr);
+				static CJM_LIT_CONST lit_type get_lit_type(std::array<char, Size> arr);
 
 				template<size_t Size>
-				static constexpr bool are_all_chars_0(std::array<char, Size> arr);
+				static CJM_LIT_CONST bool are_all_chars_0(std::array<char, Size> arr);
 
-				static constexpr uint8_t get_hex_value(char c);
-
-				template<size_t Size>
-				static constexpr std::pair<bool, size_t> scan_chars_dec(std::array<char, Size> arr);
+				static CJM_LIT_CONST uint8_t get_hex_value(char c);
 
 				template<size_t Size>
-				static constexpr std::pair<size_t, size_t> get_dec_val(std::array<char, Size> arr, size_t index);
-
-				static constexpr char to_lower(char c) noexcept;
+				static CJM_LIT_CONST std::pair<bool, size_t> scan_chars_dec(std::array<char, Size> arr);
 
 				template<size_t Size>
-				static constexpr uint128 get_hex_literal(std::array<char, Size> arr);
+				static CJM_LIT_CONST std::pair<size_t, size_t> get_dec_val(std::array<char, Size> arr, size_t index);
+
+				static CJM_LIT_CONST char to_lower(char c) noexcept;
 
 				template<size_t Size>
-				static constexpr uint128 get_decimal_literal(std::array<char, Size> arr);
-
-				static constexpr bool is_legal_hex_char(char c) noexcept;
+				static CJM_LIT_CONST uint128 get_hex_literal(std::array<char, Size> arr);
 
 				template<size_t Size>
-				static constexpr std::pair<uint8_t, size_t> get_byte(std::array<char, Size> arr, size_t index);
+				static CJM_LIT_CONST uint128 get_decimal_literal(std::array<char, Size> arr);
+
+				static CJM_LIT_CONST bool is_legal_hex_char(char c) noexcept;
+
+				template<size_t Size>
+				static CJM_LIT_CONST std::pair<uint8_t, size_t> get_byte(std::array<char, Size> arr, size_t index);
 
 			public:
 
 				template<size_t Size>
-				static constexpr uint128 parse_from_char_array(std::array<char, Size> arr);
+				static CJM_LIT_CONST uint128 parse_from_char_array(std::array<char, Size> arr);
 
 				template<char... Chars>
-				static constexpr std::array<char, sizeof...(Chars)> get_array();
+				static CJM_LIT_CONST std::array<char, sizeof...(Chars)> get_array();
 
 				uint128_lit_helper() = delete;
 				~uint128_lit_helper() = delete;
