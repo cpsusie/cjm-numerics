@@ -1231,28 +1231,66 @@ void cjm::uint128::example_code::demonstrate_literals()
 			<< a << " " << b << newl
 			<< c << newl;
 	}
-	//Where things get a little tricky to handle is with illegal literals
-	//The ONLY  intended use case for literals is for compile-time constants
-	//If an illegal literal is detected, a compiler error should be emitted (e.g. throwing an exception)
-	//Throwing an exception causes a constexpr function to have its evaluation deferred to runtime
-	//This is not good: there is no reason to want an exception to be thrown at runtime for something
-	//that can be determined erroneous at compile time.
-	//
-	//It follows, therefore, that literal operators should be consteval, not constexpr,
-	//but between MSVC, Clang, GCC and Intel, not all compilers fully support consteval at this time.
-	//
-	//To resolve this problem, I have TRIED introducing otherwise unnecessary temporary variables
-	//marked constexpr into the literal operator code.  If the exception is thrown,
-	//a compiler error indicating that the function did not evaluate to a constant 
-	//will be emitted. (MSVC: Error C2131) -- but on clang the code will not compile AT ALL when so written
-	//
-	//Thus, even if not assigned to a constexpr variable in your code, an illegal literal will not
-	//compile.
-	//auto a = 001_u128; //Illegal: octal is not supported
-	//auto b = 340'282'366'920'938'463'463'374'607'431'768'211'456_u128;  //illegal: (too big by one)
 
-	//cout << "You will never see this: " << a << " " << b << "." << newl;
+	//KNOWN ISSUES -
+	//Be careful with potentially illegal literals.
+	//If they are evaluated in a constexpr context,
+	//an error will be emitted at compile time.
+	//
+	//If they are not forced to be evaluated at compile time,
+	//there evaluation will be deferred until runtime and a std::domain_error
+	//exception will be thrown.
+	//
+	//This is undesirable and will be addressed in the future.  Current attempts
+	//have not worked across all supported compilers.
+	//
 	
-	
+	try
+	{
+		auto a = 001_u128; //Illegal: octal is not supported
+		std::cerr << "You should never see this: [" << a << "]." << newl;
+		throw std::logic_error{ "It should have thrown domain error." };
+	}
+	catch (const std::domain_error& ex)
+	{
+		std::cout << "CORRECT (for now) behavior: domain_error thrown.  Msg: [" << ex.what() << "]." << newl;
+	}
+	catch (const std::logic_error&)
+	{
+		std::cerr << "ERROR -- it did NOT throw!" << newl;
+		std::terminate();
+	}
+	catch (const std::exception& ex)
+	{
+		std::cerr << "ERROR -- it threw the wrong exception.  Msg: [" << ex.what() << "]." << newl;
+		std::terminate();
+	}
+
+	try
+	{
+		auto b = 340'282'366'920'938'463'463'374'607'431'768'211'456_u128;  //illegal: (too big by one)
+		std::cerr << "You should never see this: [" << b << "]." << newl;
+		throw std::logic_error{ "It should have thrown domain error." };
+	}
+	catch (const std::domain_error& ex)
+	{
+		std::cout << "CORRECT (for now) behavior: domain_error thrown.  Msg: [" << ex.what() << "]." << newl;
+	}
+	catch (const std::logic_error&)
+	{
+		std::cerr << "ERROR -- it did NOT throw!" << newl;
+		std::terminate();
+	}
+	catch (const std::exception& ex)
+	{
+		std::cerr << "ERROR -- it threw the wrong exception.  Msg: [" << ex.what() << "]." << newl;
+		std::terminate();
+	}
+
+	//you can avoid this problem by forcing evaluation of the literal into a constexpr context.
+	//The following lines will not compile:
+	//constexpr auto b = 340'282'366'920'938'463'463'374'607'431'768'211'456_u128;
+	//constexpr auto a = 001_u128; //Illegal: octal is not supported
+	//std::cout << "b: " << b << " a:" << a << "." << newl;
 }
 
