@@ -114,7 +114,9 @@ int main()
 	using namespace cjm::uint128::example_code;
 	try
 	{
-		cout << "Incremented: " << increment(std::uint64_t{5}) << newl;
+		constexpr std::uint64_t five = 5;
+		constexpr auto result = increment(five);
+		cout << "Incremented: " << result << newl;
 		say_hello();
 		demonstrate_addition();
 		demonstrate_constexpr_addition();
