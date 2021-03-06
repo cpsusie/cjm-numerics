@@ -39,13 +39,13 @@ namespace cjm
         namespace uint128_literals
         {
             template<char... Chars>
-            constexpr uint128 operator"" _u128()
+            CJM_LIT_CONST uint128 operator"" _u128()
             {
                 constexpr auto charArray = uint128_lit_helper::get_array<Chars...>();
                 return uint128_lit_helper::parse_from_char_array(charArray);                
             }
 
-            constexpr uint8_t uint128_lit_helper::get_hex_value(char c)
+	        CJM_LIT_CONST uint8_t uint128_lit_helper::get_hex_value(char c)
             {
                 switch (c)
                 {
@@ -87,7 +87,7 @@ namespace cjm
             }
 
             template<size_t Size>
-            constexpr std::pair<bool, size_t> uint128_lit_helper::scan_chars_dec(std::array<char, Size> arr)
+            CJM_LIT_CONST std::pair<bool, size_t> uint128_lit_helper::scan_chars_dec(std::array<char, Size> arr)
             {
                 std::pair<bool, size_t> ret;
                 if (arr.empty())
@@ -128,7 +128,7 @@ namespace cjm
             }
 
             template<size_t Size>
-            constexpr std::pair<size_t, size_t> uint128_lit_helper::get_dec_val(std::array<char, Size> arr, size_t index)
+            CJM_LIT_CONST std::pair<size_t, size_t> uint128_lit_helper::get_dec_val(std::array<char, Size> arr, size_t index)
             {
                 //if we got here we know that every char in chars is either \' or a legal digit
                 std::pair<size_t, size_t> ret;
@@ -162,7 +162,7 @@ namespace cjm
                 return ret;
             }
 
-            constexpr char uint128_lit_helper::to_lower(char c) noexcept
+	        CJM_LIT_CONST char uint128_lit_helper::to_lower(char c) noexcept
             {
                 return (c >= 65 && c <= 90) ?
                        static_cast<char>(static_cast<unsigned char>(c + 0x20)) :
@@ -170,7 +170,7 @@ namespace cjm
             }
 
             template<size_t Size>
-            constexpr uint128 uint128_lit_helper::get_hex_literal(std::array<char, Size> arr)
+            CJM_LIT_CONST uint128 uint128_lit_helper::get_hex_literal(std::array<char, Size> arr)
             {
                 size_t length = arr.size();
                 if (length < 3)
@@ -194,7 +194,7 @@ namespace cjm
                 return value;
             }
             template<size_t Size>
-            constexpr uint128 uint128_lit_helper::get_decimal_literal(std::array<char, Size> arr)
+            CJM_LIT_CONST uint128 uint128_lit_helper::get_decimal_literal(std::array<char, Size> arr)
             {
                 uint128 ret = 0;
                 auto result = scan_chars_dec(arr);
@@ -220,14 +220,14 @@ namespace cjm
             }
 
             template <char... Chars>
-            constexpr std::array<char, sizeof...(Chars)> uint128_lit_helper::get_array()
+            CJM_LIT_CONST std::array<char, sizeof...(Chars)> uint128_lit_helper::get_array()
             {
                 std::array<char, sizeof...(Chars)> ret{ Chars... };
                 return ret;
             }
 
             template<size_t Size>
-            constexpr lit_type uint128_lit_helper::get_lit_type(std::array<char, Size> arr)
+            CJM_LIT_CONST lit_type uint128_lit_helper::get_lit_type(std::array<char, Size> arr)
             {
                 size_t length = arr.size();
                 if (length == 0)
@@ -253,14 +253,14 @@ namespace cjm
                 return arr[0] >= 0x30 && arr[0] <= 0x39 ? lit_type::Decimal : lit_type::Illegal;
             }
 
-            constexpr bool uint128_lit_helper::is_legal_hex_char(char c) noexcept
+	        CJM_LIT_CONST bool uint128_lit_helper::is_legal_hex_char(char c) noexcept
             {
                 c = to_lower(c);
                 return ((c >= 0x30 && c <= 0x39) || (c >= 0x61 && c <= 0x66));
             }
 
             template<size_t Size>
-            constexpr bool uint128_lit_helper::are_all_chars_0(std::array<char, Size> arr)
+            CJM_LIT_CONST bool uint128_lit_helper::are_all_chars_0(std::array<char, Size> arr)
             {
                 for (size_t i = 0; i < arr.size(); i++)
                 {
@@ -271,7 +271,7 @@ namespace cjm
             }
 
             template<size_t Size>
-            constexpr std::pair<std::uint8_t, size_t> uint128_lit_helper::get_byte(std::array<char, Size> arr, size_t index)
+            CJM_LIT_CONST std::pair<std::uint8_t, size_t> uint128_lit_helper::get_byte(std::array<char, Size> arr, size_t index)
             {
 
                 char currentChar = to_lower(arr[index]);
@@ -302,7 +302,7 @@ namespace cjm
             }
 
             template <size_t Size>
-            constexpr uint128 uint128_lit_helper::parse_from_char_array(std::array<char, Size> arr)
+            CJM_LIT_CONST uint128 uint128_lit_helper::parse_from_char_array(std::array<char, Size> arr)
             {
                 lit_type lt = get_lit_type(arr);
                 uint128 temp;

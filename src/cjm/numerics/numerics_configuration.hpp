@@ -131,7 +131,9 @@
 #define CJM_HAS_BITOPS
 #endif
 
-
+#ifndef CJM_LIT_CONST
+#define CJM_LIT_CONST constexpr
+#endif
 
 
 namespace cjm
