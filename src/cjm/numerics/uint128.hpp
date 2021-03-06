@@ -276,7 +276,11 @@ namespace cjm::numerics
             std::basic_string_view<Chars, CharTraits> view = trim_and_strip_me;
             std::basic_string<Chars, std::char_traits<Chars>, std::allocator<Chars>> trimmed;
             trimmed = cjm::string::trim_as_sv(view);
-            trimmed.erase(std::remove(trimmed.begin(), trimmed.end(), non_decimal_separator()[0]), trimmed.end());
+            constexpr auto non_dec_separators = non_decimal_separator();
+            for (auto separator : non_dec_separators)
+            {
+                trimmed.erase(std::remove(trimmed.begin(), trimmed.end(), separator), trimmed.end());
+            }
             return trimmed;
         }
 

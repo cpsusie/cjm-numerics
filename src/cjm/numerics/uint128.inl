@@ -1521,6 +1521,20 @@ namespace cjm
 
 		}
 
+		template<concepts::builtin_unsigned_integer Ui>
+        constexpr uint128 operator<<(uint128 lhs, Ui amount) noexcept
+        {
+            assert(amount < std::numeric_limits<uint128>::digits);
+            return (lhs << static_cast<int>(amount));
+        }
+
+        template<concepts::builtin_unsigned_integer Ui>
+		constexpr uint128 operator>>(uint128 lhs, Ui amount) noexcept
+        {
+            assert(amount < std::numeric_limits<uint128>::digits);
+            return (lhs >> static_cast<int>(amount));
+        }
+
 		constexpr uint128 operator>>(uint128 lhs, uint128 amount) noexcept
 		{
 			assert(amount < std::numeric_limits<uint128>::digits && static_cast<int>(amount) > -1);
@@ -2052,23 +2066,23 @@ non_decimal_separator()
 
     if constexpr (std::is_same_v<char_t, char>)
     {
-        return ","sv;
+        return ",_"sv;
     }
     else if constexpr (std::is_same_v<char_t, wchar_t>)
     {
-        return L","sv;
+        return L",_"sv;
     }
     else if constexpr (std::is_same_v<char_t, char8_t>)
     {
-        return u8","sv;
+        return u8",_"sv;
     }
     else if constexpr (std::is_same_v<char_t, char16_t>)
     {
-        return u","sv;
+        return u",_"sv;
     }
     else
     {
-        return U","sv;
+        return U",_"sv;
     }
 }
 
@@ -2641,7 +2655,7 @@ parse_hex_str(sv hex_str)
 		{
             hex_str = hex_str.substr(2, hex_str.size() - 2);            
 		}
-        auto hex_digits = std::count_if(hex_str.cbegin(), hex_str.cend(), [](char_t c) -> bool
+        size_t hex_digits = std::count_if(hex_str.cbegin(), hex_str.cend(), [](char_t c) -> bool
             {
                 return is_legal_hex_char(c);
             });
@@ -2649,11 +2663,12 @@ parse_hex_str(sv hex_str)
         {
             throw std::invalid_argument{ "Supplied string contains no valid hexadecimal digits." };
         }
-        constexpr auto max_hex_digits = std::numeric_limits<uint128>::digits / (CHAR_BIT / 2); //max of 32 hex digits
+        constexpr size_t max_hex_digits = std::numeric_limits<uint128>::digits / (CHAR_BIT / 2); //max of 32 hex digits
         if (hex_digits > max_hex_digits)
         {
             throw std::invalid_argument{ "Supplied string contains too many hex digits to store in uint128." };
         }
+        const size_t shift_result_right_amount = (max_hex_digits - hex_digits) * 4u;
         //nb. removed vector and just use array.  not only vector not necessary, but clang can't handle in constexpr context yet
         auto arr = (0_u128).to_big_endian_arr(); //get an empty zero-filled array
         size_t idx = 0;
@@ -2665,7 +2680,7 @@ parse_hex_str(sv hex_str)
             hex_str = new_hex_str;
             arr[idx++] = byte;
         }
-        return uint128::make_from_bytes_big_endian(arr);
+        return (uint128::make_from_bytes_big_endian(arr) >> shift_result_right_amount);
 	}   
 }
 
