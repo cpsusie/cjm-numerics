@@ -102,6 +102,11 @@ namespace cjm::uint128::example_code
 		~just_like_uint128_t() = default;
 	};
 	static_assert(std::is_default_constructible_v<just_like_uint128_t>&& std::is_trivially_copyable_v<just_like_uint128_t>, "To be bit-castable, gotta be at least this.");
+
+	consteval std::uint64_t increment(std::uint64_t val)
+	{
+		return val + 1;
+	}
 }
 
 int main()
@@ -109,6 +114,7 @@ int main()
 	using namespace cjm::uint128::example_code;
 	try
 	{
+		cout << "Incremented: " << increment(std::uint64_t{5}) << newl;
 		say_hello();
 		demonstrate_addition();
 		demonstrate_constexpr_addition();
@@ -1243,7 +1249,7 @@ void cjm::uint128::example_code::demonstrate_literals()
 	auto a = 001_u128; //Illegal: octal is not supported
 	auto b = 340'282'366'920'938'463'463'374'607'431'768'211'456_u128;  //illegal: (too big by one)
 
-	//cout << "You will never see this: " << a << " " << a << "." << newl;
+	cout << "You will never see this: " << a << " " << b << "." << newl;
 	
 	
 }
