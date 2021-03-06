@@ -181,6 +181,8 @@ namespace cjm::uint128_tests
 
     void execute_umult_spec_tests();
     void execute_uintcontainer_adc_tests();
+
+    void execute_issue27_bug_test();
 	
     [[maybe_unused]] void print_n_static_assertions(const binary_op_u128_vect_t& op_vec, size_t n);
     [[maybe_unused]] void print_n_static_assertions(const unary_op_u128_vect_t& op_vec, size_t n);

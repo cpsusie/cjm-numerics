@@ -633,7 +633,10 @@ void cjm::uint128_tests::execute_uint128_tests()
     static_assert(((two_fifty_five << (15 * 8)) == all_at_ends) && ((all_at_ends >> (15 * 8)) == two_fifty_five));
     cout << "BEGINNING STANDARD TEST BATTERY." << newl;
     execute_test(execute_generate_addition_ops_rt_ser_deser_test, "generate_addition_ops_rt_ser_deser_test"sv);
-    //execute_test(parse_file_test, "parse_file_test"sv);
+
+    execute_test(execute_issue27_bug_test, "issue27_bug_test");
+
+	//execute_test(parse_file_test, "parse_file_test"sv);
     execute_test(execute_basic_test_one, "basic_test_one"sv);
     execute_test(execute_binary_operation_rt_ser_tests, "binary_operation_rt_ser_tests"sv);
     execute_test(execute_print_generated_filename_test, "print_generated_filename_test"sv);
@@ -4340,6 +4343,50 @@ void cjm::uint128_tests::execute_uintcontainer_adc_tests()
     
 }
 
+void cjm::uint128_tests::execute_issue27_bug_test()
+{
+    constexpr auto expected_value = 0xc0de'd00d'ea75'dead'beef'600d'f00d_u128;
+    constexpr auto narrow_text = "0xc0ded00dea75deadbeef600df00d"sv;
+    constexpr auto wide_text = L"0xc0de_d00dea75deadbeef600df00d"sv;
+    constexpr auto utf8_text = u8"0xc0de,d00dea75deadbeef600df00d"sv;
+    constexpr auto utf16_text = u"0xc0ded00dea75deadbeef600df00d"sv;
+    constexpr auto utf32_text = U"0xc0ded00dea75deadbeef600df00d"sv;
+
+    auto narrow_stream = cjm::string::make_throwing_sstream<char>();
+    auto wide_stream = cjm::string::make_throwing_sstream<wchar_t>();
+    auto utf8_stream = cjm::string::make_throwing_sstream<char8_t>();
+    auto utf16_stream = cjm::string::make_throwing_sstream<char16_t>();
+    auto utf32_stream = cjm::string::make_throwing_sstream<char32_t>();
+
+    uint128_t narrow_result, wide_result, utf8_result, utf16_result, utf32_result;
+	
+    cout << "Testing narrow text conversion...." << newl;
+    narrow_stream << narrow_text;
+    narrow_stream >> narrow_result;
+
+    cjm_assert(narrow_result == expected_value);
+	
+    cout << "Testing wide text conversion...." << newl;
+    wide_stream << wide_text;
+    wide_stream >> wide_result;
+    cjm_assert(wide_result == expected_value);
+
+    cout << "Testing utf8 text conversion...." << newl;
+    utf8_stream << utf8_text;
+    utf8_stream >> utf8_result;
+    cjm_assert(utf8_result == expected_value);
+
+    cout << "Testing utf16 text conversion...." << newl;
+    utf16_stream << utf16_text;
+    utf16_stream >> utf16_result;
+    cjm_assert(utf16_result == expected_value);
+
+    cout << "Testing utf32 text conversion...." << newl;
+    utf32_stream << utf32_text;
+    utf32_stream >> utf32_result;
+    cjm_assert(utf32_result == expected_value);
+}
+
 
 #ifdef CJM_HAVE_BUILTIN_128
 void cjm::uint128_tests::execute_builtin_u128fls_test_if_avail()
@@ -4358,7 +4405,7 @@ void cjm::uint128_tests::execute_builtin_u128fls_test_if_avail()
 #else
 void cjm::uint128_tests::execute_builtin_u128fls_test_if_avail()
 {
-    std::cout << "Will not test builtin_u128_fls because not available in this enviornment." << newl;
+    std::cout << "Will not test builtin_u128_fls because not available in this environment." << newl;
 }
 
 

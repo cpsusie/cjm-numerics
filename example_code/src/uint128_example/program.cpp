@@ -1315,8 +1315,10 @@ void cjm::uint128::example_code::demonstrate_stream_insertion_and_extraction()
 	std::cout << newl << "This is the stream insertion and extraction demonstration." << newl;
 	{
 		std::cout << "First, we demonstrate decimal format: " << newl;
+		
 		constexpr auto expected_value = 256'368'684'943'268'121'395'391'016'720'575'361'037_u128;
-		constexpr auto narrow_text = "256,368,684,943,268,121,395,391,016,720,575,361,037"sv;
+		//commas and underscores ignored
+		constexpr auto narrow_text = "256_368_684_943_268_121_395_391_016_720_575_361_037"sv;
 		constexpr auto wide_text = L"256,368,684,943,268,121,395,391,016,720,575,361,037"sv;
 
 		std::cout << "Going to stream insert the following narrow text then extract it into a uint128_t: \"" << narrow_text << "\"." << newl;
@@ -1352,8 +1354,9 @@ void cjm::uint128::example_code::demonstrate_stream_insertion_and_extraction()
 	{
 		std::cout << "Next, we demonstrate hexadecimal format: " << newl;
 		constexpr auto expected_value = 0xc0de'd00d'ea75'dead'beef'600d'f00d_u128;
-		constexpr auto narrow_text = "0xc0ded00dea75deadbeef600df00d"sv;
-		constexpr auto wide_text =  L"0xc0ded00dea75deadbeef600df00d"sv;
+		//commas and underscores ignored
+		constexpr auto narrow_text = "0xc0de_d00d_ea75_dead_beef_600d_f00d"sv;
+		constexpr auto wide_text =  L"0xc0de,d00d,ea75,dead,beef,600d,f00d"sv;
 
 		std::cout << "Going to stream insert the following narrow text then extract it into a uint128_t: \"" << narrow_text << "\"." << newl;
 
