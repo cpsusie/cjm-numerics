@@ -1248,10 +1248,10 @@ void cjm::uint128::example_code::demonstrate_literals()
 	//
 	//Thus, even if not assigned to a constexpr variable in your code, an illegal literal will not
 	//compile.
-	auto a = 001_u128; //Illegal: octal is not supported
-	auto b = 340'282'366'920'938'463'463'374'607'431'768'211'456_u128;  //illegal: (too big by one)
+	//auto a = 001_u128; //Illegal: octal is not supported
+	//auto b = 340'282'366'920'938'463'463'374'607'431'768'211'456_u128;  //illegal: (too big by one)
 
-	cout << "You will never see this: " << a << " " << b << "." << newl;
+	//cout << "You will never see this: " << a << " " << b << "." << newl;
 	
 	
 }
