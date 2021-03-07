@@ -19,6 +19,7 @@
 #include <concepts>
 #include <compare>
 #include <cmath>
+#include <typeinfo>
 #include "array_lit_checker.hpp"
 
 //The purpose of this EXAMPLE_CODE is to demonstrate the functionality of the CJM uint128 type,
@@ -60,7 +61,11 @@ namespace cjm::uint128::example_code
 
 	template<concepts::character Char>
 	std::basic_stringstream<Char, std::char_traits<Char>, std::allocator<Char>> make_throwing_sstream();
-	
+
+	template<concepts::unsigned_integer Ui, concepts::character Char = char>
+	std::basic_string<Char> print_max_digits10();
+
+
 	void demonstrate_subtraction();
 	void demonstrate_constexpr_subtraction();
 	void demonstrate_addition();
@@ -105,7 +110,7 @@ namespace cjm::uint128::example_code
 		constexpr just_like_uint128_t(just_like_uint128_t&& other) noexcept = default;
 		constexpr just_like_uint128_t& operator=(const just_like_uint128_t& other) noexcept = default;
 		constexpr just_like_uint128_t& operator=(just_like_uint128_t&& other) noexcept = default;
-		~just_like_uint128_t() = default;
+		constexpr ~just_like_uint128_t() = default;
 	};
 	static_assert(std::is_default_constructible_v<just_like_uint128_t>&& std::is_trivially_copyable_v<just_like_uint128_t>, "To be bit-castable, gotta be at least this.");
 
@@ -121,7 +126,23 @@ namespace cjm::uint128::example_code
 		ret.exceptions(std::ios::failbit | std::ios::badbit);
 		return ret;
 	}
-	
+	template<concepts::unsigned_integer Ui, concepts::character Char>
+	std::basic_string<Char> print_max_digits10()
+	{
+		auto strm = make_throwing_sstream<Char>();
+		constexpr size_t digits_ten = std::numeric_limits<Ui>::digits10;
+		strm
+			<< std::dec << "Digits10 for type [" << typeid(Ui).name() << "] is [" << digits_ten
+			<< "], meaning that its max value, in decimal, will have [" << digits_ten + 1
+			<< "] digits." << newl;
+		strm << "Maximum value for type [" << typeid(Ui).name() << "], expressed in decimal, is: [";
+		for (char c : cjm::experimental::array_lit_checker::max_decimal_digits_v<Ui>)
+		{
+			strm << c;
+		}
+		strm << "]." << newl;
+		return strm.str();
+	}
 }
 
 int main()
@@ -130,6 +151,24 @@ int main()
 	std::ios::sync_with_stdio(false);
 	try
 	{
+//		auto hex_chars = cjm::experimental::array_lit_checker::count_hex_chars<'0', 'x', 'c', '0', 'd', 'e', '\'', 'd', '0', '0', 'd'>();
+//		if (hex_chars.has_value())
+//			cout << "hex chars: [" << *hex_chars << "]." << newl;
+//		else
+//			cout << "illegal hex char count." << newl;
+//		constexpr auto& dec_lu =cjm::experimental::array_lit_checker::digit_lookup_v<lit_type::Decimal>;
+//		constexpr auto& hex_lu =cjm::experimental::array_lit_checker::digit_lookup_v<lit_type::Hexadecimal>;
+//		cout << hex_lu.size() << dec_lu.size() << newl;
+
+		using cjm::experimental::array_lit_checker::operator""_tu128;
+
+		static_assert(0xc0de'd00d'fea2'b00b_tu128 == 0xc0de'd00d'fea2'b00b_u128);
+		static_assert(121'327'892_tu128 == 121'327'892_u128);
+
+		//auto x = 340'282'366'920'938'463'463'374'607'431'768'211'456_tu128;
+		auto y = 340'282'366'920'938'463'463'374'607'431'768'211'455_tu128;
+		cout << y;
+
 		static_assert(cjm::experimental::array_lit_checker::get_lit_type<'0', 'x', 'c', '0', 'd', 'e', 'd', '0', '0', 'd'>() == lit_type::Hexadecimal);
 		static_assert(cjm::experimental::array_lit_checker::get_lit_type<'3', '4', '0', '\'', '2', '8', '2', '\'', '3', '6', '6', '\'', '9', '2', '0', '\'',
 			'9', '3', '8', '\'', '4', '6', '3', '\'', '4', '6', '3', '\'', '3', '7', '4', '\'', '6', '0', '7', '\'', '4', '3', '1', '\'', '7', '6', '8', '\'', '2', '1', '1', '\'', '4', '5', '5'>() == lit_type::Decimal);
@@ -147,19 +186,21 @@ int main()
 		static_assert(cjm::experimental::array_lit_checker::count_hex_chars<'0', 'x', 'c', '0', 'd', 'e', '\'', 'd', '0', '0', 'd'>() == 8);
 		static_assert(cjm::experimental::array_lit_checker::count_hex_chars<'0', 'X', 'C', '0', 'D', 'e', '\'', 'D', '0', '0', 'F'>() == 8);
 		static_assert(cjm::experimental::array_lit_checker::count_hex_chars<'0', 'X', 'C', '0', 'D', 'e', '\'', 'D', '0', '0', 'g'>() == std::nullopt);
-		
-		std::cout << "Digits10 for uint128_t: [" << std::dec << std::numeric_limits<uint128_t>::digits10 << "].";
-
-		std::cout << "Max digits10 value for uint128_t: [";
-		for (char c : cjm::experimental::array_lit_checker::max_decimal_digits_v<uint128_t>)
+		static_assert(cjm::experimental::array_lit_checker::parse_literal<std::uint64_t, '0'>() == 0);
+		//static_assert(cjm::experimental::array_lit_checker::parse_literal<std::uint64_t, '2'>() == 2);
+		static_assert(cjm::experimental::array_lit_checker::parse_literal<std::uint64_t, 'q'>() == std::nullopt);
+		static_assert(cjm::experimental::array_lit_checker::parse_literal<std::uint64_t, '0', 'x', 'c', '0', 'd', 'e', '\'', 'd', '0', '0', 'd'>() == 0xc0de'd00d);
+		using reverser_t = typename cjm::experimental::array_lit_checker::internal::array_retrieval_helper<'0', 'X', 'C', '0', 'D', 'e', '\'', 'D', '0', '0', 'g'>;
+		static_assert(reverser_t::reversed_array_val[0] == 'g' && reverser_t::reversed_array_val[9] == 'X' && reverser_t::reversed_array_val[10]=='0' && reverser_t::reversed_array_val.size() == 11);
 		{
-			cout << c;
+
+			std::string uint32_max_digits_txt = print_max_digits10<std::uint32_t>();
+			cout << uint32_max_digits_txt << newl;
+			std::string uint128_t_max_digits_txt = print_max_digits10<uint128_t>();
+			cout << newl << uint128_t_max_digits_txt << newl;
 		}
-		cout << "]." << newl;
-		
-		constexpr std::uint64_t five = 5;
-		constexpr auto result = increment(five);
-		cout << "Incremented: " << result << newl;
+		//////////
+
 		say_hello();
 		demonstrate_addition();
 		demonstrate_constexpr_addition();
@@ -1340,7 +1381,7 @@ void cjm::uint128::example_code::demonstrate_literals()
 
 void cjm::uint128::example_code::demonstrate_stream_insertion_and_extraction()
 {
-	constexpr auto wnewl = L'\n';
+
 	std::cout << newl << "This is the stream insertion and extraction demonstration." << newl;
 	{
 		std::cout << "First, we demonstrate decimal format: " << newl;
@@ -1352,7 +1393,6 @@ void cjm::uint128::example_code::demonstrate_stream_insertion_and_extraction()
 
 		std::cout << "Going to stream insert the following narrow text then extract it into a uint128_t: \"" << narrow_text << "\"." << newl;
 
-		std::wcout << L"Going to stream insert the following wide text then extract it into a uint128_t: \"" << wide_text << L"\"." << wnewl;
 		auto narrow_stream = make_throwing_sstream<char>();
 		auto wide_stream = make_throwing_sstream<wchar_t>();
 
@@ -1377,7 +1417,8 @@ void cjm::uint128::example_code::demonstrate_stream_insertion_and_extraction()
 		}
 
 		cout << "Narrow uint128_t: [" << std::dec << narrow << "]." << newl;
-		std::wcout << L"Wide uint128_t: [" << std::dec << wide << L"]." << wnewl;
+		//don't want to use wcout in same program with cout
+		cout << "Wide also worked." << newl;
 				 
 	}
 	{
@@ -1389,7 +1430,6 @@ void cjm::uint128::example_code::demonstrate_stream_insertion_and_extraction()
 
 		std::cout << "Going to stream insert the following narrow text then extract it into a uint128_t: \"" << narrow_text << "\"." << newl;
 
-		std::wcout << L"Going to stream insert the following wide text then extract it into a uint128_t: \"" << wide_text << L"\"." << wnewl;
 		auto narrow_stream = make_throwing_sstream<char>();
 		auto wide_stream = make_throwing_sstream<wchar_t>();
 
@@ -1414,8 +1454,8 @@ void cjm::uint128::example_code::demonstrate_stream_insertion_and_extraction()
 		}
 
 		cout << "Narrow uint128_t: [" << std::hex << narrow << "]." << newl;
-		std::wcout << L"Wide uint128_t: [" << std::hex << wide << L"]." << wnewl;
+		//don't want to use wcout in same program with cout
+		cout << "Wide also worked." << newl;
 
 	}
 }
-
