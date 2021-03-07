@@ -488,7 +488,7 @@ namespace cjm::numerics
         constexpr uint128& operator=(const uint128& other) noexcept = default;
         constexpr uint128& operator=(uint128&& other) noexcept = default;
         constexpr explicit uint128(int_part high, int_part low) noexcept;
-        ~uint128() noexcept = default;
+        constexpr ~uint128() noexcept = default;
         // Constructors from arithmetic types
         constexpr uint128(int v) noexcept;
         constexpr uint128(unsigned int v) noexcept;
@@ -685,6 +685,7 @@ namespace cjm
 			/************************************************************************/
 			class uint128_lit_helper
 			{
+			public:
 				friend class cjm::numerics::fixed_uint_literals::fixed_uint_lit_helper; 
 
 				template<char... Chars>
@@ -717,7 +718,7 @@ namespace cjm
 				template<size_t Size>
 				static CJM_LIT_CONST std::pair<uint8_t, size_t> get_byte(std::array<char, Size> arr, size_t index);
 
-			public:
+			
 
 				template<size_t Size>
 				static CJM_LIT_CONST uint128 parse_from_char_array(std::array<char, Size> arr);

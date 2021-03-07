@@ -42,7 +42,7 @@ namespace cjm
             CJM_LIT_CONST uint128 operator"" _u128()
             {
                 constexpr auto charArray = uint128_lit_helper::get_array<Chars...>();
-                return uint128_lit_helper::parse_from_char_array(charArray);                
+                return uint128_lit_helper::parse_from_char_array(charArray);
             }
 
 	        CJM_LIT_CONST uint8_t uint128_lit_helper::get_hex_value(char c)

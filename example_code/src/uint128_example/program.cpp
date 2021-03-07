@@ -19,6 +19,7 @@
 #include <concepts>
 #include <compare>
 #include <cmath>
+#include "array_lit_checker.hpp"
 
 //The purpose of this EXAMPLE_CODE is to demonstrate the functionality of the CJM uint128 type,
 //show how it works, and talk somewhat about its strategies on various systems. It does NOT attempt
@@ -48,6 +49,7 @@
 
 namespace cjm::uint128::example_code
 {
+	static_assert(cjm::experimental::array_lit_checker::get_lit_type<'0', 'x', '0', '1'>() == lit_type::Hexadecimal);
 	using uint128_t = numerics::uint128;
 	using divmod_result_t = uint128_t ::divmod_result_t;
 	using namespace uint128_literals;
@@ -128,6 +130,33 @@ int main()
 	std::ios::sync_with_stdio(false);
 	try
 	{
+		static_assert(cjm::experimental::array_lit_checker::get_lit_type<'0', 'x', 'c', '0', 'd', 'e', 'd', '0', '0', 'd'>() == lit_type::Hexadecimal);
+		static_assert(cjm::experimental::array_lit_checker::get_lit_type<'3', '4', '0', '\'', '2', '8', '2', '\'', '3', '6', '6', '\'', '9', '2', '0', '\'',
+			'9', '3', '8', '\'', '4', '6', '3', '\'', '4', '6', '3', '\'', '3', '7', '4', '\'', '6', '0', '7', '\'', '4', '3', '1', '\'', '7', '6', '8', '\'', '2', '1', '1', '\'', '4', '5', '5'>() == lit_type::Decimal);
+		static_assert(cjm::experimental::array_lit_checker::count_decimal_chars<'3', '4', '0', '\'', '2', '8', '2', '\'', '3', '6', '6', '\'', '9', '2', '0', '\'',
+			'9', '3', '8', '\'', '4', '6', '3', '\'', '4', '6', '3', '\'', '3', '7', '4', '\'', '6', '0', '7', '\'', '4', '3', '1', '\'', '7', '6', '8', '\'', '2', '1', '1', '\'', '4', '5', '5'>() == std::numeric_limits<uint128_t>::digits10 + 1);
+		static_assert(cjm::experimental::array_lit_checker::count_decimal_chars<'3', '4', '0', '\'', '2', '8', '2', '\'', '3', '6', '6', '\'', '9', '2', '0', '\'',
+			'9', '3', '8', '\'', '4', '6', '3', '\'', '4', '6', '3', '\'', '3', '7', '4', '\'', '6', '0', '7', '\'', '4', '3', '1', '\'', '7', '6', '8', '\'', '2', '1', '1', '\'', '4', 'q', '5'>() == std::nullopt);
+		static_assert(cjm::experimental::array_lit_checker::validate_decimal_size<uint128_t, '3', '4', '0', '\'', '2', '8', '2', '\'', '3', '6', '6', '\'', '9', '2', '0', '\'',
+			'9', '3', '8', '\'', '4', '6', '3', '\'', '4', '6', '3', '\'', '3', '7', '4', '\'', '6', '0', '7', '\'', '4', '3', '1', '\'', '7', '6', '8', '\'', '2', '1', '1', '\'', '4', '5', '5'>());
+		static_assert(!cjm::experimental::array_lit_checker::validate_decimal_size<std::uint64_t, '3', '4', '0', '\'', '2', '8', '2', '\'', '3', '6', '6', '\'', '9', '2', '0', '\'',
+			'9', '3', '8', '\'', '4', '6', '3', '\'', '4', '6', '3', '\'', '3', '7', '4', '\'', '6', '0', '7', '\'', '4', '3', '1', '\'', '7', '6', '8', '\'', '2', '1', '1', '\'', '4', '5', '5'>());
+		static_assert(!cjm::experimental::array_lit_checker::validate_decimal_size<uint128_t, '3', '4', '0', '\'', '2', '8', '2', '\'', '3', '6', '6', '\'', '9', '2', '0', '\'',
+			'9', '3', '8', '\'', '4', '6', '3', '\'', '4', '6', '3', '\'', '3', '7', '4', '\'', '6', '0', '7', '\'', '4', '3', '1', '\'', '7', '6', '8', '\'', '2', '1', '1', '\'', '4', '5', '6'>());
+		static_assert(cjm::experimental::array_lit_checker::validate_decimal_size<std::uint64_t, '1', '2', '3', '\'', '4', '5', '6'>());
+		static_assert(cjm::experimental::array_lit_checker::count_hex_chars<'0', 'x', 'c', '0', 'd', 'e', '\'', 'd', '0', '0', 'd'>() == 8);
+		static_assert(cjm::experimental::array_lit_checker::count_hex_chars<'0', 'X', 'C', '0', 'D', 'e', '\'', 'D', '0', '0', 'F'>() == 8);
+		static_assert(cjm::experimental::array_lit_checker::count_hex_chars<'0', 'X', 'C', '0', 'D', 'e', '\'', 'D', '0', '0', 'g'>() == std::nullopt);
+		
+		std::cout << "Digits10 for uint128_t: [" << std::dec << std::numeric_limits<uint128_t>::digits10 << "].";
+
+		std::cout << "Max digits10 value for uint128_t: [";
+		for (char c : cjm::experimental::array_lit_checker::max_decimal_digits_v<uint128_t>)
+		{
+			cout << c;
+		}
+		cout << "]." << newl;
+		
 		constexpr std::uint64_t five = 5;
 		constexpr auto result = increment(five);
 		cout << "Incremented: " << result << newl;
@@ -1319,7 +1348,7 @@ void cjm::uint128::example_code::demonstrate_stream_insertion_and_extraction()
 		constexpr auto expected_value = 256'368'684'943'268'121'395'391'016'720'575'361'037_u128;
 		//commas and underscores ignored
 		constexpr auto narrow_text = "256_368_684_943_268_121_395_391_016_720_575_361_037"sv;
-		constexpr auto wide_text = L"256,368,684,943,268,121,395,391,016,720,575,361,037"sv;
+		constexpr auto wide_text = L"256,368,684,943,268,121,395,391,016,720,575,361,037"sv; 
 
 		std::cout << "Going to stream insert the following narrow text then extract it into a uint128_t: \"" << narrow_text << "\"." << newl;
 
