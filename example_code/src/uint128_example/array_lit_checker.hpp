@@ -26,11 +26,12 @@ namespace cjm::experimental::array_lit_checker
 			requires (sizeof...(Chars) > 0)
 		constexpr std::array<char, sizeof...(Chars)> array_retrieval_helper<Chars...>::reverse_array()
 		{
-			std::array<char, sizeof...(Chars)> ret;
+			std::array<char, sizeof...(Chars)> src{ Chars... };
+			std::array<char, sizeof...(Chars)> ret{};
 			size_t dst_idx = 0;
-			for (size_t src_idx = array_val.size() -1; src_idx != std::numeric_limits<size_t>::max(); --src_idx)
+			for (size_t src_idx = src.size() - 1; src_idx != std::numeric_limits<size_t>::max(); --src_idx)
 			{
-				ret[dst_idx++] = array_val[src_idx];
+				ret[dst_idx++] = src[src_idx];
 			}
 			return ret;
 		}
