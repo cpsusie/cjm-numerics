@@ -3072,32 +3072,164 @@ inline void uint128::div_mod_msc_x64_impl([[maybe_unused]]uint128 dividend,[[may
 }
 #endif
 
-/*
- * Evil macro'd up version of fls64 from google:
- * 		// Returns the 0-based position of the last set bit (i.e., most significant bit)
-		// in the given uint64_t. The argument may not be 0.
-		//
-		// For example:
-		//   Given: 5 (decimal) == 101 (binary)
-		//   Returns: 2
-#define STEP(T, n, pos, sh)           \
-		  do {                                        \
-			if ((n) >= (static_cast<T>(1) << (sh))) { \
-			  (n) = (n) >> (sh);                      \
-			  (pos) |= (sh);                          \
-			}                                         \
-		  } while (0)
-		constexpr int uint128::fls64_v1(std::uint64_t n)
-		{
-			assert(n != 0);
-			int pos = 0;
-			STEP(uint64_t, n, pos, 0x20);
-			auto n32 = static_cast<std::uint32_t>(n);
-			STEP(std::uint32_t, n32, pos, 0x10);
-			STEP(std::uint32_t, n32, pos, 0x08);
-			STEP(std::uint32_t, n32, pos, 0x04);
-			return pos + ((std::uint64_t{ 0x3333333322221100 } >> (n32 << 2)) & 0x3);
-		}
-#undef STEP
- */
+namespace cjm::numerics::uint128_literals
+{
+    namespace internal
+    {
+        template<char... Chars>
+        requires (sizeof...(Chars) > 0)
+            struct array_retrieval_helper;
+
+        template<char... Chars>
+        requires (sizeof...(Chars) > 0)
+            struct array_retrieval_helper final
+        {
+            static constexpr std::array<char, sizeof...(Chars)> reverse_array();
+            static constexpr std::array<char, sizeof...(Chars)> reversed_array_val = reverse_array();
+            static constexpr std::array<char, sizeof...(Chars)> array_val{ Chars... };
+        };
+
+        template<char... Chars>
+        requires (sizeof...(Chars) > 0)
+            constexpr std::array<char, sizeof...(Chars)> array_retrieval_helper<Chars...>::reverse_array()
+        {
+            std::array<char, sizeof...(Chars)> src{ Chars... };
+            std::array<char, sizeof...(Chars)> ret{};
+            size_t dst_idx = 0;
+            for (size_t src_idx = src.size() - 1; src_idx != std::numeric_limits<size_t>::max(); --src_idx)
+            {
+                ret[dst_idx++] = src[src_idx];
+            }
+            return ret;
+        }
+
+    }
+
+    template<lit_type LiteralType>
+    requires (LiteralType == lit_type::Decimal || LiteralType == lit_type::Hexadecimal)
+        constexpr std::array<std::optional<unsigned short>, 256u> init_digit_lookup()
+    {
+        if constexpr (LiteralType == lit_type::Decimal)
+        {
+            return std::array<std::optional<unsigned short>, 256u>{
+                std::nullopt, std::nullopt, std::nullopt, std::nullopt, std::nullopt,
+                    std::nullopt, std::nullopt, std::nullopt, std::nullopt, std::nullopt,
+                    std::nullopt, std::nullopt, std::nullopt, std::nullopt, std::nullopt,
+                    std::nullopt, std::nullopt, std::nullopt, std::nullopt, std::nullopt,
+                    std::nullopt, std::nullopt, std::nullopt, std::nullopt, std::nullopt,
+                    std::nullopt, std::nullopt, std::nullopt, std::nullopt, std::nullopt,
+                    std::nullopt, std::nullopt, std::nullopt, std::nullopt, std::nullopt,
+                    std::nullopt, std::nullopt, std::nullopt, std::nullopt, std::nullopt,
+                    std::nullopt, std::nullopt, std::nullopt, std::nullopt, std::nullopt,
+                    std::nullopt, std::nullopt, std::nullopt, 0, 1,
+                    2, 3, 4, 5, 6,
+                    7, 8, 9, std::nullopt, std::nullopt,
+                    std::nullopt, std::nullopt, std::nullopt, std::nullopt, std::nullopt,
+                    std::nullopt, std::nullopt, std::nullopt, std::nullopt, std::nullopt,
+                    std::nullopt, std::nullopt, std::nullopt, std::nullopt, std::nullopt,
+                    std::nullopt, std::nullopt, std::nullopt, std::nullopt, std::nullopt,
+                    std::nullopt, std::nullopt, std::nullopt, std::nullopt, std::nullopt,
+                    std::nullopt, std::nullopt, std::nullopt, std::nullopt, std::nullopt,
+                    std::nullopt, std::nullopt, std::nullopt, std::nullopt, std::nullopt,
+                    std::nullopt, std::nullopt, std::nullopt, std::nullopt, std::nullopt,
+                    std::nullopt, std::nullopt, std::nullopt, std::nullopt, std::nullopt,
+                    std::nullopt, std::nullopt, std::nullopt, std::nullopt, std::nullopt,
+                    std::nullopt, std::nullopt, std::nullopt, std::nullopt, std::nullopt,
+                    std::nullopt, std::nullopt, std::nullopt, std::nullopt, std::nullopt,
+                    std::nullopt, std::nullopt, std::nullopt, std::nullopt, std::nullopt,
+                    std::nullopt, std::nullopt, std::nullopt, std::nullopt, std::nullopt,
+                    std::nullopt, std::nullopt, std::nullopt, std::nullopt, std::nullopt,
+                    std::nullopt, std::nullopt, std::nullopt, std::nullopt, std::nullopt,
+                    std::nullopt, std::nullopt, std::nullopt, std::nullopt, std::nullopt,
+                    std::nullopt, std::nullopt, std::nullopt, std::nullopt, std::nullopt,
+                    std::nullopt, std::nullopt, std::nullopt, std::nullopt, std::nullopt,
+                    std::nullopt, std::nullopt, std::nullopt, std::nullopt, std::nullopt,
+                    std::nullopt, std::nullopt, std::nullopt, std::nullopt, std::nullopt,
+                    std::nullopt, std::nullopt, std::nullopt, std::nullopt, std::nullopt,
+                    std::nullopt, std::nullopt, std::nullopt, std::nullopt, std::nullopt,
+                    std::nullopt, std::nullopt, std::nullopt, std::nullopt, std::nullopt,
+                    std::nullopt, std::nullopt, std::nullopt, std::nullopt, std::nullopt,
+                    std::nullopt, std::nullopt, std::nullopt, std::nullopt, std::nullopt,
+                    std::nullopt, std::nullopt, std::nullopt, std::nullopt, std::nullopt,
+                    std::nullopt, std::nullopt, std::nullopt, std::nullopt, std::nullopt,
+                    std::nullopt, std::nullopt, std::nullopt, std::nullopt, std::nullopt,
+                    std::nullopt, std::nullopt, std::nullopt, std::nullopt, std::nullopt,
+                    std::nullopt, std::nullopt, std::nullopt, std::nullopt, std::nullopt,
+                    std::nullopt, std::nullopt, std::nullopt, std::nullopt, std::nullopt,
+                    std::nullopt, std::nullopt, std::nullopt, std::nullopt, std::nullopt,
+                    std::nullopt, std::nullopt, std::nullopt, std::nullopt, std::nullopt,
+                    std::nullopt, std::nullopt, std::nullopt, std::nullopt, std::nullopt,
+                    std::nullopt, std::nullopt, std::nullopt, std::nullopt, std::nullopt,
+                    std::nullopt, std::nullopt, std::nullopt, std::nullopt, std::nullopt,
+                    std::nullopt, std::nullopt, std::nullopt, std::nullopt, std::nullopt,
+                    std::nullopt, std::nullopt, std::nullopt, std::nullopt, std::nullopt,
+                    std::nullopt};
+        }
+        else
+        {
+            return std::array<std::optional<unsigned short>, 256u>{
+                std::nullopt, std::nullopt, std::nullopt, std::nullopt, std::nullopt,
+                    std::nullopt, std::nullopt, std::nullopt, std::nullopt, std::nullopt,
+                    std::nullopt, std::nullopt, std::nullopt, std::nullopt, std::nullopt,
+                    std::nullopt, std::nullopt, std::nullopt, std::nullopt, std::nullopt,
+                    std::nullopt, std::nullopt, std::nullopt, std::nullopt, std::nullopt,
+                    std::nullopt, std::nullopt, std::nullopt, std::nullopt, std::nullopt,
+                    std::nullopt, std::nullopt, std::nullopt, std::nullopt, std::nullopt,
+                    std::nullopt, std::nullopt, std::nullopt, std::nullopt, std::nullopt,
+                    std::nullopt, std::nullopt, std::nullopt, std::nullopt, std::nullopt,
+                    std::nullopt, std::nullopt, std::nullopt, 0, 1,
+                    2, 3, 4, 5, 6,
+                    7, 8, 9, std::nullopt, std::nullopt,
+                    std::nullopt, std::nullopt, std::nullopt, std::nullopt, std::nullopt,
+                    10, 11, 12, 13, 14,
+                    15, std::nullopt, std::nullopt, std::nullopt, std::nullopt,
+                    std::nullopt, std::nullopt, std::nullopt, std::nullopt, std::nullopt,
+                    std::nullopt, std::nullopt, std::nullopt, std::nullopt, std::nullopt,
+                    std::nullopt, std::nullopt, std::nullopt, std::nullopt, std::nullopt,
+                    std::nullopt, std::nullopt, std::nullopt, std::nullopt, std::nullopt,
+                    std::nullopt, std::nullopt, 10, 11, 12,
+                    13, 14, 15, std::nullopt, std::nullopt,
+                    std::nullopt, std::nullopt, std::nullopt, std::nullopt, std::nullopt,
+                    std::nullopt, std::nullopt, std::nullopt, std::nullopt, std::nullopt,
+                    std::nullopt, std::nullopt, std::nullopt, std::nullopt, std::nullopt,
+                    std::nullopt, std::nullopt, std::nullopt, std::nullopt, std::nullopt,
+                    std::nullopt, std::nullopt, std::nullopt, std::nullopt, std::nullopt,
+                    std::nullopt, std::nullopt, std::nullopt, std::nullopt, std::nullopt,
+                    std::nullopt, std::nullopt, std::nullopt, std::nullopt, std::nullopt,
+                    std::nullopt, std::nullopt, std::nullopt, std::nullopt, std::nullopt,
+                    std::nullopt, std::nullopt, std::nullopt, std::nullopt, std::nullopt,
+                    std::nullopt, std::nullopt, std::nullopt, std::nullopt, std::nullopt,
+                    std::nullopt, std::nullopt, std::nullopt, std::nullopt, std::nullopt,
+                    std::nullopt, std::nullopt, std::nullopt, std::nullopt, std::nullopt,
+                    std::nullopt, std::nullopt, std::nullopt, std::nullopt, std::nullopt,
+                    std::nullopt, std::nullopt, std::nullopt, std::nullopt, std::nullopt,
+                    std::nullopt, std::nullopt, std::nullopt, std::nullopt, std::nullopt,
+                    std::nullopt, std::nullopt, std::nullopt, std::nullopt, std::nullopt,
+                    std::nullopt, std::nullopt, std::nullopt, std::nullopt, std::nullopt,
+                    std::nullopt, std::nullopt, std::nullopt, std::nullopt, std::nullopt,
+                    std::nullopt, std::nullopt, std::nullopt, std::nullopt, std::nullopt,
+                    std::nullopt, std::nullopt, std::nullopt, std::nullopt, std::nullopt,
+                    std::nullopt, std::nullopt, std::nullopt, std::nullopt, std::nullopt,
+                    std::nullopt, std::nullopt, std::nullopt, std::nullopt, std::nullopt,
+                    std::nullopt, std::nullopt, std::nullopt, std::nullopt, std::nullopt,
+                    std::nullopt, std::nullopt, std::nullopt, std::nullopt, std::nullopt,
+                    std::nullopt, std::nullopt, std::nullopt, std::nullopt, std::nullopt,
+                    std::nullopt, std::nullopt, std::nullopt, std::nullopt, std::nullopt,
+                    std::nullopt, std::nullopt, std::nullopt, std::nullopt, std::nullopt,
+                    std::nullopt, std::nullopt, std::nullopt, std::nullopt, std::nullopt,
+                    std::nullopt, std::nullopt, std::nullopt, std::nullopt, std::nullopt,
+                    std::nullopt, std::nullopt, std::nullopt, std::nullopt, std::nullopt,
+                    std::nullopt};
+        }
+    }
+
+    template<char... Chars>
+		requires (sizeof...(Chars) > 0)
+    constexpr uint128 operator"" _tu128() 
+    {
+        constexpr std::optional<uint128> result = parse_literal<uint128, Chars...>();
+        static_assert(result.has_value(), "This literal is not a valid decimal or hexadecimal uint128_t.");
+        return *result;
+    }
+}
 #endif

@@ -10,21 +10,21 @@ namespace cjm::experimental::array_lit_checker
 	namespace internal
 	{
 		template<char... Chars>
-			requires (sizeof...(Chars) > 0)
-		struct array_retrieval_helper;
+		requires (sizeof...(Chars) > 0)
+			struct array_retrieval_helper;
 
 		template<char... Chars>
-			requires (sizeof...(Chars) > 0)
-		struct array_retrieval_helper final
+		requires (sizeof...(Chars) > 0)
+			struct array_retrieval_helper final
 		{
-				static constexpr std::array<char, sizeof...(Chars)> reverse_array();
-				static constexpr std::array<char, sizeof...(Chars)> reversed_array_val = reverse_array();
-				static constexpr std::array<char, sizeof...(Chars)> array_val{ Chars... };
+			static constexpr std::array<char, sizeof...(Chars)> reverse_array();
+			static constexpr std::array<char, sizeof...(Chars)> reversed_array_val = reverse_array();
+			static constexpr std::array<char, sizeof...(Chars)> array_val{ Chars... };
 		};
 
 		template<char... Chars>
-			requires (sizeof...(Chars) > 0)
-		constexpr std::array<char, sizeof...(Chars)> array_retrieval_helper<Chars...>::reverse_array()
+		requires (sizeof...(Chars) > 0)
+			constexpr std::array<char, sizeof...(Chars)> array_retrieval_helper<Chars...>::reverse_array()
 		{
 			std::array<char, sizeof...(Chars)> src{ Chars... };
 			std::array<char, sizeof...(Chars)> ret{};

@@ -665,6 +665,10 @@ namespace cjm
 			template<char... Chars>
 			CJM_LIT_CONST uint128 operator"" _u128();
 
+			template<char... Chars>
+				requires (sizeof...(Chars) > 0)
+            constexpr uint128 operator"" _tu128();
+
 			enum class lit_type
 			{
 				Illegal = 0,
@@ -732,6 +736,78 @@ namespace cjm
 				uint128_lit_helper(uint128_lit_helper&& other) noexcept = delete;
 				uint128_lit_helper& operator=(const uint128_lit_helper& other) = delete;
 				uint128_lit_helper& operator=(uint128_lit_helper&& other) noexcept = delete;
+			};
+
+			class lit_helper final
+			{
+                template<char... Chars>
+					requires (sizeof...(Chars) > 0)
+                friend CJM_LIT_CONST uint128 operator"" _tu128();
+
+                template<char... Chars>
+                requires (sizeof...(Chars) > 0)
+                    static CJM_LIT_CONST bool are_all_chars_0();
+
+                static CJM_LIT_CONST bool is_legal_hex_char(char c) noexcept;
+
+                static CJM_LIT_CONST bool is_legal_dec_char(char c) noexcept;
+
+                template<char... Chars>
+                static CJM_LIT_CONST lit_type get_chars() noexcept;
+
+                template<char... Chars>
+                static CJM_LIT_CONST lit_type get_lit_type();
+
+                template<lit_type LiteralType>
+                requires (LiteralType == lit_type::Decimal || LiteralType == lit_type::Hexadecimal)
+                    static CJM_LIT_CONST std::array<std::optional<unsigned short>, 256u> init_digit_lookup();
+
+                template<lit_type LiteralType>
+                requires (LiteralType == lit_type::Decimal || LiteralType == lit_type::Hexadecimal)
+                    static CJM_LIT_CONST std::array<std::optional<unsigned short>, 256u>  digit_lookup_v
+                    = init_digit_lookup<LiteralType>();
+
+                template<concepts::unsigned_integer Ui>
+                static CJM_LIT_CONST std::array<char, std::numeric_limits<Ui>::digits10 + 1> get_max_decimal();
+
+                template<concepts::unsigned_integer Ui>
+                static CJM_LIT_CONST std::array<char, std::numeric_limits<Ui>::digits10 + 1> max_decimal_v = get_max_decimal<Ui>();
+
+                template<concepts::unsigned_integer Ui>
+                static CJM_LIT_CONST std::array<char, std::numeric_limits<Ui>::digits10 + 1> max_decimal_digits_v
+                    = get_max_decimal<Ui>();
+
+                template<concepts::unsigned_integer Ui>
+                static CJM_LIT_CONST size_t max_hex_digits_v = std::numeric_limits<Ui>::digits / 4;
+
+                template<char... Chars>
+                static CJM_LIT_CONST std::optional<size_t> count_hex_chars();
+
+                template<concepts::unsigned_integer Ui, char... Chars>
+                static CJM_LIT_CONST bool validate_decimal_size();
+
+                template<concepts::unsigned_integer Ui, size_t Digits, lit_type LiteralType, char... Chars>
+                requires (sizeof...(Chars) > 0 && sizeof...(Chars) >= Digits && Digits > 0
+                    && (LiteralType == lit_type::Decimal || LiteralType == lit_type::Hexadecimal))
+                    static CJM_LIT_CONST std::optional<Ui> execute_literal_parse();
+
+                template<char... Chars>
+                static CJM_LIT_CONST std::optional<size_t> count_decimal_chars();
+
+            public:
+
+                template<char... Chars>
+                static CJM_LIT_CONST std::array<char, sizeof...(Chars)> get_array();
+
+                template <concepts::unsigned_integer Ui, char... Chars>
+                static CJM_LIT_CONST std::optional<Ui> parse_literal();
+
+                lit_helper() = delete;
+                ~lit_helper() = delete;
+                lit_helper(const lit_helper& other) = delete;
+                lit_helper(lit_helper&& other) noexcept = delete;
+                lit_helper& operator=(const lit_helper& other) = delete;
+                lit_helper& operator=(lit_helper&& other) noexcept = delete;
 			};
 		}
 
