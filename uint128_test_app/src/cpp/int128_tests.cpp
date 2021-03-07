@@ -4224,9 +4224,9 @@ void cjm::uint128_tests::execute_umult_spec_tests()
 	constexpr std::uint16_t left_factor_16 = 0xfe'a2;
 	constexpr std::uint16_t right_factor_16 = 0xf0'0f;
 	constexpr std::uint32_t expected_product_32 = 0xeec6'cb7e;
-	static_assert(internal::concepts::is_uint_16_or_32_t<std::uint16_t>);
-	auto actual_product_32 = internal::umult(left_factor_16, right_factor_16);
-	constexpr auto actual_ctime_product_32 = internal::umult(left_factor_16, right_factor_16);
+	static_assert(cjm::numerics::internal::concepts::is_uint_16_or_32_t<std::uint16_t>);
+	auto actual_product_32 = cjm::numerics::internal::umult(left_factor_16, right_factor_16);
+	constexpr auto actual_ctime_product_32 = cjm::numerics::internal::umult(left_factor_16, right_factor_16);
 	auto saver = testing::cout_saver{std::cout};
 	std::cout
 		<< "[0x" << std::hex << std::setw(std::numeric_limits<decltype(left_factor_16)>::digits / 4)
@@ -4245,8 +4245,8 @@ void cjm::uint128_tests::execute_umult_spec_tests()
 	constexpr std::uint8_t left_factor_8 = 0xff;
 	constexpr std::uint8_t right_factor_8 = 0xff;
 	constexpr std::uint16_t expected_product_16 = 0xfe01;
-	auto actual_product_16 = internal::umult(left_factor_8, right_factor_8);
-	constexpr auto actual_ctime_product_16 = internal::umult(left_factor_8, right_factor_8);
+	auto actual_product_16 = cjm::numerics::internal::umult(left_factor_8, right_factor_8);
+	constexpr auto actual_ctime_product_16 = cjm::numerics::internal::umult(left_factor_8, right_factor_8);
 
 	std::cout
 			<< "[0x" << std::hex << std::setw(std::numeric_limits<decltype(left_factor_8)>::digits / 4)
@@ -4265,8 +4265,8 @@ void cjm::uint128_tests::execute_umult_spec_tests()
 	constexpr std::uint32_t left_factor_32 = 0xffff'ffff;
 	constexpr std::uint32_t right_factor_32 = 0xffff'ffff;
 	constexpr std::uint64_t expected_product_64 = 0xffff'fffe'0000'0001;
-	auto actual_product_64 = internal::umult(left_factor_32, right_factor_32);
-	constexpr auto actual_ctime_product_64 = internal::umult(left_factor_32, right_factor_32);
+	auto actual_product_64 = cjm::numerics::internal::umult(left_factor_32, right_factor_32);
+	constexpr auto actual_ctime_product_64 = cjm::numerics::internal::umult(left_factor_32, right_factor_32);
 
 	std::cout
 			<< "[0x" << std::hex << std::setw(std::numeric_limits<decltype(left_factor_32)>::digits / 4)
@@ -4287,8 +4287,8 @@ void cjm::uint128_tests::execute_umult_spec_tests()
     constexpr std::uint64_t right_factor_64 = 0xbabe'b00b'600d'f00dull;
     constexpr auto expected_product_128 = static_cast<uint128_t>(left_factor_64) * right_factor_64;
     auto actual_product_128
-		= internal::umult(left_factor_64, right_factor_64);
-    constexpr auto actual_ctime_product_128 = internal::umult(left_factor_64, right_factor_64);
+		= cjm::numerics::internal::umult(left_factor_64, right_factor_64);
+    constexpr auto actual_ctime_product_128 = cjm::numerics::internal::umult(left_factor_64, right_factor_64);
     constexpr auto converted_ctime = uint128_t{ actual_ctime_product_128.m_high, actual_ctime_product_128.m_low };
     auto converted_rtime = bit_cast<uint128_t>(actual_product_128);
 
@@ -4312,7 +4312,7 @@ void cjm::uint128_tests::execute_umult_spec_tests()
 //    constexpr uint128_t factor_1_u128 = factor_1;
 //    constexpr uint128_t factor_2_u128 = factor_2;
 //
-//    constexpr auto result = internal::umult(factor_1, factor_2);
+//    constexpr auto result = cjm::numerics::internal::umult(factor_1, factor_2);
 //    constexpr auto ctrl = factor_1_u128 * factor_2_u128;
 //
 //    auto final_res = bit_cast<uint128_t>(result);

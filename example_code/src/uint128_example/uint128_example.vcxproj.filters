@@ -26,8 +26,5 @@
     <ClInclude Include="oldv.txt">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="array_lit_checker.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
   </ItemGroup>
 </Project>

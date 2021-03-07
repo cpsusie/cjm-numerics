@@ -20,7 +20,7 @@
 #include <compare>
 #include <cmath>
 #include <typeinfo>
-#include "array_lit_checker.hpp"
+
 
 //The purpose of this EXAMPLE_CODE is to demonstrate the functionality of the CJM uint128 type,
 //show how it works, and talk somewhat about its strategies on various systems. It does NOT attempt
@@ -50,7 +50,7 @@
 
 namespace cjm::uint128::example_code
 {
-	static_assert(cjm::experimental::array_lit_checker::get_lit_type<'0', 'x', '0', '1'>() == lit_type::Hexadecimal);
+	static_assert(cjm::numerics::uint128_literals::lit_helper::get_lit_type<'0', 'x', '0', '1'>() == lit_type::Hexadecimal);
 	using uint128_t = numerics::uint128;
 	using divmod_result_t = uint128_t ::divmod_result_t;
 	using namespace uint128_literals;
@@ -136,7 +136,7 @@ namespace cjm::uint128::example_code
 			<< "], meaning that its max value, in decimal, will have [" << digits_ten + 1
 			<< "] digits." << newl;
 		strm << "Maximum value for type [" << typeid(Ui).name() << "], expressed in decimal, is: [";
-		for (char c : cjm::experimental::array_lit_checker::max_decimal_digits_v<Ui>)
+		for (char c : cjm::numerics::uint128_literals::lit_helper::max_decimal_digits_v<Ui>)
 		{
 			strm << c;
 		}
@@ -151,16 +151,16 @@ int main()
 	std::ios::sync_with_stdio(false);
 	try
 	{
-//		auto hex_chars = cjm::experimental::array_lit_checker::count_hex_chars<'0', 'x', 'c', '0', 'd', 'e', '\'', 'd', '0', '0', 'd'>();
+//		auto hex_chars = cjm::numerics::uint128_literals::lit_helper::count_hex_chars<'0', 'x', 'c', '0', 'd', 'e', '\'', 'd', '0', '0', 'd'>();
 //		if (hex_chars.has_value())
 //			cout << "hex chars: [" << *hex_chars << "]." << newl;
 //		else
 //			cout << "illegal hex char count." << newl;
-//		constexpr auto& dec_lu =cjm::experimental::array_lit_checker::digit_lookup_v<lit_type::Decimal>;
-//		constexpr auto& hex_lu =cjm::experimental::array_lit_checker::digit_lookup_v<lit_type::Hexadecimal>;
+//		constexpr auto& dec_lu =cjm::numerics::uint128_literals::lit_helper::digit_lookup_v<lit_type::Decimal>;
+//		constexpr auto& hex_lu =cjm::numerics::uint128_literals::lit_helper::digit_lookup_v<lit_type::Hexadecimal>;
 //		cout << hex_lu.size() << dec_lu.size() << newl;
 
-		using cjm::experimental::array_lit_checker::operator""_tu128;
+		using cjm::numerics::uint128_literals::operator""_tu128;
 
 		static_assert(0xc0de'd00d'fea2'b00b_tu128 == 0xc0de'd00d'fea2'b00b_u128);
 		static_assert(121'327'892_tu128 == 121'327'892_u128);
@@ -169,28 +169,28 @@ int main()
 		auto y = 340'282'366'920'938'463'463'374'607'431'768'211'455_tu128;
 		cout << y;
 
-		static_assert(cjm::experimental::array_lit_checker::get_lit_type<'0', 'x', 'c', '0', 'd', 'e', 'd', '0', '0', 'd'>() == lit_type::Hexadecimal);
-		static_assert(cjm::experimental::array_lit_checker::get_lit_type<'3', '4', '0', '\'', '2', '8', '2', '\'', '3', '6', '6', '\'', '9', '2', '0', '\'',
+		static_assert(cjm::numerics::uint128_literals::lit_helper::get_lit_type<'0', 'x', 'c', '0', 'd', 'e', 'd', '0', '0', 'd'>() == lit_type::Hexadecimal);
+		static_assert(cjm::numerics::uint128_literals::lit_helper::get_lit_type<'3', '4', '0', '\'', '2', '8', '2', '\'', '3', '6', '6', '\'', '9', '2', '0', '\'',
 			'9', '3', '8', '\'', '4', '6', '3', '\'', '4', '6', '3', '\'', '3', '7', '4', '\'', '6', '0', '7', '\'', '4', '3', '1', '\'', '7', '6', '8', '\'', '2', '1', '1', '\'', '4', '5', '5'>() == lit_type::Decimal);
-		static_assert(cjm::experimental::array_lit_checker::count_decimal_chars<'3', '4', '0', '\'', '2', '8', '2', '\'', '3', '6', '6', '\'', '9', '2', '0', '\'',
+		static_assert(cjm::numerics::uint128_literals::lit_helper::count_decimal_chars<'3', '4', '0', '\'', '2', '8', '2', '\'', '3', '6', '6', '\'', '9', '2', '0', '\'',
 			'9', '3', '8', '\'', '4', '6', '3', '\'', '4', '6', '3', '\'', '3', '7', '4', '\'', '6', '0', '7', '\'', '4', '3', '1', '\'', '7', '6', '8', '\'', '2', '1', '1', '\'', '4', '5', '5'>() == std::numeric_limits<uint128_t>::digits10 + 1);
-		static_assert(cjm::experimental::array_lit_checker::count_decimal_chars<'3', '4', '0', '\'', '2', '8', '2', '\'', '3', '6', '6', '\'', '9', '2', '0', '\'',
+		static_assert(cjm::numerics::uint128_literals::lit_helper::count_decimal_chars<'3', '4', '0', '\'', '2', '8', '2', '\'', '3', '6', '6', '\'', '9', '2', '0', '\'',
 			'9', '3', '8', '\'', '4', '6', '3', '\'', '4', '6', '3', '\'', '3', '7', '4', '\'', '6', '0', '7', '\'', '4', '3', '1', '\'', '7', '6', '8', '\'', '2', '1', '1', '\'', '4', 'q', '5'>() == std::nullopt);
-		static_assert(cjm::experimental::array_lit_checker::validate_decimal_size<uint128_t, '3', '4', '0', '\'', '2', '8', '2', '\'', '3', '6', '6', '\'', '9', '2', '0', '\'',
+		static_assert(cjm::numerics::uint128_literals::lit_helper::validate_decimal_size<uint128_t, '3', '4', '0', '\'', '2', '8', '2', '\'', '3', '6', '6', '\'', '9', '2', '0', '\'',
 			'9', '3', '8', '\'', '4', '6', '3', '\'', '4', '6', '3', '\'', '3', '7', '4', '\'', '6', '0', '7', '\'', '4', '3', '1', '\'', '7', '6', '8', '\'', '2', '1', '1', '\'', '4', '5', '5'>());
-		static_assert(!cjm::experimental::array_lit_checker::validate_decimal_size<std::uint64_t, '3', '4', '0', '\'', '2', '8', '2', '\'', '3', '6', '6', '\'', '9', '2', '0', '\'',
+		static_assert(!cjm::numerics::uint128_literals::lit_helper::validate_decimal_size<std::uint64_t, '3', '4', '0', '\'', '2', '8', '2', '\'', '3', '6', '6', '\'', '9', '2', '0', '\'',
 			'9', '3', '8', '\'', '4', '6', '3', '\'', '4', '6', '3', '\'', '3', '7', '4', '\'', '6', '0', '7', '\'', '4', '3', '1', '\'', '7', '6', '8', '\'', '2', '1', '1', '\'', '4', '5', '5'>());
-		static_assert(!cjm::experimental::array_lit_checker::validate_decimal_size<uint128_t, '3', '4', '0', '\'', '2', '8', '2', '\'', '3', '6', '6', '\'', '9', '2', '0', '\'',
+		static_assert(!cjm::numerics::uint128_literals::lit_helper::validate_decimal_size<uint128_t, '3', '4', '0', '\'', '2', '8', '2', '\'', '3', '6', '6', '\'', '9', '2', '0', '\'',
 			'9', '3', '8', '\'', '4', '6', '3', '\'', '4', '6', '3', '\'', '3', '7', '4', '\'', '6', '0', '7', '\'', '4', '3', '1', '\'', '7', '6', '8', '\'', '2', '1', '1', '\'', '4', '5', '6'>());
-		static_assert(cjm::experimental::array_lit_checker::validate_decimal_size<std::uint64_t, '1', '2', '3', '\'', '4', '5', '6'>());
-		static_assert(cjm::experimental::array_lit_checker::count_hex_chars<'0', 'x', 'c', '0', 'd', 'e', '\'', 'd', '0', '0', 'd'>() == 8);
-		static_assert(cjm::experimental::array_lit_checker::count_hex_chars<'0', 'X', 'C', '0', 'D', 'e', '\'', 'D', '0', '0', 'F'>() == 8);
-		static_assert(cjm::experimental::array_lit_checker::count_hex_chars<'0', 'X', 'C', '0', 'D', 'e', '\'', 'D', '0', '0', 'g'>() == std::nullopt);
-		static_assert(cjm::experimental::array_lit_checker::parse_literal<std::uint64_t, '0'>() == 0);
-		//static_assert(cjm::experimental::array_lit_checker::parse_literal<std::uint64_t, '2'>() == 2);
-		static_assert(cjm::experimental::array_lit_checker::parse_literal<std::uint64_t, 'q'>() == std::nullopt);
-		static_assert(cjm::experimental::array_lit_checker::parse_literal<std::uint64_t, '0', 'x', 'c', '0', 'd', 'e', '\'', 'd', '0', '0', 'd'>() == 0xc0de'd00d);
-		using reverser_t = typename cjm::experimental::array_lit_checker::internal::array_retrieval_helper<'0', 'X', 'C', '0', 'D', 'e', '\'', 'D', '0', '0', 'g'>;
+		static_assert(cjm::numerics::uint128_literals::lit_helper::validate_decimal_size<std::uint64_t, '1', '2', '3', '\'', '4', '5', '6'>());
+		static_assert(cjm::numerics::uint128_literals::lit_helper::count_hex_chars<'0', 'x', 'c', '0', 'd', 'e', '\'', 'd', '0', '0', 'd'>() == 8);
+		static_assert(cjm::numerics::uint128_literals::lit_helper::count_hex_chars<'0', 'X', 'C', '0', 'D', 'e', '\'', 'D', '0', '0', 'F'>() == 8);
+		static_assert(cjm::numerics::uint128_literals::lit_helper::count_hex_chars<'0', 'X', 'C', '0', 'D', 'e', '\'', 'D', '0', '0', 'g'>() == std::nullopt);
+		static_assert(cjm::numerics::uint128_literals::lit_helper::parse_literal<std::uint64_t, '0'>() == 0);
+		//static_assert(cjm::numerics::uint128_literals::lit_helper::parse_literal<std::uint64_t, '2'>() == 2);
+		static_assert(cjm::numerics::uint128_literals::lit_helper::parse_literal<std::uint64_t, 'q'>() == std::nullopt);
+		static_assert(cjm::numerics::uint128_literals::lit_helper::parse_literal<std::uint64_t, '0', 'x', 'c', '0', 'd', 'e', '\'', 'd', '0', '0', 'd'>() == 0xc0de'd00d);
+		using reverser_t = typename cjm::numerics::uint128_literals::internal::array_retrieval_helper<'0', 'X', 'C', '0', 'D', 'e', '\'', 'D', '0', '0', 'g'>;
 		static_assert(reverser_t::reversed_array_val[0] == 'g' && reverser_t::reversed_array_val[9] == 'X' && reverser_t::reversed_array_val[10]=='0' && reverser_t::reversed_array_val.size() == 11);
 		{
 

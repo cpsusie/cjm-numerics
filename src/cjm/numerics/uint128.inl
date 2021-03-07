@@ -3288,13 +3288,14 @@ namespace cjm::numerics::uint128_literals
 
 
     template<char... Chars>
-    constexpr lit_type lit_helper::get_chars()
+    constexpr lit_type lit_helper::get_chars() noexcept
     {
         constexpr lit_type the_lit_type = get_lit_type<Chars...>();
         return the_lit_type;
     }
 
     template<char... Chars>
+		requires (sizeof...(Chars) > 0)
     constexpr bool lit_helper::are_all_chars_0()
     {
         std::array<char, sizeof...(Chars)> arr{ Chars... };
@@ -3469,7 +3470,7 @@ namespace cjm::numerics::uint128_literals
 		requires (sizeof...(Chars) > 0)
     constexpr uint128 operator"" _tu128() 
     {
-        constexpr std::optional<uint128> result = parse_literal<uint128, Chars...>();
+        constexpr std::optional<uint128> result = uint128_literals::lit_helper::parse_literal<uint128, Chars...>();
         static_assert(result.has_value(), "This literal is not a valid decimal or hexadecimal uint128_t.");
         return *result;
     }

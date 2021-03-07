@@ -518,7 +518,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\visual_studio_environment_test\src\visual_studio_environment_test_app\test_program.hpp" />
-    <ClInclude Include="array_lit_checker.hpp" />
     <ClInclude Include="oldv.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

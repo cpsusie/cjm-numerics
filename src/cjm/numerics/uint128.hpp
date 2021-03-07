@@ -740,13 +740,14 @@ namespace cjm
 
 			class lit_helper final
 			{
+            public:
                 template<char... Chars>
 					requires (sizeof...(Chars) > 0)
                 friend CJM_LIT_CONST uint128 operator"" _tu128();
 
                 template<char... Chars>
-                requires (sizeof...(Chars) > 0)
-                    static CJM_LIT_CONST bool are_all_chars_0();
+					requires (sizeof...(Chars) > 0)
+                static CJM_LIT_CONST bool are_all_chars_0();
 
                 static CJM_LIT_CONST bool is_legal_hex_char(char c) noexcept;
 
@@ -794,7 +795,7 @@ namespace cjm
                 template<char... Chars>
                 static CJM_LIT_CONST std::optional<size_t> count_decimal_chars();
 
-            public:
+            
 
                 template<char... Chars>
                 static CJM_LIT_CONST std::array<char, sizeof...(Chars)> get_array();
