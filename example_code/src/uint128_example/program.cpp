@@ -160,13 +160,13 @@ int main()
 //		constexpr auto& hex_lu =cjm::numerics::uint128_literals::lit_helper::digit_lookup_v<lit_type::Hexadecimal>;
 //		cout << hex_lu.size() << dec_lu.size() << newl;
 
-		using cjm::numerics::uint128_literals::operator""_tu128;
+		using cjm::numerics::uint128_literals::operator""_u128;
 
-		static_assert(0xc0de'd00d'fea2'b00b_tu128 == 0xc0de'd00d'fea2'b00b_u128);
-		static_assert(121'327'892_tu128 == 121'327'892_u128);
+		static_assert(0xc0de'd00d'fea2'b00b_u128 == 0xc0de'd00d'fea2'b00b_u128);
+		static_assert(121'327'892_u128 == 121'327'892_u128);
 
 		//auto x = 340'282'366'920'938'463'463'374'607'431'768'211'456_tu128;
-		auto y = 340'282'366'920'938'463'463'374'607'431'768'211'455_tu128;
+		auto y = 340'282'366'920'938'463'463'374'607'431'768'211'455_u128;
 		cout << y;
 
 		static_assert(cjm::numerics::uint128_literals::lit_helper::get_lit_type<'0', 'x', 'c', '0', 'd', 'e', 'd', '0', '0', 'd'>() == lit_type::Hexadecimal);
@@ -1330,47 +1330,47 @@ void cjm::uint128::example_code::demonstrate_literals()
 	//have not worked across all supported compilers.
 	//
 	
-	try
-	{
-		auto a = 001_u128; //Illegal: octal is not supported
-		std::cerr << "You should never see this: [" << a << "]." << newl;
-		throw std::logic_error{ "It should have thrown domain error." };
-	}
-	catch (const std::domain_error& ex)
-	{
-		std::cout << "CORRECT (for now) behavior: domain_error thrown.  Msg: [" << ex.what() << "]." << newl;
-	}
-	catch (const std::logic_error&)
-	{
-		std::cerr << "ERROR -- it did NOT throw!" << newl;
-		std::terminate();
-	}
-	catch (const std::exception& ex)
-	{
-		std::cerr << "ERROR -- it threw the wrong exception.  Msg: [" << ex.what() << "]." << newl;
-		std::terminate();
-	}
-
-	try
-	{
-		auto b = 340'282'366'920'938'463'463'374'607'431'768'211'456_u128;  //illegal: (too big by one)
-		std::cerr << "You should never see this: [" << b << "]." << newl;
-		throw std::logic_error{ "It should have thrown domain error." };
-	}
-	catch (const std::domain_error& ex)
-	{
-		std::cout << "CORRECT (for now) behavior: domain_error thrown.  Msg: [" << ex.what() << "]." << newl;
-	}
-	catch (const std::logic_error&)
-	{
-		std::cerr << "ERROR -- it did NOT throw!" << newl;
-		std::terminate();
-	}
-	catch (const std::exception& ex)
-	{
-		std::cerr << "ERROR -- it threw the wrong exception.  Msg: [" << ex.what() << "]." << newl;
-		std::terminate();
-	}
+//	try
+//	{
+//		auto a = 001_u128; //Illegal: octal is not supported
+//		std::cerr << "You should never see this: [" << a << "]." << newl;
+//		throw std::logic_error{ "It should have thrown domain error." };
+//	}
+//	catch (const std::domain_error& ex)
+//	{
+//		std::cout << "CORRECT (for now) behavior: domain_error thrown.  Msg: [" << ex.what() << "]." << newl;
+//	}
+//	catch (const std::logic_error&)
+//	{
+//		std::cerr << "ERROR -- it did NOT throw!" << newl;
+//		std::terminate();
+//	}
+//	catch (const std::exception& ex)
+//	{
+//		std::cerr << "ERROR -- it threw the wrong exception.  Msg: [" << ex.what() << "]." << newl;
+//		std::terminate();
+//	}
+//
+//	try
+//	{
+//		auto b = 340'282'366'920'938'463'463'374'607'431'768'211'456_u128;  //illegal: (too big by one)
+//		std::cerr << "You should never see this: [" << b << "]." << newl;
+//		throw std::logic_error{ "It should have thrown domain error." };
+//	}
+//	catch (const std::domain_error& ex)
+//	{
+//		std::cout << "CORRECT (for now) behavior: domain_error thrown.  Msg: [" << ex.what() << "]." << newl;
+//	}
+//	catch (const std::logic_error&)
+//	{
+//		std::cerr << "ERROR -- it did NOT throw!" << newl;
+//		std::terminate();
+//	}
+//	catch (const std::exception& ex)
+//	{
+//		std::cerr << "ERROR -- it threw the wrong exception.  Msg: [" << ex.what() << "]." << newl;
+//		std::terminate();
+//	}
 
 	//you can avoid this problem by forcing evaluation of the literal into a constexpr context.
 	//The following lines will not compile:

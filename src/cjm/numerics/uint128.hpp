@@ -662,12 +662,10 @@ namespace cjm
 			 * DO NOT USE THIS LITERAL OPERATOR TO PARSE STRINGS
 			 *                  */
 			/************************************************************************/
-			template<char... Chars>
-			CJM_LIT_CONST uint128 operator"" _u128();
 
 			template<char... Chars>
 				requires (sizeof...(Chars) > 0)
-            constexpr uint128 operator"" _tu128();
+            constexpr uint128 operator"" _u128();
 
 			enum class lit_type
 			{
@@ -692,9 +690,6 @@ namespace cjm
 			public:
 				friend class cjm::numerics::fixed_uint_literals::fixed_uint_lit_helper; 
 
-				template<char... Chars>
-				friend CJM_LIT_CONST uint128 operator"" _u128();
-				
 				template<size_t Size>
 				static CJM_LIT_CONST lit_type get_lit_type(std::array<char, Size> arr);
 
@@ -743,7 +738,7 @@ namespace cjm
             public:
                 template<char... Chars>
 					requires (sizeof...(Chars) > 0)
-                friend CJM_LIT_CONST uint128 operator"" _tu128();
+                friend CJM_LIT_CONST uint128 operator"" _u128();
 
                 template<char... Chars>
 					requires (sizeof...(Chars) > 0)

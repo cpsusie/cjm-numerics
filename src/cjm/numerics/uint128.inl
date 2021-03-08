@@ -38,13 +38,14 @@ namespace cjm
 		
         namespace uint128_literals
         {
-            template<char... Chars>
-            CJM_LIT_CONST uint128 operator"" _u128()
-            {
-                constexpr auto charArray = uint128_lit_helper::get_array<Chars...>();
-                return uint128_lit_helper::parse_from_char_array(charArray);
-            }
-
+	        template<char... Chars>
+	        requires (sizeof...(Chars) > 0)
+	        constexpr uint128 operator"" _u128()
+	        {
+		        constexpr std::optional<uint128> result = uint128_literals::lit_helper::parse_literal<uint128, Chars...>();
+		        static_assert(result.has_value(), "This literal is not a valid decimal or hexadecimal uint128_t.");
+		        return *result;
+	        }
 	        CJM_LIT_CONST uint8_t uint128_lit_helper::get_hex_value(char c)
             {
                 switch (c)
@@ -1098,7 +1099,7 @@ namespace cjm
 				{
 					if constexpr (std::endian::native == std::endian::little)
 					{
-						auto all_ones_in_byte = 0xff_u128;
+						auto all_ones_in_byte = static_cast<uint128>(0xffu);
 						auto ret = byte_array{};
 						for (size_t index = 0; index < ret.size(); ++index)
 						{
@@ -1110,7 +1111,7 @@ namespace cjm
 					}
 					else // constexpr (std::endian::native == std::endian::big)
 					{
-						auto all_ones_in_byte = 0xff00'0000'0000'0000'0000'0000'0000'0000_u128;
+						auto all_ones_in_byte = uint128{0xff00'0000'0000'0000, 0};
 						auto ret = byte_array{};
 						for (size_t index = 0; index < ret.size(); ++index)
 						{
@@ -2670,7 +2671,7 @@ parse_hex_str(sv hex_str)
         }
         const size_t shift_result_right_amount = (max_hex_digits - hex_digits) * 4u;
         //nb. removed vector and just use array.  not only vector not necessary, but clang can't handle in constexpr context yet
-        auto arr = (0_u128).to_big_endian_arr(); //get an empty zero-filled array
+        auto arr = (uint128{}).to_big_endian_arr(); //get an empty zero-filled array
         size_t idx = 0;
         while (!hex_str.empty()) //i.e. more bytes to go
         {
@@ -2832,7 +2833,7 @@ namespace
 	using namespace cjm::numerics;
 	using namespace uint128_literals;
 	using ones_arr = std::array<uint128, 129>;
-	constexpr uint128 all_ones = 0xffff'ffff'ffff'ffff'ffff'ffff'ffff'ffff_u128;
+	constexpr uint128 all_ones = std::numeric_limits<uint128>::max();
 	constexpr ones_arr init_ones_lookup() noexcept
 	{
 		auto ret = ones_arr{};
@@ -3466,13 +3467,6 @@ namespace cjm::numerics::uint128_literals
             }
         }
     }
-    template<char... Chars>
-		requires (sizeof...(Chars) > 0)
-    constexpr uint128 operator"" _tu128() 
-    {
-        constexpr std::optional<uint128> result = uint128_literals::lit_helper::parse_literal<uint128, Chars...>();
-        static_assert(result.has_value(), "This literal is not a valid decimal or hexadecimal uint128_t.");
-        return *result;
-    }
+
 }
 #endif
