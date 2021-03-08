@@ -735,7 +735,7 @@ namespace cjm
 
 			class lit_helper final
 			{
-            public:
+            
                 template<char... Chars>
 					requires (sizeof...(Chars) > 0)
                 friend CJM_LIT_CONST uint128 operator"" _u128();
@@ -790,7 +790,7 @@ namespace cjm
                 template<char... Chars>
                 static CJM_LIT_CONST std::optional<size_t> count_decimal_chars();
 
-            
+				public:
 
                 template<char... Chars>
                 static CJM_LIT_CONST std::array<char, sizeof...(Chars)> get_array();
