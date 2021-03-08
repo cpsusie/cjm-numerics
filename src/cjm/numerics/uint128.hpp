@@ -758,20 +758,8 @@ namespace cjm
                 requires (LiteralType == lit_type::Decimal || LiteralType == lit_type::Hexadecimal)
                     static CJM_LIT_CONST std::array<std::optional<unsigned short>, 256u> init_digit_lookup();
 
-                template<lit_type LiteralType>
-                requires (LiteralType == lit_type::Decimal || LiteralType == lit_type::Hexadecimal)
-                    static CJM_LIT_CONST std::array<std::optional<unsigned short>, 256u>  digit_lookup_v
-                    = init_digit_lookup<LiteralType>();
-
                 template<concepts::unsigned_integer Ui>
                 static CJM_LIT_CONST std::array<char, std::numeric_limits<Ui>::digits10 + 1> get_max_decimal();
-
-                template<concepts::unsigned_integer Ui>
-                static CJM_LIT_CONST std::array<char, std::numeric_limits<Ui>::digits10 + 1> max_decimal_v = get_max_decimal<Ui>();
-
-                template<concepts::unsigned_integer Ui>
-                static CJM_LIT_CONST std::array<char, std::numeric_limits<Ui>::digits10 + 1> max_decimal_digits_v
-                    = get_max_decimal<Ui>();
 
                 template<concepts::unsigned_integer Ui>
                 static CJM_LIT_CONST size_t max_hex_digits_v = std::numeric_limits<Ui>::digits / 4;
@@ -790,13 +778,22 @@ namespace cjm
                 template<char... Chars>
                 static CJM_LIT_CONST std::optional<size_t> count_decimal_chars();
 
-				public:
+			public:
 
                 template<char... Chars>
                 static CJM_LIT_CONST std::array<char, sizeof...(Chars)> get_array();
 
                 template <concepts::unsigned_integer Ui, char... Chars>
                 static CJM_LIT_CONST std::optional<Ui> parse_literal();
+
+				template<lit_type LiteralType>
+					requires (LiteralType == lit_type::Decimal || LiteralType == lit_type::Hexadecimal)
+				static CJM_LIT_CONST std::array<std::optional<unsigned short>, 256u>  digit_lookup_v
+						= init_digit_lookup<LiteralType>();
+
+				template<concepts::unsigned_integer Ui>
+				static CJM_LIT_CONST std::array<char, std::numeric_limits<Ui>::digits10 + 1> max_decimal_digits_v
+						= get_max_decimal<Ui>();
 
                 lit_helper() = delete;
                 ~lit_helper() = delete;

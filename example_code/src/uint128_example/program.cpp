@@ -50,7 +50,6 @@
 
 namespace cjm::uint128::example_code
 {
-	static_assert(cjm::numerics::uint128_literals::lit_helper::get_lit_type<'0', 'x', '0', '1'>() == lit_type::Hexadecimal);
 	using uint128_t = numerics::uint128;
 	using divmod_result_t = uint128_t ::divmod_result_t;
 	using namespace uint128_literals;
@@ -169,25 +168,8 @@ int main()
 		auto y = 340'282'366'920'938'463'463'374'607'431'768'211'455_u128;
 		cout << y;
 
-		static_assert(cjm::numerics::uint128_literals::lit_helper::get_lit_type<'0', 'x', 'c', '0', 'd', 'e', 'd', '0', '0', 'd'>() == lit_type::Hexadecimal);
-		static_assert(cjm::numerics::uint128_literals::lit_helper::get_lit_type<'3', '4', '0', '\'', '2', '8', '2', '\'', '3', '6', '6', '\'', '9', '2', '0', '\'',
-			'9', '3', '8', '\'', '4', '6', '3', '\'', '4', '6', '3', '\'', '3', '7', '4', '\'', '6', '0', '7', '\'', '4', '3', '1', '\'', '7', '6', '8', '\'', '2', '1', '1', '\'', '4', '5', '5'>() == lit_type::Decimal);
-		static_assert(cjm::numerics::uint128_literals::lit_helper::count_decimal_chars<'3', '4', '0', '\'', '2', '8', '2', '\'', '3', '6', '6', '\'', '9', '2', '0', '\'',
-			'9', '3', '8', '\'', '4', '6', '3', '\'', '4', '6', '3', '\'', '3', '7', '4', '\'', '6', '0', '7', '\'', '4', '3', '1', '\'', '7', '6', '8', '\'', '2', '1', '1', '\'', '4', '5', '5'>() == std::numeric_limits<uint128_t>::digits10 + 1);
-		static_assert(cjm::numerics::uint128_literals::lit_helper::count_decimal_chars<'3', '4', '0', '\'', '2', '8', '2', '\'', '3', '6', '6', '\'', '9', '2', '0', '\'',
-			'9', '3', '8', '\'', '4', '6', '3', '\'', '4', '6', '3', '\'', '3', '7', '4', '\'', '6', '0', '7', '\'', '4', '3', '1', '\'', '7', '6', '8', '\'', '2', '1', '1', '\'', '4', 'q', '5'>() == std::nullopt);
-		static_assert(cjm::numerics::uint128_literals::lit_helper::validate_decimal_size<uint128_t, '3', '4', '0', '\'', '2', '8', '2', '\'', '3', '6', '6', '\'', '9', '2', '0', '\'',
-			'9', '3', '8', '\'', '4', '6', '3', '\'', '4', '6', '3', '\'', '3', '7', '4', '\'', '6', '0', '7', '\'', '4', '3', '1', '\'', '7', '6', '8', '\'', '2', '1', '1', '\'', '4', '5', '5'>());
-		static_assert(!cjm::numerics::uint128_literals::lit_helper::validate_decimal_size<std::uint64_t, '3', '4', '0', '\'', '2', '8', '2', '\'', '3', '6', '6', '\'', '9', '2', '0', '\'',
-			'9', '3', '8', '\'', '4', '6', '3', '\'', '4', '6', '3', '\'', '3', '7', '4', '\'', '6', '0', '7', '\'', '4', '3', '1', '\'', '7', '6', '8', '\'', '2', '1', '1', '\'', '4', '5', '5'>());
-		static_assert(!cjm::numerics::uint128_literals::lit_helper::validate_decimal_size<uint128_t, '3', '4', '0', '\'', '2', '8', '2', '\'', '3', '6', '6', '\'', '9', '2', '0', '\'',
-			'9', '3', '8', '\'', '4', '6', '3', '\'', '4', '6', '3', '\'', '3', '7', '4', '\'', '6', '0', '7', '\'', '4', '3', '1', '\'', '7', '6', '8', '\'', '2', '1', '1', '\'', '4', '5', '6'>());
-		static_assert(cjm::numerics::uint128_literals::lit_helper::validate_decimal_size<std::uint64_t, '1', '2', '3', '\'', '4', '5', '6'>());
-		static_assert(cjm::numerics::uint128_literals::lit_helper::count_hex_chars<'0', 'x', 'c', '0', 'd', 'e', '\'', 'd', '0', '0', 'd'>() == 8);
-		static_assert(cjm::numerics::uint128_literals::lit_helper::count_hex_chars<'0', 'X', 'C', '0', 'D', 'e', '\'', 'D', '0', '0', 'F'>() == 8);
-		static_assert(cjm::numerics::uint128_literals::lit_helper::count_hex_chars<'0', 'X', 'C', '0', 'D', 'e', '\'', 'D', '0', '0', 'g'>() == std::nullopt);
 		static_assert(cjm::numerics::uint128_literals::lit_helper::parse_literal<std::uint64_t, '0'>() == 0);
-		//static_assert(cjm::numerics::uint128_literals::lit_helper::parse_literal<std::uint64_t, '2'>() == 2);
+		static_assert(cjm::numerics::uint128_literals::lit_helper::parse_literal<std::uint64_t, '2'>() == 2);
 		static_assert(cjm::numerics::uint128_literals::lit_helper::parse_literal<std::uint64_t, 'q'>() == std::nullopt);
 		static_assert(cjm::numerics::uint128_literals::lit_helper::parse_literal<std::uint64_t, '0', 'x', 'c', '0', 'd', 'e', '\'', 'd', '0', '0', 'd'>() == 0xc0de'd00d);
 		using reverser_t = typename cjm::numerics::uint128_literals::internal::array_retrieval_helper<'0', 'X', 'C', '0', 'D', 'e', '\'', 'D', '0', '0', 'g'>;
