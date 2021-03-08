@@ -46,284 +46,6 @@ namespace cjm
 		        static_assert(result.has_value(), "This literal is not a valid decimal or hexadecimal uint128_t.");
 		        return *result;
 	        }
-	        CJM_LIT_CONST uint8_t uint128_lit_helper::get_hex_value(char c)
-            {
-                switch (c)
-                {
-                    case '0':
-                        return 0;
-                    case '1':
-                        return 1;
-                    case '2':
-                        return 2;
-                    case '3':
-                        return 3;
-                    case '4':
-                        return 4;
-                    case '5':
-                        return 5;
-                    case '6':
-                        return 6;
-                    case '7':
-                        return 7;
-                    case '8':
-                        return 8;
-                    case '9':
-                        return 9;
-                    case 'a':
-                        return 10;
-                    case 'b':
-                        return 11;
-                    case 'c':
-                        return 12;
-                    case 'd':
-                        return 13;
-                    case 'e':
-                        return 14;
-                    case 'f':
-                        return 15;
-                    default:
-                        throw std::invalid_argument("Unrecognized character");
-                }
-            }
-
-            template<size_t Size>
-            CJM_LIT_CONST std::pair<bool, size_t> uint128_lit_helper::scan_chars_dec(std::array<char, Size> arr)
-            {
-                std::pair<bool, size_t> ret;
-                if (arr.empty())
-                {
-                    ret.first = false;
-                    ret.second = 0;
-                }
-                else
-                {
-                    char current_char = arr[0];
-                    if (current_char == '0' || !(current_char >= 0x30 && current_char <= 0x39))
-                    {
-                        ret.first = false;
-                        ret.second = 0;
-                    }
-                    else
-                    {
-                        ret.first = true;
-                        ret.second = 1;
-                        current_char = ret.second < arr.size() ? arr[ret.second] : '\0';
-                        if (current_char != '\0')
-                        {
-                            while (current_char != '\0')
-                            {
-                                ++ret.second;
-                                if (ret.first)
-                                    ret.first = (current_char == '\'') || (current_char >= 0x30 && current_char <= 0x39);
-                                current_char = ret.second < arr.size() ? arr[ret.second] : '\0';
-                            }
-                        }
-                        else
-                        {
-                            ret.second = 1;
-                        }
-                    }
-                }
-                return ret;
-            }
-
-            template<size_t Size>
-            CJM_LIT_CONST std::pair<size_t, size_t> uint128_lit_helper::get_dec_val(std::array<char, Size> arr, size_t index)
-            {
-                //if we got here we know that every char in chars is either \' or a legal digit
-                std::pair<size_t, size_t> ret;
-                char current_char = arr[index--];
-                if (current_char == '\'')
-                {
-                    //since we cannot reasonably expect a literal to ever have size_t::max digits,
-                    //if it equals the size_t::max, that means it was zero (zero - 1 == max) that
-                    //in turn means that the first character was a separator, which is not legal.
-                    if (index == std::numeric_limits<size_t>::max())
-                    {
-                        throw std::domain_error("Cannot begin with a separator.");
-                    }
-                    while (current_char == '\'')
-                    {
-                        if (index == 0 && arr[0] == '\'')
-                        {
-                            throw std::domain_error("Cannot begin with a separator.");
-                        }
-                        current_char = arr[index--];
-                    }
-                    ret.first = static_cast<size_t>(current_char) & 0x000Full;
-                    assert(ret.first <= 9);
-                    ret.second = index;
-                }
-                else
-                {
-                    ret.first = static_cast<size_t>(current_char) & 0x000Full;
-                    ret.second = index;
-                }
-                return ret;
-            }
-
-	        CJM_LIT_CONST char uint128_lit_helper::to_lower(char c) noexcept
-            {
-                return (c >= 65 && c <= 90) ?
-                       static_cast<char>(static_cast<unsigned char>(c + 0x20)) :
-                       c;
-            }
-
-            template<size_t Size>
-            CJM_LIT_CONST uint128 uint128_lit_helper::get_hex_literal(std::array<char, Size> arr)
-            {
-                size_t length = arr.size();
-                if (length < 3)
-                    throw std::domain_error("Bad literal");
-                if (arr[0] != '0' || (arr[1] != 'X' && arr[1] != 'x'))
-                    throw std::domain_error("Only hexadecimal literals are allowed.");
-
-                uint128 value = 0;
-                size_t byteCount = 0;
-                for (size_t i = length - 1; i > 1; )
-                {
-                    if (byteCount >= (sizeof(uint128)))
-                    {
-                        throw std::domain_error("The literal is too long.");
-                    }
-                    auto pair = get_byte(arr, i);
-                    uint128 insertMe = static_cast<uint128>(pair.first) << (static_cast<int>(byteCount++) * CHAR_BIT);
-                    value |= insertMe;
-                    i = pair.second;
-                }
-                return value;
-            }
-            template<size_t Size>
-            CJM_LIT_CONST uint128 uint128_lit_helper::get_decimal_literal(std::array<char, Size> arr)
-            {
-                uint128 ret = 0;
-                auto result = scan_chars_dec(arr);
-                if (result.first)
-                {
-                    uint128 exponent = 1;
-                    size_t length = result.second;
-                    for (auto i = length - 1; i != std::numeric_limits<size_t>::max(); )
-                    {
-                        auto temp = get_dec_val(arr, i);
-                        uint128 retCopy = ret;
-                        ret += (temp.first * exponent);
-                        if (ret < retCopy)
-                        {
-                            throw std::domain_error("literal too large to fit.");
-                        }
-                        exponent *= 10;
-                        i = temp.second;
-                    }
-                    return ret;
-                }
-                throw std::domain_error("Bad decimal literal");
-            }
-
-            template <char... Chars>
-            CJM_LIT_CONST std::array<char, sizeof...(Chars)> uint128_lit_helper::get_array()
-            {
-                std::array<char, sizeof...(Chars)> ret{ Chars... };
-                return ret;
-            }
-
-            template<size_t Size>
-            CJM_LIT_CONST lit_type uint128_lit_helper::get_lit_type(std::array<char, Size> arr)
-            {
-                size_t length = arr.size();
-                if (length == 0)
-                {
-                    return lit_type::Illegal;
-                }
-                if (arr[0] == '0' && (length == 1 || are_all_chars_0(arr)))
-                {
-                    return lit_type::Zero;
-                }
-                if (length < 3)
-                {
-                    if (arr[0] == '0')
-                        return lit_type::Illegal;
-                    if (arr[0] < 0x30 || arr[0] > 0x39)
-                        return lit_type::Illegal;
-                    return lit_type::Decimal;
-                }
-                if (arr[0] == '0' && (arr[1] == 'x' || arr[1] == 'X'))
-                    return is_legal_hex_char(arr[2]) ? lit_type::Hexadecimal : lit_type::Illegal;
-                if (arr[0] == '0')
-                    return lit_type::Illegal;
-                return arr[0] >= 0x30 && arr[0] <= 0x39 ? lit_type::Decimal : lit_type::Illegal;
-            }
-
-	        CJM_LIT_CONST bool uint128_lit_helper::is_legal_hex_char(char c) noexcept
-            {
-                c = to_lower(c);
-                return ((c >= 0x30 && c <= 0x39) || (c >= 0x61 && c <= 0x66));
-            }
-
-            template<size_t Size>
-            CJM_LIT_CONST bool uint128_lit_helper::are_all_chars_0(std::array<char, Size> arr)
-            {
-                for (size_t i = 0; i < arr.size(); i++)
-                {
-                    if (arr[i] != '0' && arr[i] != '\'')
-                        return false;
-                }
-                return true;
-            }
-
-            template<size_t Size>
-            CJM_LIT_CONST std::pair<std::uint8_t, size_t> uint128_lit_helper::get_byte(std::array<char, Size> arr, size_t index)
-            {
-
-                char currentChar = to_lower(arr[index]);
-                while (currentChar == 0 || currentChar == '\'')
-                {
-                    currentChar = to_lower(arr[--index]);
-                }
-                --index;
-                uint8_t bottomValue = get_hex_value(currentChar);
-                if (index < 2)
-                {
-                    return std::make_pair(bottomValue, index);
-                }
-                currentChar = to_lower(arr[index]);
-                while (currentChar == 0 || currentChar == '\'')
-                {
-                    --index;
-                    if (index < 2)
-                    {
-                        return std::make_pair(bottomValue, index);
-                    }
-                    currentChar = to_lower(arr[index]);
-                }
-                uint8_t topValue = get_hex_value(currentChar);
-                topValue <<= 4;
-                topValue |= bottomValue;
-                return std::make_pair(topValue, --index);
-            }
-
-            template <size_t Size>
-            CJM_LIT_CONST uint128 uint128_lit_helper::parse_from_char_array(std::array<char, Size> arr)
-            {
-                lit_type lt = get_lit_type(arr);
-                uint128 temp;
-                switch (lt)
-                {
-                    default:  // NOLINT(clang-diagnostic-covered-switch-default) 
-                    case lit_type::Illegal:
-                        throw std::domain_error("Illegal literal: only hexadecimal and decimal are supported.");
-                    case lit_type::Decimal:
-                        temp = get_decimal_literal(arr);
-                        break;
-                    case lit_type::Hexadecimal:
-                        temp = get_hex_literal(arr);
-                        break;
-                    case lit_type::Zero:
-                        temp = 0;
-                        break;
-                }
-                return temp;
-            }
         }
 		template <typename Char, typename CharTraits, typename Allocator>
             requires cjm::numerics::concepts::char_with_traits_and_allocator<Char, CharTraits, Allocator>
@@ -3264,7 +2986,7 @@ namespace cjm::numerics::uint128_literals
             return lit_type::Decimal;
         }
         if (arr[0] == '0' && (arr[1] == 'x' || arr[1] == 'X'))
-            return uint128_lit_helper::is_legal_hex_char(arr[2]) ? lit_type::Hexadecimal : lit_type::Illegal;
+            return lit_helper::is_legal_hex_char(arr[2]) ? lit_type::Hexadecimal : lit_type::Illegal;
         if (arr[0] == '0')
             return lit_type::Illegal;
         return arr[0] >= 0x30 && arr[0] <= 0x39 ? lit_type::Decimal : lit_type::Illegal;
@@ -3307,7 +3029,15 @@ namespace cjm::numerics::uint128_literals
         }
         return true;
     }
+	CJM_LIT_CONST bool lit_helper::is_legal_hex_char(char c) noexcept
+	{
+    	return lit_helper::digit_lookup_v<lit_type::Hexadecimal>[static_cast<unsigned>(c)].has_value();
+	}
 
+	CJM_LIT_CONST bool lit_helper::is_legal_dec_char(char c) noexcept
+	{
+		return lit_helper::digit_lookup_v<lit_type::Decimal>[static_cast<unsigned>(c)].has_value();
+	}
     template<concepts::unsigned_integer Ui, char... Chars>
     constexpr bool lit_helper::validate_decimal_size()
     {
