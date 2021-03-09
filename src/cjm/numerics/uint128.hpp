@@ -690,7 +690,8 @@ namespace cjm
             
                 template<char... Chars>
 					requires (sizeof...(Chars) > 0)
-                friend CJM_LIT_CONST uint128 operator"" _u128();
+                friend constexpr uint128 operator"" _u128();
+				
 
                 template<char... Chars>
 					requires (sizeof...(Chars) > 0)
@@ -714,7 +715,7 @@ namespace cjm
                 static CJM_LIT_CONST std::array<char, std::numeric_limits<Ui>::digits10 + 1> get_max_decimal();
 
                 template<concepts::unsigned_integer Ui>
-                static CJM_LIT_CONST size_t max_hex_digits_v = std::numeric_limits<Ui>::digits / 4;
+                static constexpr size_t max_hex_digits_v = std::numeric_limits<Ui>::digits / 4;
 
                 template<char... Chars>
                 static CJM_LIT_CONST std::optional<size_t> count_hex_chars();
@@ -725,7 +726,7 @@ namespace cjm
                 template<concepts::unsigned_integer Ui, size_t Digits, lit_type LiteralType, char... Chars>
                 requires (sizeof...(Chars) > 0 && sizeof...(Chars) >= Digits && Digits > 0
                     && (LiteralType == lit_type::Decimal || LiteralType == lit_type::Hexadecimal))
-                    static CJM_LIT_CONST std::optional<Ui> execute_literal_parse();
+                static CJM_LIT_CONST std::optional<Ui> execute_literal_parse();
 
                 template<char... Chars>
                 static CJM_LIT_CONST std::optional<size_t> count_decimal_chars();
@@ -740,11 +741,11 @@ namespace cjm
 
 				template<lit_type LiteralType>
 					requires (LiteralType == lit_type::Decimal || LiteralType == lit_type::Hexadecimal)
-				static CJM_LIT_CONST std::array<std::optional<unsigned short>, 256u>  digit_lookup_v
+				static constexpr std::array<std::optional<unsigned short>, 256u>  digit_lookup_v
 						= init_digit_lookup<LiteralType>();
 
 				template<concepts::unsigned_integer Ui>
-				static CJM_LIT_CONST std::array<char, std::numeric_limits<Ui>::digits10 + 1> max_decimal_digits_v
+				static constexpr std::array<char, std::numeric_limits<Ui>::digits10 + 1> max_decimal_digits_v
 						= get_max_decimal<Ui>();
 
                 lit_helper() = delete;

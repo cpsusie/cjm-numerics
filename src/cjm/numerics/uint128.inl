@@ -39,7 +39,7 @@ namespace cjm
         namespace uint128_literals
         {
 	        template<char... Chars>
-	        requires (sizeof...(Chars) > 0)
+				requires (sizeof...(Chars) > 0)
 	        constexpr uint128 operator"" _u128()
 	        {
 		        constexpr std::optional<uint128> result = uint128_literals::lit_helper::parse_literal<uint128, Chars...>();
@@ -2800,21 +2800,21 @@ namespace cjm::numerics::uint128_literals
     namespace internal
     {
         template<char... Chars>
-        requires (sizeof...(Chars) > 0)
-            struct array_retrieval_helper;
+			requires (sizeof...(Chars) > 0)
+        struct array_retrieval_helper;
 
         template<char... Chars>
-        requires (sizeof...(Chars) > 0)
-            struct array_retrieval_helper final
+			requires (sizeof...(Chars) > 0)
+        struct array_retrieval_helper final
         {
-            static constexpr std::array<char, sizeof...(Chars)> reverse_array();
+            static CJM_LIT_CONST std::array<char, sizeof...(Chars)> reverse_array();
             static constexpr std::array<char, sizeof...(Chars)> reversed_array_val = reverse_array();
             static constexpr std::array<char, sizeof...(Chars)> array_val{ Chars... };
         };
 
         template<char... Chars>
-        requires (sizeof...(Chars) > 0)
-            constexpr std::array<char, sizeof...(Chars)> array_retrieval_helper<Chars...>::reverse_array()
+		    requires (sizeof...(Chars) > 0)
+        CJM_LIT_CONST std::array<char, sizeof...(Chars)> array_retrieval_helper<Chars...>::reverse_array()
         {
             std::array<char, sizeof...(Chars)> src{ Chars... };
             std::array<char, sizeof...(Chars)> ret{};
@@ -2829,8 +2829,8 @@ namespace cjm::numerics::uint128_literals
     }
 
     template<lit_type LiteralType>
-    requires (LiteralType == lit_type::Decimal || LiteralType == lit_type::Hexadecimal)
-        constexpr std::array<std::optional<unsigned short>, 256u> lit_helper::init_digit_lookup()
+		requires (LiteralType == lit_type::Decimal || LiteralType == lit_type::Hexadecimal)
+    CJM_LIT_CONST std::array<std::optional<unsigned short>, 256u> lit_helper::init_digit_lookup()
     {
         if constexpr (LiteralType == lit_type::Decimal)
         {
@@ -2946,7 +2946,7 @@ namespace cjm::numerics::uint128_literals
         }
     }
     template<concepts::unsigned_integer Ui>
-    constexpr std::array<char, std::numeric_limits<Ui>::digits10 + 1> lit_helper::get_max_decimal()
+    CJM_LIT_CONST std::array<char, std::numeric_limits<Ui>::digits10 + 1> lit_helper::get_max_decimal()
     {
         constexpr Ui max = std::numeric_limits<Ui>::max();
         std::array<char, std::numeric_limits<Ui>::digits10 + 1> ret{};
@@ -2965,7 +2965,7 @@ namespace cjm::numerics::uint128_literals
 
 
     template<char... Chars>
-    constexpr lit_type lit_helper::get_lit_type()
+    CJM_LIT_CONST lit_type lit_helper::get_lit_type()
     {
         std::array<char, sizeof...(Chars)> arr{ Chars... };
         size_t length = arr.size();
@@ -2993,7 +2993,7 @@ namespace cjm::numerics::uint128_literals
     }
 
     template<char... Chars>
-    constexpr std::optional<size_t> lit_helper::count_decimal_chars()
+    CJM_LIT_CONST std::optional<size_t> lit_helper::count_decimal_chars()
     {
         std::array<char, sizeof...(Chars)> arr{ Chars... };
         size_t ret = 0;
@@ -3011,7 +3011,7 @@ namespace cjm::numerics::uint128_literals
 
 
     template<char... Chars>
-    constexpr lit_type lit_helper::get_chars() noexcept
+    CJM_LIT_CONST lit_type lit_helper::get_chars() noexcept
     {
         constexpr lit_type the_lit_type = get_lit_type<Chars...>();
         return the_lit_type;
@@ -3019,7 +3019,7 @@ namespace cjm::numerics::uint128_literals
 
     template<char... Chars>
 		requires (sizeof...(Chars) > 0)
-    constexpr bool lit_helper::are_all_chars_0()
+    CJM_LIT_CONST bool lit_helper::are_all_chars_0()
     {
         std::array<char, sizeof...(Chars)> arr{ Chars... };
         for (char c : arr)
@@ -3031,15 +3031,15 @@ namespace cjm::numerics::uint128_literals
     }
 	CJM_LIT_CONST bool lit_helper::is_legal_hex_char(char c) noexcept
 	{
-    	return lit_helper::digit_lookup_v<lit_type::Hexadecimal>[static_cast<unsigned>(c)].has_value();
+    	return lit_helper::digit_lookup_v<lit_type::Hexadecimal>[static_cast<unsigned>(c) % 256u].has_value();
 	}
 
 	CJM_LIT_CONST bool lit_helper::is_legal_dec_char(char c) noexcept
 	{
-		return lit_helper::digit_lookup_v<lit_type::Decimal>[static_cast<unsigned>(c)].has_value();
+		return lit_helper::digit_lookup_v<lit_type::Decimal>[static_cast<unsigned>(c) % 256u].has_value();
 	}
     template<concepts::unsigned_integer Ui, char... Chars>
-    constexpr bool lit_helper::validate_decimal_size()
+    CJM_LIT_CONST bool lit_helper::validate_decimal_size()
     {
         if (get_lit_type<Chars...>() != lit_type::Decimal)
             return false;
@@ -3066,7 +3066,7 @@ namespace cjm::numerics::uint128_literals
     }
 
     template<char... Chars>
-    constexpr std::optional<size_t> lit_helper::count_hex_chars()
+    CJM_LIT_CONST std::optional<size_t> lit_helper::count_hex_chars()
     {
         if (get_lit_type<Chars...>() != lit_type::Hexadecimal)
             return std::nullopt;
@@ -3107,7 +3107,7 @@ namespace cjm::numerics::uint128_literals
     template<concepts::unsigned_integer Ui, size_t Digits, lit_type LiteralType, char... Chars>
 		requires (sizeof...(Chars) > 0 && sizeof...(Chars) >= Digits && Digits > 0 &&
             (LiteralType == lit_type::Decimal || LiteralType == lit_type::Hexadecimal))
-    constexpr std::optional<Ui> lit_helper::execute_literal_parse()
+    CJM_LIT_CONST std::optional<Ui> lit_helper::execute_literal_parse()
     {
         using reverser_t = typename internal::array_retrieval_helper<Chars...>;
         Ui ret = 0;
@@ -3139,7 +3139,7 @@ namespace cjm::numerics::uint128_literals
     }
 
     template <concepts::unsigned_integer Ui, char... Chars>
-    constexpr std::optional<Ui> lit_helper::parse_literal()
+    CJM_LIT_CONST std::optional<Ui> lit_helper::parse_literal()
     {
         constexpr lit_type type = get_lit_type<Chars...>();
         if (type != lit_type::Decimal && type != lit_type::Hexadecimal && type != lit_type::Zero)

@@ -131,7 +131,11 @@
 #define CJM_HAS_BITOPS
 #endif
 
-#ifndef CJM_LIT_CONST
+#ifdef CJM_LIT_CONST
+#error "Do not define CJM_LIT_CONST manually."
+#elif defined(__cpp_consteval)
+#define CJM_LIT_CONST consteval
+#else
 #define CJM_LIT_CONST constexpr
 #endif
 
