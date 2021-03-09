@@ -188,6 +188,12 @@ namespace cjm::clang::test_program
 #else
 			false;
 #endif
+		constexpr bool has_consteval =
+#ifdef __cpp_consteval
+			true;
+#else
+			false;
+#endif
 	}
 
 	namespace intrinsics_test
