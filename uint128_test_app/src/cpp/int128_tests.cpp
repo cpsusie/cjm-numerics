@@ -558,6 +558,7 @@ void cjm::uint128_tests::print_environ_data()
     print_uint128_eval_mode();
     print_cpp20_bitops_available();
     print_builtin_uint128_data_if_present();
+    print_whether_has_consteval();
     cout << "END ENVIRONMENT DATA" << newl << newl;
 }
 
@@ -1692,6 +1693,12 @@ void cjm::uint128_tests::print_constexpr_bitcast_available()
     using namespace numerics;
     cout_saver o_saver{cout};
     cout << "Is constexpr bitcasting available?: [" << avail_text << "]." << newl;
+}
+
+void cjm::uint128_tests::print_whether_has_consteval()
+{
+    auto saver = cout_saver{ std::cout };
+    cout << "Is consteval (immediate function) available?: [" << std::boolalpha << cjm::numerics::internal::has_consteval << "]." << newl;
 }
 
 void cjm::uint128_tests::print_builtin_uint128_data_if_present()

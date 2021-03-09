@@ -128,6 +128,7 @@ namespace cjm::uint128_tests
     void print_constexpr_bitcast_available();
     void print_cpp20_bitops_available();
     void print_builtin_uint128_data_if_present();
+    void print_whether_has_consteval();
     void test_interconversion(const ctrl_uint128_t& control, uint128_t test);
     void execute_builtin_u128fls_test_if_avail();
     void execute_first_bin_op_test();
