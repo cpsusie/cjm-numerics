@@ -7,6 +7,23 @@ namespace
     using namespace cjm::testing;
     using cjm::testing::newl;
 
+    constexpr auto hex_char_arr = std::array<char, 16> {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'};
+
+	template<concepts::unsigned_integer Ui, bool HexAndDecimal>
+	constexpr std::array<size_t, (std::numeric_limits<Ui>::digits10 + 2)> init_num_tests_arr() noexcept
+	{
+        auto temp = std::array<size_t, std::numeric_limits<Ui>::digits10 + 2>{};
+        constexpr size_t num_zero_digit_tests = 0;
+        constexpr size_t num_one_digit_tests = HexAndDecimal ? 26u : 10u;
+        constexpr size_t num_tests_per_other_digit_per_base = 5u;
+        temp[0] = num_zero_digit_tests;
+        temp[1] = num_one_digit_tests;
+		for (size_t i = 2; i < temp.size(); ++i)
+		{
+            temp[i] = num_tests_per_other_digit_per_base * (HexAndDecimal ? 2u : 1u);
+		}
+        return temp;
+	}
 	constexpr std::array<int, 128> get_shifting_arr() noexcept
 	{
         std::array<int, 128> ret{};
@@ -1871,6 +1888,7 @@ namespace cjm::uint128_tests::generator::internal
         rgen_impl& operator=(const rgen_impl& other) = delete;
         rgen_impl& operator=(rgen_impl&& other) noexcept = delete;
 
+        std::uint8_t random_byte();
         std::vector<std::uint8_t> generate(size_t bytes);
         int generate_shift_param(int num_digits);
         template<typename Int> requires(std::integral<Int> &&
@@ -1899,6 +1917,13 @@ namespace
 std::unique_ptr<cjm::uint128_tests::generator::internal::rgen_impl> cjm::uint128_tests::generator::internal::rgen_impl::make_rgen()
 {
     return std::unique_ptr<rgen_impl>(new rgen_impl());
+}
+
+std::uint8_t cjm::uint128_tests::generator::internal::rgen_impl::random_byte()
+{
+    constexpr unsigned short bottom_half = 0x00ffu;
+    auto distrib = std::uniform_int_distribution<unsigned short>();
+    return static_cast<std::uint8_t>(distrib(m_twister) & bottom_half);
 }
 
 std::vector<std::uint8_t> cjm::uint128_tests::generator::internal::rgen_impl::generate(size_t bytes)
@@ -2091,7 +2116,30 @@ cjm::uint128_tests::generator::rgen& cjm::uint128_tests::generator::rgen::operat
     return *this;
 }
 
+char cjm::uint128_tests::generator::rgen::random_decimal_digit(char max)
+{
+	if (max < 0x30 || max > 0x39)
+	{
+        auto strm = string::make_throwing_sstream<char>();
+        strm
+            << std::hex << std::setw(2) << std::setfill('0') 
+            << "Parameter [max] must be between [0x30] ('0') "
+			<< "and [0x39] ('9') inclusively.  Actual value: [0x"
+			<< std::hex << std::setw(2) << std::setfill('0')
+			<< static_cast<unsigned>(static_cast<unsigned char>(max))
+			<< "] (" << max << ")." << newl;
+        throw std::invalid_argument{ strm.str() };
+	}
 
+    const auto random_byte = (static_cast<unsigned>(m_gen->random_byte()) % 10u) + 0x30u;
+    return static_cast<char>(static_cast<unsigned char>(random_byte));
+}
+
+char cjm::uint128_tests::generator::rgen::random_hex_digit()
+{
+    const auto random_byte = (static_cast<unsigned>(m_gen->random_byte()) % 0x10u);
+    return hex_char_arr.at(random_byte);
+}
 
 
 cjm::uint128_tests::binary_op cjm::uint128_tests::generator::rgen::
@@ -4393,6 +4441,133 @@ void cjm::uint128_tests::execute_issue27_bug_test()
     utf32_stream >> utf32_result;
     cjm_assert(utf32_result == expected_value);
 }
+
+std::pair<cjm::uint128_tests::ctrl_uint128_t, std::string> cjm::uint128_tests::create_random_dec_n_digits_long(
+    size_t decimal_digits, generator::rgen& rgen)
+{
+    constexpr size_t max_dec_digits = std::numeric_limits<ctrl_uint128_t>::digits10 + 1u;
+    if (decimal_digits == 0 || decimal_digits > max_dec_digits)
+    {
+        auto strm = string::make_throwing_sstream<char>();
+        strm
+            << "The parameter [hex_digits] must be greater than zero"
+            << " and no greater than [" << max_dec_digits << "].  "
+            << "Actual value: [" << decimal_digits << "]." << newl;
+        throw std::invalid_argument{ strm.str() };
+    }
+
+    constexpr auto max = lit_helper::max_decimal_digits_v<ctrl_uint128_t>;
+    auto char_array = std::vector<char>{};
+    char_array.reserve(decimal_digits);
+    size_t max_char_idx = 0;
+    
+    bool can_ignore_max_char = decimal_digits < max_dec_digits;
+
+    ctrl_uint128_t result = 0;
+    ctrl_uint128_t current_digit = 1;
+    constexpr ctrl_uint128_t base_factor = 10u;
+    while (char_array.size() < decimal_digits)
+    {
+        char random;
+        if (can_ignore_max_char)
+        {
+            random = rgen.random_decimal_digit();
+        }
+        else
+        {
+            const char max_char = max.at(max_char_idx);
+            random = rgen.random_decimal_digit(max_char);
+            assert(random <= max.at(max_char_idx));
+            can_ignore_max_char = random < max.at(max_char_idx);
+            ++max_char_idx;
+        }
+        unsigned value = lit_helper::digit_lookup_v<lit_type::Decimal>[static_cast<unsigned>(static_cast<unsigned char>(random)) % 0x0100u].value();
+        result += (value * current_digit);
+        current_digit *= base_factor;
+        char_array.push_back(random);
+    }
+    return std::make_pair(result, std::string{ char_array.crbegin(), char_array.crend() });
+}
+
+std::pair<cjm::uint128_tests::ctrl_uint128_t, std::string> cjm::uint128_tests::
+	create_random_hex_n_digits_long(size_t hex_digits, generator::rgen& rgen)
+{
+    constexpr size_t max_hex_digits = std::numeric_limits<ctrl_uint128_t>::digits / 4u;
+	if (hex_digits == 0 || hex_digits > max_hex_digits)
+	{
+        auto strm = string::make_throwing_sstream<char>();
+        strm
+			<< "The parameter [hex_digits] must be greater than zero"
+			<< " and no greater than [" << max_hex_digits << "].  "
+			<< "Actual value: [" << hex_digits << "]." << newl;
+        throw std::invalid_argument{ strm.str() };
+	}
+        
+    ctrl_uint128_t result = 0;
+    ctrl_uint128_t current_digit = 1;
+    const ctrl_uint128_t base_factor = 0x0a;
+    auto vec = std::vector<char>{ };
+    vec.reserve(hex_digits);
+	while (vec.size() < hex_digits)
+	{
+        const char c = rgen.random_hex_digit();
+        unsigned value = lit_helper::digit_lookup_v<lit_type::Hexadecimal>[static_cast<unsigned>(static_cast<unsigned char>(c)) % 0x0100u].value();
+        result += (value * current_digit);
+        current_digit *= base_factor;
+        vec.push_back(c);
+	}
+    auto strm = string::make_throwing_sstream<char>();
+    strm << "0x";
+	for (auto it = vec.crbegin(); it != vec.crend(); ++it)
+	{
+        strm << *it;
+	}
+    return std::make_pair(result, strm.str());
+}
+
+
+std::string cjm::uint128_tests::generate_literal_test(lit_type literal_type, size_t num_digits, generator::rgen& gen)
+{
+	if (literal_type != lit_type::Decimal && literal_type != lit_type::Hexadecimal)
+	{
+        auto strm = string::make_throwing_sstream<char>();
+        strm << "Only hexadecimal and decimal literals supported.  Specified literal type: [" << literal_type << "]." << newl;
+        throw std::invalid_argument{ strm.str() };
+	}
+	if (num_digits == 0)
+	{
+        throw std::invalid_argument{ "At least one digit must be specified." };
+	}
+    //using namespace boost::multiprecision::literals;
+    
+    const auto&& [value, value_text]  = create_random_hex_n_digits_long(num_digits, gen);
+    auto strm = string::make_throwing_sstream<char>();
+    strm << std::hex;
+    strm << "\t\tcjm_assert(to_test(0x" << value << "_cppui128) == " << value_text << "u128);" << newl;
+    return strm.str();
+}
+std::vector<std::string> cjm::uint128_tests::generate_literal_tests()
+{
+    constexpr auto arr = init_num_tests_arr<ctrl_uint128_t, true>();
+    const size_t total_tests = std::accumulate(arr.cbegin(), arr.cend(), 0u);
+    assert(total_tests > 0);
+	auto vec = std::vector<std::string>{};
+    vec.reserve(total_tests);
+    constexpr size_t max_digits = std::numeric_limits<ctrl_uint128_t>::digits10 + 1u;
+    using namespace std::string_literals;
+    vec.emplace_back("")
+	
+
+	for (size_t digits_now = 2; digits_now <= max_digits; ++digits_now)
+	{
+        
+		
+	}
+	
+}
+
+
+
 
 
 #ifdef CJM_HAVE_BUILTIN_128
