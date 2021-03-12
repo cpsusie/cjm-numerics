@@ -4532,8 +4532,7 @@ std::pair<cjm::uint128_tests::ctrl_uint128_t, std::string> cjm::uint128_tests::c
         char_array.push_back(random);
     }
     constexpr auto& arr = lit_helper::digit_lookup_v<lit_type::Decimal>;
-    std::string ret;
-    ret.reserve(char_array.size());
+    
 	for (auto it = char_array.crbegin(); it != char_array.crend(); ++it)
 	{
         char c = *it;
@@ -4541,7 +4540,7 @@ std::pair<cjm::uint128_tests::ctrl_uint128_t, std::string> cjm::uint128_tests::c
         unsigned value = arr.at(idx).value();
         result += (value * current_digit);
         current_digit *= base_factor;
-        ret.push_back(c);
+        
 	}    
     return std::make_pair(result, std::string{ char_array.cbegin(), char_array.cend() });
 }
