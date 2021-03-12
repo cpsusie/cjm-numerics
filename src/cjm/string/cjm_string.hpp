@@ -16,6 +16,8 @@
 #include <cjm/string/istream_utils.hpp>
 namespace cjm::string
 {
+
+	
 	template<typename Char, typename CharTraits = std::char_traits<Char>, typename Allocator = std::allocator<Char>>
 	        requires cjm::numerics::concepts::char_with_traits_and_allocator<Char, CharTraits, Allocator>
 	std::basic_string<Char, CharTraits, Allocator> trim(const std::basic_string<Char, CharTraits, Allocator>& trimMe);

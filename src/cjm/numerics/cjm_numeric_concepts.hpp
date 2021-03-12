@@ -522,6 +522,13 @@ namespace cjm::numerics::concepts
     template<typename Allocator>
     concept utf32_char_allocator = std::is_nothrow_convertible_v<std::allocator<char32_t>, Allocator>;
 
+    template<typename T, typename Char>
+    concept stream_insertable = character<Char>
+        && requires (std::basic_ostream<Char>& os, const T & v)
+    {
+        {os << v } -> nothrow_convertible<std::basic_ostream<Char>&>;
+    };
+	
     /// <summary>
     /// Determines whether you can bitcast From to To:
     ///    to be bit_castable, the types must both:

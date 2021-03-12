@@ -191,6 +191,8 @@ namespace cjm::uint128_tests
 
     void execute_issue27_bug_test();
 
+    std::basic_ostream<char>& operator<<(std::basic_ostream<char>&, lit_type v);
+	
     std::pair<ctrl_uint128_t, std::string> create_random_dec_n_digits_long(size_t decimal_digits, generator::rgen& gen);
     std::pair<ctrl_uint128_t, std::string> create_random_hex_n_digits_long(size_t hex_digits, generator::rgen& gen);
     std::string generate_literal_test(lit_type literal_type, size_t num_digits, generator::rgen& gen);
@@ -2316,5 +2318,6 @@ std::size_t std::hash<cjm::uint128_tests::unary_operation<TestType, ControlType>
 {
     return hash_me.hash_value();
 }
-#endif //INT128_INT128_TESTS_HPP
 #include "int128_tests.inl"
+#endif //INT128_INT128_TESTS_HPP
+

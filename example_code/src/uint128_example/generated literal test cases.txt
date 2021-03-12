@@ -1,0 +1,1000 @@
+        using namespace boost::multiprecision::literals;
+
+        std::cout << "Beginning single digit hex literal tests...";
+        cjm_assert_equal(to_test(0x0_cppui128), 0x0_u128, "0x0"sv);
+        cjm_assert_equal(to_test(0x1_cppui128), 0x1_u128, "0x1"sv);
+        cjm_assert_equal(to_test(0x2_cppui128), 0x2_u128, "0x2"sv);
+        cjm_assert_equal(to_test(0x3_cppui128), 0x3_u128, "0x3"sv);
+        cjm_assert_equal(to_test(0x4_cppui128), 0x4_u128, "0x4"sv);
+        cjm_assert_equal(to_test(0x5_cppui128), 0x5_u128, "0x5"sv);
+        cjm_assert_equal(to_test(0x6_cppui128), 0x6_u128, "0x6"sv);
+        cjm_assert_equal(to_test(0x7_cppui128), 0x7_u128, "0x7"sv);
+        cjm_assert_equal(to_test(0x8_cppui128), 0x8_u128, "0x8"sv);
+        cjm_assert_equal(to_test(0x9_cppui128), 0x9_u128, "0x9"sv);
+        cjm_assert_equal(to_test(0xa_cppui128), 0xa_u128, "0xa"sv);
+        cjm_assert_equal(to_test(0xb_cppui128), 0xb_u128, "0xb"sv);
+        cjm_assert_equal(to_test(0xc_cppui128), 0xc_u128, "0xc"sv);
+        cjm_assert_equal(to_test(0xd_cppui128), 0xd_u128, "0xd"sv);
+        cjm_assert_equal(to_test(0xe_cppui128), 0xe_u128, "0xe"sv);
+        cjm_assert_equal(to_test(0xf_cppui128), 0xf_u128, "0xf"sv);
+        std::cout << "End single digit hex literal tests...";
+
+        std::cout << "Begin single digit decimal literal tests...";
+        cjm_assert_equal(to_test(0_cppui128), 0_u128, "0"sv);
+        cjm_assert_equal(to_test(1_cppui128), 1_u128, "1"sv);
+        cjm_assert_equal(to_test(2_cppui128), 2_u128, "2"sv);
+        cjm_assert_equal(to_test(3_cppui128), 3_u128, "3"sv);
+        cjm_assert_equal(to_test(4_cppui128), 4_u128, "4"sv);
+        cjm_assert_equal(to_test(5_cppui128), 5_u128, "5"sv);
+        cjm_assert_equal(to_test(6_cppui128), 6_u128, "6"sv);
+        cjm_assert_equal(to_test(7_cppui128), 7_u128, "7"sv);
+        cjm_assert_equal(to_test(8_cppui128), 8_u128, "8"sv);
+        cjm_assert_equal(to_test(9_cppui128), 9_u128, "9"sv);
+        std::cout << "End single digit decimal literal tests...";
+
+        std::cout << "Begin 2 digit hex literal tests...";
+        cjm_assert_equal(to_test(0xcc_cppui128), 0xcc_u128, "0xcc"sv);
+
+        cjm_assert_equal(to_test(0x22_cppui128), 0x22_u128, "0x22"sv);
+
+        cjm_assert_equal(to_test(0x12_cppui128), 0x12_u128, "0x12"sv);
+
+        cjm_assert_equal(to_test(0x6e_cppui128), 0x6e_u128, "0x6e"sv);
+
+        cjm_assert_equal(to_test(0x93_cppui128), 0x93_u128, "0x93"sv);
+
+        std::cout << "End 2 digit hex literal tests...";
+
+        std::cout << "Begin 2 digit decimal literal tests...";
+        cjm_assert_equal(to_test(54_cppui128), 54_u128, "54"sv);
+
+        cjm_assert_equal(to_test(77_cppui128), 77_u128, "77"sv);
+
+        cjm_assert_equal(to_test(35_cppui128), 35_u128, "35"sv);
+
+        cjm_assert_equal(to_test(75_cppui128), 75_u128, "75"sv);
+
+        cjm_assert_equal(to_test(58_cppui128), 58_u128, "58"sv);
+
+        std::cout << "End 2 digit decimal literal tests...";
+
+        std::cout << "Begin 3 digit hex literal tests...";
+        cjm_assert_equal(to_test(0xb3c_cppui128), 0xb3c_u128, "0xb3c"sv);
+
+        cjm_assert_equal(to_test(0xc4f_cppui128), 0xc4f_u128, "0xc4f"sv);
+
+        cjm_assert_equal(to_test(0xd76_cppui128), 0xd76_u128, "0xd76"sv);
+
+        cjm_assert_equal(to_test(0xa00_cppui128), 0xa00_u128, "0xa00"sv);
+
+        cjm_assert_equal(to_test(0xd97_cppui128), 0xd97_u128, "0xd97"sv);
+
+        std::cout << "End 3 digit hex literal tests...";
+
+        std::cout << "Begin 3 digit decimal literal tests...";
+        cjm_assert_equal(to_test(865_cppui128), 865_u128, "865"sv);
+
+        cjm_assert_equal(to_test(731_cppui128), 731_u128, "731"sv);
+
+        cjm_assert_equal(to_test(940_cppui128), 940_u128, "940"sv);
+
+        cjm_assert_equal(to_test(702_cppui128), 702_u128, "702"sv);
+
+        cjm_assert_equal(to_test(965_cppui128), 965_u128, "965"sv);
+
+        std::cout << "End 3 digit decimal literal tests...";
+
+        std::cout << "Begin 4 digit hex literal tests...";
+        cjm_assert_equal(to_test(0xfcb7_cppui128), 0xfcb7_u128, "0xfcb7"sv);
+
+        cjm_assert_equal(to_test(0x8662_cppui128), 0x8662_u128, "0x8662"sv);
+
+        cjm_assert_equal(to_test(0x9b88_cppui128), 0x9b88_u128, "0x9b88"sv);
+
+        cjm_assert_equal(to_test(0x17a1_cppui128), 0x17a1_u128, "0x17a1"sv);
+
+        cjm_assert_equal(to_test(0x2e6b_cppui128), 0x2e6b_u128, "0x2e6b"sv);
+
+        std::cout << "End 4 digit hex literal tests...";
+
+        std::cout << "Begin 4 digit decimal literal tests...";
+        cjm_assert_equal(to_test(3161_cppui128), 3161_u128, "3161"sv);
+
+        cjm_assert_equal(to_test(5617_cppui128), 5617_u128, "5617"sv);
+
+        cjm_assert_equal(to_test(6242_cppui128), 6242_u128, "6242"sv);
+
+        cjm_assert_equal(to_test(7397_cppui128), 7397_u128, "7397"sv);
+
+        cjm_assert_equal(to_test(7341_cppui128), 7341_u128, "7341"sv);
+
+        std::cout << "End 4 digit decimal literal tests...";
+
+        std::cout << "Begin 5 digit hex literal tests...";
+        cjm_assert_equal(to_test(0x9dc15_cppui128), 0x9dc15_u128, "0x9dc15"sv);
+
+        cjm_assert_equal(to_test(0xb4541_cppui128), 0xb4541_u128, "0xb4541"sv);
+
+        cjm_assert_equal(to_test(0xe5687_cppui128), 0xe5687_u128, "0xe5687"sv);
+
+        cjm_assert_equal(to_test(0x9a5c8_cppui128), 0x9a5c8_u128, "0x9a5c8"sv);
+
+        cjm_assert_equal(to_test(0x98aef_cppui128), 0x98aef_u128, "0x98aef"sv);
+
+        std::cout << "End 5 digit hex literal tests...";
+
+        std::cout << "Begin 5 digit decimal literal tests...";
+        cjm_assert_equal(to_test(63537_cppui128), 63537_u128, "63537"sv);
+
+        cjm_assert_equal(to_test(43401_cppui128), 43401_u128, "43401"sv);
+
+        cjm_assert_equal(to_test(21598_cppui128), 21598_u128, "21598"sv);
+
+        cjm_assert_equal(to_test(62559_cppui128), 62559_u128, "62559"sv);
+
+        cjm_assert_equal(to_test(67176_cppui128), 67176_u128, "67176"sv);
+
+        std::cout << "End 5 digit decimal literal tests...";
+
+        std::cout << "Begin 6 digit hex literal tests...";
+        cjm_assert_equal(to_test(0x6ed9ab_cppui128), 0x6ed9ab_u128, "0x6ed9ab"sv);
+
+        cjm_assert_equal(to_test(0x19db7_cppui128), 0x019db7_u128, "0x019db7"sv);
+
+        cjm_assert_equal(to_test(0x8bec0e_cppui128), 0x8bec0e_u128, "0x8bec0e"sv);
+
+        cjm_assert_equal(to_test(0xcd9cab_cppui128), 0xcd9cab_u128, "0xcd9cab"sv);
+
+        cjm_assert_equal(to_test(0x37edde_cppui128), 0x37edde_u128, "0x37edde"sv);
+
+        std::cout << "End 6 digit hex literal tests...";
+
+        std::cout << "Begin 6 digit decimal literal tests...";
+        cjm_assert_equal(to_test(577921_cppui128), 577921_u128, "577921"sv);
+
+        cjm_assert_equal(to_test(349452_cppui128), 349452_u128, "349452"sv);
+
+        cjm_assert_equal(to_test(656901_cppui128), 656901_u128, "656901"sv);
+
+        cjm_assert_equal(to_test(903665_cppui128), 903665_u128, "903665"sv);
+
+        cjm_assert_equal(to_test(122608_cppui128), 122608_u128, "122608"sv);
+
+        std::cout << "End 6 digit decimal literal tests...";
+
+        std::cout << "Begin 7 digit hex literal tests...";
+        cjm_assert_equal(to_test(0x90ab793_cppui128), 0x90ab793_u128, "0x90ab793"sv);
+
+        cjm_assert_equal(to_test(0xa00c918_cppui128), 0xa00c918_u128, "0xa00c918"sv);
+
+        cjm_assert_equal(to_test(0xbe07eaa_cppui128), 0xbe07eaa_u128, "0xbe07eaa"sv);
+
+        cjm_assert_equal(to_test(0xfe7ed2a_cppui128), 0xfe7ed2a_u128, "0xfe7ed2a"sv);
+
+        cjm_assert_equal(to_test(0x7f4072c_cppui128), 0x7f4072c_u128, "0x7f4072c"sv);
+
+        std::cout << "End 7 digit hex literal tests...";
+
+        std::cout << "Begin 7 digit decimal literal tests...";
+        cjm_assert_equal(to_test(8735130_cppui128), 8735130_u128, "8735130"sv);
+
+        cjm_assert_equal(to_test(5559128_cppui128), 5559128_u128, "5559128"sv);
+
+        cjm_assert_equal(to_test(8939041_cppui128), 8939041_u128, "8939041"sv);
+
+        cjm_assert_equal(to_test(4179666_cppui128), 4179666_u128, "4179666"sv);
+
+        cjm_assert_equal(to_test(6310505_cppui128), 6310505_u128, "6310505"sv);
+
+        std::cout << "End 7 digit decimal literal tests...";
+
+        std::cout << "Begin 8 digit hex literal tests...";
+        cjm_assert_equal(to_test(0xac2abb39_cppui128), 0xac2abb39_u128, "0xac2abb39"sv);
+
+        cjm_assert_equal(to_test(0xa7089c55_cppui128), 0xa7089c55_u128, "0xa7089c55"sv);
+
+        cjm_assert_equal(to_test(0x701be562_cppui128), 0x701be562_u128, "0x701be562"sv);
+
+        cjm_assert_equal(to_test(0xb6002654_cppui128), 0xb6002654_u128, "0xb6002654"sv);
+
+        cjm_assert_equal(to_test(0x99896ec_cppui128), 0x099896ec_u128, "0x099896ec"sv);
+
+        std::cout << "End 8 digit hex literal tests...";
+
+        std::cout << "Begin 8 digit decimal literal tests...";
+        cjm_assert_equal(to_test(71028803_cppui128), 71028803_u128, "71028803"sv);
+
+        cjm_assert_equal(to_test(60245997_cppui128), 60245997_u128, "60245997"sv);
+
+        cjm_assert_equal(to_test(20190359_cppui128), 20190359_u128, "20190359"sv);
+
+        cjm_assert_equal(to_test(76297982_cppui128), 76297982_u128, "76297982"sv);
+
+        cjm_assert_equal(to_test(55325831_cppui128), 55325831_u128, "55325831"sv);
+
+        std::cout << "End 8 digit decimal literal tests...";
+
+        std::cout << "Begin 9 digit hex literal tests...";
+        cjm_assert_equal(to_test(0x76d77e1d3_cppui128), 0x76d77e1d3_u128, "0x76d77e1d3"sv);
+
+        cjm_assert_equal(to_test(0x233ce5e97_cppui128), 0x233ce5e97_u128, "0x233ce5e97"sv);
+
+        cjm_assert_equal(to_test(0x1711f5766_cppui128), 0x1711f5766_u128, "0x1711f5766"sv);
+
+        cjm_assert_equal(to_test(0x9b9d2c919_cppui128), 0x9b9d2c919_u128, "0x9b9d2c919"sv);
+
+        cjm_assert_equal(to_test(0x60f48599f_cppui128), 0x60f48599f_u128, "0x60f48599f"sv);
+
+        std::cout << "End 9 digit hex literal tests...";
+
+        std::cout << "Begin 9 digit decimal literal tests...";
+        cjm_assert_equal(to_test(713704217_cppui128), 713704217_u128, "713704217"sv);
+
+        cjm_assert_equal(to_test(713698640_cppui128), 713698640_u128, "713698640"sv);
+
+        cjm_assert_equal(to_test(625750790_cppui128), 625750790_u128, "625750790"sv);
+
+        cjm_assert_equal(to_test(684494514_cppui128), 684494514_u128, "684494514"sv);
+
+        cjm_assert_equal(to_test(115665879_cppui128), 115665879_u128, "115665879"sv);
+
+        std::cout << "End 9 digit decimal literal tests...";
+
+        std::cout << "Begin 10 digit hex literal tests...";
+        cjm_assert_equal(to_test(0xe5fbd4c592_cppui128), 0xe5fbd4c592_u128, "0xe5fbd4c592"sv);
+
+        cjm_assert_equal(to_test(0xb0e765e9ed_cppui128), 0xb0e765e9ed_u128, "0xb0e765e9ed"sv);
+
+        cjm_assert_equal(to_test(0xc8a5b5e152_cppui128), 0xc8a5b5e152_u128, "0xc8a5b5e152"sv);
+
+        cjm_assert_equal(to_test(0xc2862f53d9_cppui128), 0xc2862f53d9_u128, "0xc2862f53d9"sv);
+
+        cjm_assert_equal(to_test(0x760d4dff45_cppui128), 0x760d4dff45_u128, "0x760d4dff45"sv);
+
+        std::cout << "End 10 digit hex literal tests...";
+
+        std::cout << "Begin 10 digit decimal literal tests...";
+        cjm_assert_equal(to_test(7336289123_cppui128), 7336289123_u128, "7336289123"sv);
+
+        cjm_assert_equal(to_test(3613821159_cppui128), 3613821159_u128, "3613821159"sv);
+
+        cjm_assert_equal(to_test(5780521220_cppui128), 5780521220_u128, "5780521220"sv);
+
+        cjm_assert_equal(to_test(1765444156_cppui128), 1765444156_u128, "1765444156"sv);
+
+        cjm_assert_equal(to_test(9658531045_cppui128), 9658531045_u128, "9658531045"sv);
+
+        std::cout << "End 10 digit decimal literal tests...";
+
+        std::cout << "Begin 11 digit hex literal tests...";
+        cjm_assert_equal(to_test(0x399a758089a_cppui128), 0x399a758089a_u128, "0x399a758089a"sv);
+
+        cjm_assert_equal(to_test(0xda989ee4689_cppui128), 0xda989ee4689_u128, "0xda989ee4689"sv);
+
+        cjm_assert_equal(to_test(0xa0d1082a434_cppui128), 0xa0d1082a434_u128, "0xa0d1082a434"sv);
+
+        cjm_assert_equal(to_test(0x616a40880f7_cppui128), 0x616a40880f7_u128, "0x616a40880f7"sv);
+
+        cjm_assert_equal(to_test(0xb83f6ce833b_cppui128), 0xb83f6ce833b_u128, "0xb83f6ce833b"sv);
+
+        std::cout << "End 11 digit hex literal tests...";
+
+        std::cout << "Begin 11 digit decimal literal tests...";
+        cjm_assert_equal(to_test(20911571068_cppui128), 20911571068_u128, "20911571068"sv);
+
+        cjm_assert_equal(to_test(50236190382_cppui128), 50236190382_u128, "50236190382"sv);
+
+        cjm_assert_equal(to_test(70329787624_cppui128), 70329787624_u128, "70329787624"sv);
+
+        cjm_assert_equal(to_test(10075661630_cppui128), 10075661630_u128, "10075661630"sv);
+
+        cjm_assert_equal(to_test(55332006336_cppui128), 55332006336_u128, "55332006336"sv);
+
+        std::cout << "End 11 digit decimal literal tests...";
+
+        std::cout << "Begin 12 digit hex literal tests...";
+        cjm_assert_equal(to_test(0x2a12cbdf9a71_cppui128), 0x2a12cbdf9a71_u128, "0x2a12cbdf9a71"sv);
+
+        cjm_assert_equal(to_test(0xcc32a03bc68c_cppui128), 0xcc32a03bc68c_u128, "0xcc32a03bc68c"sv);
+
+        cjm_assert_equal(to_test(0x2bcd933f6fef_cppui128), 0x2bcd933f6fef_u128, "0x2bcd933f6fef"sv);
+
+        cjm_assert_equal(to_test(0x15bc870e9d0_cppui128), 0x015bc870e9d0_u128, "0x015bc870e9d0"sv);
+
+        cjm_assert_equal(to_test(0x98e76624a6fe_cppui128), 0x98e76624a6fe_u128, "0x98e76624a6fe"sv);
+
+        std::cout << "End 12 digit hex literal tests...";
+
+        std::cout << "Begin 12 digit decimal literal tests...";
+        cjm_assert_equal(to_test(532706015972_cppui128), 532706015972_u128, "532706015972"sv);
+
+        cjm_assert_equal(to_test(900781230644_cppui128), 900781230644_u128, "900781230644"sv);
+
+        cjm_assert_equal(to_test(910705734604_cppui128), 910705734604_u128, "910705734604"sv);
+
+        cjm_assert_equal(to_test(384841238970_cppui128), 384841238970_u128, "384841238970"sv);
+
+        cjm_assert_equal(to_test(792211040121_cppui128), 792211040121_u128, "792211040121"sv);
+
+        std::cout << "End 12 digit decimal literal tests...";
+
+        std::cout << "Begin 13 digit hex literal tests...";
+        cjm_assert_equal(to_test(0xf57c2518eded5_cppui128), 0xf57c2518eded5_u128, "0xf57c2518eded5"sv);
+
+        cjm_assert_equal(to_test(0xca8e34f148951_cppui128), 0xca8e34f148951_u128, "0xca8e34f148951"sv);
+
+        cjm_assert_equal(to_test(0x39c0d47da0b4b_cppui128), 0x39c0d47da0b4b_u128, "0x39c0d47da0b4b"sv);
+
+        cjm_assert_equal(to_test(0x9348ec0356116_cppui128), 0x9348ec0356116_u128, "0x9348ec0356116"sv);
+
+        cjm_assert_equal(to_test(0x2b0747553169a_cppui128), 0x2b0747553169a_u128, "0x2b0747553169a"sv);
+
+        std::cout << "End 13 digit hex literal tests...";
+
+        std::cout << "Begin 13 digit decimal literal tests...";
+        cjm_assert_equal(to_test(6262102633488_cppui128), 6262102633488_u128, "6262102633488"sv);
+
+        cjm_assert_equal(to_test(8847638817679_cppui128), 8847638817679_u128, "8847638817679"sv);
+
+        cjm_assert_equal(to_test(6370550649682_cppui128), 6370550649682_u128, "6370550649682"sv);
+
+        cjm_assert_equal(to_test(5386386554942_cppui128), 5386386554942_u128, "5386386554942"sv);
+
+        cjm_assert_equal(to_test(8836787365436_cppui128), 8836787365436_u128, "8836787365436"sv);
+
+        std::cout << "End 13 digit decimal literal tests...";
+
+        std::cout << "Begin 14 digit hex literal tests...";
+        cjm_assert_equal(to_test(0xbca69450d2c1d_cppui128), 0x0bca69450d2c1d_u128, "0x0bca69450d2c1d"sv);
+
+        cjm_assert_equal(to_test(0xcc73c18b2e7388_cppui128), 0xcc73c18b2e7388_u128, "0xcc73c18b2e7388"sv);
+
+        cjm_assert_equal(to_test(0xd3626886c76bbb_cppui128), 0xd3626886c76bbb_u128, "0xd3626886c76bbb"sv);
+
+        cjm_assert_equal(to_test(0x4000d95bfc19b4_cppui128), 0x4000d95bfc19b4_u128, "0x4000d95bfc19b4"sv);
+
+        cjm_assert_equal(to_test(0xb188ca2852c0b7_cppui128), 0xb188ca2852c0b7_u128, "0xb188ca2852c0b7"sv);
+
+        std::cout << "End 14 digit hex literal tests...";
+
+        std::cout << "Begin 14 digit decimal literal tests...";
+        cjm_assert_equal(to_test(38477413614107_cppui128), 38477413614107_u128, "38477413614107"sv);
+
+        cjm_assert_equal(to_test(33001650462179_cppui128), 33001650462179_u128, "33001650462179"sv);
+
+        cjm_assert_equal(to_test(48920395905213_cppui128), 48920395905213_u128, "48920395905213"sv);
+
+        cjm_assert_equal(to_test(61280991280717_cppui128), 61280991280717_u128, "61280991280717"sv);
+
+        cjm_assert_equal(to_test(94611399718734_cppui128), 94611399718734_u128, "94611399718734"sv);
+
+        std::cout << "End 14 digit decimal literal tests...";
+
+        std::cout << "Begin 15 digit hex literal tests...";
+        cjm_assert_equal(to_test(0x8fadc43fdf8af63_cppui128), 0x8fadc43fdf8af63_u128, "0x8fadc43fdf8af63"sv);
+
+        cjm_assert_equal(to_test(0x5b6c20769155f41_cppui128), 0x5b6c20769155f41_u128, "0x5b6c20769155f41"sv);
+
+        cjm_assert_equal(to_test(0x963d6eda6708948_cppui128), 0x963d6eda6708948_u128, "0x963d6eda6708948"sv);
+
+        cjm_assert_equal(to_test(0x8f725529cb02fa2_cppui128), 0x8f725529cb02fa2_u128, "0x8f725529cb02fa2"sv);
+
+        cjm_assert_equal(to_test(0xbbc4ff0e609e4e3_cppui128), 0xbbc4ff0e609e4e3_u128, "0xbbc4ff0e609e4e3"sv);
+
+        std::cout << "End 15 digit hex literal tests...";
+
+        std::cout << "Begin 15 digit decimal literal tests...";
+        cjm_assert_equal(to_test(293942417345588_cppui128), 293942417345588_u128, "293942417345588"sv);
+
+        cjm_assert_equal(to_test(642796500388674_cppui128), 642796500388674_u128, "642796500388674"sv);
+
+        cjm_assert_equal(to_test(728866318445840_cppui128), 728866318445840_u128, "728866318445840"sv);
+
+        cjm_assert_equal(to_test(299246433440496_cppui128), 299246433440496_u128, "299246433440496"sv);
+
+        cjm_assert_equal(to_test(321439016430406_cppui128), 321439016430406_u128, "321439016430406"sv);
+
+        std::cout << "End 15 digit decimal literal tests...";
+
+        std::cout << "Begin 16 digit hex literal tests...";
+        cjm_assert_equal(to_test(0x880e7895e25ef617_cppui128), 0x880e7895e25ef617_u128, "0x880e7895e25ef617"sv);
+
+        cjm_assert_equal(to_test(0x98ed79ee0c431709_cppui128), 0x98ed79ee0c431709_u128, "0x98ed79ee0c431709"sv);
+
+        cjm_assert_equal(to_test(0xd051380f8c1d5770_cppui128), 0xd051380f8c1d5770_u128, "0xd051380f8c1d5770"sv);
+
+        cjm_assert_equal(to_test(0x9dcac3dd6baba3d4_cppui128), 0x9dcac3dd6baba3d4_u128, "0x9dcac3dd6baba3d4"sv);
+
+        cjm_assert_equal(to_test(0xd1013186605e0a7b_cppui128), 0xd1013186605e0a7b_u128, "0xd1013186605e0a7b"sv);
+
+        std::cout << "End 16 digit hex literal tests...";
+
+        std::cout << "Begin 16 digit decimal literal tests...";
+        cjm_assert_equal(to_test(5320551158321119_cppui128), 5320551158321119_u128, "5320551158321119"sv);
+
+        cjm_assert_equal(to_test(5591564124469504_cppui128), 5591564124469504_u128, "5591564124469504"sv);
+
+        cjm_assert_equal(to_test(8594876608720656_cppui128), 8594876608720656_u128, "8594876608720656"sv);
+
+        cjm_assert_equal(to_test(1262313811762082_cppui128), 1262313811762082_u128, "1262313811762082"sv);
+
+        cjm_assert_equal(to_test(8124247449077583_cppui128), 8124247449077583_u128, "8124247449077583"sv);
+
+        std::cout << "End 16 digit decimal literal tests...";
+
+        std::cout << "Begin 17 digit hex literal tests...";
+        cjm_assert_equal(to_test(0x258da0e73c699b21c_cppui128), 0x258da0e73c699b21c_u128, "0x258da0e73c699b21c"sv);
+
+        cjm_assert_equal(to_test(0x30ba8ef9cef7149ed_cppui128), 0x30ba8ef9cef7149ed_u128, "0x30ba8ef9cef7149ed"sv);
+
+        cjm_assert_equal(to_test(0xbf17dfaad6b59c8c5_cppui128), 0xbf17dfaad6b59c8c5_u128, "0xbf17dfaad6b59c8c5"sv);
+
+        cjm_assert_equal(to_test(0xfe4d93e82f0a82db1_cppui128), 0xfe4d93e82f0a82db1_u128, "0xfe4d93e82f0a82db1"sv);
+
+        cjm_assert_equal(to_test(0x6237ef4ace1ede404_cppui128), 0x6237ef4ace1ede404_u128, "0x6237ef4ace1ede404"sv);
+
+        std::cout << "End 17 digit hex literal tests...";
+
+        std::cout << "Begin 17 digit decimal literal tests...";
+        cjm_assert_equal(to_test(75338441550230479_cppui128), 75338441550230479_u128, "75338441550230479"sv);
+
+        cjm_assert_equal(to_test(83434145261788948_cppui128), 83434145261788948_u128, "83434145261788948"sv);
+
+        cjm_assert_equal(to_test(16518697509655694_cppui128), 16518697509655694_u128, "16518697509655694"sv);
+
+        cjm_assert_equal(to_test(91996548325995124_cppui128), 91996548325995124_u128, "91996548325995124"sv);
+
+        cjm_assert_equal(to_test(97306254563279617_cppui128), 97306254563279617_u128, "97306254563279617"sv);
+
+        std::cout << "End 17 digit decimal literal tests...";
+
+        std::cout << "Begin 18 digit hex literal tests...";
+        cjm_assert_equal(to_test(0xeaf289e23ad4da4cf6_cppui128), 0xeaf289e23ad4da4cf6_u128, "0xeaf289e23ad4da4cf6"sv);
+
+        cjm_assert_equal(to_test(0xf1687ab986046c5c3f_cppui128), 0xf1687ab986046c5c3f_u128, "0xf1687ab986046c5c3f"sv);
+
+        cjm_assert_equal(to_test(0xdb11ffebaeb2cd0c15_cppui128), 0xdb11ffebaeb2cd0c15_u128, "0xdb11ffebaeb2cd0c15"sv);
+
+        cjm_assert_equal(to_test(0xb9144ca6fbe7f34b70_cppui128), 0xb9144ca6fbe7f34b70_u128, "0xb9144ca6fbe7f34b70"sv);
+
+        cjm_assert_equal(to_test(0x98296b02ec2b2d6c37_cppui128), 0x98296b02ec2b2d6c37_u128, "0x98296b02ec2b2d6c37"sv);
+
+        std::cout << "End 18 digit hex literal tests...";
+
+        std::cout << "Begin 18 digit decimal literal tests...";
+        cjm_assert_equal(to_test(896639645147095594_cppui128), 896639645147095594_u128, "896639645147095594"sv);
+
+        cjm_assert_equal(to_test(400336689975996652_cppui128), 400336689975996652_u128, "400336689975996652"sv);
+
+        cjm_assert_equal(to_test(345738201088567465_cppui128), 345738201088567465_u128, "345738201088567465"sv);
+
+        cjm_assert_equal(to_test(441836229804432886_cppui128), 441836229804432886_u128, "441836229804432886"sv);
+
+        cjm_assert_equal(to_test(532635962374262670_cppui128), 532635962374262670_u128, "532635962374262670"sv);
+
+        std::cout << "End 18 digit decimal literal tests...";
+
+        std::cout << "Begin 19 digit hex literal tests...";
+        cjm_assert_equal(to_test(0x401fecec3ed36d94c1c_cppui128), 0x401fecec3ed36d94c1c_u128, "0x401fecec3ed36d94c1c"sv);
+
+        cjm_assert_equal(to_test(0x3658096280744d47dea_cppui128), 0x3658096280744d47dea_u128, "0x3658096280744d47dea"sv);
+
+        cjm_assert_equal(to_test(0x71726baa07863147081_cppui128), 0x71726baa07863147081_u128, "0x71726baa07863147081"sv);
+
+        cjm_assert_equal(to_test(0xa31a85f31d095e75085_cppui128), 0xa31a85f31d095e75085_u128, "0xa31a85f31d095e75085"sv);
+
+        cjm_assert_equal(to_test(0x3c8c0fe9c5b942ad9b_cppui128), 0x03c8c0fe9c5b942ad9b_u128, "0x03c8c0fe9c5b942ad9b"sv);
+
+        std::cout << "End 19 digit hex literal tests...";
+
+        std::cout << "Begin 19 digit decimal literal tests...";
+        cjm_assert_equal(to_test(5702421105280223560_cppui128), 5702421105280223560_u128, "5702421105280223560"sv);
+
+        cjm_assert_equal(to_test(7667971413883162513_cppui128), 7667971413883162513_u128, "7667971413883162513"sv);
+
+        cjm_assert_equal(to_test(7730244513792639959_cppui128), 7730244513792639959_u128, "7730244513792639959"sv);
+
+        cjm_assert_equal(to_test(1066569856237862140_cppui128), 1066569856237862140_u128, "1066569856237862140"sv);
+
+        cjm_assert_equal(to_test(2274305398682351772_cppui128), 2274305398682351772_u128, "2274305398682351772"sv);
+
+        std::cout << "End 19 digit decimal literal tests...";
+
+        std::cout << "Begin 20 digit hex literal tests...";
+        cjm_assert_equal(to_test(0x12820066a096dd8b5a95_cppui128), 0x12820066a096dd8b5a95_u128, "0x12820066a096dd8b5a95"sv);
+
+        cjm_assert_equal(to_test(0xe10c2e29eb718040617f_cppui128), 0xe10c2e29eb718040617f_u128, "0xe10c2e29eb718040617f"sv);
+
+        cjm_assert_equal(to_test(0x2fd2e399a4f931d56acb_cppui128), 0x2fd2e399a4f931d56acb_u128, "0x2fd2e399a4f931d56acb"sv);
+
+        cjm_assert_equal(to_test(0x865d2c20ce5575fbd363_cppui128), 0x865d2c20ce5575fbd363_u128, "0x865d2c20ce5575fbd363"sv);
+
+        cjm_assert_equal(to_test(0x17b85bb7e71eb57e15a0_cppui128), 0x17b85bb7e71eb57e15a0_u128, "0x17b85bb7e71eb57e15a0"sv);
+
+        std::cout << "End 20 digit hex literal tests...";
+
+        std::cout << "Begin 20 digit decimal literal tests...";
+        cjm_assert_equal(to_test(99677648376202510099_cppui128), 99677648376202510099_u128, "99677648376202510099"sv);
+
+        cjm_assert_equal(to_test(90136133207280450464_cppui128), 90136133207280450464_u128, "90136133207280450464"sv);
+
+        cjm_assert_equal(to_test(93685989509596170335_cppui128), 93685989509596170335_u128, "93685989509596170335"sv);
+
+        cjm_assert_equal(to_test(93290374933207914563_cppui128), 93290374933207914563_u128, "93290374933207914563"sv);
+
+        cjm_assert_equal(to_test(55938989051516563579_cppui128), 55938989051516563579_u128, "55938989051516563579"sv);
+
+        std::cout << "End 20 digit decimal literal tests...";
+
+        std::cout << "Begin 21 digit hex literal tests...";
+        cjm_assert_equal(to_test(0xb3cd2f7105622a6a6e6ac_cppui128), 0xb3cd2f7105622a6a6e6ac_u128, "0xb3cd2f7105622a6a6e6ac"sv);
+
+        cjm_assert_equal(to_test(0x4b9cc9f9a37fdc0ecdbde_cppui128), 0x4b9cc9f9a37fdc0ecdbde_u128, "0x4b9cc9f9a37fdc0ecdbde"sv);
+
+        cjm_assert_equal(to_test(0x83bb0707fb94af85aad4c_cppui128), 0x83bb0707fb94af85aad4c_u128, "0x83bb0707fb94af85aad4c"sv);
+
+        cjm_assert_equal(to_test(0x740f9f0fe099b6c129b87_cppui128), 0x740f9f0fe099b6c129b87_u128, "0x740f9f0fe099b6c129b87"sv);
+
+        cjm_assert_equal(to_test(0x7fcdba1e3a1b7be095ad4_cppui128), 0x7fcdba1e3a1b7be095ad4_u128, "0x7fcdba1e3a1b7be095ad4"sv);
+
+        std::cout << "End 21 digit hex literal tests...";
+
+        std::cout << "Begin 21 digit decimal literal tests...";
+        cjm_assert_equal(to_test(518386084362417185431_cppui128), 518386084362417185431_u128, "518386084362417185431"sv);
+
+        cjm_assert_equal(to_test(182668104369695453989_cppui128), 182668104369695453989_u128, "182668104369695453989"sv);
+
+        cjm_assert_equal(to_test(632402512131831160462_cppui128), 632402512131831160462_u128, "632402512131831160462"sv);
+
+        cjm_assert_equal(to_test(738671880710366759017_cppui128), 738671880710366759017_u128, "738671880710366759017"sv);
+
+        cjm_assert_equal(to_test(285233413534368066631_cppui128), 285233413534368066631_u128, "285233413534368066631"sv);
+
+        std::cout << "End 21 digit decimal literal tests...";
+
+        std::cout << "Begin 22 digit hex literal tests...";
+        cjm_assert_equal(to_test(0xc0cd6c669c416736f088ac_cppui128), 0xc0cd6c669c416736f088ac_u128, "0xc0cd6c669c416736f088ac"sv);
+
+        cjm_assert_equal(to_test(0x5c4e13aab05d04983737ea_cppui128), 0x5c4e13aab05d04983737ea_u128, "0x5c4e13aab05d04983737ea"sv);
+
+        cjm_assert_equal(to_test(0x9e89fdfce58286a3888455_cppui128), 0x9e89fdfce58286a3888455_u128, "0x9e89fdfce58286a3888455"sv);
+
+        cjm_assert_equal(to_test(0xbdc9937c7f782599700c67_cppui128), 0xbdc9937c7f782599700c67_u128, "0xbdc9937c7f782599700c67"sv);
+
+        cjm_assert_equal(to_test(0x4c581306a3a83080eac4f4_cppui128), 0x4c581306a3a83080eac4f4_u128, "0x4c581306a3a83080eac4f4"sv);
+
+        std::cout << "End 22 digit hex literal tests...";
+
+        std::cout << "Begin 22 digit decimal literal tests...";
+        cjm_assert_equal(to_test(5321553703514294909815_cppui128), 5321553703514294909815_u128, "5321553703514294909815"sv);
+
+        cjm_assert_equal(to_test(1131762267347314383650_cppui128), 1131762267347314383650_u128, "1131762267347314383650"sv);
+
+        cjm_assert_equal(to_test(6315293807490579284319_cppui128), 6315293807490579284319_u128, "6315293807490579284319"sv);
+
+        cjm_assert_equal(to_test(2314631326063510403189_cppui128), 2314631326063510403189_u128, "2314631326063510403189"sv);
+
+        cjm_assert_equal(to_test(8195810594010979508946_cppui128), 8195810594010979508946_u128, "8195810594010979508946"sv);
+
+        std::cout << "End 22 digit decimal literal tests...";
+
+        std::cout << "Begin 23 digit hex literal tests...";
+        cjm_assert_equal(to_test(0x6ec704f0af893c946e8a49d_cppui128), 0x6ec704f0af893c946e8a49d_u128, "0x6ec704f0af893c946e8a49d"sv);
+
+        cjm_assert_equal(to_test(0x85fa38a7bc12b4554f7890_cppui128), 0x085fa38a7bc12b4554f7890_u128, "0x085fa38a7bc12b4554f7890"sv);
+
+        cjm_assert_equal(to_test(0xa154589d1fe3e0d4cade77e_cppui128), 0xa154589d1fe3e0d4cade77e_u128, "0xa154589d1fe3e0d4cade77e"sv);
+
+        cjm_assert_equal(to_test(0xa2cf43f32427ed354b7918c_cppui128), 0xa2cf43f32427ed354b7918c_u128, "0xa2cf43f32427ed354b7918c"sv);
+
+        cjm_assert_equal(to_test(0x283a40009c585cc182009f1_cppui128), 0x283a40009c585cc182009f1_u128, "0x283a40009c585cc182009f1"sv);
+
+        std::cout << "End 23 digit hex literal tests...";
+
+        std::cout << "Begin 23 digit decimal literal tests...";
+        cjm_assert_equal(to_test(40671393244330965548605_cppui128), 40671393244330965548605_u128, "40671393244330965548605"sv);
+
+        cjm_assert_equal(to_test(23578506826544037649703_cppui128), 23578506826544037649703_u128, "23578506826544037649703"sv);
+
+        cjm_assert_equal(to_test(93845089327821556063225_cppui128), 93845089327821556063225_u128, "93845089327821556063225"sv);
+
+        cjm_assert_equal(to_test(92793726032818627827065_cppui128), 92793726032818627827065_u128, "92793726032818627827065"sv);
+
+        cjm_assert_equal(to_test(94717921957530038983614_cppui128), 94717921957530038983614_u128, "94717921957530038983614"sv);
+
+        std::cout << "End 23 digit decimal literal tests...";
+
+        std::cout << "Begin 24 digit hex literal tests...";
+        cjm_assert_equal(to_test(0x407ac050c4a550300a0441f1_cppui128), 0x407ac050c4a550300a0441f1_u128, "0x407ac050c4a550300a0441f1"sv);
+
+        cjm_assert_equal(to_test(0xa51c4e81272a18c8745271a2_cppui128), 0xa51c4e81272a18c8745271a2_u128, "0xa51c4e81272a18c8745271a2"sv);
+
+        cjm_assert_equal(to_test(0xeb74003ba7bf167c79669d16_cppui128), 0xeb74003ba7bf167c79669d16_u128, "0xeb74003ba7bf167c79669d16"sv);
+
+        cjm_assert_equal(to_test(0x63a59656e39d1de0de1441d3_cppui128), 0x63a59656e39d1de0de1441d3_u128, "0x63a59656e39d1de0de1441d3"sv);
+
+        cjm_assert_equal(to_test(0xa39aa73f8f97a3cb31e39a7_cppui128), 0x0a39aa73f8f97a3cb31e39a7_u128, "0x0a39aa73f8f97a3cb31e39a7"sv);
+
+        std::cout << "End 24 digit hex literal tests...";
+
+        std::cout << "Begin 24 digit decimal literal tests...";
+        cjm_assert_equal(to_test(619446306532336464742216_cppui128), 619446306532336464742216_u128, "619446306532336464742216"sv);
+
+        cjm_assert_equal(to_test(290752485431991447090082_cppui128), 290752485431991447090082_u128, "290752485431991447090082"sv);
+
+        cjm_assert_equal(to_test(501678929356001154077428_cppui128), 501678929356001154077428_u128, "501678929356001154077428"sv);
+
+        cjm_assert_equal(to_test(849627805278320801022566_cppui128), 849627805278320801022566_u128, "849627805278320801022566"sv);
+
+        cjm_assert_equal(to_test(821316167653834689763867_cppui128), 821316167653834689763867_u128, "821316167653834689763867"sv);
+
+        std::cout << "End 24 digit decimal literal tests...";
+
+        std::cout << "Begin 25 digit hex literal tests...";
+        cjm_assert_equal(to_test(0xe4a51af20cbf2269f6e19e49_cppui128), 0x0e4a51af20cbf2269f6e19e49_u128, "0x0e4a51af20cbf2269f6e19e49"sv);
+
+        cjm_assert_equal(to_test(0x550f1e82176fc325387e36e22_cppui128), 0x550f1e82176fc325387e36e22_u128, "0x550f1e82176fc325387e36e22"sv);
+
+        cjm_assert_equal(to_test(0x8ab81173a1e6b61cdb6407024_cppui128), 0x8ab81173a1e6b61cdb6407024_u128, "0x8ab81173a1e6b61cdb6407024"sv);
+
+        cjm_assert_equal(to_test(0xaa0a627e6ef58f38c25abb063_cppui128), 0xaa0a627e6ef58f38c25abb063_u128, "0xaa0a627e6ef58f38c25abb063"sv);
+
+        cjm_assert_equal(to_test(0xb649636d5a62ee3371d9a40f6_cppui128), 0xb649636d5a62ee3371d9a40f6_u128, "0xb649636d5a62ee3371d9a40f6"sv);
+
+        std::cout << "End 25 digit hex literal tests...";
+
+        std::cout << "Begin 25 digit decimal literal tests...";
+        cjm_assert_equal(to_test(5984806810986342817976996_cppui128), 5984806810986342817976996_u128, "5984806810986342817976996"sv);
+
+        cjm_assert_equal(to_test(4926034158047642352459717_cppui128), 4926034158047642352459717_u128, "4926034158047642352459717"sv);
+
+        cjm_assert_equal(to_test(5198326813269287488587306_cppui128), 5198326813269287488587306_u128, "5198326813269287488587306"sv);
+
+        cjm_assert_equal(to_test(2066337254858591019685608_cppui128), 2066337254858591019685608_u128, "2066337254858591019685608"sv);
+
+        cjm_assert_equal(to_test(9383188075327776170271207_cppui128), 9383188075327776170271207_u128, "9383188075327776170271207"sv);
+
+        std::cout << "End 25 digit decimal literal tests...";
+
+        std::cout << "Begin 26 digit hex literal tests...";
+        cjm_assert_equal(to_test(0x1b68013004d6c4c16c57264891_cppui128), 0x1b68013004d6c4c16c57264891_u128, "0x1b68013004d6c4c16c57264891"sv);
+
+        cjm_assert_equal(to_test(0x534968e28e0e64795df1834820_cppui128), 0x534968e28e0e64795df1834820_u128, "0x534968e28e0e64795df1834820"sv);
+
+        cjm_assert_equal(to_test(0x4bda027600854d52ab08c21ad9_cppui128), 0x4bda027600854d52ab08c21ad9_u128, "0x4bda027600854d52ab08c21ad9"sv);
+
+        cjm_assert_equal(to_test(0xc59b8ddf93f3fa9903f5f3f4cf_cppui128), 0xc59b8ddf93f3fa9903f5f3f4cf_u128, "0xc59b8ddf93f3fa9903f5f3f4cf"sv);
+
+        cjm_assert_equal(to_test(0xb4a132907dadd177a0417263bf_cppui128), 0xb4a132907dadd177a0417263bf_u128, "0xb4a132907dadd177a0417263bf"sv);
+
+        std::cout << "End 26 digit hex literal tests...";
+
+        std::cout << "Begin 26 digit decimal literal tests...";
+        cjm_assert_equal(to_test(43867233879920447993796380_cppui128), 43867233879920447993796380_u128, "43867233879920447993796380"sv);
+
+        cjm_assert_equal(to_test(73045347964688902231793166_cppui128), 73045347964688902231793166_u128, "73045347964688902231793166"sv);
+
+        cjm_assert_equal(to_test(78701325552114768151833544_cppui128), 78701325552114768151833544_u128, "78701325552114768151833544"sv);
+
+        cjm_assert_equal(to_test(74429174259309081948288008_cppui128), 74429174259309081948288008_u128, "74429174259309081948288008"sv);
+
+        cjm_assert_equal(to_test(35035797584245739187444321_cppui128), 35035797584245739187444321_u128, "35035797584245739187444321"sv);
+
+        std::cout << "End 26 digit decimal literal tests...";
+
+        std::cout << "Begin 27 digit hex literal tests...";
+        cjm_assert_equal(to_test(0xbff6ddbebcf8565f81b94584b0f_cppui128), 0xbff6ddbebcf8565f81b94584b0f_u128, "0xbff6ddbebcf8565f81b94584b0f"sv);
+
+        cjm_assert_equal(to_test(0xf467759421f3f0abbd8fe6d811_cppui128), 0x0f467759421f3f0abbd8fe6d811_u128, "0x0f467759421f3f0abbd8fe6d811"sv);
+
+        cjm_assert_equal(to_test(0xed462b5e377d009f513a3829732_cppui128), 0xed462b5e377d009f513a3829732_u128, "0xed462b5e377d009f513a3829732"sv);
+
+        cjm_assert_equal(to_test(0x7f1eab9b85aae5f15b89ab18155_cppui128), 0x7f1eab9b85aae5f15b89ab18155_u128, "0x7f1eab9b85aae5f15b89ab18155"sv);
+
+        cjm_assert_equal(to_test(0x718dde7be6f2f9cc12a245facbd_cppui128), 0x718dde7be6f2f9cc12a245facbd_u128, "0x718dde7be6f2f9cc12a245facbd"sv);
+
+        std::cout << "End 27 digit hex literal tests...";
+
+        std::cout << "Begin 27 digit decimal literal tests...";
+        cjm_assert_equal(to_test(734683576367223627240084703_cppui128), 734683576367223627240084703_u128, "734683576367223627240084703"sv);
+
+        cjm_assert_equal(to_test(799298036358685928626027479_cppui128), 799298036358685928626027479_u128, "799298036358685928626027479"sv);
+
+        cjm_assert_equal(to_test(579497805627146152236392873_cppui128), 579497805627146152236392873_u128, "579497805627146152236392873"sv);
+
+        cjm_assert_equal(to_test(942750390238950247913541886_cppui128), 942750390238950247913541886_u128, "942750390238950247913541886"sv);
+
+        cjm_assert_equal(to_test(813279755920342741344536383_cppui128), 813279755920342741344536383_u128, "813279755920342741344536383"sv);
+
+        std::cout << "End 27 digit decimal literal tests...";
+
+        std::cout << "Begin 28 digit hex literal tests...";
+        cjm_assert_equal(to_test(0x630255dcbcc5c02ebcc1c6e0d0ac_cppui128), 0x630255dcbcc5c02ebcc1c6e0d0ac_u128, "0x630255dcbcc5c02ebcc1c6e0d0ac"sv);
+
+        cjm_assert_equal(to_test(0xf50f77133a6d6126cd27f905920c_cppui128), 0xf50f77133a6d6126cd27f905920c_u128, "0xf50f77133a6d6126cd27f905920c"sv);
+
+        cjm_assert_equal(to_test(0xec64b14cd9c7651df47c2ec354aa_cppui128), 0xec64b14cd9c7651df47c2ec354aa_u128, "0xec64b14cd9c7651df47c2ec354aa"sv);
+
+        cjm_assert_equal(to_test(0xc73cb1c7ad0677b2ab5ca562bd1_cppui128), 0x0c73cb1c7ad0677b2ab5ca562bd1_u128, "0x0c73cb1c7ad0677b2ab5ca562bd1"sv);
+
+        cjm_assert_equal(to_test(0xf38c25bfa1c052d0d65561b6e7ec_cppui128), 0xf38c25bfa1c052d0d65561b6e7ec_u128, "0xf38c25bfa1c052d0d65561b6e7ec"sv);
+
+        std::cout << "End 28 digit hex literal tests...";
+
+        std::cout << "Begin 28 digit decimal literal tests...";
+        cjm_assert_equal(to_test(5063817683981031108178557813_cppui128), 5063817683981031108178557813_u128, "5063817683981031108178557813"sv);
+
+        cjm_assert_equal(to_test(9192262425820303276621635214_cppui128), 9192262425820303276621635214_u128, "9192262425820303276621635214"sv);
+
+        cjm_assert_equal(to_test(6757819872607862668861980129_cppui128), 6757819872607862668861980129_u128, "6757819872607862668861980129"sv);
+
+        cjm_assert_equal(to_test(7485219429715953240569741391_cppui128), 7485219429715953240569741391_u128, "7485219429715953240569741391"sv);
+
+        cjm_assert_equal(to_test(4738936510964949405453280802_cppui128), 4738936510964949405453280802_u128, "4738936510964949405453280802"sv);
+
+        std::cout << "End 28 digit decimal literal tests...";
+
+        std::cout << "Begin 29 digit hex literal tests...";
+        cjm_assert_equal(to_test(0xd909565b901fd51c4272c97e0c518_cppui128), 0xd909565b901fd51c4272c97e0c518_u128, "0xd909565b901fd51c4272c97e0c518"sv);
+
+        cjm_assert_equal(to_test(0x81c3357d5c8449b6cdbb9fb07f52d_cppui128), 0x81c3357d5c8449b6cdbb9fb07f52d_u128, "0x81c3357d5c8449b6cdbb9fb07f52d"sv);
+
+        cjm_assert_equal(to_test(0x3fd01274c5e4cf5bbd2e7245fd975_cppui128), 0x3fd01274c5e4cf5bbd2e7245fd975_u128, "0x3fd01274c5e4cf5bbd2e7245fd975"sv);
+
+        cjm_assert_equal(to_test(0x8b17490632aa6f1692479e9eaaaee_cppui128), 0x8b17490632aa6f1692479e9eaaaee_u128, "0x8b17490632aa6f1692479e9eaaaee"sv);
+
+        cjm_assert_equal(to_test(0x459584c5dba3c31d757f0ea2db072_cppui128), 0x459584c5dba3c31d757f0ea2db072_u128, "0x459584c5dba3c31d757f0ea2db072"sv);
+
+        std::cout << "End 29 digit hex literal tests...";
+
+        std::cout << "Begin 29 digit decimal literal tests...";
+        cjm_assert_equal(to_test(43472131389845513267892351516_cppui128), 43472131389845513267892351516_u128, "43472131389845513267892351516"sv);
+
+        cjm_assert_equal(to_test(62983802179444213472603906788_cppui128), 62983802179444213472603906788_u128, "62983802179444213472603906788"sv);
+
+        cjm_assert_equal(to_test(77098723719260692826623014734_cppui128), 77098723719260692826623014734_u128, "77098723719260692826623014734"sv);
+
+        cjm_assert_equal(to_test(58817543415173107211684801418_cppui128), 58817543415173107211684801418_u128, "58817543415173107211684801418"sv);
+
+        cjm_assert_equal(to_test(63588221311616657042166541323_cppui128), 63588221311616657042166541323_u128, "63588221311616657042166541323"sv);
+
+        std::cout << "End 29 digit decimal literal tests...";
+
+        std::cout << "Begin 30 digit hex literal tests...";
+        cjm_assert_equal(to_test(0xfc3fd9017c78574bc0de24582d73a8_cppui128), 0xfc3fd9017c78574bc0de24582d73a8_u128, "0xfc3fd9017c78574bc0de24582d73a8"sv);
+
+        cjm_assert_equal(to_test(0x7255326e146dbe3f1b6a24bdf386ed_cppui128), 0x7255326e146dbe3f1b6a24bdf386ed_u128, "0x7255326e146dbe3f1b6a24bdf386ed"sv);
+
+        cjm_assert_equal(to_test(0x50511a412c02ad5464b31ea1d7170_cppui128), 0x050511a412c02ad5464b31ea1d7170_u128, "0x050511a412c02ad5464b31ea1d7170"sv);
+
+        cjm_assert_equal(to_test(0xc6cea94150cbd8a175de6ce1d7ed92_cppui128), 0xc6cea94150cbd8a175de6ce1d7ed92_u128, "0xc6cea94150cbd8a175de6ce1d7ed92"sv);
+
+        cjm_assert_equal(to_test(0x6a5a3f7c1376115eea42df95db80f0_cppui128), 0x6a5a3f7c1376115eea42df95db80f0_u128, "0x6a5a3f7c1376115eea42df95db80f0"sv);
+
+        std::cout << "End 30 digit hex literal tests...";
+
+        std::cout << "Begin 30 digit decimal literal tests...";
+        cjm_assert_equal(to_test(894672702045775333120216336955_cppui128), 894672702045775333120216336955_u128, "894672702045775333120216336955"sv);
+
+        cjm_assert_equal(to_test(287126878848661951401795543260_cppui128), 287126878848661951401795543260_u128, "287126878848661951401795543260"sv);
+
+        cjm_assert_equal(to_test(578071893608196225037254884797_cppui128), 578071893608196225037254884797_u128, "578071893608196225037254884797"sv);
+
+        cjm_assert_equal(to_test(913411560090721798829301401320_cppui128), 913411560090721798829301401320_u128, "913411560090721798829301401320"sv);
+
+        cjm_assert_equal(to_test(589453212981255226039202072734_cppui128), 589453212981255226039202072734_u128, "589453212981255226039202072734"sv);
+
+        std::cout << "End 30 digit decimal literal tests...";
+
+        std::cout << "Begin 31 digit hex literal tests...";
+        cjm_assert_equal(to_test(0xa8891a79eb2a67b2df651eef995cbe2_cppui128), 0xa8891a79eb2a67b2df651eef995cbe2_u128, "0xa8891a79eb2a67b2df651eef995cbe2"sv);
+
+        cjm_assert_equal(to_test(0xa74d7e3a7a2b1780bbeb21ffe5a636b_cppui128), 0xa74d7e3a7a2b1780bbeb21ffe5a636b_u128, "0xa74d7e3a7a2b1780bbeb21ffe5a636b"sv);
+
+        cjm_assert_equal(to_test(0xaab8c96d60265a722c902a79f092d91_cppui128), 0xaab8c96d60265a722c902a79f092d91_u128, "0xaab8c96d60265a722c902a79f092d91"sv);
+
+        cjm_assert_equal(to_test(0x391931f3e0b1e90222b0952eaa47907_cppui128), 0x391931f3e0b1e90222b0952eaa47907_u128, "0x391931f3e0b1e90222b0952eaa47907"sv);
+
+        cjm_assert_equal(to_test(0x4f18e61ad26f829a779c961998c809b_cppui128), 0x4f18e61ad26f829a779c961998c809b_u128, "0x4f18e61ad26f829a779c961998c809b"sv);
+
+        std::cout << "End 31 digit hex literal tests...";
+
+        std::cout << "Begin 31 digit decimal literal tests...";
+        cjm_assert_equal(to_test(4776857580898049166532212670167_cppui128), 4776857580898049166532212670167_u128, "4776857580898049166532212670167"sv);
+
+        cjm_assert_equal(to_test(2096923724058432672880532770861_cppui128), 2096923724058432672880532770861_u128, "2096923724058432672880532770861"sv);
+
+        cjm_assert_equal(to_test(9441460143947443339239105339023_cppui128), 9441460143947443339239105339023_u128, "9441460143947443339239105339023"sv);
+
+        cjm_assert_equal(to_test(8112673264630266425396725888079_cppui128), 8112673264630266425396725888079_u128, "8112673264630266425396725888079"sv);
+
+        cjm_assert_equal(to_test(2534780366707808445387069165066_cppui128), 2534780366707808445387069165066_u128, "2534780366707808445387069165066"sv);
+
+        std::cout << "End 31 digit decimal literal tests...";
+
+        std::cout << "Begin 32 digit hex literal tests...";
+        cjm_assert_equal(to_test(0x4ecf7e5c2e234211751f07ecf9d7fee8_cppui128), 0x4ecf7e5c2e234211751f07ecf9d7fee8_u128, "0x4ecf7e5c2e234211751f07ecf9d7fee8"sv);
+
+        cjm_assert_equal(to_test(0xbf27c202c9c97899f7bb00d2937ead90_cppui128), 0xbf27c202c9c97899f7bb00d2937ead90_u128, "0xbf27c202c9c97899f7bb00d2937ead90"sv);
+
+        cjm_assert_equal(to_test(0x9d0419a230d7cf89981ec5011c80045a_cppui128), 0x9d0419a230d7cf89981ec5011c80045a_u128, "0x9d0419a230d7cf89981ec5011c80045a"sv);
+
+        cjm_assert_equal(to_test(0x1e2e5fd8fd35bcec591ef8bb6cf2bba_cppui128), 0x01e2e5fd8fd35bcec591ef8bb6cf2bba_u128, "0x01e2e5fd8fd35bcec591ef8bb6cf2bba"sv);
+
+        cjm_assert_equal(to_test(0x359d7ebb8c90bf47f52f5cbfb4761bd7_cppui128), 0x359d7ebb8c90bf47f52f5cbfb4761bd7_u128, "0x359d7ebb8c90bf47f52f5cbfb4761bd7"sv);
+
+        std::cout << "End 32 digit hex literal tests...";
+
+        std::cout << "Begin 32 digit decimal literal tests...";
+        cjm_assert_equal(to_test(32248702111494488495152264316304_cppui128), 32248702111494488495152264316304_u128, "32248702111494488495152264316304"sv);
+
+        cjm_assert_equal(to_test(56228785229618117068222406460147_cppui128), 56228785229618117068222406460147_u128, "56228785229618117068222406460147"sv);
+
+        cjm_assert_equal(to_test(43585137947510266631676914061014_cppui128), 43585137947510266631676914061014_u128, "43585137947510266631676914061014"sv);
+
+        cjm_assert_equal(to_test(37282756115380840857611221512310_cppui128), 37282756115380840857611221512310_u128, "37282756115380840857611221512310"sv);
+
+        cjm_assert_equal(to_test(45991210349170540208922877069059_cppui128), 45991210349170540208922877069059_u128, "45991210349170540208922877069059"sv);
+
+        std::cout << "End 32 digit decimal literal tests...";
+
+        std::cout << "Begin 33 digit decimal literal tests...";
+        cjm_assert_equal(to_test(113746578776041137172662484459364_cppui128), 113746578776041137172662484459364_u128, "113746578776041137172662484459364"sv);
+
+        cjm_assert_equal(to_test(781649136618488211180624734334311_cppui128), 781649136618488211180624734334311_u128, "781649136618488211180624734334311"sv);
+
+        cjm_assert_equal(to_test(409946582552240692730810359545126_cppui128), 409946582552240692730810359545126_u128, "409946582552240692730810359545126"sv);
+
+        cjm_assert_equal(to_test(769136784601847692308920939201336_cppui128), 769136784601847692308920939201336_u128, "769136784601847692308920939201336"sv);
+
+        cjm_assert_equal(to_test(753185797222802590246967949600836_cppui128), 753185797222802590246967949600836_u128, "753185797222802590246967949600836"sv);
+
+        cjm_assert_equal(to_test(885714568035876934245137999016299_cppui128), 885714568035876934245137999016299_u128, "885714568035876934245137999016299"sv);
+
+        cjm_assert_equal(to_test(908417601152703146214917663559243_cppui128), 908417601152703146214917663559243_u128, "908417601152703146214917663559243"sv);
+
+        cjm_assert_equal(to_test(870806850088040591512082283126111_cppui128), 870806850088040591512082283126111_u128, "870806850088040591512082283126111"sv);
+
+        cjm_assert_equal(to_test(874336383153347551833140999746577_cppui128), 874336383153347551833140999746577_u128, "874336383153347551833140999746577"sv);
+
+        cjm_assert_equal(to_test(113697683769507216866831558281355_cppui128), 113697683769507216866831558281355_u128, "113697683769507216866831558281355"sv);
+
+        std::cout << "End 33 digit decimal literal tests...";
+
+        std::cout << "Begin 34 digit decimal literal tests...";
+        cjm_assert_equal(to_test(5323420894050518405562610437643765_cppui128), 5323420894050518405562610437643765_u128, "5323420894050518405562610437643765"sv);
+
+        cjm_assert_equal(to_test(9840342173991994550725437485549398_cppui128), 9840342173991994550725437485549398_u128, "9840342173991994550725437485549398"sv);
+
+        cjm_assert_equal(to_test(9039366594607149844347087798350412_cppui128), 9039366594607149844347087798350412_u128, "9039366594607149844347087798350412"sv);
+
+        cjm_assert_equal(to_test(2245325324003367159475423378426347_cppui128), 2245325324003367159475423378426347_u128, "2245325324003367159475423378426347"sv);
+
+        cjm_assert_equal(to_test(2840288970608221719533429153778806_cppui128), 2840288970608221719533429153778806_u128, "2840288970608221719533429153778806"sv);
+
+        cjm_assert_equal(to_test(1190340736149138776076026225839816_cppui128), 1190340736149138776076026225839816_u128, "1190340736149138776076026225839816"sv);
+
+        cjm_assert_equal(to_test(9010879028696166855115466630714124_cppui128), 9010879028696166855115466630714124_u128, "9010879028696166855115466630714124"sv);
+
+        cjm_assert_equal(to_test(3655275680324015588850958279158515_cppui128), 3655275680324015588850958279158515_u128, "3655275680324015588850958279158515"sv);
+
+        cjm_assert_equal(to_test(8655548493772048799881153576949695_cppui128), 8655548493772048799881153576949695_u128, "8655548493772048799881153576949695"sv);
+
+        cjm_assert_equal(to_test(6752018261004688116867479589735724_cppui128), 6752018261004688116867479589735724_u128, "6752018261004688116867479589735724"sv);
+
+        std::cout << "End 34 digit decimal literal tests...";
+
+        std::cout << "Begin 35 digit decimal literal tests...";
+        cjm_assert_equal(to_test(58237648469375849882934995254156136_cppui128), 58237648469375849882934995254156136_u128, "58237648469375849882934995254156136"sv);
+
+        cjm_assert_equal(to_test(39300256326747000923641920498805850_cppui128), 39300256326747000923641920498805850_u128, "39300256326747000923641920498805850"sv);
+
+        cjm_assert_equal(to_test(44733706528316527699823382861140864_cppui128), 44733706528316527699823382861140864_u128, "44733706528316527699823382861140864"sv);
+
+        cjm_assert_equal(to_test(95113158030896952897857951892432524_cppui128), 95113158030896952897857951892432524_u128, "95113158030896952897857951892432524"sv);
+
+        cjm_assert_equal(to_test(57089847095385818422394799036315357_cppui128), 57089847095385818422394799036315357_u128, "57089847095385818422394799036315357"sv);
+
+        cjm_assert_equal(to_test(81129158561052477534057543259856233_cppui128), 81129158561052477534057543259856233_u128, "81129158561052477534057543259856233"sv);
+
+        cjm_assert_equal(to_test(35142987516724061312134616530264799_cppui128), 35142987516724061312134616530264799_u128, "35142987516724061312134616530264799"sv);
+
+        cjm_assert_equal(to_test(11852037451972987514041656894555294_cppui128), 11852037451972987514041656894555294_u128, "11852037451972987514041656894555294"sv);
+
+        cjm_assert_equal(to_test(83989656336229055215836734677898408_cppui128), 83989656336229055215836734677898408_u128, "83989656336229055215836734677898408"sv);
+
+        cjm_assert_equal(to_test(69627665237996145100583802367775588_cppui128), 69627665237996145100583802367775588_u128, "69627665237996145100583802367775588"sv);
+
+        std::cout << "End 35 digit decimal literal tests...";
+
+        std::cout << "Begin 36 digit decimal literal tests...";
+        cjm_assert_equal(to_test(583123540748526741963359521918274468_cppui128), 583123540748526741963359521918274468_u128, "583123540748526741963359521918274468"sv);
+
+        cjm_assert_equal(to_test(101203563360135468184069108569355898_cppui128), 101203563360135468184069108569355898_u128, "101203563360135468184069108569355898"sv);
+
+        cjm_assert_equal(to_test(866661055351388163827371191091034099_cppui128), 866661055351388163827371191091034099_u128, "866661055351388163827371191091034099"sv);
+
+        cjm_assert_equal(to_test(571621701754222363293624420630556307_cppui128), 571621701754222363293624420630556307_u128, "571621701754222363293624420630556307"sv);
+
+        cjm_assert_equal(to_test(324326959173341750245292517989186549_cppui128), 324326959173341750245292517989186549_u128, "324326959173341750245292517989186549"sv);
+
+        cjm_assert_equal(to_test(471540304072630296290154648382926522_cppui128), 471540304072630296290154648382926522_u128, "471540304072630296290154648382926522"sv);
+
+        cjm_assert_equal(to_test(309306674801775925858332640880040913_cppui128), 309306674801775925858332640880040913_u128, "309306674801775925858332640880040913"sv);
+
+        cjm_assert_equal(to_test(197247818610140814337052433925723257_cppui128), 197247818610140814337052433925723257_u128, "197247818610140814337052433925723257"sv);
+
+        cjm_assert_equal(to_test(121135644437646951755609086770666371_cppui128), 121135644437646951755609086770666371_u128, "121135644437646951755609086770666371"sv);
+
+        cjm_assert_equal(to_test(303686434861622621522191988589307108_cppui128), 303686434861622621522191988589307108_u128, "303686434861622621522191988589307108"sv);
+
+        std::cout << "End 36 digit decimal literal tests...";
+
+        std::cout << "Begin 37 digit decimal literal tests...";
+        cjm_assert_equal(to_test(4396933815253688540364171060258347905_cppui128), 4396933815253688540364171060258347905_u128, "4396933815253688540364171060258347905"sv);
+
+        cjm_assert_equal(to_test(7235660023172289843389037842472897528_cppui128), 7235660023172289843389037842472897528_u128, "7235660023172289843389037842472897528"sv);
+
+        cjm_assert_equal(to_test(9781029173506781002479495025094989527_cppui128), 9781029173506781002479495025094989527_u128, "9781029173506781002479495025094989527"sv);
+
+        cjm_assert_equal(to_test(3369617253250111549816184797296880437_cppui128), 3369617253250111549816184797296880437_u128, "3369617253250111549816184797296880437"sv);
+
+        cjm_assert_equal(to_test(1409522216426860304619832246644456154_cppui128), 1409522216426860304619832246644456154_u128, "1409522216426860304619832246644456154"sv);
+
+        cjm_assert_equal(to_test(5557256212873393311902960237938061301_cppui128), 5557256212873393311902960237938061301_u128, "5557256212873393311902960237938061301"sv);
+
+        cjm_assert_equal(to_test(3370357233094466788192610317106294992_cppui128), 3370357233094466788192610317106294992_u128, "3370357233094466788192610317106294992"sv);
+
+        cjm_assert_equal(to_test(1757600328099647924573008104113569308_cppui128), 1757600328099647924573008104113569308_u128, "1757600328099647924573008104113569308"sv);
+
+        cjm_assert_equal(to_test(2560011885435479157879016919732154440_cppui128), 2560011885435479157879016919732154440_u128, "2560011885435479157879016919732154440"sv);
+
+        cjm_assert_equal(to_test(5634424171979763566905012300516061586_cppui128), 5634424171979763566905012300516061586_u128, "5634424171979763566905012300516061586"sv);
+
+        std::cout << "End 37 digit decimal literal tests...";
+
+        std::cout << "Begin 38 digit decimal literal tests...";
+        cjm_assert_equal(to_test(45228616852567812572545760782917364202_cppui128), 45228616852567812572545760782917364202_u128, "45228616852567812572545760782917364202"sv);
+
+        cjm_assert_equal(to_test(65430641696409423727859180922807227906_cppui128), 65430641696409423727859180922807227906_u128, "65430641696409423727859180922807227906"sv);
+
+        cjm_assert_equal(to_test(94920446264329337945623275414044177080_cppui128), 94920446264329337945623275414044177080_u128, "94920446264329337945623275414044177080"sv);
+
+        cjm_assert_equal(to_test(18588513469009908329043842875235296008_cppui128), 18588513469009908329043842875235296008_u128, "18588513469009908329043842875235296008"sv);
+
+        cjm_assert_equal(to_test(46177408343754432737412908052584240946_cppui128), 46177408343754432737412908052584240946_u128, "46177408343754432737412908052584240946"sv);
+
+        cjm_assert_equal(to_test(72678318504282839112490541447827291498_cppui128), 72678318504282839112490541447827291498_u128, "72678318504282839112490541447827291498"sv);
+
+        cjm_assert_equal(to_test(99258875763763083205609000241427404913_cppui128), 99258875763763083205609000241427404913_u128, "99258875763763083205609000241427404913"sv);
+
+        cjm_assert_equal(to_test(79625210994763261832682469066261969292_cppui128), 79625210994763261832682469066261969292_u128, "79625210994763261832682469066261969292"sv);
+
+        cjm_assert_equal(to_test(18470094375173411040527536470443549170_cppui128), 18470094375173411040527536470443549170_u128, "18470094375173411040527536470443549170"sv);
+
+        cjm_assert_equal(to_test(23989818564996688913507856191259788564_cppui128), 23989818564996688913507856191259788564_u128, "23989818564996688913507856191259788564"sv);
+
+        std::cout << "End 38 digit decimal literal tests...";
+
+        std::cout << "Begin 39 digit decimal literal tests...";
+        cjm_assert_equal(to_test(28385424097691113855942448431308557426_cppui128), 368667791018629577319317055863076768882_u128, "368667791018629577319317055863076768882"sv);
+
+        cjm_assert_equal(to_test(281283223287990228335767245616091912082_cppui128), 281283223287990228335767245616091912082_u128, "281283223287990228335767245616091912082"sv);
+
+        cjm_assert_equal(to_test(41759614332940540702671605255070738587_cppui128), 382041981253879004166046212686838950043_u128, "382041981253879004166046212686838950043"sv);
+
+        cjm_assert_equal(to_test(236012986862286911995342801033461187450_cppui128), 916577720704163838922092015896997610362_u128, "916577720704163838922092015896997610362"sv);
+
+        cjm_assert_equal(to_test(22219956672706507580574411462035089834_cppui128), 362502323593644971043949018893803301290_u128, "362502323593644971043949018893803301290"sv);
+
+        cjm_assert_equal(to_test(159179466896719014899257395578358801818_cppui128), 839744200738595941826006610441895224730_u128, "839744200738595941826006610441895224730"sv);
+
+        cjm_assert_equal(to_test(195575430604546097333608194749231332835_cppui128), 535857797525484560796982802180999544291_u128, "535857797525484560796982802180999544291"sv);
+
+        cjm_assert_equal(to_test(105624330665276070187981361595620037508_cppui128), 786189064507152997114730576459156460420_u128, "786189064507152997114730576459156460420"sv);
+
+        cjm_assert_equal(to_test(13149269670045276090323461267621435025_cppui128), 353431636590983739553698068699389646481_u128, "353431636590983739553698068699389646481"sv);
+
+        cjm_assert_equal(to_test(116858717335159510166173489416145313333_cppui128), 116858717335159510166173489416145313333_u128, "116858717335159510166173489416145313333"sv);
+
+        std::cout << "End 39 digit decimal literal tests...";

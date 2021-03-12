@@ -11,6 +11,7 @@
 #include <optional>
 #include <cjm/numerics/cjm_numeric_concepts.hpp>
 #include <cjm/string/cjm_string.hpp>
+#include <concepts>
 namespace cjm
 {
 	namespace testing
@@ -40,6 +41,10 @@ namespace cjm
 		template<typename T>
 		void cjm_assert_nullopt(const std::optional<T>& optional);
 
+		template<std::equality_comparable T>
+			requires (cjm::numerics::concepts::stream_insertable<T, char>)
+		void cjm_assert_equal(const T& x, const T& y, std::string_view text_rep_of_value);
+		
 		template<typename Predicate>
 		void cjm_assert(Predicate p);
 
@@ -70,6 +75,25 @@ namespace cjm
 
 			explicit testing_failure(const char* msg)
 				: domain_error(msg) {}
+		};
+
+		class not_equal_testing_failure : public testing_failure
+		{
+		public:
+			template<typename TValue>
+				requires (std::equality_comparable<TValue> && cjm::numerics::concepts::stream_insertable<TValue, char>)
+			explicit not_equal_testing_failure(const TValue& x, const TValue& y, std::string_view text_rep)
+				: testing_failure(create_msg(x, y, text_rep)) {}
+		
+		private:
+			template<typename TValue>
+				requires (cjm::numerics::concepts::stream_insertable<TValue, char>)
+			static std::string create_msg(const TValue& x, const TValue& y, std::string_view text_rep)
+			{
+				auto strm = string::make_throwing_sstream<char>();
+				strm << "The value [" << x << "] does not equal the value [" << y << "]. Text representation of value: [" << text_rep << "].";
+				return strm.str();
+			}
 		};
 
 		template<typename Predicate>
@@ -330,6 +354,16 @@ namespace cjm
 		{
 			if (!rhs.has_value())  throw testing_failure{ "The right hand parameter is std::nullopt." };
 			cjm_assert_close_enough(lhs, *rhs, percent_tolerance);
+		}
+
+		template<std::equality_comparable T>
+			requires (cjm::numerics::concepts::stream_insertable<T, char>)
+		void cjm_assert_equal(const T& x, const T& y, std::string_view text_rep_of_value)
+		{
+			if (x != y)
+			{
+				throw not_equal_testing_failure{ x, y, text_rep_of_value };
+			}
 		}
 	}
 }

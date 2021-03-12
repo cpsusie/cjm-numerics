@@ -449,6 +449,17 @@ void cjm::uint128_tests::run_test_application(std::span<test_switch> switches)
 	//uncomment to generate random binary and unary ops file for demo purposes
     /*save_random_binary_ops_to_file(std::filesystem::path{ "random_binary_ops.txt" });
     save_random_unary_ops_to_file(std::filesystem::path{ "random_unary_ops.txt" });*/
+
+    std::cout << "Generating literal tests." << newl;
+    auto vec = generate_literal_tests();
+    std::cout << "Literal tests generatored and will be printed ...." << newl;
+	
+	for (const auto& str : vec)
+	{
+        std::cout << str;
+	}
+    std::cout << newl << newl << "Done printing generated literal tests." << newl;
+	
 	if (switches.empty())
 	{
         print_environ_data();
@@ -2118,7 +2129,9 @@ cjm::uint128_tests::generator::rgen& cjm::uint128_tests::generator::rgen::operat
 
 char cjm::uint128_tests::generator::rgen::random_decimal_digit(char max)
 {
-	if (max < 0x30 || max > 0x39)
+    assert(max != '0');
+    const auto umax = static_cast<unsigned char>(max);
+    if (max < 0x30 || max > 0x39)
 	{
         auto strm = string::make_throwing_sstream<char>();
         strm
@@ -2130,9 +2143,15 @@ char cjm::uint128_tests::generator::rgen::random_decimal_digit(char max)
 			<< "] (" << max << ")." << newl;
         throw std::invalid_argument{ strm.str() };
 	}
-
-    const auto random_byte = (static_cast<unsigned>(m_gen->random_byte()) % 10u) + 0x30u;
-    return static_cast<char>(static_cast<unsigned char>(random_byte));
+    unsigned random = 0x30;
+    do
+    {
+        random = m_gen->random_byte() % 10u;
+        random += 0x30u;
+        assert(random >= 0x30 && random <= 0x39);        
+    } while (random > umax);
+	
+    return *reinterpret_cast<char*>(&random);
 }
 
 char cjm::uint128_tests::generator::rgen::random_hex_digit()
@@ -4442,6 +4461,28 @@ void cjm::uint128_tests::execute_issue27_bug_test()
     cjm_assert(utf32_result == expected_value);
 }
 
+std::basic_ostream<char>& cjm::uint128_tests::operator<<(std::basic_ostream<char>& os, lit_type v)
+{
+    using namespace std::literals::string_view_literals;
+    switch (v)
+    {
+    default:
+    case lit_type::Illegal:
+        os << "Illegal"sv;
+        break;
+    case lit_type::Decimal:
+        os << "Decimal"sv;
+        break;
+    case lit_type::Hexadecimal:
+        os << "Hexadecimal"sv;
+        break;
+    case lit_type::Zero:
+        os << "Zero"sv;
+        break;
+    }
+    return os;
+}
+
 std::pair<cjm::uint128_tests::ctrl_uint128_t, std::string> cjm::uint128_tests::create_random_dec_n_digits_long(
     size_t decimal_digits, generator::rgen& rgen)
 {
@@ -4456,7 +4497,7 @@ std::pair<cjm::uint128_tests::ctrl_uint128_t, std::string> cjm::uint128_tests::c
         throw std::invalid_argument{ strm.str() };
     }
 
-    constexpr auto max = lit_helper::max_decimal_digits_v<ctrl_uint128_t>;
+    constexpr auto& max = lit_helper::max_decimal_digits_v<ctrl_uint128_t>;
     auto char_array = std::vector<char>{};
     char_array.reserve(decimal_digits);
     size_t max_char_idx = 0;
@@ -4468,25 +4509,41 @@ std::pair<cjm::uint128_tests::ctrl_uint128_t, std::string> cjm::uint128_tests::c
     constexpr ctrl_uint128_t base_factor = 10u;
     while (char_array.size() < decimal_digits)
     {
+        const bool not_zero = char_array.empty();
         char random;
         if (can_ignore_max_char)
         {
-            random = rgen.random_decimal_digit();
+            do
+            {
+                random = rgen.random_decimal_digit();
+            } while (not_zero && random == '0');
         }
         else
         {
             const char max_char = max.at(max_char_idx);
-            random = rgen.random_decimal_digit(max_char);
+            do
+            {
+                random = max_char == '0' ? '0' : rgen.random_decimal_digit(max_char);
+            } while (not_zero && random == '0');
             assert(random <= max.at(max_char_idx));
             can_ignore_max_char = random < max.at(max_char_idx);
             ++max_char_idx;
         }
-        unsigned value = lit_helper::digit_lookup_v<lit_type::Decimal>[static_cast<unsigned>(static_cast<unsigned char>(random)) % 0x0100u].value();
-        result += (value * current_digit);
-        current_digit *= base_factor;
         char_array.push_back(random);
     }
-    return std::make_pair(result, std::string{ char_array.crbegin(), char_array.crend() });
+    constexpr auto& arr = lit_helper::digit_lookup_v<lit_type::Decimal>;
+    std::string ret;
+    ret.reserve(char_array.size());
+	for (auto it = char_array.crbegin(); it != char_array.crend(); ++it)
+	{
+        char c = *it;
+        const auto idx = static_cast<unsigned>(*reinterpret_cast<unsigned char*>(&c)) % 0x100u;
+        unsigned value = arr.at(idx).value();
+        result += (value * current_digit);
+        current_digit *= base_factor;
+        ret.push_back(c);
+	}    
+    return std::make_pair(result, std::string{ char_array.cbegin(), char_array.cend() });
 }
 
 std::pair<cjm::uint128_tests::ctrl_uint128_t, std::string> cjm::uint128_tests::
@@ -4505,7 +4562,7 @@ std::pair<cjm::uint128_tests::ctrl_uint128_t, std::string> cjm::uint128_tests::
         
     ctrl_uint128_t result = 0;
     ctrl_uint128_t current_digit = 1;
-    const ctrl_uint128_t base_factor = 0x0a;
+    constexpr ctrl_uint128_t base_factor = 0x10;
     auto vec = std::vector<char>{ };
     vec.reserve(hex_digits);
 	while (vec.size() < hex_digits)
@@ -4538,32 +4595,110 @@ std::string cjm::uint128_tests::generate_literal_test(lit_type literal_type, siz
 	{
         throw std::invalid_argument{ "At least one digit must be specified." };
 	}
-    //using namespace boost::multiprecision::literals;
-    
-    const auto&& [value, value_text]  = create_random_hex_n_digits_long(num_digits, gen);
-    auto strm = string::make_throwing_sstream<char>();
-    strm << std::hex;
-    strm << "\t\tcjm_assert(to_test(0x" << value << "_cppui128) == " << value_text << "u128);" << newl;
-    return strm.str();
+	if (literal_type == lit_type::Hexadecimal)
+	{
+        const auto&& [value, value_text] = create_random_hex_n_digits_long(num_digits, gen);
+        auto strm = string::make_throwing_sstream<char>();
+        strm << std::hex;
+        strm << "\tcjm_assert_equal(to_test(0x" << value << "_cppui128), " << value_text << "_u128, \"" << value_text << "\"sv);\n" << newl;
+        return strm.str();
+	}
+	const auto&& [value, value_text] = create_random_dec_n_digits_long(num_digits, gen);
+	auto strm = string::make_throwing_sstream<char>();
+	strm << std::dec;
+	strm << "\tcjm_assert_equal(to_test(" << value << "_cppui128), " << value_text << "_u128, \"" << value_text << "\"sv);\n" << newl;
+	return strm.str();
 }
 std::vector<std::string> cjm::uint128_tests::generate_literal_tests()
 {
     constexpr auto arr = init_num_tests_arr<ctrl_uint128_t, true>();
-    const size_t total_tests = std::accumulate(arr.cbegin(), arr.cend(), 0u);
+    const size_t total_tests = std::accumulate(arr.cbegin(), arr.cend(), 0_szt);
+    constexpr size_t max_hex_digits = std::numeric_limits<ctrl_uint128_t>::digits / 4u;
     assert(total_tests > 0);
 	auto vec = std::vector<std::string>{};
-    vec.reserve(total_tests);
+    vec.reserve(total_tests + 150);
     constexpr size_t max_digits = std::numeric_limits<ctrl_uint128_t>::digits10 + 1u;
     using namespace std::string_literals;
-    vec.emplace_back("")
+    using namespace cjm::numerics::uint128_literals;
+    using namespace boost::multiprecision::literals;
 	
+    vec.emplace_back("\tusing namespace boost::multiprecision::literals;\n\n"s);
+    vec.emplace_back("\tstd::cout << \"Beginning single digit hex literal tests...\";\n");
+    vec.emplace_back("\tcjm_assert_equal(to_test(0x0_cppui128), 0x0_u128, \"0x0\"sv);\n");
+    vec.emplace_back("\tcjm_assert_equal(to_test(0x1_cppui128), 0x1_u128, \"0x1\"sv);\n");
+    vec.emplace_back("\tcjm_assert_equal(to_test(0x2_cppui128), 0x2_u128, \"0x2\"sv);\n");
+    vec.emplace_back("\tcjm_assert_equal(to_test(0x3_cppui128), 0x3_u128, \"0x3\"sv);\n");
+    vec.emplace_back("\tcjm_assert_equal(to_test(0x4_cppui128), 0x4_u128, \"0x4\"sv);\n");
+    vec.emplace_back("\tcjm_assert_equal(to_test(0x5_cppui128), 0x5_u128, \"0x5\"sv);\n");
+    vec.emplace_back("\tcjm_assert_equal(to_test(0x6_cppui128), 0x6_u128, \"0x6\"sv);\n");
+    vec.emplace_back("\tcjm_assert_equal(to_test(0x7_cppui128), 0x7_u128, \"0x7\"sv);\n");
+    vec.emplace_back("\tcjm_assert_equal(to_test(0x8_cppui128), 0x8_u128, \"0x8\"sv);\n");
+    vec.emplace_back("\tcjm_assert_equal(to_test(0x9_cppui128), 0x9_u128, \"0x9\"sv);\n");
+    vec.emplace_back("\tcjm_assert_equal(to_test(0xa_cppui128), 0xa_u128, \"0xa\"sv);\n");
+    vec.emplace_back("\tcjm_assert_equal(to_test(0xb_cppui128), 0xb_u128, \"0xb\"sv);\n");
+    vec.emplace_back("\tcjm_assert_equal(to_test(0xc_cppui128), 0xc_u128, \"0xc\"sv);\n");
+    vec.emplace_back("\tcjm_assert_equal(to_test(0xd_cppui128), 0xd_u128, \"0xd\"sv);\n");
+    vec.emplace_back("\tcjm_assert_equal(to_test(0xe_cppui128), 0xe_u128, \"0xe\"sv);\n");
+    vec.emplace_back("\tcjm_assert_equal(to_test(0xf_cppui128), 0xf_u128, \"0xf\"sv);\n");
+    vec.emplace_back("\tstd::cout << \"End single digit hex literal tests...\";\n\n");
 
-	for (size_t digits_now = 2; digits_now <= max_digits; ++digits_now)
+    vec.emplace_back("\tstd::cout << \"Begin single digit decimal literal tests...\";\n");
+    vec.emplace_back("\tcjm_assert_equal(to_test(0_cppui128), 0_u128, \"0\"sv);\n");
+    vec.emplace_back("\tcjm_assert_equal(to_test(1_cppui128), 1_u128, \"1\"sv);\n");
+    vec.emplace_back("\tcjm_assert_equal(to_test(2_cppui128), 2_u128, \"2\"sv);\n");
+    vec.emplace_back("\tcjm_assert_equal(to_test(3_cppui128), 3_u128, \"3\"sv);\n");
+    vec.emplace_back("\tcjm_assert_equal(to_test(4_cppui128), 4_u128, \"4\"sv);\n");
+    vec.emplace_back("\tcjm_assert_equal(to_test(5_cppui128), 5_u128, \"5\"sv);\n");
+    vec.emplace_back("\tcjm_assert_equal(to_test(6_cppui128), 6_u128, \"6\"sv);\n");
+    vec.emplace_back("\tcjm_assert_equal(to_test(7_cppui128), 7_u128, \"7\"sv);\n");
+    vec.emplace_back("\tcjm_assert_equal(to_test(8_cppui128), 8_u128, \"8\"sv);\n");
+    vec.emplace_back("\tcjm_assert_equal(to_test(9_cppui128), 9_u128, \"9\"sv);\n");
+    vec.emplace_back("\tstd::cout << \"End single digit decimal literal tests...\";\n\n");
+
+    auto get_entry_exit_line = [](size_t num, bool entry, bool hex) -> std::string
+    {
+        std::string_view hex_or_dec = hex ? "hex"sv : "decimal"sv;
+        std::string_view begin_end = entry ? "Begin"sv : "End"sv;
+        auto strm = string::make_throwing_sstream<char>();
+        strm << "\tstd::cout << \"" << begin_end << " " << num << " digit " << hex_or_dec << " literal tests...\";\n";
+        return strm.str();
+    };
+    auto rgen = generator::rgen{};
+    
+	for (size_t i = 2; i < arr.size() && i <= max_hex_digits; ++i)
 	{
-        
-		
+        vec.emplace_back(get_entry_exit_line(i, true, true));
+        const auto total_num_tests = arr[i];
+        const auto total_each_hex_dec_set_tests = total_num_tests / 2;
+        size_t tests_so_far = 0;
+		do
+		{
+            vec.emplace_back(generate_literal_test(lit_type::Hexadecimal, i, rgen));
+            ++tests_so_far;
+        } while (tests_so_far < total_each_hex_dec_set_tests);
+        vec.emplace_back(get_entry_exit_line(i, false, true) + "\n"s);
+
+        vec.emplace_back(get_entry_exit_line(i, true, false));
+		do
+		{
+            vec.emplace_back(generate_literal_test(lit_type::Decimal, i, rgen));
+            ++tests_so_far;
+        } while (tests_so_far < total_num_tests);
+        vec.emplace_back(get_entry_exit_line(i, false, false) + "\n"s);		
 	}
-	
+	for (size_t i = max_hex_digits + 1; i <= max_digits; ++i )
+	{
+        vec.emplace_back(get_entry_exit_line(i, true, false));
+        const auto total_num_tests = arr[i];
+        size_t tests_so_far = 0;
+        do
+        {
+            vec.emplace_back(generate_literal_test(lit_type::Decimal, i, rgen));
+            ++tests_so_far;
+        } while (tests_so_far < total_num_tests);
+        vec.emplace_back(get_entry_exit_line(i, false, false) + "\n"s);
+	}
+    return vec;
 }
 
 

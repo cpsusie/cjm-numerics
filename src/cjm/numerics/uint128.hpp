@@ -675,8 +675,7 @@ namespace cjm
 				Zero = 3,
 			};
 
-			template<concepts::character Char>
-            std::basic_ostream<Char>& operator<<(std::basic_ostream<Char>& os, lit_type t);
+			
 
 			/************************************************************************/
 			/* NOT FOR EXTERNAL USE
@@ -757,124 +756,10 @@ namespace cjm
                 lit_helper(lit_helper&& other) noexcept = delete;
                 lit_helper& operator=(const lit_helper& other) = delete;
                 lit_helper& operator=(lit_helper&& other) noexcept = delete;
-			};
-		}
-        template<concepts::character Char>
-        std::basic_ostream<Char>& operator<< <char>(std::basic_ostream<Char>& os, lit_type t)
-		{
-            using namespace std::literals::string_view_literals;
-			switch (t)
-			{
-            default:	
-            case lit_type::Illegal:
-                os << "Illegal"sv;
-                break;
-            case lit_type::Decimal:
-                os << "Decimal"sv;
-                break;
-            case lit_type::Hexadecimal:
-                os << "Hexadecimal"sv;
-                break;
-            case lit_type::Zero:
-                os << "Zero"sv;
-                break;
-			}
-            return os;
-		}
-
-        template<concepts::character Char>
-        std::basic_ostream<Char>& operator<< <wchar_t>(std::basic_ostream<Char>& os, lit_type t)
-        {
-            using namespace std::literals::string_view_literals;
-            switch (t)
-            {
-            default:
-            case lit_type::Illegal:
-                os << L"Illegal"sv;
-                break;
-            case lit_type::Decimal:
-                os << L"Decimal"sv;
-                break;
-            case lit_type::Hexadecimal:
-                os << L"Hexadecimal"sv;
-                break;
-            case lit_type::Zero:
-                os << L"Zero"sv;
-                break;
-            }
-            return os;
-        }
-
-        template<concepts::character Char>
-        std::basic_ostream<Char>& operator<< <char8_t>(std::basic_ostream<Char>& os, lit_type t)
-        {
-            using namespace std::literals::string_view_literals;
-            switch (t)
-            {
-            default:
-            case lit_type::Illegal:
-                os << u8"Illegal"sv;
-                break;
-            case lit_type::Decimal:
-                os << u8"Decimal"sv;
-                break;
-            case lit_type::Hexadecimal:
-                os << u8"Hexadecimal"sv;
-                break;
-            case lit_type::Zero:
-                os << u8"Zero"sv;
-                break;
-            }
-            return os;
-        }
-
-        template<concepts::character Char>
-        std::basic_ostream<Char>& operator<< <char16_t>(std::basic_ostream<Char>& os, lit_type t)
-        {
-            using namespace std::literals::string_view_literals;
-            switch (t)
-            {
-            default:
-            case lit_type::Illegal:
-                os << u"Illegal"sv;
-                break;
-            case lit_type::Decimal:
-                os << u"Decimal"sv;
-                break;
-            case lit_type::Hexadecimal:
-                os << u"Hexadecimal"sv;
-                break;
-            case lit_type::Zero:
-                os << u"Zero"sv;
-                break;
-            }
-            return os;
-        }
-
-        template<concepts::character Char>
-        std::basic_ostream<Char>& operator<< <char32_t>(std::basic_ostream<Char>& os, lit_type t)
-        {
-            using namespace std::literals::string_view_literals;
-            switch (t)
-            {
-            default:
-            case lit_type::Illegal:
-                os << U"Illegal"sv;
-                break;
-            case lit_type::Decimal:
-                os << U"Decimal"sv;
-                break;
-            case lit_type::Hexadecimal:
-                os << U"Hexadecimal"sv;
-                break;
-            case lit_type::Zero:
-                os << U"Zero"sv;
-                break;
-            }
-            return os;
-        }
-        
+			};			
+		}        
 	}
 }
-#endif
 #include <cjm/numerics/uint128.inl>
+#endif
+
