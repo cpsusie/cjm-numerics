@@ -150,39 +150,6 @@ int main()
 	std::ios::sync_with_stdio(false);
 	try
 	{
-//		auto hex_chars = cjm::numerics::uint128_literals::lit_helper::count_hex_chars<'0', 'x', 'c', '0', 'd', 'e', '\'', 'd', '0', '0', 'd'>();
-//		if (hex_chars.has_value())
-//			cout << "hex chars: [" << *hex_chars << "]." << newl;
-//		else
-//			cout << "illegal hex char count." << newl;
-//		constexpr auto& dec_lu =cjm::numerics::uint128_literals::lit_helper::digit_lookup_v<lit_type::Decimal>;
-//		constexpr auto& hex_lu =cjm::numerics::uint128_literals::lit_helper::digit_lookup_v<lit_type::Hexadecimal>;
-//		cout << hex_lu.size() << dec_lu.size() << newl;
-
-		using cjm::numerics::uint128_literals::operator""_u128;
-
-		static_assert(0xc0de'd00d'fea2'b00b_u128 == 0xc0de'd00d'fea2'b00b_u128);
-		static_assert(121'327'892_u128 == 121'327'892_u128);
-
-		//auto x = 340'282'366'920'938'463'463'374'607'431'768'211'456_tu128;
-		auto y = 340'282'366'920'938'463'463'374'607'431'768'211'455_u128;
-		cout << y;
-
-		static_assert(cjm::numerics::uint128_literals::lit_helper::parse_literal<std::uint64_t, '0'>() == 0);
-		static_assert(cjm::numerics::uint128_literals::lit_helper::parse_literal<std::uint64_t, '2'>() == 2);
-		static_assert(cjm::numerics::uint128_literals::lit_helper::parse_literal<std::uint64_t, 'q'>() == std::nullopt);
-		static_assert(cjm::numerics::uint128_literals::lit_helper::parse_literal<std::uint64_t, '0', 'x', 'c', '0', 'd', 'e', '\'', 'd', '0', '0', 'd'>() == 0xc0de'd00d);
-		using reverser_t = typename cjm::numerics::uint128_literals::internal::array_retrieval_helper<'0', 'X', 'C', '0', 'D', 'e', '\'', 'D', '0', '0', 'g'>;
-		static_assert(reverser_t::reversed_array_val[0] == 'g' && reverser_t::reversed_array_val[9] == 'X' && reverser_t::reversed_array_val[10]=='0' && reverser_t::reversed_array_val.size() == 11);
-		{
-
-			std::string uint32_max_digits_txt = print_max_digits10<std::uint32_t>();
-			cout << uint32_max_digits_txt << newl;
-			std::string uint128_t_max_digits_txt = print_max_digits10<uint128_t>();
-			cout << newl << uint128_t_max_digits_txt << newl;
-		}
-		//////////
-
 		say_hello();
 		demonstrate_addition();
 		demonstrate_constexpr_addition();
