@@ -190,6 +190,7 @@ namespace cjm::uint128_tests
     void execute_uintcontainer_adc_tests();
 
     void execute_issue27_bug_test();
+    void execute_literal_test();
 
     std::basic_ostream<char>& operator<<(std::basic_ostream<char>&, lit_type v);
 	

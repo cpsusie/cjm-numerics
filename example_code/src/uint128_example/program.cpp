@@ -1266,67 +1266,18 @@ void cjm::uint128::example_code::demonstrate_literals()
 			<< a << " " << b << newl
 			<< c << newl;
 	}
-
-	//KNOWN ISSUES -
-	//Be careful with potentially illegal literals.
-	//If they are evaluated in a constexpr context,
-	//an error will be emitted at compile time.
-	//
-	//If they are not forced to be evaluated at compile time,
-	//there evaluation will be deferred until runtime and a std::domain_error
-	//exception will be thrown.
-	//
-	//This is undesirable and will be addressed in the future.  Current attempts
-	//have not worked across all supported compilers.
-	//
 	
-//	try
-//	{
-//		auto a = 001_u128; //Illegal: octal is not supported
-//		std::cerr << "You should never see this: [" << a << "]." << newl;
-//		throw std::logic_error{ "It should have thrown domain error." };
-//	}
-//	catch (const std::domain_error& ex)
-//	{
-//		std::cout << "CORRECT (for now) behavior: domain_error thrown.  Msg: [" << ex.what() << "]." << newl;
-//	}
-//	catch (const std::logic_error&)
-//	{
-//		std::cerr << "ERROR -- it did NOT throw!" << newl;
-//		std::terminate();
-//	}
-//	catch (const std::exception& ex)
-//	{
-//		std::cerr << "ERROR -- it threw the wrong exception.  Msg: [" << ex.what() << "]." << newl;
-//		std::terminate();
-//	}
-//
-//	try
-//	{
-//		auto b = 340'282'366'920'938'463'463'374'607'431'768'211'456_u128;  //illegal: (too big by one)
-//		std::cerr << "You should never see this: [" << b << "]." << newl;
-//		throw std::logic_error{ "It should have thrown domain error." };
-//	}
-//	catch (const std::domain_error& ex)
-//	{
-//		std::cout << "CORRECT (for now) behavior: domain_error thrown.  Msg: [" << ex.what() << "]." << newl;
-//	}
-//	catch (const std::logic_error&)
-//	{
-//		std::cerr << "ERROR -- it did NOT throw!" << newl;
-//		std::terminate();
-//	}
-//	catch (const std::exception& ex)
-//	{
-//		std::cerr << "ERROR -- it threw the wrong exception.  Msg: [" << ex.what() << "]." << newl;
-//		std::terminate();
-//	}
-
-	//you can avoid this problem by forcing evaluation of the literal into a constexpr context.
-	//The following lines will not compile:
-	//constexpr auto b = 340'282'366'920'938'463'463'374'607'431'768'211'456_u128;
-	//constexpr auto a = 001_u128; //Illegal: octal is not supported
-	//std::cout << "b: " << b << " a:" << a << "." << newl;
+	//ILLEGAL LITERAL VALUES ARE CAUGHT AT COMPILE TIME
+	//illegal literals should be caught at compile time even if not assigned to constexpr.
+	//examples ... none of following declaration/assignments should compile:
+	//auto illegal_octal = 01_u128; //illegal -- octal literals not supported.
+	//auto illegal_too_long = 0xabcd'ef01'2345'6789'abdc'ef01'6789'abcd'e_u128;
+	//auto illegal_dec_too_big_by_one = 340'282'366'920'938'463'463'374'607'431'768'211'456_u128;
+	//auto illegal_one_too_many_dec_digits = 1'000'000'000'000'000'000'000'000'000'000'000'000'000_u128;
+	//cout << "illegal_octal: " << illegal_octal << newl;
+	//cout << "illegal_too_long: " << illegal_too_long << newl;
+	//cout << "illegal_dec_too_big_by_one: " << illegal_dec_too_big_by_one << newl;
+	//cout << "illegal_one_too_many_dec_digits: " << illegal_one_too_many_dec_digits << newl;
 }
 
 void cjm::uint128::example_code::demonstrate_stream_insertion_and_extraction()
