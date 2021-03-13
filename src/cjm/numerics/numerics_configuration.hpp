@@ -131,7 +131,11 @@
 #define CJM_HAS_BITOPS
 #endif
 
-#ifndef CJM_LIT_CONST
+#ifdef CJM_LIT_CONST
+#error "Do not define CJM_LIT_CONST manually."
+#elif defined(__cpp_consteval)
+#define CJM_LIT_CONST consteval
+#else
 #define CJM_LIT_CONST constexpr
 #endif
 
@@ -170,6 +174,13 @@ namespace cjm
 			              "CJM NUMERICS requires definition of std::int64_t to be a type 8 bytes long and with 63 binary digits.");
 			static_assert(sizeof(size_t) == 8 || sizeof(size_t) == 4, "Only 32 and 64 bit architecture supported.");
 
+			constexpr bool has_consteval =
+#ifdef __cpp_consteval
+				true;
+#else
+				false;
+#endif
+			
 			constexpr bool validate_uint128_concept_compliance_dev =
 #ifndef CJM_NUMERICS_UINT128_VALIDATE_UINT128_CONCEPT_COMPLIANCE_DEV
 				false;

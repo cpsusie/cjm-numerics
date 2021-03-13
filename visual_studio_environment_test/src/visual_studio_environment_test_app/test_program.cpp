@@ -45,6 +45,7 @@ void cjm::clang::test_program::test_program()
 
 	cout << "Has concepts?: [" << environment::has_concepts << "]." << newl;
 	cout << "Has char8_t?: [" << environment::has_char8_t << "]." << newl;
+	cout << "Has consteval?: [" << environment::has_consteval << "]." << newl;
 	cout << "Has library bit-ops?: [" << environment::has_lib_bitops << "]." << newl;
 	cout << "Has library char8_t?: [" << environment::has_lib_char8_t << "]." << newl;
 	cout << "Has library concepts?: [" << environment::has_lib_concepts << "]." << newl;

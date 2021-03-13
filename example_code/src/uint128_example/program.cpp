@@ -19,6 +19,8 @@
 #include <concepts>
 #include <compare>
 #include <cmath>
+#include <typeinfo>
+
 
 //The purpose of this EXAMPLE_CODE is to demonstrate the functionality of the CJM uint128 type,
 //show how it works, and talk somewhat about its strategies on various systems. It does NOT attempt
@@ -58,7 +60,11 @@ namespace cjm::uint128::example_code
 
 	template<concepts::character Char>
 	std::basic_stringstream<Char, std::char_traits<Char>, std::allocator<Char>> make_throwing_sstream();
-	
+
+	template<concepts::unsigned_integer Ui, concepts::character Char = char>
+	std::basic_string<Char> print_max_digits10();
+
+
 	void demonstrate_subtraction();
 	void demonstrate_constexpr_subtraction();
 	void demonstrate_addition();
@@ -103,7 +109,7 @@ namespace cjm::uint128::example_code
 		constexpr just_like_uint128_t(just_like_uint128_t&& other) noexcept = default;
 		constexpr just_like_uint128_t& operator=(const just_like_uint128_t& other) noexcept = default;
 		constexpr just_like_uint128_t& operator=(just_like_uint128_t&& other) noexcept = default;
-		~just_like_uint128_t() = default;
+		constexpr ~just_like_uint128_t() = default;
 	};
 	static_assert(std::is_default_constructible_v<just_like_uint128_t>&& std::is_trivially_copyable_v<just_like_uint128_t>, "To be bit-castable, gotta be at least this.");
 
@@ -119,7 +125,23 @@ namespace cjm::uint128::example_code
 		ret.exceptions(std::ios::failbit | std::ios::badbit);
 		return ret;
 	}
-	
+	template<concepts::unsigned_integer Ui, concepts::character Char>
+	std::basic_string<Char> print_max_digits10()
+	{
+		auto strm = make_throwing_sstream<Char>();
+		constexpr size_t digits_ten = std::numeric_limits<Ui>::digits10;
+		strm
+			<< std::dec << "Digits10 for type [" << typeid(Ui).name() << "] is [" << digits_ten
+			<< "], meaning that its max value, in decimal, will have [" << digits_ten + 1
+			<< "] digits." << newl;
+		strm << "Maximum value for type [" << typeid(Ui).name() << "], expressed in decimal, is: [";
+		for (char c : cjm::numerics::uint128_literals::lit_helper::max_decimal_digits_v<Ui>)
+		{
+			strm << c;
+		}
+		strm << "]." << newl;
+		return strm.str();
+	}
 }
 
 int main()
@@ -128,9 +150,6 @@ int main()
 	std::ios::sync_with_stdio(false);
 	try
 	{
-		constexpr std::uint64_t five = 5;
-		constexpr auto result = increment(five);
-		cout << "Incremented: " << result << newl;
 		say_hello();
 		demonstrate_addition();
 		demonstrate_constexpr_addition();
@@ -572,6 +591,7 @@ void cjm::uint128::example_code::say_hello()
 	cout << "Intel Adx Available: [" << std::boolalpha << intel_adx_available << "]." << newl;
 	cout << "Intel BMI2 Available: [" << std::boolalpha << intel_bmi2_available << "]." << newl;
 	cout << "Sse3 available: [" << std::boolalpha << sse3_available << "]." << newl;
+	cout << "Consteval available: [" << std::boolalpha << cjm::numerics::internal::has_consteval << "]." << newl;
 }
 
 void cjm::uint128::example_code::say_goodbye()
@@ -1246,72 +1266,23 @@ void cjm::uint128::example_code::demonstrate_literals()
 			<< a << " " << b << newl
 			<< c << newl;
 	}
-
-	//KNOWN ISSUES -
-	//Be careful with potentially illegal literals.
-	//If they are evaluated in a constexpr context,
-	//an error will be emitted at compile time.
-	//
-	//If they are not forced to be evaluated at compile time,
-	//there evaluation will be deferred until runtime and a std::domain_error
-	//exception will be thrown.
-	//
-	//This is undesirable and will be addressed in the future.  Current attempts
-	//have not worked across all supported compilers.
-	//
 	
-	try
-	{
-		auto a = 001_u128; //Illegal: octal is not supported
-		std::cerr << "You should never see this: [" << a << "]." << newl;
-		throw std::logic_error{ "It should have thrown domain error." };
-	}
-	catch (const std::domain_error& ex)
-	{
-		std::cout << "CORRECT (for now) behavior: domain_error thrown.  Msg: [" << ex.what() << "]." << newl;
-	}
-	catch (const std::logic_error&)
-	{
-		std::cerr << "ERROR -- it did NOT throw!" << newl;
-		std::terminate();
-	}
-	catch (const std::exception& ex)
-	{
-		std::cerr << "ERROR -- it threw the wrong exception.  Msg: [" << ex.what() << "]." << newl;
-		std::terminate();
-	}
-
-	try
-	{
-		auto b = 340'282'366'920'938'463'463'374'607'431'768'211'456_u128;  //illegal: (too big by one)
-		std::cerr << "You should never see this: [" << b << "]." << newl;
-		throw std::logic_error{ "It should have thrown domain error." };
-	}
-	catch (const std::domain_error& ex)
-	{
-		std::cout << "CORRECT (for now) behavior: domain_error thrown.  Msg: [" << ex.what() << "]." << newl;
-	}
-	catch (const std::logic_error&)
-	{
-		std::cerr << "ERROR -- it did NOT throw!" << newl;
-		std::terminate();
-	}
-	catch (const std::exception& ex)
-	{
-		std::cerr << "ERROR -- it threw the wrong exception.  Msg: [" << ex.what() << "]." << newl;
-		std::terminate();
-	}
-
-	//you can avoid this problem by forcing evaluation of the literal into a constexpr context.
-	//The following lines will not compile:
-	//constexpr auto b = 340'282'366'920'938'463'463'374'607'431'768'211'456_u128;
-	//constexpr auto a = 001_u128; //Illegal: octal is not supported
-	//std::cout << "b: " << b << " a:" << a << "." << newl;
+	//ILLEGAL LITERAL VALUES ARE CAUGHT AT COMPILE TIME
+	//illegal literals should be caught at compile time even if not assigned to constexpr.
+	//examples ... none of following declaration/assignments should compile:
+	//auto illegal_octal = 01_u128; //illegal -- octal literals not supported.
+	//auto illegal_too_long = 0xabcd'ef01'2345'6789'abdc'ef01'6789'abcd'e_u128;
+	//auto illegal_dec_too_big_by_one = 340'282'366'920'938'463'463'374'607'431'768'211'456_u128;
+	//auto illegal_one_too_many_dec_digits = 1'000'000'000'000'000'000'000'000'000'000'000'000'000_u128;
+	//cout << "illegal_octal: " << illegal_octal << newl;
+	//cout << "illegal_too_long: " << illegal_too_long << newl;
+	//cout << "illegal_dec_too_big_by_one: " << illegal_dec_too_big_by_one << newl;
+	//cout << "illegal_one_too_many_dec_digits: " << illegal_one_too_many_dec_digits << newl;
 }
 
 void cjm::uint128::example_code::demonstrate_stream_insertion_and_extraction()
 {
-	constexpr auto wnewl = L'\n';
+
 	std::cout << newl << "This is the stream insertion and extraction demonstration." << newl;
 	{
 		std::cout << "First, we demonstrate decimal format: " << newl;
@@ -1319,11 +1290,10 @@ void cjm::uint128::example_code::demonstrate_stream_insertion_and_extraction()
 		constexpr auto expected_value = 256'368'684'943'268'121'395'391'016'720'575'361'037_u128;
 		//commas and underscores ignored
 		constexpr auto narrow_text = "256_368_684_943_268_121_395_391_016_720_575_361_037"sv;
-		constexpr auto wide_text = L"256,368,684,943,268,121,395,391,016,720,575,361,037"sv;
+		constexpr auto wide_text = L"256,368,684,943,268,121,395,391,016,720,575,361,037"sv; 
 
 		std::cout << "Going to stream insert the following narrow text then extract it into a uint128_t: \"" << narrow_text << "\"." << newl;
 
-		std::wcout << L"Going to stream insert the following wide text then extract it into a uint128_t: \"" << wide_text << L"\"." << wnewl;
 		auto narrow_stream = make_throwing_sstream<char>();
 		auto wide_stream = make_throwing_sstream<wchar_t>();
 
@@ -1348,7 +1318,8 @@ void cjm::uint128::example_code::demonstrate_stream_insertion_and_extraction()
 		}
 
 		cout << "Narrow uint128_t: [" << std::dec << narrow << "]." << newl;
-		std::wcout << L"Wide uint128_t: [" << std::dec << wide << L"]." << wnewl;
+		//don't want to use wcout in same program with cout
+		cout << "Wide also worked." << newl;
 				 
 	}
 	{
@@ -1360,7 +1331,6 @@ void cjm::uint128::example_code::demonstrate_stream_insertion_and_extraction()
 
 		std::cout << "Going to stream insert the following narrow text then extract it into a uint128_t: \"" << narrow_text << "\"." << newl;
 
-		std::wcout << L"Going to stream insert the following wide text then extract it into a uint128_t: \"" << wide_text << L"\"." << wnewl;
 		auto narrow_stream = make_throwing_sstream<char>();
 		auto wide_stream = make_throwing_sstream<wchar_t>();
 
@@ -1385,8 +1355,8 @@ void cjm::uint128::example_code::demonstrate_stream_insertion_and_extraction()
 		}
 
 		cout << "Narrow uint128_t: [" << std::hex << narrow << "]." << newl;
-		std::wcout << L"Wide uint128_t: [" << std::hex << wide << L"]." << wnewl;
+		//don't want to use wcout in same program with cout
+		cout << "Wide also worked." << newl;
 
 	}
 }
-

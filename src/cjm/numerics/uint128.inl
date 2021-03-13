@@ -38,291 +38,14 @@ namespace cjm
 		
         namespace uint128_literals
         {
-            template<char... Chars>
-            CJM_LIT_CONST uint128 operator"" _u128()
-            {
-                constexpr auto charArray = uint128_lit_helper::get_array<Chars...>();
-                return uint128_lit_helper::parse_from_char_array(charArray);                
-            }
-
-	        CJM_LIT_CONST uint8_t uint128_lit_helper::get_hex_value(char c)
-            {
-                switch (c)
-                {
-                    case '0':
-                        return 0;
-                    case '1':
-                        return 1;
-                    case '2':
-                        return 2;
-                    case '3':
-                        return 3;
-                    case '4':
-                        return 4;
-                    case '5':
-                        return 5;
-                    case '6':
-                        return 6;
-                    case '7':
-                        return 7;
-                    case '8':
-                        return 8;
-                    case '9':
-                        return 9;
-                    case 'a':
-                        return 10;
-                    case 'b':
-                        return 11;
-                    case 'c':
-                        return 12;
-                    case 'd':
-                        return 13;
-                    case 'e':
-                        return 14;
-                    case 'f':
-                        return 15;
-                    default:
-                        throw std::invalid_argument("Unrecognized character");
-                }
-            }
-
-            template<size_t Size>
-            CJM_LIT_CONST std::pair<bool, size_t> uint128_lit_helper::scan_chars_dec(std::array<char, Size> arr)
-            {
-                std::pair<bool, size_t> ret;
-                if (arr.empty())
-                {
-                    ret.first = false;
-                    ret.second = 0;
-                }
-                else
-                {
-                    char current_char = arr[0];
-                    if (current_char == '0' || !(current_char >= 0x30 && current_char <= 0x39))
-                    {
-                        ret.first = false;
-                        ret.second = 0;
-                    }
-                    else
-                    {
-                        ret.first = true;
-                        ret.second = 1;
-                        current_char = ret.second < arr.size() ? arr[ret.second] : '\0';
-                        if (current_char != '\0')
-                        {
-                            while (current_char != '\0')
-                            {
-                                ++ret.second;
-                                if (ret.first)
-                                    ret.first = (current_char == '\'') || (current_char >= 0x30 && current_char <= 0x39);
-                                current_char = ret.second < arr.size() ? arr[ret.second] : '\0';
-                            }
-                        }
-                        else
-                        {
-                            ret.second = 1;
-                        }
-                    }
-                }
-                return ret;
-            }
-
-            template<size_t Size>
-            CJM_LIT_CONST std::pair<size_t, size_t> uint128_lit_helper::get_dec_val(std::array<char, Size> arr, size_t index)
-            {
-                //if we got here we know that every char in chars is either \' or a legal digit
-                std::pair<size_t, size_t> ret;
-                char current_char = arr[index--];
-                if (current_char == '\'')
-                {
-                    //since we cannot reasonably expect a literal to ever have size_t::max digits,
-                    //if it equals the size_t::max, that means it was zero (zero - 1 == max) that
-                    //in turn means that the first character was a separator, which is not legal.
-                    if (index == std::numeric_limits<size_t>::max())
-                    {
-                        throw std::domain_error("Cannot begin with a separator.");
-                    }
-                    while (current_char == '\'')
-                    {
-                        if (index == 0 && arr[0] == '\'')
-                        {
-                            throw std::domain_error("Cannot begin with a separator.");
-                        }
-                        current_char = arr[index--];
-                    }
-                    ret.first = static_cast<size_t>(current_char) & 0x000Full;
-                    assert(ret.first <= 9);
-                    ret.second = index;
-                }
-                else
-                {
-                    ret.first = static_cast<size_t>(current_char) & 0x000Full;
-                    ret.second = index;
-                }
-                return ret;
-            }
-
-	        CJM_LIT_CONST char uint128_lit_helper::to_lower(char c) noexcept
-            {
-                return (c >= 65 && c <= 90) ?
-                       static_cast<char>(static_cast<unsigned char>(c + 0x20)) :
-                       c;
-            }
-
-            template<size_t Size>
-            CJM_LIT_CONST uint128 uint128_lit_helper::get_hex_literal(std::array<char, Size> arr)
-            {
-                size_t length = arr.size();
-                if (length < 3)
-                    throw std::domain_error("Bad literal");
-                if (arr[0] != '0' || (arr[1] != 'X' && arr[1] != 'x'))
-                    throw std::domain_error("Only hexadecimal literals are allowed.");
-
-                uint128 value = 0;
-                size_t byteCount = 0;
-                for (size_t i = length - 1; i > 1; )
-                {
-                    if (byteCount >= (sizeof(uint128)))
-                    {
-                        throw std::domain_error("The literal is too long.");
-                    }
-                    auto pair = get_byte(arr, i);
-                    uint128 insertMe = static_cast<uint128>(pair.first) << (static_cast<int>(byteCount++) * CHAR_BIT);
-                    value |= insertMe;
-                    i = pair.second;
-                }
-                return value;
-            }
-            template<size_t Size>
-            CJM_LIT_CONST uint128 uint128_lit_helper::get_decimal_literal(std::array<char, Size> arr)
-            {
-                uint128 ret = 0;
-                auto result = scan_chars_dec(arr);
-                if (result.first)
-                {
-                    uint128 exponent = 1;
-                    size_t length = result.second;
-                    for (auto i = length - 1; i != std::numeric_limits<size_t>::max(); )
-                    {
-                        auto temp = get_dec_val(arr, i);
-                        uint128 retCopy = ret;
-                        ret += (temp.first * exponent);
-                        if (ret < retCopy)
-                        {
-                            throw std::domain_error("literal too large to fit.");
-                        }
-                        exponent *= 10;
-                        i = temp.second;
-                    }
-                    return ret;
-                }
-                throw std::domain_error("Bad decimal literal");
-            }
-
-            template <char... Chars>
-            CJM_LIT_CONST std::array<char, sizeof...(Chars)> uint128_lit_helper::get_array()
-            {
-                std::array<char, sizeof...(Chars)> ret{ Chars... };
-                return ret;
-            }
-
-            template<size_t Size>
-            CJM_LIT_CONST lit_type uint128_lit_helper::get_lit_type(std::array<char, Size> arr)
-            {
-                size_t length = arr.size();
-                if (length == 0)
-                {
-                    return lit_type::Illegal;
-                }
-                if (arr[0] == '0' && (length == 1 || are_all_chars_0(arr)))
-                {
-                    return lit_type::Zero;
-                }
-                if (length < 3)
-                {
-                    if (arr[0] == '0')
-                        return lit_type::Illegal;
-                    if (arr[0] < 0x30 || arr[0] > 0x39)
-                        return lit_type::Illegal;
-                    return lit_type::Decimal;
-                }
-                if (arr[0] == '0' && (arr[1] == 'x' || arr[1] == 'X'))
-                    return is_legal_hex_char(arr[2]) ? lit_type::Hexadecimal : lit_type::Illegal;
-                if (arr[0] == '0')
-                    return lit_type::Illegal;
-                return arr[0] >= 0x30 && arr[0] <= 0x39 ? lit_type::Decimal : lit_type::Illegal;
-            }
-
-	        CJM_LIT_CONST bool uint128_lit_helper::is_legal_hex_char(char c) noexcept
-            {
-                c = to_lower(c);
-                return ((c >= 0x30 && c <= 0x39) || (c >= 0x61 && c <= 0x66));
-            }
-
-            template<size_t Size>
-            CJM_LIT_CONST bool uint128_lit_helper::are_all_chars_0(std::array<char, Size> arr)
-            {
-                for (size_t i = 0; i < arr.size(); i++)
-                {
-                    if (arr[i] != '0' && arr[i] != '\'')
-                        return false;
-                }
-                return true;
-            }
-
-            template<size_t Size>
-            CJM_LIT_CONST std::pair<std::uint8_t, size_t> uint128_lit_helper::get_byte(std::array<char, Size> arr, size_t index)
-            {
-
-                char currentChar = to_lower(arr[index]);
-                while (currentChar == 0 || currentChar == '\'')
-                {
-                    currentChar = to_lower(arr[--index]);
-                }
-                --index;
-                uint8_t bottomValue = get_hex_value(currentChar);
-                if (index < 2)
-                {
-                    return std::make_pair(bottomValue, index);
-                }
-                currentChar = to_lower(arr[index]);
-                while (currentChar == 0 || currentChar == '\'')
-                {
-                    --index;
-                    if (index < 2)
-                    {
-                        return std::make_pair(bottomValue, index);
-                    }
-                    currentChar = to_lower(arr[index]);
-                }
-                uint8_t topValue = get_hex_value(currentChar);
-                topValue <<= 4;
-                topValue |= bottomValue;
-                return std::make_pair(topValue, --index);
-            }
-
-            template <size_t Size>
-            CJM_LIT_CONST uint128 uint128_lit_helper::parse_from_char_array(std::array<char, Size> arr)
-            {
-                lit_type lt = get_lit_type(arr);
-                uint128 temp;
-                switch (lt)
-                {
-                    default:  // NOLINT(clang-diagnostic-covered-switch-default) 
-                    case lit_type::Illegal:
-                        throw std::domain_error("Illegal literal: only hexadecimal and decimal are supported.");
-                    case lit_type::Decimal:
-                        temp = get_decimal_literal(arr);
-                        break;
-                    case lit_type::Hexadecimal:
-                        temp = get_hex_literal(arr);
-                        break;
-                    case lit_type::Zero:
-                        temp = 0;
-                        break;
-                }
-                return temp;
-            }
+	        template<char... Chars>
+				requires (sizeof...(Chars) > 0)
+	        constexpr uint128 operator"" _u128()
+	        {
+		        constexpr std::optional<uint128> result = uint128_literals::lit_helper::parse_literal<uint128, Chars...>();
+		        static_assert(result.has_value(), "This literal is not a valid decimal or hexadecimal uint128_t.");
+		        return *result;
+	        }
         }
 		template <typename Char, typename CharTraits, typename Allocator>
             requires cjm::numerics::concepts::char_with_traits_and_allocator<Char, CharTraits, Allocator>
@@ -1098,7 +821,7 @@ namespace cjm
 				{
 					if constexpr (std::endian::native == std::endian::little)
 					{
-						auto all_ones_in_byte = 0xff_u128;
+						auto all_ones_in_byte = static_cast<uint128>(0xffu);
 						auto ret = byte_array{};
 						for (size_t index = 0; index < ret.size(); ++index)
 						{
@@ -1110,7 +833,7 @@ namespace cjm
 					}
 					else // constexpr (std::endian::native == std::endian::big)
 					{
-						auto all_ones_in_byte = 0xff00'0000'0000'0000'0000'0000'0000'0000_u128;
+						auto all_ones_in_byte = uint128{0xff00'0000'0000'0000, 0};
 						auto ret = byte_array{};
 						for (size_t index = 0; index < ret.size(); ++index)
 						{
@@ -2670,7 +2393,7 @@ parse_hex_str(sv hex_str)
         }
         const size_t shift_result_right_amount = (max_hex_digits - hex_digits) * 4u;
         //nb. removed vector and just use array.  not only vector not necessary, but clang can't handle in constexpr context yet
-        auto arr = (0_u128).to_big_endian_arr(); //get an empty zero-filled array
+        auto arr = (uint128{}).to_big_endian_arr(); //get an empty zero-filled array
         size_t idx = 0;
         while (!hex_str.empty()) //i.e. more bytes to go
         {
@@ -2832,7 +2555,7 @@ namespace
 	using namespace cjm::numerics;
 	using namespace uint128_literals;
 	using ones_arr = std::array<uint128, 129>;
-	constexpr uint128 all_ones = 0xffff'ffff'ffff'ffff'ffff'ffff'ffff'ffff_u128;
+	constexpr uint128 all_ones = std::numeric_limits<uint128>::max();
 	constexpr ones_arr init_ones_lookup() noexcept
 	{
 		auto ret = ones_arr{};
@@ -3072,32 +2795,408 @@ inline void uint128::div_mod_msc_x64_impl([[maybe_unused]]uint128 dividend,[[may
 }
 #endif
 
-/*
- * Evil macro'd up version of fls64 from google:
- * 		// Returns the 0-based position of the last set bit (i.e., most significant bit)
-		// in the given uint64_t. The argument may not be 0.
-		//
-		// For example:
-		//   Given: 5 (decimal) == 101 (binary)
-		//   Returns: 2
-#define STEP(T, n, pos, sh)           \
-		  do {                                        \
-			if ((n) >= (static_cast<T>(1) << (sh))) { \
-			  (n) = (n) >> (sh);                      \
-			  (pos) |= (sh);                          \
-			}                                         \
-		  } while (0)
-		constexpr int uint128::fls64_v1(std::uint64_t n)
-		{
-			assert(n != 0);
-			int pos = 0;
-			STEP(uint64_t, n, pos, 0x20);
-			auto n32 = static_cast<std::uint32_t>(n);
-			STEP(std::uint32_t, n32, pos, 0x10);
-			STEP(std::uint32_t, n32, pos, 0x08);
-			STEP(std::uint32_t, n32, pos, 0x04);
-			return pos + ((std::uint64_t{ 0x3333333322221100 } >> (n32 << 2)) & 0x3);
-		}
-#undef STEP
- */
+namespace cjm::numerics::uint128_literals
+{
+    namespace internal
+    {
+        template<char... Chars>
+			requires (sizeof...(Chars) > 0)
+        struct array_retrieval_helper;
+
+        template<char... Chars>
+			requires (sizeof...(Chars) > 0)
+        struct array_retrieval_helper final
+        {
+            static CJM_LIT_CONST std::array<char, sizeof...(Chars)> reverse_array();
+            static constexpr std::array<char, sizeof...(Chars)> reversed_array_val = reverse_array();
+            static constexpr std::array<char, sizeof...(Chars)> array_val{ Chars... };
+        };
+
+        template<char... Chars>
+		    requires (sizeof...(Chars) > 0)
+        CJM_LIT_CONST std::array<char, sizeof...(Chars)> array_retrieval_helper<Chars...>::reverse_array()
+        {
+            std::array<char, sizeof...(Chars)> src{ Chars... };
+            std::array<char, sizeof...(Chars)> ret{};
+            size_t dst_idx = 0;
+            for (size_t src_idx = src.size() - 1; src_idx != std::numeric_limits<size_t>::max(); --src_idx)
+            {
+                ret[dst_idx++] = src[src_idx];
+            }
+            return ret;
+        }
+
+    }
+
+    template<lit_type LiteralType>
+		requires (LiteralType == lit_type::Decimal || LiteralType == lit_type::Hexadecimal)
+    CJM_LIT_CONST std::array<std::optional<unsigned short>, 256u> lit_helper::init_digit_lookup()
+    {
+        if constexpr (LiteralType == lit_type::Decimal)
+        {
+            return std::array<std::optional<unsigned short>, 256u>{
+                std::nullopt, std::nullopt, std::nullopt, std::nullopt, std::nullopt,
+                    std::nullopt, std::nullopt, std::nullopt, std::nullopt, std::nullopt,
+                    std::nullopt, std::nullopt, std::nullopt, std::nullopt, std::nullopt,
+                    std::nullopt, std::nullopt, std::nullopt, std::nullopt, std::nullopt,
+                    std::nullopt, std::nullopt, std::nullopt, std::nullopt, std::nullopt,
+                    std::nullopt, std::nullopt, std::nullopt, std::nullopt, std::nullopt,
+                    std::nullopt, std::nullopt, std::nullopt, std::nullopt, std::nullopt,
+                    std::nullopt, std::nullopt, std::nullopt, std::nullopt, std::nullopt,
+                    std::nullopt, std::nullopt, std::nullopt, std::nullopt, std::nullopt,
+                    std::nullopt, std::nullopt, std::nullopt, 0, 1,
+                    2, 3, 4, 5, 6,
+                    7, 8, 9, std::nullopt, std::nullopt,
+                    std::nullopt, std::nullopt, std::nullopt, std::nullopt, std::nullopt,
+                    std::nullopt, std::nullopt, std::nullopt, std::nullopt, std::nullopt,
+                    std::nullopt, std::nullopt, std::nullopt, std::nullopt, std::nullopt,
+                    std::nullopt, std::nullopt, std::nullopt, std::nullopt, std::nullopt,
+                    std::nullopt, std::nullopt, std::nullopt, std::nullopt, std::nullopt,
+                    std::nullopt, std::nullopt, std::nullopt, std::nullopt, std::nullopt,
+                    std::nullopt, std::nullopt, std::nullopt, std::nullopt, std::nullopt,
+                    std::nullopt, std::nullopt, std::nullopt, std::nullopt, std::nullopt,
+                    std::nullopt, std::nullopt, std::nullopt, std::nullopt, std::nullopt,
+                    std::nullopt, std::nullopt, std::nullopt, std::nullopt, std::nullopt,
+                    std::nullopt, std::nullopt, std::nullopt, std::nullopt, std::nullopt,
+                    std::nullopt, std::nullopt, std::nullopt, std::nullopt, std::nullopt,
+                    std::nullopt, std::nullopt, std::nullopt, std::nullopt, std::nullopt,
+                    std::nullopt, std::nullopt, std::nullopt, std::nullopt, std::nullopt,
+                    std::nullopt, std::nullopt, std::nullopt, std::nullopt, std::nullopt,
+                    std::nullopt, std::nullopt, std::nullopt, std::nullopt, std::nullopt,
+                    std::nullopt, std::nullopt, std::nullopt, std::nullopt, std::nullopt,
+                    std::nullopt, std::nullopt, std::nullopt, std::nullopt, std::nullopt,
+                    std::nullopt, std::nullopt, std::nullopt, std::nullopt, std::nullopt,
+                    std::nullopt, std::nullopt, std::nullopt, std::nullopt, std::nullopt,
+                    std::nullopt, std::nullopt, std::nullopt, std::nullopt, std::nullopt,
+                    std::nullopt, std::nullopt, std::nullopt, std::nullopt, std::nullopt,
+                    std::nullopt, std::nullopt, std::nullopt, std::nullopt, std::nullopt,
+                    std::nullopt, std::nullopt, std::nullopt, std::nullopt, std::nullopt,
+                    std::nullopt, std::nullopt, std::nullopt, std::nullopt, std::nullopt,
+                    std::nullopt, std::nullopt, std::nullopt, std::nullopt, std::nullopt,
+                    std::nullopt, std::nullopt, std::nullopt, std::nullopt, std::nullopt,
+                    std::nullopt, std::nullopt, std::nullopt, std::nullopt, std::nullopt,
+                    std::nullopt, std::nullopt, std::nullopt, std::nullopt, std::nullopt,
+                    std::nullopt, std::nullopt, std::nullopt, std::nullopt, std::nullopt,
+                    std::nullopt, std::nullopt, std::nullopt, std::nullopt, std::nullopt,
+                    std::nullopt, std::nullopt, std::nullopt, std::nullopt, std::nullopt,
+                    std::nullopt, std::nullopt, std::nullopt, std::nullopt, std::nullopt,
+                    std::nullopt, std::nullopt, std::nullopt, std::nullopt, std::nullopt,
+                    std::nullopt, std::nullopt, std::nullopt, std::nullopt, std::nullopt,
+                    std::nullopt, std::nullopt, std::nullopt, std::nullopt, std::nullopt,
+                    std::nullopt, std::nullopt, std::nullopt, std::nullopt, std::nullopt,
+                    std::nullopt, std::nullopt, std::nullopt, std::nullopt, std::nullopt,
+                    std::nullopt, std::nullopt, std::nullopt, std::nullopt, std::nullopt,
+                    std::nullopt};
+        }
+        else
+        {
+            return std::array<std::optional<unsigned short>, 256u>{
+                std::nullopt, std::nullopt, std::nullopt, std::nullopt, std::nullopt,
+                    std::nullopt, std::nullopt, std::nullopt, std::nullopt, std::nullopt,
+                    std::nullopt, std::nullopt, std::nullopt, std::nullopt, std::nullopt,
+                    std::nullopt, std::nullopt, std::nullopt, std::nullopt, std::nullopt,
+                    std::nullopt, std::nullopt, std::nullopt, std::nullopt, std::nullopt,
+                    std::nullopt, std::nullopt, std::nullopt, std::nullopt, std::nullopt,
+                    std::nullopt, std::nullopt, std::nullopt, std::nullopt, std::nullopt,
+                    std::nullopt, std::nullopt, std::nullopt, std::nullopt, std::nullopt,
+                    std::nullopt, std::nullopt, std::nullopt, std::nullopt, std::nullopt,
+                    std::nullopt, std::nullopt, std::nullopt, 0, 1,
+                    2, 3, 4, 5, 6,
+                    7, 8, 9, std::nullopt, std::nullopt,
+                    std::nullopt, std::nullopt, std::nullopt, std::nullopt, std::nullopt,
+                    10, 11, 12, 13, 14,
+                    15, std::nullopt, std::nullopt, std::nullopt, std::nullopt,
+                    std::nullopt, std::nullopt, std::nullopt, std::nullopt, std::nullopt,
+                    std::nullopt, std::nullopt, std::nullopt, std::nullopt, std::nullopt,
+                    std::nullopt, std::nullopt, std::nullopt, std::nullopt, std::nullopt,
+                    std::nullopt, std::nullopt, std::nullopt, std::nullopt, std::nullopt,
+                    std::nullopt, std::nullopt, 10, 11, 12,
+                    13, 14, 15, std::nullopt, std::nullopt,
+                    std::nullopt, std::nullopt, std::nullopt, std::nullopt, std::nullopt,
+                    std::nullopt, std::nullopt, std::nullopt, std::nullopt, std::nullopt,
+                    std::nullopt, std::nullopt, std::nullopt, std::nullopt, std::nullopt,
+                    std::nullopt, std::nullopt, std::nullopt, std::nullopt, std::nullopt,
+                    std::nullopt, std::nullopt, std::nullopt, std::nullopt, std::nullopt,
+                    std::nullopt, std::nullopt, std::nullopt, std::nullopt, std::nullopt,
+                    std::nullopt, std::nullopt, std::nullopt, std::nullopt, std::nullopt,
+                    std::nullopt, std::nullopt, std::nullopt, std::nullopt, std::nullopt,
+                    std::nullopt, std::nullopt, std::nullopt, std::nullopt, std::nullopt,
+                    std::nullopt, std::nullopt, std::nullopt, std::nullopt, std::nullopt,
+                    std::nullopt, std::nullopt, std::nullopt, std::nullopt, std::nullopt,
+                    std::nullopt, std::nullopt, std::nullopt, std::nullopt, std::nullopt,
+                    std::nullopt, std::nullopt, std::nullopt, std::nullopt, std::nullopt,
+                    std::nullopt, std::nullopt, std::nullopt, std::nullopt, std::nullopt,
+                    std::nullopt, std::nullopt, std::nullopt, std::nullopt, std::nullopt,
+                    std::nullopt, std::nullopt, std::nullopt, std::nullopt, std::nullopt,
+                    std::nullopt, std::nullopt, std::nullopt, std::nullopt, std::nullopt,
+                    std::nullopt, std::nullopt, std::nullopt, std::nullopt, std::nullopt,
+                    std::nullopt, std::nullopt, std::nullopt, std::nullopt, std::nullopt,
+                    std::nullopt, std::nullopt, std::nullopt, std::nullopt, std::nullopt,
+                    std::nullopt, std::nullopt, std::nullopt, std::nullopt, std::nullopt,
+                    std::nullopt, std::nullopt, std::nullopt, std::nullopt, std::nullopt,
+                    std::nullopt, std::nullopt, std::nullopt, std::nullopt, std::nullopt,
+                    std::nullopt, std::nullopt, std::nullopt, std::nullopt, std::nullopt,
+                    std::nullopt, std::nullopt, std::nullopt, std::nullopt, std::nullopt,
+                    std::nullopt, std::nullopt, std::nullopt, std::nullopt, std::nullopt,
+                    std::nullopt, std::nullopt, std::nullopt, std::nullopt, std::nullopt,
+                    std::nullopt, std::nullopt, std::nullopt, std::nullopt, std::nullopt,
+                    std::nullopt, std::nullopt, std::nullopt, std::nullopt, std::nullopt,
+                    std::nullopt, std::nullopt, std::nullopt, std::nullopt, std::nullopt,
+                    std::nullopt};
+        }
+    }
+    template<concepts::unsigned_integer Ui>
+    CJM_LIT_CONST std::array<char, std::numeric_limits<Ui>::digits10 + 1> lit_helper::get_max_decimal()
+    {
+        constexpr Ui max = std::numeric_limits<Ui>::max();
+        std::array<char, std::numeric_limits<Ui>::digits10 + 1> ret{};
+        Ui current = max;
+        bool done;
+        size_t idx = ret.size() - 1;
+        do
+        {
+            int value = static_cast<int>(current % 10);
+            current /= 10;
+            ret[idx--] = static_cast<char>(value + 0x30);
+            done = idx == std::numeric_limits<size_t>::max();
+        } while (!done);
+        return ret;
+    }
+
+
+    template<char... Chars>
+    CJM_LIT_CONST lit_type lit_helper::get_lit_type()
+    {
+        std::array<char, sizeof...(Chars)> arr{ Chars... };
+        size_t length = arr.size();
+        if (length == 0)
+        {
+            return lit_type::Illegal;
+        }
+        if (arr[0] == '0' && (length == 1 || are_all_chars_0<Chars...>()))
+        {
+            return lit_type::Zero;
+        }
+        if (length < 3)
+        {
+            if (arr[0] == '0')
+                return lit_type::Illegal;
+            if (arr[0] < 0x30 || arr[0] > 0x39)
+                return lit_type::Illegal;
+            return lit_type::Decimal;
+        }
+        if (arr[0] == '0' && (arr[1] == 'x' || arr[1] == 'X'))
+            return lit_helper::is_legal_hex_char(arr[2]) ? lit_type::Hexadecimal : lit_type::Illegal;
+        if (arr[0] == '0')
+            return lit_type::Illegal;
+        return arr[0] >= 0x30 && arr[0] <= 0x39 ? lit_type::Decimal : lit_type::Illegal;
+    }
+
+    template<char... Chars>
+    CJM_LIT_CONST std::optional<size_t> lit_helper::count_decimal_chars()
+    {
+        std::array<char, sizeof...(Chars)> arr{ Chars... };
+        size_t ret = 0;
+        for (char c : arr)
+        {
+            if (c == '\'') continue;
+            int cast = static_cast<int>(c) - 0x30;
+            if (cast >= 0 && cast <= 9)
+                ++ret;
+            else
+                return std::nullopt;
+        }
+        return ret;
+    }
+
+
+    template<char... Chars>
+    CJM_LIT_CONST lit_type lit_helper::get_chars() noexcept
+    {
+        constexpr lit_type the_lit_type = get_lit_type<Chars...>();
+        return the_lit_type;
+    }
+
+    template<char... Chars>
+		requires (sizeof...(Chars) > 0)
+    CJM_LIT_CONST bool lit_helper::are_all_chars_0()
+    {
+        std::array<char, sizeof...(Chars)> arr{ Chars... };
+        for (char c : arr)
+        {
+            if (c != '0')
+                return false;
+        }
+        return true;
+    }
+	CJM_LIT_CONST bool lit_helper::is_legal_hex_char(char c) noexcept
+	{
+    	return lit_helper::digit_lookup_v<lit_type::Hexadecimal>[static_cast<unsigned>(c) % 256u].has_value();
+	}
+
+	CJM_LIT_CONST bool lit_helper::is_legal_dec_char(char c) noexcept
+	{
+		return lit_helper::digit_lookup_v<lit_type::Decimal>[static_cast<unsigned>(c) % 256u].has_value();
+	}
+    template<concepts::unsigned_integer Ui, char... Chars>
+    CJM_LIT_CONST bool lit_helper::validate_decimal_size()
+    {
+        if (get_lit_type<Chars...>() != lit_type::Decimal)
+            return false;
+
+        constexpr size_t max_dec_digits = std::numeric_limits<Ui>::digits10 + 1;
+        constexpr std::optional<size_t> dec_digits = count_decimal_chars<Chars...>();
+        if (!dec_digits.has_value() || *dec_digits > max_dec_digits)
+            return false;
+        if (*dec_digits < max_dec_digits)
+            return true;
+        //the hard part, need if it has max digits
+        constexpr auto arr = std::array<char, sizeof...(Chars)>{ Chars... };
+        size_t max_idx = 0;
+        for (char c : arr)
+        {
+            if (c == '\'') continue;
+            char comparand = max_decimal_digits_v<Ui>[max_idx++];
+            if (c < comparand)
+                return true;
+            if (c > comparand)
+                return false;
+        }
+        return true;
+    }
+
+    template<char... Chars>
+    CJM_LIT_CONST std::optional<size_t> lit_helper::count_hex_chars()
+    {
+        if (get_lit_type<Chars...>() != lit_type::Hexadecimal)
+            return std::nullopt;
+        constexpr auto ok_chars =
+            std::array<char, 22u>{
+            '0', '1', '2', '3', '4',
+                '5', '6', '7', '8', '9',
+                'a', 'b', 'c', 'd', 'e',
+                'f', 'A', 'B', 'C', 'D',
+                'E', 'F' };
+        constexpr auto arr = std::array<char, sizeof...(Chars)>{ Chars... };
+        if (arr.size() < 3)
+            return std::nullopt;
+        if (arr[0] != '0' || (arr[1] != 'x' && arr[1] != 'X'))
+            return std::nullopt;
+        size_t char_count = 0;
+        for (size_t idx = 2; idx < arr.size(); ++idx)
+        {
+            char val = arr[idx];
+            if (val == '\'') continue;
+            bool found_it = false;
+            for (size_t j = 0; j < ok_chars.size(); ++j)
+            {
+                if (ok_chars[j] == val)
+                {
+                    found_it = true;
+                    break;
+                }
+            }
+            if (found_it)
+                ++char_count;
+            else
+                return std::nullopt;
+        }
+        return char_count;
+    }
+
+    template<concepts::unsigned_integer Ui, size_t Digits, lit_type LiteralType, char... Chars>
+		requires (sizeof...(Chars) > 0 && sizeof...(Chars) >= Digits && Digits > 0 &&
+            (LiteralType == lit_type::Decimal || LiteralType == lit_type::Hexadecimal))
+    CJM_LIT_CONST std::optional<Ui> lit_helper::execute_literal_parse()
+    {
+        using reverser_t = typename internal::array_retrieval_helper<Chars...>;
+        Ui ret = 0;
+        constexpr Ui base_factor = LiteralType == lit_type::Decimal ? 10 : 16;
+        constexpr auto& arr = digit_lookup_v<LiteralType>;
+        Ui current_digit = 1;
+        size_t processed_digits = 0;
+        size_t digit_idx = 0;
+        while (processed_digits < Digits && digit_idx < reverser_t::reversed_array_val.size())
+        {
+            char digit = reverser_t::reversed_array_val[digit_idx++];
+            if (digit == '\'') continue;
+            std::optional<unsigned short> value = arr[static_cast<size_t>(digit)];
+            if (value.has_value())
+            {
+                ret += (*value * current_digit);
+                current_digit *= base_factor;
+                ++processed_digits;
+            }
+            else
+            {
+                return std::nullopt;
+            }
+        }
+        if (processed_digits == Digits)
+            return ret;
+        else
+            return std::nullopt;
+    }
+
+    template <concepts::unsigned_integer Ui, char... Chars>
+    CJM_LIT_CONST std::optional<Ui> lit_helper::parse_literal()
+    {
+        constexpr lit_type type = get_lit_type<Chars...>();
+        if (type != lit_type::Decimal && type != lit_type::Hexadecimal && type != lit_type::Zero)
+            return std::nullopt;
+        if constexpr (type == lit_type::Zero)
+        {
+            return 0;
+        }
+        else
+        {
+            using reverser_t = typename internal::array_retrieval_helper<Chars...>;
+            if constexpr (type == lit_type::Decimal)
+            {
+                if constexpr (!validate_decimal_size<Ui, Chars...>())
+                {
+                    return std::nullopt;
+                }
+                else
+                {
+                    constexpr std::optional<size_t> decimal_size = count_decimal_chars<Chars...>();
+                    if constexpr (decimal_size.has_value())
+                    {
+                        static_assert(*decimal_size <= reverser_t::array_val.size());
+                        constexpr auto reversed_array = internal::array_retrieval_helper<Chars...>::reversed_array_val;
+                        if constexpr (reversed_array.size() > 0)
+                            return execute_literal_parse<Ui, *decimal_size, lit_type::Decimal, Chars...>();
+                        else
+                            return std::nullopt;
+                    }
+                    else
+                    {
+                        return std::nullopt;
+                    }
+                }
+            }
+            else //hexadecimal
+            {
+                constexpr std::optional<size_t> hex_chars = count_hex_chars<Chars...>();
+                if constexpr (hex_chars.has_value())
+                {
+                    constexpr size_t num_digits = *hex_chars;
+                    if constexpr (num_digits <= max_hex_digits_v<Ui>)
+                    {
+                        return execute_literal_parse<Ui, num_digits, lit_type::Hexadecimal, Chars...>();
+                    }
+                    else
+                    {
+                        return std::nullopt;
+                    }
+                }
+                else
+                {
+                    return std::nullopt;
+                }
+            }
+        }
+    }
+
+}
 #endif

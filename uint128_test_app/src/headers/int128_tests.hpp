@@ -9,6 +9,7 @@
 #include <iostream>
 #include <iomanip>
 #include <string_view>
+#include <array>
 #include <string>
 #include <sstream>
 #include <limits>
@@ -38,6 +39,11 @@
 #include <absl/numeric/int128.h>
 #include "fixed_uint_container_math.hpp"
 #include "umult.hpp"
+
+namespace cjm::uint128_tests::generator
+{
+    class rgen;
+}
 
 namespace cjm::uint128_tests
 {
@@ -128,6 +134,7 @@ namespace cjm::uint128_tests
     void print_constexpr_bitcast_available();
     void print_cpp20_bitops_available();
     void print_builtin_uint128_data_if_present();
+    void print_whether_has_consteval();
     void test_interconversion(const ctrl_uint128_t& control, uint128_t test);
     void execute_builtin_u128fls_test_if_avail();
     void execute_first_bin_op_test();
@@ -183,6 +190,15 @@ namespace cjm::uint128_tests
     void execute_uintcontainer_adc_tests();
 
     void execute_issue27_bug_test();
+    void execute_literal_test();
+
+    std::basic_ostream<char>& operator<<(std::basic_ostream<char>&, lit_type v);
+	
+    std::pair<ctrl_uint128_t, std::string> create_random_dec_n_digits_long(size_t decimal_digits, generator::rgen& gen);
+    std::pair<ctrl_uint128_t, std::string> create_random_hex_n_digits_long(size_t hex_digits, generator::rgen& gen);
+    std::string generate_literal_test(lit_type literal_type, size_t num_digits, generator::rgen& gen);
+    std::vector<std::string> generate_literal_tests();
+    void generate_then_print_literal_tests();
 	
     [[maybe_unused]] void print_n_static_assertions(const binary_op_u128_vect_t& op_vec, size_t n);
     [[maybe_unused]] void print_n_static_assertions(const unary_op_u128_vect_t& op_vec, size_t n);
@@ -2189,6 +2205,9 @@ namespace cjm::uint128_tests::generator
         ~rgen() = default;
 
         void shuffle(binary_op_u128_vect_t& vec, size_t shuffle_depth);
+
+        char random_decimal_digit(char max = '9');
+        char random_hex_digit();
     	
         friend bool operator==(const rgen& lhs, const rgen& rhs) noexcept;
         friend bool operator!=(const rgen& lhs, const rgen& rhs) noexcept;
@@ -2301,5 +2320,6 @@ std::size_t std::hash<cjm::uint128_tests::unary_operation<TestType, ControlType>
 {
     return hash_me.hash_value();
 }
-#endif //INT128_INT128_TESTS_HPP
 #include "int128_tests.inl"
+#endif //INT128_INT128_TESTS_HPP
+
