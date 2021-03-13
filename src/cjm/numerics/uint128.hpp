@@ -16,7 +16,7 @@
 #include <cjm/numerics/cjm_numeric_concepts.hpp>
 #include <cjm/string/cjm_string.hpp>
 #include <cmath>
-#include <cjm/string/istream_utils.hpp>
+#include <cjm/numerics/fixed_uint_container_math.hpp>
 #include <cctype>
 #include <cwctype>
 #include <concepts>
@@ -616,15 +616,7 @@ namespace cjm::numerics
         static std::basic_string<Char, CharTraits, Allocator> to_string(uint128 item,
             std::ios_base::fmtflags flags);
 
-
-#if CJM_NUMERICS_LITTLE_ENDIAN
-        int_part m_low;
-        int_part m_high;
-#else //BIG ENDIAN
-        int_part m_high;
-        int_part m_low;
-#endif
-
+        fixed_uint_container::uint128_always_split_container_t m_limbs;
     };
 
 	//Ensure compliance with concepts if special development flag is set

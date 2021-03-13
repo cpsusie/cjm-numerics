@@ -1,6 +1,6 @@
 #ifndef CJM_FIXED_UINT_CONTAINER_MATH_HPP_
 #define CJM_FIXED_UINT_CONTAINER_MATH_HPP_
-#include "fixed_uint_container.hpp"
+#include <cjm/numerics/fixed_uint_container.hpp>
 #include <array>
 namespace cjm::numerics::fixed_uint_container
 {
