@@ -197,6 +197,7 @@ namespace cjm::uint128_tests
     std::pair<ctrl_uint128_t, std::string> create_random_hex_n_digits_long(size_t hex_digits, generator::rgen& gen);
     std::string generate_literal_test(lit_type literal_type, size_t num_digits, generator::rgen& gen);
     std::vector<std::string> generate_literal_tests();
+    void generate_then_print_literal_tests();
 	
     [[maybe_unused]] void print_n_static_assertions(const binary_op_u128_vect_t& op_vec, size_t n);
     [[maybe_unused]] void print_n_static_assertions(const unary_op_u128_vect_t& op_vec, size_t n);

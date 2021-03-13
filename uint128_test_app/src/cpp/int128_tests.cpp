@@ -449,17 +449,7 @@ void cjm::uint128_tests::run_test_application(std::span<test_switch> switches)
 	//uncomment to generate random binary and unary ops file for demo purposes
     /*save_random_binary_ops_to_file(std::filesystem::path{ "random_binary_ops.txt" });
     save_random_unary_ops_to_file(std::filesystem::path{ "random_unary_ops.txt" });*/
-
-    std::cout << "Generating literal tests." << newl;
-    auto vec = generate_literal_tests();
-    std::cout << "Literal tests generatored and will be printed ...." << newl;
-	
-	for (const auto& str : vec)
-	{
-        std::cout << str;
-	}
-    std::cout << newl << newl << "Done printing generated literal tests." << newl;
-	
+    	
 	if (switches.empty())
 	{
         print_environ_data();
@@ -4498,7 +4488,7 @@ std::pair<cjm::uint128_tests::ctrl_uint128_t, std::string> cjm::uint128_tests::c
     }
 
     constexpr auto& max = lit_helper::max_decimal_digits_v<ctrl_uint128_t>;
-    auto char_array = std::vector<char>{};
+    auto char_array = std::string{};
     char_array.reserve(decimal_digits);
     size_t max_char_idx = 0;
     
@@ -4542,7 +4532,7 @@ std::pair<cjm::uint128_tests::ctrl_uint128_t, std::string> cjm::uint128_tests::c
         current_digit *= base_factor;
         
 	}    
-    return std::make_pair(result, std::string{ char_array.cbegin(), char_array.cend() });
+    return std::make_pair(result, char_array);
 }
 
 std::pair<cjm::uint128_tests::ctrl_uint128_t, std::string> cjm::uint128_tests::
@@ -4700,8 +4690,18 @@ std::vector<std::string> cjm::uint128_tests::generate_literal_tests()
     return vec;
 }
 
+void cjm::uint128_tests::generate_then_print_literal_tests()
+{
+    std::cout << "Generating literal tests." << newl;
+    auto vec = generate_literal_tests();
+    std::cout << "Literal tests generated and will be printed ...." << newl;
 
-
+    for (const auto& str : vec)
+    {
+        std::cout << str;
+    }
+    std::cout << newl << newl << "Done printing generated literal tests." << newl; 
+}
 
 
 #ifdef CJM_HAVE_BUILTIN_128
