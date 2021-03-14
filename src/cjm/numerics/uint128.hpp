@@ -1,5 +1,5 @@
-#ifndef CJM_UINT128_HPP
-#define CJM_UINT128_HPP
+#ifndef CJM_UINT128_HPP_
+#define CJM_UINT128_HPP_
 #include <iostream>
 #include <compare>
 #include<cstdint>
@@ -381,7 +381,7 @@ namespace cjm::numerics
     public:
         static constexpr size_t byte_array_size = 16;
 
-        using int_part = std::uint64_t;      
+        using int_part = std::uint64_t;
         using byte_array = std::array<unsigned char, byte_array_size>;
         using divmod_result_t = divmod_result<uint128>;
 
@@ -395,25 +395,25 @@ namespace cjm::numerics
         /// <exception cref="std::invalid_argument">A uint128 could not be parsed from
         /// the supplied value.</exception>
         template<typename Chars, typename CharTraits = std::char_traits<Chars>>
-			requires cjm::numerics::concepts::char_with_traits<Chars, CharTraits>
-        static uint128 make_from_string(std::basic_string_view<Chars, CharTraits> 
-            parse_me);
+        requires cjm::numerics::concepts::char_with_traits<Chars, CharTraits>
+            static uint128 make_from_string(std::basic_string_view<Chars, CharTraits>
+                parse_me);
 
-		/// <summary>
-	    /// Parses a string into a uint128
-	    /// </summary>
-	    /// <typeparam name="Chars">Character type</typeparam>
-	    /// <typeparam name="CharTraits">Character traits type</typeparam>
-	    /// <param name="parse_me">the string to parse.</param>
-	    /// <returns>A uint128 parsed from parse_me.</returns>
-	    /// <exception cref="std::invalid_argument">A uint128 could not be parsed from
-	    /// the supplied value.</exception>
+        /// <summary>
+        /// Parses a string into a uint128
+        /// </summary>
+        /// <typeparam name="Chars">Character type</typeparam>
+        /// <typeparam name="CharTraits">Character traits type</typeparam>
+        /// <param name="parse_me">the string to parse.</param>
+        /// <returns>A uint128 parsed from parse_me.</returns>
+        /// <exception cref="std::invalid_argument">A uint128 could not be parsed from
+        /// the supplied value.</exception>
         template<typename Chars, typename CharTraits = std::char_traits<Chars>,
-    		typename Allocator = std::allocator<Chars>>
-			requires cjm::numerics::concepts::char_with_traits_and_allocator<Chars,
-    			CharTraits, Allocator>
-        static uint128 make_from_string(const std::basic_string<Chars, CharTraits, 
-            Allocator>& parse_me);
+            typename Allocator = std::allocator<Chars>>
+            requires cjm::numerics::concepts::char_with_traits_and_allocator<Chars,
+            CharTraits, Allocator>
+            static uint128 make_from_string(const std::basic_string<Chars, CharTraits,
+                Allocator>& parse_me);
 
         /// <summary>
         /// For future functionality -- will facilitate building addition operations
@@ -427,22 +427,22 @@ namespace cjm::numerics
         /// represents carry_out.  carry_out will be non-zero if the addition overflowed.</returns>
         /// <remarks>Not yet fully tested.</remarks>
         friend constexpr std::pair<uint128, unsigned char>
-    		add_with_carry(uint128 first_addend, uint128 second_addend, 
+            add_with_carry(uint128 first_addend, uint128 second_addend,
                 unsigned char carry_in) noexcept;
 
         /// <summary>
         /// For future functionality -- will facilitate building subtraction operations
-	    /// for a uint256 type.
+        /// for a uint256 type.
         /// </summary>
         /// <param name="minuend">minuend</param>
         /// <param name="subtrahend">subtrahend</param>
-		/// <param name="borrow_in">0 for no borrow-in, 1 for borrow-in</param>
+        /// <param name="borrow_in">0 for no borrow-in, 1 for borrow-in</param>
         /// <returns>a pair whose first member is the difference and the second number
         /// represents borrow_out.  borrow_out will be non-zero if the subtraction overflowed.</returns>
         /// <remarks>Not yet fully tested.</remarks>
-        friend constexpr std::pair<uint128, unsigned char> sub_with_borrow(uint128 minuend, 
+        friend constexpr std::pair<uint128, unsigned char> sub_with_borrow(uint128 minuend,
             uint128 subtrahend, unsigned char borrow_in) noexcept;
-    	
+
         /// <summary>
         /// add with carry for limbs / int parts
         /// </summary>
@@ -453,34 +453,34 @@ namespace cjm::numerics
         /// <returns>sum and carry out</returns>
         /// <remarks>Not yet fully tested.</remarks>
         friend constexpr int_part add_with_carry(int_part first_addend,
-            int_part second_addend, unsigned char carry_in, 
-				unsigned char& carry_out) noexcept;
+            int_part second_addend, unsigned char carry_in,
+            unsigned char& carry_out) noexcept;
         /// <summary>
-		/// subtract with borrow for limbs / int parts
-		/// </summary>
-		/// <param name="minuend">the minuend</param>
-		/// <param name="subtrahend">the subtrahend</param>
-		/// <param name="borrow_in">borrow in</param>
-		/// <param name="borrow_out">borrow out</param>
-		/// <returns>difference and borrow out</returns>
-		/// <remarks>Not yet fully tested.</remarks>
-        friend constexpr int_part sub_with_borrow(int_part minuend, int_part subtrahend,  
+        /// subtract with borrow for limbs / int parts
+        /// </summary>
+        /// <param name="minuend">the minuend</param>
+        /// <param name="subtrahend">the subtrahend</param>
+        /// <param name="borrow_in">borrow in</param>
+        /// <param name="borrow_out">borrow out</param>
+        /// <returns>difference and borrow out</returns>
+        /// <remarks>Not yet fully tested.</remarks>
+        friend constexpr int_part sub_with_borrow(int_part minuend, int_part subtrahend,
             unsigned char borrow_in, unsigned char& borrow_out) noexcept;
         static constexpr uint128 make_from_bytes_little_endian(byte_array bytes) noexcept;
         static constexpr uint128 make_from_bytes_big_endian(byte_array bytes) noexcept;
-        static constexpr uint128 make_uint128(std::uint64_t high, 
+        static constexpr uint128 make_uint128(std::uint64_t high,
             std::uint64_t low) noexcept;
-        static constexpr std::optional<divmod_result_t> try_div_mod(uint128 dividend, 
+        static constexpr std::optional<divmod_result_t> try_div_mod(uint128 dividend,
             uint128 divisor) noexcept;
-    	static constexpr divmod_result_t div_mod(uint128 dividend, uint128 divisor);
-        static constexpr divmod_result_t unsafe_div_mod(uint128 dividend, 
+        static constexpr divmod_result_t div_mod(uint128 dividend, uint128 divisor);
+        static constexpr divmod_result_t unsafe_div_mod(uint128 dividend,
             uint128 divisor) noexcept; //NOLINT (bugprone-exception-escape)
         static inline void instrumented_div_mod(std::basic_ostream<char>& stream, uint128 dividend,
             uint128 divisor, uint128* quotient_ret, uint128* remainder_ret);
         static constexpr int_part int_part_bits{ sizeof(int_part) * CHAR_BIT };
         static constexpr int_part int_part_bottom_half_bits{ int_part_bits / 2 };
         static constexpr int_part int_part_bottom_half_bitmask{
-        	std::numeric_limits<int_part>::max() >> int_part_bottom_half_bits};
+            std::numeric_limits<int_part>::max() >> int_part_bottom_half_bits };
         static constexpr int most_sign_set_bit(uint128 value) noexcept;
         constexpr uint128() noexcept;
         constexpr uint128(const uint128& other) noexcept = default;
@@ -504,7 +504,7 @@ namespace cjm::numerics
         constexpr uint128& operator=(long long v) noexcept;
         constexpr uint128& operator=(unsigned long long v) noexcept;
 
-    	//converting ctors from floating point types
+        //converting ctors from floating point types
         inline explicit uint128(float f) noexcept;
         inline explicit uint128(double d) noexcept;
         inline explicit uint128(long double d) noexcept;
@@ -529,15 +529,44 @@ namespace cjm::numerics
         inline explicit operator long double() const;
 
         //ctor, assign op and explicit to-conversion for intrinsic unsigned __int128
-#ifdef CJM_USE_INTRINSIC_U128
-        inline uint128(unsigned __int128 other) noexcept;
-        inline uint128& operator=(unsigned __int128 other) noexcept;
-        inline explicit operator unsigned __int128() const noexcept;
-#elif defined (CJM_DIV_ONLY_INTRINSIC_U128)
-        inline uint128(divonlynatuint128_t other) noexcept;
-        inline uint128& operator=(divonlynatuint128_t other) noexcept;
-        inline explicit operator divonlynatuint128_t() const noexcept;
-#endif
+        template<fixed_uint_container::internal::is_full_builtin_u128 Ui>
+        inline uint128(Ui other) noexcept
+    		: m_limbs{ bit_cast<fixed_uint_container::uint128_always_split_container_t,
+    			Ui>(other) } {}
+    	
+        template<fixed_uint_container::internal::is_full_builtin_u128 Ui>
+        inline uint128& operator=(Ui other) noexcept
+        {
+            m_limbs = bit_cast<fixed_uint_container::uint128_always_split_container_t,
+                Ui>(other);
+            return *this;
+        }
+        template<fixed_uint_container::internal::is_full_builtin_u128 Ui>
+        inline explicit operator Ui() const noexcept
+        {
+            return bit_cast<Ui,
+        	fixed_uint_container::uint128_always_split_container_t>(m_limbs);
+
+        }
+
+    	template<fixed_uint_container::internal::is_partial_builtin_u128 Ui>
+        inline uint128(Ui other) noexcept : m_limbs{ bit_cast<fixed_uint_container::uint128_always_split_container_t,
+                Ui>(other) } {}    
+        
+        template<fixed_uint_container::internal::is_partial_builtin_u128 Ui>
+    	inline uint128& operator=(Ui other) noexcept
+        {
+            m_limbs = bit_cast<fixed_uint_container::uint128_always_split_container_t,
+                Ui>(other);
+            return *this;
+        }
+    	
+        template<fixed_uint_container::internal::is_partial_builtin_u128 Ui>
+        inline explicit operator Ui() const noexcept
+        {
+            return bit_cast<Ui, fixed_uint_container::uint128_always_split_container_t>(m_limbs);
+        }
+
         //hash code function and comparison operators
         [[nodiscard]] constexpr size_t hash_code() const noexcept;
                

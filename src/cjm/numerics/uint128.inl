@@ -1,5 +1,5 @@
-#ifndef CJM_UINT128_INL
-#define CJM_UINT128_INL
+#ifndef CJM_UINT128_INL_
+#define CJM_UINT128_INL_
 #include <cjm/numerics/uint128.hpp>
 #include <algorithm>
 #include <cjm/string/cjm_string.hpp>
@@ -2679,43 +2679,6 @@ inline void uint128::best_safe_div_mod(uint128 dividend, uint128 divisor, uint12
 	*quotient = result.quotient;
 	*remainder = result.remainder;
 }
-
-#ifdef CJM_USE_INTRINSIC_U128
-inline cjm::numerics::uint128& cjm::numerics::uint128::operator=(__uint128_t other) noexcept
-{
-	return (*this = cjm::numerics::bit_cast<uint128, unsigned __int128>(other));
-}
-
-
-inline cjm::numerics::uint128::operator unsigned __int128() const noexcept
-{
-	return cjm::numerics::bit_cast<unsigned __int128, uint128>(*this);
-//    unsigned __int128 ret = m_high;
-//    ret <<= 64;
-//    ret |= m_low;
-//    return ret;
-}
-
-inline cjm::numerics::uint128::uint128(__uint128_t other) noexcept
-{
-	*this = cjm::numerics::bit_cast<uint128, unsigned __int128>(other);
-}
-#elif defined (CJM_DIV_ONLY_INTRINSIC_U128)
-inline cjm::numerics::uint128::uint128(divonlynatuint128_t other) noexcept : m_limbs{}
-{
-    *this = cjm::numerics::bit_cast<uint128, divonlynatuint128_t>(other);
-}
-inline cjm::numerics::uint128& cjm::numerics::uint128::operator=(divonlynatuint128_t other) noexcept
-{
-	return (*this = cjm::numerics::bit_cast<uint128, divonlynatuint128_t>(other));
-}
-inline cjm::numerics::uint128::operator divonlynatuint128_t() const noexcept
-{
-    return cjm::numerics::bit_cast<divonlynatuint128_t, uint128>(*this);
-}
-
-
-#endif
 
 //This method is based on the 128-bit unsigned integer division
 //provided by clang / LLVM for a built-in unsigned __int128 type

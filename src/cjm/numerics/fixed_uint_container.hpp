@@ -115,7 +115,7 @@ namespace cjm::numerics::fixed_uint_container
 			{
 				return static_cast<std::uint32_t>(m_low);
 			}
-			~uint128_limb_container() = default;
+			constexpr ~uint128_limb_container() = default;
 		};
 		
 		template<>
@@ -164,7 +164,7 @@ namespace cjm::numerics::fixed_uint_container
 			{
 				return static_cast<std::uint32_t>(m_low);
 			}
-			~uint128_limb_container() = default;
+			constexpr ~uint128_limb_container() = default;
 		};
 
 		template<is_builtin_u128 UnsignedInteger, bool LittleEndian>
@@ -276,7 +276,7 @@ namespace cjm::numerics::fixed_uint_container
 			{
 				return static_cast<std::uint32_t>(m_value);
 			}
-			~uint128_limb_container() = default;
+			constexpr ~uint128_limb_container() = default;
 			
 		};
 
