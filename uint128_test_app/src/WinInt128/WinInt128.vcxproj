@@ -179,8 +179,13 @@
     <ClCompile Include="..\cpp\uint128_test_program.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\headers\fixed_uint_container.hpp" />
-    <ClInclude Include="..\headers\fixed_uint_container_math.hpp" />
+    <ClInclude Include="..\..\..\src\cjm\numerics\cjm_configuration.hpp" />
+    <ClInclude Include="..\..\..\src\cjm\numerics\cjm_numeric_concepts.hpp" />
+    <ClInclude Include="..\..\..\src\cjm\numerics\fixed_uint_container.hpp" />
+    <ClInclude Include="..\..\..\src\cjm\numerics\fixed_uint_container_math.hpp" />
+    <ClInclude Include="..\..\..\src\cjm\numerics\numerics.hpp" />
+    <ClInclude Include="..\..\..\src\cjm\numerics\numerics_configuration.hpp" />
+    <ClInclude Include="..\..\..\src\cjm\numerics\uint128.hpp" />
     <ClInclude Include="..\headers\int128_tests.hpp" />
     <ClInclude Include="..\headers\int128_test_switches.hpp" />
     <ClInclude Include="..\headers\testing.hpp" />
@@ -191,6 +196,11 @@
     <Text Include="..\cpp\llvm_int_typedefs.txt" />
     <Text Include="..\cpp\Llvm_u128div.txt" />
     <Text Include="..\headers\lshift.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\..\src\cjm\numerics\numerics.inl" />
+    <None Include="..\..\..\src\cjm\numerics\numerics_configuration.inl" />
+    <None Include="..\..\..\src\cjm\numerics\uint128.inl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

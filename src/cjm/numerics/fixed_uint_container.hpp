@@ -27,7 +27,7 @@ namespace cjm::numerics::fixed_uint_container
 		constexpr bool exits_builtin_u128 = is_builtin_u128<natuint128_t>;
 		
 		template<typename Ui, size_t Digits>
-		concept is_unsigned_int_with_digits = (cjm::numerics::concepts::builtin_unsigned_integer<Ui> && Digits >= 64u && std::popcount(Digits) == 1u && Digits == std::numeric_limits<Ui>::digits) || (is_builtin_u128<Ui> && sizeof(Ui) == (sizeof(std::uint64_t) * 2) && Digits == 128);
+		concept is_unsigned_int_with_digits = (cjm::numerics::concepts::builtin_unsigned_integer<Ui> && Digits >= 64u && Digits == std::numeric_limits<Ui>::digits) || (is_builtin_u128<Ui> && sizeof(Ui) == (sizeof(std::uint64_t) * 2) && Digits == 128);
 
 		constexpr size_t uint128_alignment = is_x64 ? alignof(std::uint64_t) * 2 : alignof(std::uint64_t);
 
@@ -83,6 +83,9 @@ namespace cjm::numerics::fixed_uint_container
 			constexpr uint128_limb_container& operator=(uint128_limb_container && other) noexcept = default;
 			constexpr uint128_limb_container(std::uint64_t val) noexcept : m_low{ val }, m_high{} {}
 			constexpr uint128_limb_container(std::uint32_t val) noexcept : m_low{ val }, m_high{} {}
+			constexpr uint128_limb_container(std::uint64_t high, std::uint64_t low) noexcept : m_low{ low }, m_high{ high } {}
+			constexpr uint128_limb_container(std::int64_t v) noexcept :
+				m_low{static_cast<uint64_t>(v)}, m_high{(v < 0 ? std::numeric_limits<std::uint64_t>::max() : 0u)}{}
 			constexpr uint128_limb_container(std::array<std::uint64_t, 2u> native_byte_order_arr) noexcept
 			{
 				m_low = native_byte_order_arr[0];
@@ -112,7 +115,7 @@ namespace cjm::numerics::fixed_uint_container
 			{
 				return static_cast<std::uint32_t>(m_low);
 			}
-			~uint128_limb_container() = default;
+			constexpr ~uint128_limb_container() = default;
 		};
 		
 		template<>
@@ -127,6 +130,11 @@ namespace cjm::numerics::fixed_uint_container
 			constexpr uint128_limb_container& operator=(uint128_limb_container && other) noexcept = default;
 			constexpr uint128_limb_container(std::uint64_t val) noexcept : m_high{}, m_low{ val } {}
 			constexpr uint128_limb_container(std::uint32_t val) noexcept : m_high{}, m_low{ val } {}
+			constexpr uint128_limb_container(std::uint64_t high, std::uint64_t low) noexcept
+				: m_high{ high }, m_low{ low } {}
+			constexpr uint128_limb_container(std::int64_t v) noexcept :
+				m_high{ (v < 0 ? std::numeric_limits<std::uint64_t>::max() : 0u) },
+					m_low{ static_cast<uint64_t>(v) } {}
 			constexpr uint128_limb_container(std::array<std::uint64_t, 2u> native_byte_order_arr) noexcept
 			{
 				m_high = native_byte_order_arr[0];
@@ -156,7 +164,7 @@ namespace cjm::numerics::fixed_uint_container
 			{
 				return static_cast<std::uint32_t>(m_low);
 			}
-			~uint128_limb_container() = default;
+			constexpr ~uint128_limb_container() = default;
 		};
 
 		template<is_builtin_u128 UnsignedInteger, bool LittleEndian>
@@ -205,13 +213,25 @@ namespace cjm::numerics::fixed_uint_container
 			constexpr uint128_limb_container& operator=(const uint128_limb_container& other) noexcept = default;
 			constexpr uint128_limb_container& operator=(uint128_limb_container&& other) noexcept = default;
 			constexpr uint128_limb_container(uint_t val) noexcept : m_value{val} {}
+			constexpr uint128_limb_container(std::int64_t v) noexcept : m_value{}
+			{
+				m_value = static_cast<uint_t>(v);
+			}
 			constexpr uint128_limb_container(std::uint64_t val) noexcept : m_value{ val } {}
 			constexpr uint128_limb_container(std::uint32_t val) noexcept : m_value{val} {}
+			constexpr uint128_limb_container(std::uint64_t high, std::uint64_t low) noexcept
+			{
+				m_value = high;
+				m_value <<= 64;
+				m_value |= low;
+			}
 			constexpr uint128_limb_container& operator=(uint_t val) noexcept
 			{
 				m_value = val;
 				return *this;
 			}
+
+			
 			constexpr uint128_limb_container(std::array<std::uint64_t, 2u> native_byte_order_arr) noexcept
 			{
 				if (std::is_constant_evaluated())
@@ -256,7 +276,7 @@ namespace cjm::numerics::fixed_uint_container
 			{
 				return static_cast<std::uint32_t>(m_value);
 			}
-			~uint128_limb_container() = default;
+			constexpr ~uint128_limb_container() = default;
 			
 		};
 
@@ -303,7 +323,7 @@ namespace cjm::numerics::fixed_uint_container
 
 	using bi_ui128_t = std::conditional_t<internal::exits_builtin_u128, natuint128_t, std::uint64_t>;
 	
-	constexpr uint128_calc_mode calculation_mode = numerics::calculation_mode;
+	constexpr uint128_calc_mode calculation_mode = numerics::init_eval_mode();
 
 	constexpr bool is_little_endian = std::endian::native != std::endian::big;
 	

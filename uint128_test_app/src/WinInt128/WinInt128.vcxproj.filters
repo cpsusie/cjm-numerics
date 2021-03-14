@@ -47,10 +47,25 @@
     <ClInclude Include="..\headers\umult.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\headers\fixed_uint_container.hpp">
+    <ClInclude Include="..\..\..\src\cjm\numerics\cjm_configuration.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\headers\fixed_uint_container_math.hpp">
+    <ClInclude Include="..\..\..\src\cjm\numerics\cjm_numeric_concepts.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\cjm\numerics\numerics.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\cjm\numerics\numerics_configuration.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\cjm\numerics\uint128.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\cjm\numerics\fixed_uint_container.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\cjm\numerics\fixed_uint_container_math.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -64,5 +79,16 @@
     <Text Include="..\headers\lshift.txt">
       <Filter>Source Files</Filter>
     </Text>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\..\src\cjm\numerics\numerics.inl">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="..\..\..\src\cjm\numerics\numerics_configuration.inl">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="..\..\..\src\cjm\numerics\uint128.inl">
+      <Filter>Header Files</Filter>
+    </None>
   </ItemGroup>
 </Project>

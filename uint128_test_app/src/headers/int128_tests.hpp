@@ -37,7 +37,7 @@
 #include <cjm/string/istream_utils.hpp>
 #include "int128_test_switches.hpp"
 #include <absl/numeric/int128.h>
-#include "fixed_uint_container_math.hpp"
+#include <cjm/numerics/fixed_uint_container_math.hpp>
 #include "umult.hpp"
 
 namespace cjm::uint128_tests::generator

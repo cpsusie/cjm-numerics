@@ -1,5 +1,5 @@
-#ifndef CJM_UINT128_INL
-#define CJM_UINT128_INL
+#ifndef CJM_UINT128_INL_
+#define CJM_UINT128_INL_
 #include <cjm/numerics/uint128.hpp>
 #include <algorithm>
 #include <cjm/string/cjm_string.hpp>
@@ -363,11 +363,8 @@ namespace cjm
             
 		}
 
-#ifdef CJM_NUMERICS_LITTLE_ENDIAN
-		constexpr uint128::uint128() noexcept  : m_low{}, m_high{} {}
-#else
-		constexpr uint128::uint128() noexcept : m_high{}, m_low{} {}
-#endif
+
+        constexpr uint128::uint128() noexcept : m_limbs{} {}
 
 		constexpr uint128::divmod_result_t uint128::div_mod(uint128 dividend, uint128 divisor)
 		{
@@ -376,54 +373,52 @@ namespace cjm
 		}
 
 		constexpr uint128::uint128(int v) noexcept
-			: m_low{ static_cast<int_part>(v) },
-			m_high{ v < 0 ? std::numeric_limits<int_part>::max() : 0 } {}
-		constexpr uint128::uint128(unsigned int v) noexcept : m_low{ v }, m_high{ 0 } {}
+            : m_limbs{static_cast<std::int64_t>(v)} {}
+		constexpr uint128::uint128(unsigned int v) noexcept
+			: m_limbs{ static_cast<int_part>(v) } {}
 		constexpr uint128::uint128(long v) noexcept
-			: m_low{ static_cast<int_part>(v) },
-			m_high{ v < 0 ? std::numeric_limits<int_part>::max() : 0 } {}
+            : m_limbs{static_cast<std::int64_t>(v)} {}
 		constexpr uint128::uint128(unsigned long v) noexcept
-			: m_low{ static_cast<int_part>(v) }, m_high{ 0 } {}
+            : m_limbs{ static_cast<std::uint64_t>( v) } {}
 		constexpr uint128::uint128(long long v) noexcept
-			: m_low{ static_cast<int_part>(v) },
-			m_high{ v < 0 ? std::numeric_limits<int_part>::max() : 0 } {}
+            : m_limbs{static_cast<std::int64_t>(v)} {}
 		constexpr uint128::uint128(unsigned long long v) noexcept
-			: m_low{ static_cast<int_part>(v) }, m_high{ 0 } {}
-
-		constexpr uint128& uint128::operator=(int v) noexcept
-		{
-			m_low = static_cast<int_part>(v);
-			m_high = v < 0 ? std::numeric_limits<int_part>::max() : 0;
-			return *this;
-		}
+            : m_limbs{ static_cast<std::uint64_t>(v) } {}
+        constexpr uint128& uint128::operator=(int v) noexcept
+        {
+            m_limbs.m_low = static_cast<std::int64_t>(v);
+            m_limbs.m_high = v < 0 ? std::numeric_limits<std::uint64_t>::max() : 0u;
+            return *this;
+        }
+				
 		constexpr uint128& uint128::operator=(unsigned int v) noexcept
 		{
-			m_low = static_cast<int_part>(v);
-			m_high = 0;
+			m_limbs.m_low = static_cast<int_part>(v);
+			m_limbs.m_high = 0;
 			return *this;
 		}
 		constexpr uint128& uint128::operator=(long v) noexcept
 		{
-			m_low = static_cast<int_part>(v);
-			m_high = v < 0 ? std::numeric_limits<int_part>::max() : 0;
+            m_limbs.m_low = static_cast<int_part>(v);
+			m_limbs.m_high = v < 0 ? std::numeric_limits<int_part>::max() : 0;
 			return *this;
 		}
 		constexpr uint128& uint128::operator=(unsigned long v) noexcept
 		{
-			m_low = static_cast<int_part>(v);
-			m_high = 0;
+			m_limbs.m_low = static_cast<int_part>(v);
+            m_limbs.m_high = 0;
 			return *this;
 		}
 		constexpr uint128& uint128::operator=(long long v) noexcept
 		{
-			m_low = static_cast<int_part>(v);
-			m_high = v < 0 ? std::numeric_limits<int_part>::max() : 0;
+            m_limbs.m_low = static_cast<int_part>(v);
+            m_limbs.m_high = v < 0 ? std::numeric_limits<int_part>::max() : 0;
 			return *this;
 		}
 		constexpr uint128& uint128::operator=(unsigned long long v) noexcept
 		{
-			m_low = static_cast<int_part>(v);
-			m_high = 0;
+            m_limbs.m_low = static_cast<int_part>(v);
+			m_limbs.m_high = 0;
 			return *this;
 		}
 
@@ -431,22 +426,22 @@ namespace cjm
         inline uint128::uint128(float f) noexcept : uint128()
         {
             auto temp = internal::make_from_floating_point(f);
-            m_high = temp.m_high;
-            m_low = temp.m_low;
+            m_limbs.m_high = temp.m_limbs.m_high;
+            m_limbs.m_low = temp.m_limbs.m_low;
         }
 		
         inline uint128::uint128(double d) noexcept : uint128()
         {
             auto temp = internal::make_from_floating_point(d);
-            m_high = temp.m_high;
-            m_low = temp.m_low;
+            m_limbs.m_high = temp.m_limbs.m_high;
+            m_limbs.m_low = temp.m_limbs.m_low;
         }
 		
         inline uint128::uint128(long double d) noexcept : uint128()
         {
             auto temp = internal::make_from_floating_point(d);
-            m_high = temp.m_high;
-            m_low = temp.m_low;
+            m_limbs.m_high = temp.m_limbs.m_high;
+            m_limbs.m_low = temp.m_limbs.m_low;
         }
 		
         template<typename Chars, typename CharTraits, typename Allocator>
@@ -484,66 +479,66 @@ namespace cjm
 		}
 		constexpr uint128::operator bool() const noexcept
 		{
-			return m_low || m_high;
+			return m_limbs.m_low || m_limbs.m_high;
 		}
 		constexpr uint128::operator char() const noexcept
 		{
-			return static_cast<char>(m_low);
+			return static_cast<char>(m_limbs.m_low);
 		}
 		constexpr uint128::operator signed char() const noexcept
 		{
-			return static_cast<signed char>(m_low);
+			return static_cast<signed char>(m_limbs.m_low);
 		}
 		constexpr uint128::operator unsigned char() const noexcept
 		{
-			return static_cast<unsigned char>(m_low);
+			return static_cast<unsigned char>(m_limbs.m_low);
 		}
 
         constexpr uint128::operator char8_t() const noexcept
         {
-            return static_cast<char8_t>(m_low);
+            return static_cast<char8_t>(m_limbs.m_low);
         }
 
         constexpr uint128::operator char16_t() const noexcept
 		{
-			return static_cast<char16_t>(m_low);
+			return static_cast<char16_t>(m_limbs.m_low);
 		}
 		constexpr uint128::operator char32_t() const noexcept
 		{
-			return static_cast<char32_t>(m_low);
+			return static_cast<char32_t>(m_limbs.m_low);
 		}
 		constexpr uint128::operator wchar_t() const noexcept
 		{
-			return static_cast<wchar_t>(m_low);
+			return static_cast<wchar_t>(m_limbs.m_low);
 		}
 		constexpr uint128::operator std::int16_t() const noexcept
 		{
-			return static_cast<std::int16_t>(m_low);
+			return static_cast<std::int16_t>(m_limbs.m_low);
 		}
 		constexpr uint128::operator std::uint16_t() const noexcept
 		{
-			return static_cast<std::uint16_t>(m_low);
+			return static_cast<std::uint16_t>(m_limbs.m_low);
 		}
 		constexpr uint128::operator std::int32_t() const noexcept
 		{
-			return static_cast<std::int32_t>(m_low);
+			return static_cast<std::int32_t>(m_limbs.m_low);
 		}
 		constexpr uint128::operator std::uint32_t() const noexcept
 		{
-			return static_cast<std::uint32_t>(m_low);
+			return static_cast<std::uint32_t>(m_limbs.m_low);
 		}
 		constexpr uint128::operator std::int64_t() const noexcept
 		{
-			return static_cast<std::int64_t>(m_low);
+			return static_cast<std::int64_t>(m_limbs.m_low);
 		}
 		constexpr uint128::operator std::uint64_t() const noexcept
 		{
-			return static_cast<std::uint64_t>(m_low);
+			return static_cast<std::uint64_t>(m_limbs.m_low);
 		}
 
 		constexpr size_t uint128::hash_code() const noexcept
 		{
-			return calculate_hash(m_high, m_low);
+			return calculate_hash(m_limbs.m_high, m_limbs.m_low);
 		}
 
 		constexpr uint128& uint128::operator+=(uint128 other) noexcept
@@ -634,22 +629,22 @@ namespace cjm
 
 		constexpr uint128& uint128::operator&=(uint128 other) noexcept
 		{
-			m_high &= other.m_high;
-			m_low &= other.m_low;
+            m_limbs.m_high &= other.m_limbs.m_high;
+            m_limbs.m_low &= other.m_limbs.m_low;
 			return *this;
 		}
 
 		constexpr uint128& uint128::operator|=(uint128 other) noexcept
 		{
-			m_high |= other.m_high;
-			m_low |= other.m_low;
+            m_limbs.m_high |= other.m_limbs.m_high;
+            m_limbs.m_low |= other.m_limbs.m_low;
 			return *this;
 		}
 
 		constexpr uint128& uint128::operator^=(uint128 other) noexcept
 		{
-			m_high ^= other.m_high;
-			m_low ^= other.m_low;
+            m_limbs.m_high ^= other.m_limbs.m_high;
+            m_limbs.m_low ^= other.m_limbs.m_low;
 			return *this;
 		}
 
@@ -667,12 +662,12 @@ namespace cjm
 
 		constexpr uint128::int_part uint128::low_part() const noexcept
 		{
-			return m_low;
+			return m_limbs.m_low;
 		}
 
 		constexpr uint128::int_part uint128::high_part() const noexcept
 		{
-			return m_high;
+			return m_limbs.m_high;
 		}
 
 		constexpr uint128::byte_array uint128::to_little_endian_arr() const noexcept //NOLINT (bugprone-exception-escape)
@@ -721,7 +716,7 @@ namespace cjm
 		}
 
 		constexpr uint128::uint128(int_part high, int_part low) noexcept
-			: m_low(low), m_high(high) {}
+            : m_limbs{high, low} {}
 
 		constexpr size_t uint128::calculate_hash(int_part hi, int_part low) noexcept
 		{
@@ -860,14 +855,14 @@ namespace cjm
             uint128 ret;
 			if (shift_amount >= 64)
 			{
-				ret.m_high = shift_me.m_low;
-				ret.m_low = 0;
-				ret.m_high =  (ret.m_high << (shift_amount - 64)); 
+				ret.m_limbs.m_high = shift_me.m_limbs.m_low;
+				ret.m_limbs.m_low = 0;
+				ret.m_limbs.m_high =  (ret.m_limbs.m_high << (shift_amount - 64));
 			}
 			else
 			{
-				ret.m_high = CJM_LSHIFT128(shift_me.m_low, shift_me.m_high, static_cast<unsigned char>(shift_amount));
-				ret.m_low = shift_me.m_low << shift_amount;
+				ret.m_limbs.m_high = CJM_LSHIFT128(shift_me.m_limbs.m_low, shift_me.m_limbs.m_high, static_cast<unsigned char>(shift_amount));
+				ret.m_limbs.m_low = shift_me.m_limbs.m_low << shift_amount;
 			}
 			return ret;			
 		}
@@ -878,14 +873,14 @@ namespace cjm
             uint128 ret;
 			if (shift_amount >= 64)
 			{
-				ret.m_high = 0;
-				ret.m_low = shift_me.m_high;
-				ret.m_low = ret.m_low >> (shift_amount - 64);
+				ret.m_limbs.m_high = 0;
+				ret.m_limbs.m_low = shift_me.m_limbs.m_high;
+				ret.m_limbs.m_low = ret.m_limbs.m_low >> (shift_amount - 64);
 			}
 			else
 			{
-				ret.m_low = CJM_RSHIFT128(shift_me.m_low, shift_me.m_high, static_cast<unsigned char>(shift_amount));
-				ret.m_high = shift_me.m_high >> shift_amount;
+				ret.m_limbs.m_low = CJM_RSHIFT128(shift_me.m_limbs.m_low, shift_me.m_limbs.m_high, static_cast<unsigned char>(shift_amount));
+				ret.m_limbs.m_high = shift_me.m_limbs.m_high >> shift_amount;
 			}
 			return ret;
 		}
@@ -1273,11 +1268,11 @@ namespace cjm
 		{
             if (std::is_constant_evaluated())
             {
-                auto result = uint128{ lhs.m_high + rhs.m_high,
-                                                      lhs.m_low + rhs.m_low};
-                if (result.m_low < lhs.m_low) // check for carry
+                auto result = uint128{ lhs.m_limbs.m_high + rhs.m_limbs.m_high,
+                                                      lhs.m_limbs.m_low + rhs.m_limbs.m_low};
+                if (result.m_limbs.m_low < lhs.m_limbs.m_low) // check for carry
                 {
-                    ++result.m_high;                    
+                    ++result.m_limbs.m_high;                    
                 }
                 return result;
             }  // ReSharper disable once CppRedundantElseKeywordInsideCompoundStatement
@@ -1291,18 +1286,18 @@ namespace cjm
 				{
                     uint128 ret = 0;
                     unsigned char carry_in = 0;
-                    unsigned char carry_out = CJM_ADDCARRY64(carry_in, lhs.m_low, rhs.m_low, &(ret.m_low));
+                    unsigned char carry_out = CJM_ADDCARRY64(carry_in, lhs.m_limbs.m_low, rhs.m_limbs.m_low, &(ret.m_limbs.m_low));
                     carry_in = carry_out;
-                    carry_out = CJM_ADDCARRY64(carry_in, lhs.m_high, rhs.m_high, &(ret.m_high));
+                    carry_out = CJM_ADDCARRY64(carry_in, lhs.m_limbs.m_high, rhs.m_limbs.m_high, &(ret.m_limbs.m_high));
                     return ret;
 				}
                 else // constexpr (calculation_mode == uint128_calc_mode::default_eval)
                 {
-                    auto result = uint128{ lhs.m_high + rhs.m_high,
-                                                       lhs.m_low + rhs.m_low };
-                    if (result.m_low < lhs.m_low) // check for carry
+                    auto result = uint128{ lhs.m_limbs.m_high + rhs.m_limbs.m_high,
+                                                       lhs.m_limbs.m_low + rhs.m_limbs.m_low };
+                    if (result.m_limbs.m_low < lhs.m_limbs.m_low) // check for carry
                     {
-                        ++result.m_high;
+                        ++result.m_limbs.m_high;
                     }
                     return result;
                 }
@@ -1313,10 +1308,10 @@ namespace cjm
 		{
             if (std::is_constant_evaluated())
             {
-                auto result = uint128{ lhs.m_high - rhs.m_high, lhs.m_low - rhs.m_low };
-                if (lhs.m_low < rhs.m_low) // check for borrow
+                auto result = uint128{ lhs.m_limbs.m_high - rhs.m_limbs.m_high, lhs.m_limbs.m_low - rhs.m_limbs.m_low };
+                if (lhs.m_limbs.m_low < rhs.m_limbs.m_low) // check for borrow
                 {
-                    --result.m_high;
+                    --result.m_limbs.m_high;
                 }
                 return result;
             }  // ReSharper disable once CppRedundantElseKeywordInsideCompoundStatement
@@ -1331,17 +1326,18 @@ namespace cjm
                     uint128 ret = 0;
                     unsigned char carry_in = 0;
                     unsigned char carry_out = 0;
-	            	carry_out = CJM_SUBBORROW_64(carry_in, lhs.m_low, rhs.m_low, &(ret.m_low));
+	            	carry_out = CJM_SUBBORROW_64(carry_in, lhs.m_limbs.m_low, rhs.m_limbs.m_low, &(ret.m_limbs.m_low));
                     carry_in = carry_out;
-                    carry_out = CJM_SUBBORROW_64(carry_in, lhs.m_high, rhs.m_high, &(ret.m_high));
+                    carry_out = CJM_SUBBORROW_64(carry_in, lhs.m_limbs.m_high, rhs.m_limbs.m_high, &(ret.m_limbs.m_high));
                     return ret;
 				}
                 else // constexpr (calculation_mode == uint128_calc_mode::default_eval)
                 {
-                    auto result = uint128{ lhs.m_high - rhs.m_high, lhs.m_low - rhs.m_low };
-                    if (lhs.m_low < rhs.m_low) // check for borrow
+                    auto result = uint128{ lhs.m_limbs.m_high - rhs.m_limbs.m_high,
+                    	lhs.m_limbs.m_low - rhs.m_limbs.m_low };
+                    if (lhs.m_limbs.m_low < rhs.m_limbs.m_low) // check for borrow
                     {
-                        --result.m_high;
+                        --result.m_limbs.m_high;
                     }
                     return result;
                 }
@@ -1410,7 +1406,6 @@ namespace cjm
             {
                 return UI128::most_sign_set_bit(value);
             }
-
         }
 
 
@@ -1497,8 +1492,8 @@ namespace cjm
                     unsigned char carry_1 = 0;
                     unsigned char carry_2 = 0;
                     auto ret = uint128{};
-                    ret.m_low = add_with_carry(first_addend.m_low, second_addend.m_low, carry_in, carry_1);
-                    ret.m_high = add_with_carry(first_addend.m_high, second_addend.m_high, carry_1, carry_2);
+                    ret.m_limbs.m_low = add_with_carry(first_addend.m_limbs.m_low, second_addend.m_limbs.m_low, carry_in, carry_1);
+                    ret.m_limbs.m_high = add_with_carry(first_addend.m_limbs.m_high, second_addend.m_limbs.m_high, carry_1, carry_2);
                     return std::make_pair(ret, carry_2);
                 }
                 else if constexpr (calculation_mode == uint128_calc_mode::intrinsic_u128)
@@ -1578,8 +1573,8 @@ namespace cjm
                     unsigned char borrow_1 = 0;
                     unsigned char borrow_2 = 0;
                     auto ret = uint128{};
-                    ret.m_low = sub_with_borrow(minuend.m_low, subtrahend.m_low, borrow_in, borrow_1);
-                    ret.m_high = sub_with_borrow(minuend.m_high, subtrahend.m_high, borrow_1, borrow_2);
+                    ret.m_limbs.m_low = sub_with_borrow(minuend.m_limbs.m_low, subtrahend.m_limbs.m_low, borrow_in, borrow_1);
+                    ret.m_limbs.m_high = sub_with_borrow(minuend.m_limbs.m_high, subtrahend.m_limbs.m_high, borrow_1, borrow_2);
                     return std::make_pair(ret, borrow_2);
                 }
                 else if constexpr (calculation_mode == uint128_calc_mode::intrinsic_u128)
@@ -2660,18 +2655,18 @@ inline void cjm::numerics::uint128::instrumented_div_mod(std::basic_ostream<char
 
 inline cjm::numerics::uint128::operator float() const
 {
-	return static_cast<float>(m_low) + std::ldexp(static_cast<float>(m_high), 64);
+	return static_cast<float>(m_limbs.m_low) + std::ldexp(static_cast<float>(m_limbs.m_high), 64);
 }
 
 inline cjm::numerics::uint128::operator double() const
 {
-	return static_cast<double>(m_low) + std::ldexp(static_cast<double>(m_high), 64);
+	return static_cast<double>(m_limbs.m_low) + std::ldexp(static_cast<double>(m_limbs.m_high), 64);
 }
 
 inline cjm::numerics::uint128::operator long double() const
 {
-	return static_cast<long double>(m_low) +
-	       std::ldexp(static_cast<long double>(m_high), 64);
+	return static_cast<long double>(m_limbs.m_low) +
+	       std::ldexp(static_cast<long double>(m_limbs.m_high), 64);
 }
 
 inline void uint128::best_safe_div_mod(uint128 dividend, uint128 divisor, uint128* quotient, uint128* remainder)
@@ -2684,47 +2679,6 @@ inline void uint128::best_safe_div_mod(uint128 dividend, uint128 divisor, uint12
 	*quotient = result.quotient;
 	*remainder = result.remainder;
 }
-
-#ifdef CJM_USE_INTRINSIC_U128
-inline cjm::numerics::uint128& cjm::numerics::uint128::operator=(__uint128_t other) noexcept
-{
-	return (*this = cjm::numerics::bit_cast<uint128, unsigned __int128>(other));
-}
-
-
-inline cjm::numerics::uint128::operator unsigned __int128() const noexcept
-{
-	return cjm::numerics::bit_cast<unsigned __int128, uint128>(*this);
-//    unsigned __int128 ret = m_high;
-//    ret <<= 64;
-//    ret |= m_low;
-//    return ret;
-}
-
-inline cjm::numerics::uint128::uint128(__uint128_t other) noexcept
-{
-	m_high = 0;
-	m_low = 0;
-	*this = cjm::numerics::bit_cast<uint128, unsigned __int128>(other);
-}
-#elif defined (CJM_DIV_ONLY_INTRINSIC_U128)
-inline cjm::numerics::uint128::uint128(divonlynatuint128_t other) noexcept
-{
-    m_high = 0;
-    m_low = 0;
-    *this = cjm::numerics::bit_cast<uint128, divonlynatuint128_t>(other);
-}
-inline cjm::numerics::uint128& cjm::numerics::uint128::operator=(divonlynatuint128_t other) noexcept
-{
-	return (*this = cjm::numerics::bit_cast<uint128, divonlynatuint128_t>(other));
-}
-inline cjm::numerics::uint128::operator divonlynatuint128_t() const noexcept
-{
-    return cjm::numerics::bit_cast<divonlynatuint128_t, uint128>(*this);
-}
-
-
-#endif
 
 //This method is based on the 128-bit unsigned integer division
 //provided by clang / LLVM for a built-in unsigned __int128 type
@@ -2760,24 +2714,24 @@ inline void uint128::div_mod_msc_x64_impl(uint128 dividend, uint128 divisor, uin
 		return;
 	}
 	// When the divisor fits in 64 bits, we can use an optimized path.
-	if (divisor.m_high == 0)
+	if (divisor.m_limbs.m_high == 0)
 	{
-		remainder.m_high = 0;
-		if (dividend.m_high < divisor.m_low)
+		remainder.m_limbs.m_high = 0;
+		if (dividend.m_limbs.m_high < divisor.m_limbs.m_low)
 		{
 			// The result fits in 64 bits.
-			quotient.m_low = CJM_UDIV128(dividend.m_high, dividend.m_low,
-				divisor.m_low, &remainder.m_low);
-			quotient.m_high = 0;
+			quotient.m_limbs.m_low = CJM_UDIV128(dividend.m_limbs.m_high, dividend.m_limbs.m_low,
+				divisor.m_limbs.m_low, &remainder.m_limbs.m_low);
+			quotient.m_limbs.m_high = 0;
 		}
 		else
 		{
 			// First, divide with the high part to get the remainder in dividend.s.high.
 			// After that dividend.s.high < divisor.s.low.
-			quotient.m_high = dividend.m_high / divisor.m_low;
-			dividend.m_high = dividend.m_high % divisor.m_low;
-			quotient.m_low = CJM_UDIV128(dividend.m_high, dividend.m_low,
-				divisor.m_low, &remainder.m_low);
+			quotient.m_limbs.m_high = dividend.m_limbs.m_high / divisor.m_limbs.m_low;
+			dividend.m_limbs.m_high = dividend.m_limbs.m_high % divisor.m_limbs.m_low;
+			quotient.m_limbs.m_low = CJM_UDIV128(dividend.m_limbs.m_high, dividend.m_limbs.m_low,
+				divisor.m_limbs.m_low, &remainder.m_limbs.m_low);
 		}
 		*remainder_ret = remainder;
 		*quotient_ret = quotient;
