@@ -1,5 +1,5 @@
-#ifndef CJM_NUMERICS_INL
-#define CJM_NUMERICS_INL
+#ifndef CJM_NUMERICS_INL_
+#define CJM_NUMERICS_INL_
 #include <cjm/numerics/numerics.hpp>
 namespace cjm::numerics
 {
@@ -138,14 +138,14 @@ namespace cjm::numerics::math_functions
 
 #ifdef __cpp_lib_bit_cast
 template<typename To, typename From>
-requires cjm::numerics::concepts::bit_castable<To, From>
+	requires cjm::numerics::concepts::bit_castable<To, From>
 CJM_BIT_CAST_CONST To cjm::numerics::bit_cast(const From& f) noexcept
 {
 	return std::bit_cast<To, From>(f);
 }
 #else
 template<typename To, typename From>
-requires cjm::numerics::concepts::bit_castable<To, From>
+	requires cjm::numerics::concepts::bit_castable<To, From>
 CJM_BIT_CAST_CONST To cjm::numerics::bit_cast(const From& f) noexcept
 {
 	//GCC seems to get all butt-hurt about private member variables even if type is trivial.
@@ -166,4 +166,4 @@ CJM_BIT_CAST_CONST To cjm::numerics::bit_cast(const From& f) noexcept
 #endif
 
 
-#endif 
+#endif //CJM_NUMERICS_INL_ 
