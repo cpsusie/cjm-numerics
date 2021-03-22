@@ -869,8 +869,8 @@ void cjm::uint128::example_code::demonstrate_compare_and_hash()
 }
 
 void cjm::uint128::example_code::print_compare_results(std::string left_operand, std::string right_operand,
-                                                       std::strong_ordering ordering, bool greater_than, bool less_than, bool equal, bool not_equal, bool greater_or_equal,
-                                                       bool less_or_equal, size_t left_hash, size_t right_hash, bool runtime)
+	std::strong_ordering ordering, bool greater_than, bool less_than, bool equal, bool not_equal, bool greater_or_equal,
+		bool less_or_equal, size_t left_hash, size_t right_hash, bool runtime)
 {
 	auto get_ordering_text = [](std::strong_ordering v) -> std::string_view
 	{

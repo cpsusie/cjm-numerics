@@ -351,4 +351,4 @@ namespace cjm
 }
 
 #include <cjm/numerics/numerics_configuration.inl>
-#endif CJM_NUMERICS_CONFIGURATION_HPP_
+#endif //CJM_NUMERICS_CONFIGURATION_HPP_
