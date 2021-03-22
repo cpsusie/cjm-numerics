@@ -142,4 +142,4 @@ namespace std
 	};
 }
 #include <cjm/numerics/numerics.inl>
-#endif
+#endif //CJM_NUMERICS_HPP_

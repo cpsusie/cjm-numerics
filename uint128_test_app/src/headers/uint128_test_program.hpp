@@ -22,35 +22,33 @@
 
 namespace cjm::base_test_program
 {
-    using cout_saver = cjm::uint128_tests::cout_saver;
-    constexpr auto newl = '\n';
-    template<typename T>
-    concept unsigned_integer = std::numeric_limits<T>::is_integer && !std::numeric_limits<T>::is_signed;
+	using cout_saver = cjm::uint128_tests::cout_saver;
+	constexpr auto newl = '\n';
+	template<typename T>
+	concept unsigned_integer = std::numeric_limits<T>::is_integer && !std::numeric_limits<T>::is_signed;
 
-    template<unsigned_integer TUInt>
-    void print_spec(TUInt val)
-    {
-        cout_saver{ std::cout };
-        std::cout << std::hex << "[0x" << val << "]." << newl;
-    }
+	template<unsigned_integer TUInt>
+	void print_spec(TUInt val)
+	{
+		cout_saver{ std::cout };
+		std::cout << std::hex << "[0x" << val << "]." << newl;
+	}
 
-    template<typename T>
-    void print_spec(T val)
-    {
-        auto saver = cout_saver{ std::cout };
-        std::cout << "Thing that isn't unsigned integer: [" << std::dec << val << "]." << newl;
-    }
+	template<typename T>
+	void print_spec(T val)
+	{
+		auto saver = cout_saver{ std::cout };
+		std::cout << "Thing that isn't unsigned integer: [" << std::dec << val << "]." << newl;
+	}
 
-    int execute_test_program(int argc, char* argv[]) noexcept;
+	int execute_test_program(int argc, char* argv[]) noexcept;
 
-    void native_test();
+	void native_test();
 
-    void log_arg_processing(int argc, char* argv[]);
+	void log_arg_processing(int argc, char* argv[]);
 	
-    int print_args(int argc, char* argv[]) noexcept;
+	int print_args(int argc, char* argv[]) noexcept;
 	
-    int execute_log_arg_processing(int argc, char* argv[]) noexcept;
+	int execute_log_arg_processing(int argc, char* argv[]) noexcept;
 }
-
-
-#endif
+#endif //CJM_UINT128_TEST_PROGRAM_HPP_

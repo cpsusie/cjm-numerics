@@ -5,11 +5,11 @@
 
 namespace cjm::uint128_tests::switches
 {
-    test_mode match_switch(sv_t text);
+	test_mode match_switch(sv_t text);
 
-    sv_t strip_switch_token(sv_t text);
+	sv_t strip_switch_token(sv_t text);
 
-    struct test_switch::test_switch_impl final
+	struct test_switch::test_switch_impl final
 	{
 		friend class test_switch;
 
@@ -26,10 +26,6 @@ namespace cjm::uint128_tests::switches
 		std::optional<std::filesystem::path> m_parameter;
 		test_mode m_mode;
 	};
-
-
-
-
 }
 
 namespace
@@ -54,7 +50,8 @@ namespace
 	}
 	std::optional<std::filesystem::path> create_path_if_needed(cjm::uint128_tests::switches::test_mode mode, std::string_view text)
 	{
-		if (mode == cjm::uint128_tests::switches::test_mode::execute_binary_from_file || mode == cjm::uint128_tests::switches::test_mode::execute_unary_from_file)
+		if (mode == cjm::uint128_tests::switches::test_mode::execute_binary_from_file 
+			|| mode == cjm::uint128_tests::switches::test_mode::execute_unary_from_file)
 		{
 			return create_path(text);
 		}
@@ -81,7 +78,9 @@ cjm::uint128_tests::switches::test_switch::test_switch_impl::test_switch_impl(st
 				throw bad_test_switch{ mode, "Mode requires file parameter but none supplied"sv, view };
 			}
 			auto msg = cjm::string::make_throwing_sstream<char>();
-			msg << "Mode requires file parameter referring to existing file.  Referenced file [" << m_parameter.value() << "] does not exist.";
+			msg 
+				<< "Mode requires file parameter referring to existing file.  Referenced file [" 
+				<< m_parameter.value() << "] does not exist.";
 			std::string msg_str = msg.str();
 			throw bad_test_switch(mode, msg_str, param);
 		}
@@ -122,15 +121,6 @@ std::pair<std::string, std::vector<std::string>> cjm::uint128_tests::switches::n
 	current_exec_temp = cjm::string::trim(current_exec_temp);
 
 	std::string current_exec = std::move(current_exec_temp);
-	//current_exec.reserve(current_exec_temp.size());
-	//todo fixit ... don't think i want lower unless confirmed to be a switch rather than a parameter
-	
-	/*std::transform(current_exec_temp.cbegin(), current_exec_temp.cend(), 
-		std::back_inserter(current_exec), 
-		[](unsigned char c)
-		{
-			return std::tolower(c);
-		});*/
 	
 	std::vector<std::string> ret;
 	if (argc > 1)
@@ -168,18 +158,21 @@ const std::optional<std::filesystem::path>& cjm::uint128_tests::switches::test_s
 	return m_impl->file_path();
 }
 cjm::uint128_tests::switches::test_switch::test_switch(cjm::uint128_tests::switches::test_mode mode,
-                                                       std::optional<std::string> parameter) : m_impl{}
+	std::optional<std::string> parameter) : m_impl{}
 {
-    using namespace std::string_literals;
-    m_impl = std::make_unique<test_switch_impl>(parameter.value_or(""s), mode);
+	using namespace std::string_literals;
+	m_impl = std::make_unique<test_switch_impl>(parameter.value_or(""s), mode);
 }
-cjm::uint128_tests::switches::test_switch::test_switch() : m_impl{std::make_unique<test_switch_impl>()} {}
-cjm::uint128_tests::switches::test_switch::test_switch(const test_switch& other) : m_impl{}
+cjm::uint128_tests::switches::test_switch::test_switch()
+	: m_impl{std::make_unique<test_switch_impl>()} {}
+cjm::uint128_tests::switches::test_switch::test_switch(const test_switch& other) 
+	: m_impl{}
 {
 	m_impl = std::make_unique<test_switch_impl>(*(other.m_impl));
 }
 
-cjm::uint128_tests::switches::test_switch::test_switch(test_switch&& other) noexcept : m_impl{}
+cjm::uint128_tests::switches::test_switch::test_switch(test_switch&& other) noexcept 
+	: m_impl{}
 {
 	std::swap(m_impl, other.m_impl);
 }
@@ -207,13 +200,15 @@ cjm::uint128_tests::switches::test_switch& cjm::uint128_tests::switches::test_sw
 
 
 
-cjm::uint128_tests::switches::bad_test_switch::bad_test_switch(test_mode mode, std::string_view parameter) : std::runtime_error(create_message(mode, parameter))
+cjm::uint128_tests::switches::bad_test_switch::bad_test_switch(test_mode mode, 
+	std::string_view parameter) : std::runtime_error(create_message(mode, parameter))
 {
 	
 }
 
 cjm::uint128_tests::switches::bad_test_switch::bad_test_switch(test_mode mode, std::string_view message,
-	std::string_view parameter) : std::runtime_error{create_message(mode, message, parameter)} {}
+	std::string_view parameter) 
+		: std::runtime_error{create_message(mode, message, parameter)} {}
 
 #ifdef CJM_DETECTED_GCC
 #pragma GCC diagnostic push
@@ -254,8 +249,9 @@ std::string cjm::uint128_tests::switches::bad_test_switch
 	case test_mode::execute_unary_from_file: 
 		if (parameter.empty())
 		{
-			throwing_stream		<< "Switch [execute_unary_from_file] requires the designation of a file to read from. "
-								<< " No such value specified.";
+			throwing_stream		
+				<< "Switch [execute_unary_from_file] requires the designation of a file to read from. "
+				<< " No such value specified.";
 		}
 		else
 		{
@@ -275,27 +271,31 @@ std::string cjm::uint128_tests::switches::bad_test_switch
 			{
 				if (!exists(x.value()))
 				{
-					throwing_stream		<< "Switch [execute_unary_from_file] specified [" << *x
-										<< "] as its path, but the specified file is not found.";					
+					throwing_stream	
+						<< "Switch [execute_unary_from_file] specified [" << *x
+						<< "] as its path, but the specified file is not found.";					
 				}
 				else
 				{
-					throwing_stream		<< "Switch [execute_unary_from_file] specified [" << parameter
-										<< "] as its path, but an unknown problem occurred.";
+					throwing_stream	
+						<< "Switch [execute_unary_from_file] specified [" << parameter
+						<< "] as its path, but an unknown problem occurred.";
 				}
 			}
 			else
 			{
-				throwing_stream		<< "Switch [execute_unary_from_file] specified [" << parameter
-									<< "] as its path, but an unknown problem occurred.";
+				throwing_stream	
+					<< "Switch [execute_unary_from_file] specified [" << parameter
+					<< "] as its path, but an unknown problem occurred.";
 			}			
 		}
 		break;
 	case test_mode::execute_binary_from_file: 
 		if (parameter.empty())
 		{
-			throwing_stream		<< "Switch [execute_binary_from_file] requires the designation "
-								<< "of a file to read from.  No such value specified.";
+			throwing_stream	
+				<< "Switch [execute_binary_from_file] requires the designation "
+				<< "of a file to read from.  No such value specified.";
 		}
 		else
 		{
@@ -307,28 +307,32 @@ std::string cjm::uint128_tests::switches::bad_test_switch
 			}
 			catch (const std::exception& ex)
 			{
-				throwing_stream		<< "Switch [execute_binary_from_file] specified ["
-									<< parameter << "] as its file path, but attempting "
-									<< "to parse this as a path threw the following exception: "
-									<< "[" << ex.what() << "].";
+				throwing_stream	
+					<< "Switch [execute_binary_from_file] specified ["
+					<< parameter << "] as its file path, but attempting "
+					<< "to parse this as a path threw the following exception: "
+					<< "[" << ex.what() << "].";
 			}
 			if (x.has_value())
 			{
 				if (!exists(x.value()))
 				{
-					throwing_stream		<< "Switch [execute_binary_from_file] specified ["
-										<< *x << "] as its path, but the specified file is not found.";
+					throwing_stream	
+						<< "Switch [execute_binary_from_file] specified ["
+						<< *x << "] as its path, but the specified file is not found.";
 				}
 				else
 				{
-					throwing_stream		<< "Switch [execute_binary_from_file] specified ["
-										<< parameter << "] as its path, but an unknown problem occurred.";
+					throwing_stream	
+						<< "Switch [execute_binary_from_file] specified ["
+						<< parameter << "] as its path, but an unknown problem occurred.";
 				}
 			}
 			else
 			{
-				throwing_stream		<< "Switch [execute_binary_from_file] specified [" << parameter
-									<< "] as its path, but an unknown problem occurred.";
+				throwing_stream		
+					<< "Switch [execute_binary_from_file] specified [" << parameter
+					<< "] as its path, but an unknown problem occurred.";
 			}
 		}
 		break;
@@ -340,8 +344,9 @@ std::string cjm::uint128_tests::switches::bad_test_switch
 			std::string text = get_text_from_last_two_or_combo(mode);
 			if (!parameter.empty())
 			{
-				throwing_stream		<< "[" << text << "] switch came with parameter: [" << parameter
-									<< " but this/these switches do not permit or require parameters.";
+				throwing_stream	
+					<< "[" << text << "] switch came with parameter: [" << parameter
+					<< " but this/these switches do not permit or require parameters.";
 			}
 			else
 			{
@@ -351,17 +356,20 @@ std::string cjm::uint128_tests::switches::bad_test_switch
 		}
 		break;
 	default:  // NOLINT(clang-diagnostic-covered-switch-default) // degenerate case
-		throwing_stream		<< "[0x" << std::hex << std::setw(std::numeric_limits<test_mode_underlying_t>::digits / 4)
-							<< std::setfill('0') << static_cast<test_mode_underlying_t>(mode)
-							<< "] is the bit pattern associated with the switches supplied, "
-							<< "but there is an unknown problem with it.";
+		throwing_stream	
+			<< "[0x" << std::hex << std::setw(std::numeric_limits<test_mode_underlying_t>::digits / 4)
+			<< std::setfill('0') << static_cast<test_mode_underlying_t>(mode)
+			<< "] is the bit pattern associated with the switches supplied, "
+			<< "but there is an unknown problem with it.";
 		if (parameter.empty())
 		{
 			throwing_stream << "  No parameters were supplied.";
 		}
 		else
 		{
-			throwing_stream << " The following parameter was supplied: [" << parameter << "].";
+			throwing_stream 
+				<< " The following parameter was supplied: [" 
+				<< parameter << "].";
 		}
 		break;
 	}
@@ -371,34 +379,39 @@ std::string cjm::uint128_tests::switches::bad_test_switch
 #pragma GCC diagnostic pop
 #endif
 
-std::string cjm::uint128_tests::switches::bad_test_switch::create_message(test_mode mode, std::string_view message,
-	std::string_view parameter)
+std::string cjm::uint128_tests::switches::bad_test_switch::create_message(test_mode mode, 
+	std::string_view message, std::string_view parameter)
 {
 	auto strm = cjm::string::make_throwing_sstream<char>();
 	if (message.empty() && parameter.empty())
 	{
-		strm	<< "There is an unknown problem with the supplied switch: ["
-				<< get_text_any_mode(mode) << "].";
+		strm
+			<< "There is an unknown problem with the supplied switch: ["
+			<< get_text_any_mode(mode) << "].";
 	}
 	else if (message.empty())
 	{
-		strm	<< "There is a problem with the supplied switch: [" << get_text_any_mode(mode)
-				<< "], that came with parameter: [" << parameter << "].";
+		strm
+			<< "There is a problem with the supplied switch: [" << get_text_any_mode(mode)
+			<< "], that came with parameter: [" << parameter << "].";
 	}
 	else if (parameter.empty())
 	{
-		strm	<< "There is a problem with the supplied switch: [" << get_text_any_mode(mode)
-				<< "]: \"" << message << "\".";
+		strm
+			<< "There is a problem with the supplied switch: [" << get_text_any_mode(mode)
+			<< "]: \"" << message << "\".";
 	}
 	else
 	{
-		strm	<< "There is a problem with the supplied switch: [" << get_text_any_mode(mode)
-				<< "], that came with parameter [" << parameter << "]: \"" << message << "\".";
+		strm
+			<< "There is a problem with the supplied switch: [" << get_text_any_mode(mode)
+			<< "], that came with parameter [" << parameter << "]: \"" << message << "\".";
 	}
 	return strm.str();
 }
 
-std::weak_ordering cjm::uint128_tests::switches::operator<=>(const test_switch& lhs, const test_switch& rhs) noexcept
+std::weak_ordering cjm::uint128_tests::switches::operator<=>(const test_switch& lhs, 
+	const test_switch& rhs) noexcept
 {
 	bool l_good = static_cast<bool>(lhs.m_impl);
 	bool r_good = static_cast<bool>(rhs.m_impl);
@@ -411,15 +424,19 @@ std::weak_ordering cjm::uint128_tests::switches::operator<=>(const test_switch& 
 		return l_good ? std::weak_ordering::greater : std::weak_ordering::less;
 	}
 
-	const std::weak_ordering mode_ordering = static_cast<test_mode_underlying_t>(lhs.m_impl->mode()) <=> static_cast<test_mode_underlying_t>(rhs.m_impl->mode());
+	const std::weak_ordering mode_ordering = static_cast<test_mode_underlying_t>(lhs.m_impl->mode()) <=> 
+		static_cast<test_mode_underlying_t>(rhs.m_impl->mode());
 	if (mode_ordering == std::weak_ordering::equivalent)
 	{
 		
 		if (lhs.m_impl->file_path() == rhs.m_impl->file_path())
 			return std::weak_ordering::equivalent;
-		if (!lhs.m_impl->file_path().has_value() || !rhs.m_impl->file_path().has_value())
+		if (!lhs.m_impl->file_path().has_value() 
+				|| !rhs.m_impl->file_path().has_value())
 		{
-			return lhs.m_impl->file_path().has_value() ? std::weak_ordering::greater : std::weak_ordering::less;
+			return lhs.m_impl->file_path().has_value() 
+				? std::weak_ordering::greater 
+					: std::weak_ordering::less;
 		}
 		const auto& l_val = *(lhs.m_impl->file_path());
 		const auto& r_val = *(rhs.m_impl->file_path());
@@ -427,7 +444,8 @@ std::weak_ordering cjm::uint128_tests::switches::operator<=>(const test_switch& 
 		{
 			return std::weak_ordering::equivalent;
 		}
-		return  (l_val > r_val) ? std::weak_ordering::greater : std::weak_ordering::less;
+		return  (l_val > r_val) ? 
+			std::weak_ordering::greater : std::weak_ordering::less;
 	}
 	return mode_ordering;
 }
@@ -439,158 +457,157 @@ size_t std::hash<cjm::uint128_tests::switches::test_switch>::operator()(
 }
 bool cjm::uint128_tests::switches::starts_with_switch_token(cjm::uint128_tests::sv_t text) noexcept
 {
-    if (text.empty()) return false;
-    for (auto tkn : switch_tokens)
-    {
-        if (text.starts_with(tkn))
-            return true;
-    }
-    return false;
+	if (text.empty()) return false;
+	for (auto tkn : switch_tokens)
+	{
+		if (text.starts_with(tkn))
+			return true;
+	}
+	return false;
 }
 
 cjm::uint128_tests::switches::test_mode cjm::uint128_tests::switches::match_switch(sv_t text)
 {
 
-    if (!starts_with_switch_token(text))
-    {
-        throw not_a_switch{text};
-    }
+	if (!starts_with_switch_token(text))
+	{
+		throw not_a_switch{text};
+	}
 
-    sv_t stripped = strip_switch_token(text);
-    if (stripped.empty())
-    {
-        throw not_a_switch{text};
-    }
+	sv_t stripped = strip_switch_token(text);
+	if (stripped.empty())
+	{
+		throw not_a_switch{text};
+	}
 
-    auto match = std::find_if(text_mode_lookup.cbegin(), text_mode_lookup.cend(),
-                             [=](const text_mode_t& pair) -> bool {
-        return boost::iequals(pair.first, stripped);
-    });
-    if (match != text_mode_lookup.cend())
-    {
-        return match->second;
-    }
-    throw unrecognized_switch{text};
+	auto match = std::find_if(text_mode_lookup.cbegin(), 
+		text_mode_lookup.cend(),[=](const text_mode_t& pair) 
+			-> bool { return boost::iequals(pair.first, stripped);});
+	if (match != text_mode_lookup.cend())
+	{
+		return match->second;
+	}
+	throw unrecognized_switch{text};
 }
 
 cjm::uint128_tests::sv_t cjm::uint128_tests::switches::strip_switch_token(cjm::uint128_tests::sv_t text)
 {
-    for (auto tkn : switch_tokens )
-    {
-        if (text.starts_with(tkn))
-        {
-            const size_t token_length = tkn.length();
-            return text.substr(token_length);
-        }
-    }
-    return text;
+	for (auto tkn : switch_tokens )
+	{
+		if (text.starts_with(tkn))
+		{
+			const size_t token_length = tkn.length();
+			return text.substr(token_length);
+		}
+	}
+	return text;
 }
 
 std::string cjm::uint128_tests::switches::unrecognized_switch::create_message(
-        std::string_view unrecognized_switch_text)
+		std::string_view unrecognized_switch_text)
 {
-    auto str = string::make_throwing_sstream<char>();
-    str << "The specified switch [" << unrecognized_switch_text << "] is not recognized." << newl;
-    str << "Valid switches include: " << newl;
-    for (auto [text, flag] : text_mode_lookup)
-    {
-        str << "\t\"-"sv << text << "\"" << newl;
-    }
-    return str.str();
+	auto str = string::make_throwing_sstream<char>();
+	str << "The specified switch [" << unrecognized_switch_text << "] is not recognized." << newl;
+	str << "Valid switches include: " << newl;
+	for (auto [text, flag] : text_mode_lookup)
+	{
+		str << "\t\"-"sv << text << "\"" << newl;
+	}
+	return str.str();
 }
 std::string cjm::uint128_tests::switches::not_a_switch::create_message(
-        std::string_view not_switch_text)
+		std::string_view not_switch_text)
 {
-    auto str = string::make_throwing_sstream<char>();
-    str << "Argument: [" << not_switch_text << "] is not a switch:" << newl;
-    str << "\tSwitches begin with: \"-\", \"--\", or (on windows): \"/\" " << newl;
-    return str.str();
+	auto str = string::make_throwing_sstream<char>();
+	str << "Argument: [" << not_switch_text << "] is not a switch:" << newl;
+	str << "\tSwitches begin with: \"-\", \"--\", or (on windows): \"/\" " << newl;
+	return str.str();
 }
-cjm::uint128_tests::switches::unrecognized_switch::unrecognized_switch(const std::string &arg) : runtime_error(arg) {}
+cjm::uint128_tests::switches::unrecognized_switch::unrecognized_switch(const std::string &arg)
+	: runtime_error(arg) {}
 
-cjm::uint128_tests::switches::unrecognized_switch::unrecognized_switch(cjm::uint128_tests::sv_t unknown_switch_text) : unrecognized_switch(create_message(unknown_switch_text))
+cjm::uint128_tests::switches::unrecognized_switch::unrecognized_switch(cjm::uint128_tests::sv_t unknown_switch_text) 
+	: unrecognized_switch(create_message(unknown_switch_text)){}
+
+cjm::uint128_tests::switches::not_a_switch::not_a_switch(const std::string& arg) 
+	: runtime_error{arg}{}
+
+cjm::uint128_tests::switches::not_a_switch::not_a_switch(sv_t not_a_switch_text) 
+	: not_a_switch{create_message(not_a_switch_text)}{}
+
+std::vector<cjm::uint128_tests::switches::test_switch> cjm::uint128_tests::switches::
+	process_input(std::span<std::string> args)
 {
-
-}
-
-cjm::uint128_tests::switches::not_a_switch::not_a_switch(const std::string& arg) : runtime_error{arg}
-{
-}
-
-cjm::uint128_tests::switches::not_a_switch::not_a_switch(sv_t not_a_switch_text) : not_a_switch{create_message(not_a_switch_text)}
-{
-
-}
-
-
-std::vector<cjm::uint128_tests::switches::test_switch> cjm::uint128_tests::switches::process_input(std::span<std::string> args)
-{
-    std::vector<test_switch> ret;
-    if (args.empty())
-    {
-        ret.emplace_back(test_mode::print_environ_info, std::nullopt);
-        ret.emplace_back(test_mode::run_default_tests, std::nullopt);
-    }
-    auto it = args.begin();
-    auto end_it = args.end();
-    while (it != end_it)
-    {
-        std::string_view switch_text = *it;
-        test_mode mode = match_switch(switch_text);
-        auto parameter_needed = needs_parameter(mode).value();
-        if (parameter_needed)
-        {
-            auto next = it + 1;
-            if (next == end_it)
-            {
-                throw missing_parameter{mode};
-            }
-            std::string_view next_item = *next;
-            if (starts_with_switch_token(next_item))
-            {
-                // next item is another switch, not required param
-                //for this one
-                throw missing_parameter{mode};
-            }
-            ret.emplace_back(mode, *next);
-            it += 2;
-        }
-        else
-        {
-            ret.emplace_back(mode, std::nullopt);
-            ++it;
-        }
-    }
-    return ret;
+	std::vector<test_switch> ret;
+	if (args.empty())
+	{
+		ret.emplace_back(test_mode::print_environ_info, std::nullopt);
+		ret.emplace_back(test_mode::run_default_tests, std::nullopt);
+	}
+	auto it = args.begin();
+	auto end_it = args.end();
+	while (it != end_it)
+	{
+		std::string_view switch_text = *it;
+		test_mode mode = match_switch(switch_text);
+		auto parameter_needed = needs_parameter(mode).value();
+		if (parameter_needed)
+		{
+			auto next = it + 1;
+			if (next == end_it)
+			{
+				throw missing_parameter{mode};
+			}
+			std::string_view next_item = *next;
+			if (starts_with_switch_token(next_item))
+			{
+				// next item is another switch, not required param
+				//for this one
+				throw missing_parameter{mode};
+			}
+			ret.emplace_back(mode, *next);
+			it += 2;
+		}
+		else
+		{
+			ret.emplace_back(mode, std::nullopt);
+			++it;
+		}
+	}
+	return ret;
 }
 
 cjm::uint128_tests::switches::missing_parameter::missing_parameter(const std::string& txt)
-    : runtime_error{txt} {}
+	: runtime_error{txt} {}
 
 std::string cjm::uint128_tests::switches::missing_parameter::create_message(test_mode mode)
 {
-    auto strm = string::make_throwing_sstream<char>();
-    strm << "The specified switch [" << get_text_any_mode(mode) << "] requires a filename parameter, but none has been supplied." << newl;
-    auto found = std::find_if(text_mode_lookup.cbegin(),
-        text_mode_lookup.cend(),
-        [=](const text_mode_t& pair)
-            -> bool
-            {
-                return pair.second == mode;
-            });
-    if (found == text_mode_lookup.cend())
-    {
-        throw std::logic_error{"If we have parsed the mode and reached this point, we should be able to assume it is in the lookup."};
-    }
-    auto text = found->first;
-    strm << "Example: " << newl;
-    strm << "\t-" << text << " my_file.txt" << newl;
-    return strm.str();
+	auto strm = string::make_throwing_sstream<char>();
+	strm 
+		<< "The specified switch [" << get_text_any_mode(mode) 
+		<< "] requires a filename parameter, but none has been supplied." 
+		<< newl;
+	auto found = std::find_if(text_mode_lookup.cbegin(),
+		text_mode_lookup.cend(),
+		[=](const text_mode_t& pair)
+			-> bool
+			{
+				return pair.second == mode;
+			});
+	if (found == text_mode_lookup.cend())
+	{
+		throw std::logic_error{
+			"If we have parsed the mode and reached this point, we should be able to assume it is in the lookup."};
+	}
+	auto text = found->first;
+	strm << "Example: " << newl;
+	strm << "\t-" << text << " my_file.txt" << newl;
+	return strm.str();
 
 }
 
 cjm::uint128_tests::switches::missing_parameter
-    ::missing_parameter(cjm::uint128_tests::switches::test_mode mode)
-        : missing_parameter{create_message(mode)} {}
+	::missing_parameter(cjm::uint128_tests::switches::test_mode mode)
+		: missing_parameter{create_message(mode)} {}
 
 cjm::uint128_tests::switches::test_switch::~test_switch() = default;

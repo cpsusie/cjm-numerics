@@ -95,10 +95,6 @@ namespace cjm::numerics::fixed_uint_container
 			}
 		}
 	}
-	
-	
-	
-	
-}
 
+}
 #endif

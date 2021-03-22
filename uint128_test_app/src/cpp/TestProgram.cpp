@@ -29,7 +29,7 @@ namespace
 	{
 		using namespace boost::multiprecision::literals;
 		uint128_t source = 0x000056789ABCDEF0_cppui128;
-	    uint128_t temp = (source << 64) | source;
+		uint128_t temp = (source << 64) | source;
 		return temp;		
 	}	
 }
@@ -590,7 +590,7 @@ namespace test_program
 //		cjm_assert(subtrahend == shouldBeSubtrahend);
 
 		constexpr static boost256 controlMinued =   0x00000000000000000000000000000000123456789abcdef0123456789abcdef0_cppui256;
-		constexpr static boost256 controlSubtr =    0x0000000000000000000000000000000000000000000000010000000000000000_cppui256;
+		constexpr static boost256 controlSubtr =	0x0000000000000000000000000000000000000000000000010000000000000000_cppui256;
 		auto tempMinued = minued;
 		auto tempControlMinued = controlMinued;
 		tempMinued -= subtrahend;
@@ -2206,8 +2206,8 @@ namespace test_program
 		const wstring wempty = L"";
 		const string nwhitespace = " ";
 		const wstring wwhitespace = L" ";
-		const string nlotsawhitespace =  "     ";
-		const wstring wlotsawhitespace = L"     ";
+		const string nlotsawhitespace =  "	 ";
+		const wstring wlotsawhitespace = L"	 ";
 
 		wstring toBeMovedWide = L"   This is the season of our discontent.  ";
 		string toBeMovedNarrow = "   This is the season of our discontent.  ";
@@ -3421,7 +3421,7 @@ namespace test_program
 			centimeters oneHundredCentimeters = 100_cm;
 			auto oneMeter = length_cast<meters>(oneHundredCentimeters);
 			std::common_type_t<spatial_measure<long long, std::ratio<1, 1>, 1>, spatial_measure<
-				                   long long, std::ratio<1, 100>, 1>> twoMeters = oneMeter + oneHundredCentimeters;
+								   long long, std::ratio<1, 100>, 1>> twoMeters = oneMeter + oneHundredCentimeters;
 			cout << "two meters ratio: " << decltype(twoMeters)::unit::num << " / " << decltype(twoMeters)::unit::den << "." << newl;
 			cjm_assert(oneHundredCentimeters == oneMeter);
 			cjm_assert(twoMeters == 200_cm);

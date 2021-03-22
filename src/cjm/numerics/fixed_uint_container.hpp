@@ -13,13 +13,15 @@ namespace cjm::numerics::fixed_uint_container
 		template<typename Ui>
 		concept is_builtin_u128 =
 #if (defined (CJM_DIV_ONLY_INTRINSIC_U128)) || (defined(CJM_USE_INTRINSIC_U128))
-			(sizeof(Ui) == sizeof(std::uint64_t) * 2) && std::is_same_v<unsigned __int128, std::remove_cvref_t<std::remove_const_t<Ui>>>;
+			(sizeof(Ui) == sizeof(std::uint64_t) * 2) &&
+				std::is_same_v<unsigned __int128, std::remove_cvref_t<std::remove_const_t<Ui>>>;
 #else
 			false;
 #endif
 
 		template<typename Ui>
-		concept is_full_builtin_u128 = is_builtin_u128<Ui> && std::is_arithmetic_v<Ui> && std::numeric_limits<Ui>::is_specialized;
+		concept is_full_builtin_u128 = is_builtin_u128<Ui> && std::is_arithmetic_v<Ui> &&
+			std::numeric_limits<Ui>::is_specialized;
 
 		template<typename Ui>
 		concept is_partial_builtin_u128 = is_builtin_u128<Ui> && !is_full_builtin_u128<Ui>;
@@ -27,7 +29,9 @@ namespace cjm::numerics::fixed_uint_container
 		constexpr bool exits_builtin_u128 = is_builtin_u128<natuint128_t>;
 		
 		template<typename Ui, size_t Digits>
-		concept is_unsigned_int_with_digits = (cjm::numerics::concepts::builtin_unsigned_integer<Ui> && Digits >= 64u && Digits == std::numeric_limits<Ui>::digits) || (is_builtin_u128<Ui> && sizeof(Ui) == (sizeof(std::uint64_t) * 2) && Digits == 128);
+		concept is_unsigned_int_with_digits = (cjm::numerics::concepts::builtin_unsigned_integer<Ui> && Digits >= 64u &&
+			Digits == std::numeric_limits<Ui>::digits) || (is_builtin_u128<Ui> &&
+				sizeof(Ui) == (sizeof(std::uint64_t) * 2) && Digits == 128);
 
 		constexpr size_t uint128_alignment = is_x64 ? alignof(std::uint64_t) * 2 : alignof(std::uint64_t);
 
@@ -51,25 +55,31 @@ namespace cjm::numerics::fixed_uint_container
 		template<typename Ui128LimbContainer>
 		concept ui128_limb_container_builtin = !ui128_limb_container_split<Ui128LimbContainer>
 			&& exits_builtin_u128 && ((sizeof(Ui128LimbContainer) * 2u) == (sizeof(std::uint64_t) * 2u))
-			&& requires (Ui128LimbContainer x)
+			&& requires 
+		(Ui128LimbContainer x)
 		{
 			{x.m_value}	noexcept	->	concepts::nothrow_convertible<natuint128_t>;
 		};
 
 		template<typename Ui128LimbContainer>
-		concept ui128_limb_container = ui128_limb_container_split<Ui128LimbContainer> || ui128_limb_container_builtin<Ui128LimbContainer>;
+		concept ui128_limb_container = ui128_limb_container_split<Ui128LimbContainer> ||
+			ui128_limb_container_builtin<Ui128LimbContainer>;
 		
 		template<ui128_limb_container_split UnsignedInteger, bool LittleEndian>
-		constexpr std::uint64_t get_low(const uint128_limb_container<UnsignedInteger, LittleEndian>& val) noexcept;
+		constexpr std::uint64_t get_low(const uint128_limb_container<UnsignedInteger, 
+			LittleEndian>& val) noexcept;
 
 		template<ui128_limb_container_split UnsignedInteger, bool LittleEndian>
-		constexpr std::uint64_t get_high(const uint128_limb_container<UnsignedInteger, LittleEndian>& val) noexcept;
+		constexpr std::uint64_t get_high(const uint128_limb_container<UnsignedInteger, 
+			LittleEndian>& val) noexcept;
 
 		template<ui128_limb_container_builtin UnsignedInteger, bool LittleEndian>
-		constexpr std::uint64_t get_low(const uint128_limb_container<UnsignedInteger, LittleEndian>& val) noexcept;
+		constexpr std::uint64_t get_low(const uint128_limb_container<UnsignedInteger, 
+			LittleEndian>& val) noexcept;
 
 		template<ui128_limb_container_builtin UnsignedInteger, bool LittleEndian>
-		constexpr std::uint64_t get_high(const uint128_limb_container<UnsignedInteger, LittleEndian>& val) noexcept;
+		constexpr std::uint64_t get_high(const uint128_limb_container<UnsignedInteger, 
+			LittleEndian>& val) noexcept;
 		
 		template<>
 		struct alignas(uint128_alignment) uint128_limb_container<std::uint64_t, true> final
@@ -309,7 +319,8 @@ namespace cjm::numerics::fixed_uint_container
 		using ui128_split_limb = std::uint64_t;
 		using ui128_limb = std::conditional_t<is_full_builtin_u128<natuint128_t>, natuint128_t, ui128_split_limb>;
 		
-		using ui128_partial_builtin_limb = std::conditional_t<is_partial_builtin_u128<natuint128_t> || is_full_builtin_u128<natuint128_t>, natuint128_t, std::uint64_t>;
+		using ui128_partial_builtin_limb = std::conditional_t<is_partial_builtin_u128<natuint128_t> ||
+			is_full_builtin_u128<natuint128_t>, natuint128_t, std::uint64_t>;
 	}
 
 	using uint128_limb_container_t = std::conditional_t<internal::is_full_builtin_u128<internal::ui128_limb>,
@@ -329,4 +340,4 @@ namespace cjm::numerics::fixed_uint_container
 	
 }
 
-#endif
+#endif //CJM_FIXED_UINT_CONTAINER_HPP_

@@ -1,5 +1,5 @@
-#ifndef CJM_BOOST_UINT_COMPARE_TEST_HPP
-#define CJM_BOOST_UINT_COMPARE_TEST_HPP
+#ifndef CJM_BOOST_UINT_COMPARE_TEST_HPP_
+#define CJM_BOOST_UINT_COMPARE_TEST_HPP_
 #include "fixed_uint.hpp"
 #include "testing.hpp"
 #include <boost/multiprecision/cpp_int.hpp>
@@ -618,6 +618,4 @@ namespace cjm::testing
 		return ++invert_me;
 	}
 }
-
-
-#endif // CJM_BOOST_UINT_COMPARE_TEST_HPP
+#endif // CJM_BOOST_UINT_COMPARE_TEST_HPP_
