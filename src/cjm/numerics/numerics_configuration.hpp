@@ -53,22 +53,6 @@
 #error	"CJM NUMERICS UINT128 requires standard library support for starts_with and ends_with in std::string and std::string_view."
 #endif
 
-//detect endian
-#ifdef CJM_NUMERICS_LITTLE_ENDIAN
-#error "CJM_NUMERIC_LITTLE_ENDIAN should not be set directly."
-#endif
-#ifdef CJM_DETECTED_WINDOWS
-#define CJM_NUMERICS_LITTLE_ENDIAN true
-#elif !defined(CJM_NUMERICS_LITTLE_ENDIAN) && (!defined(__BYTE_ORDER__) || ( !defined(__ORDER_LITTLE_ENDIAN__) && !defined(__ORDER_BIG_ENDIAN__)))
-#error "Unable to detect endianness of system."
-#elif !defined(CJM_NUMERICS_LITTLE_ENDIAN) && (__BYTE_ORDER__ ==  __ORDER_LITTLE_ENDIAN__)
-#define CJM_NUMERICS_LITTLE_ENDIAN true
-#elif (__BYTE_ORDER__ ==  __ORDER_BIG_ENDIAN__)
-#define CJM_NUMERICS_LITTLE_ENDIAN false
-#else
-#error "Unable to detect endianness of system."
-#endif 
-
 //detect availability/suitability of intrinsic uint128 for all purposes
 #if !defined(CJM_DETECTED_WINDOWS) && defined (CJM_DETECTED_INTRINSIC_U128)
 #define CJM_USE_INTRINSIC_U128
