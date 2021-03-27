@@ -1,0 +1,1 @@
+This file will contain licensing info about work of others included (in modified form) in this library.

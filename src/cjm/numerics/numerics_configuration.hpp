@@ -1,3 +1,22 @@
+// Copyright © 2020-2021 CJM Screws, LLC
+// Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"),
+// to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense,
+// and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+// DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+// WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+//
+// CJM Screws, LLC is a Maryland Limited Liability Company.
+// No copyright claimed to unmodified original work of others.
+// The original, unmodified work of others, to the extent included in this library,
+// is licensed to you under the same terms under which it was licensed to CJM Screws, LLC.
+// For information about copyright and licensing of the original work of others,
+// see Notices file in cjm/ folder.
+
 #ifndef CJM_NUMERICS_CONFIGURATION_HPP_
 #define CJM_NUMERICS_CONFIGURATION_HPP_
 #include <cjm/numerics/cjm_configuration.hpp>
@@ -156,7 +175,9 @@ namespace cjm
 			              "CJM NUMERICS requires definition of std::uint64_t to be a type 8 bytes long and with 64 binary digits.");
 			static_assert(sizeof(std::int64_t) == 8 && std::numeric_limits<std::int64_t>::digits == std::numeric_limits<std::uint64_t>::digits -1,
 			              "CJM NUMERICS requires definition of std::int64_t to be a type 8 bytes long and with 63 binary digits.");
-			static_assert(sizeof(size_t) == 8 || sizeof(size_t) == 4, "Only 32 and 64 bit architecture supported.");
+			// ReSharper disable once CppIdenticalOperandsInBinaryExpression (not NECESSARILY identical on all systems)
+			static_assert( (sizeof(size_t) >= 8 || sizeof(size_t) == 4) && (sizeof(std::uintptr_t) >= 8 || sizeof(uintptr_t) == 4 ), 
+				"Only 32 and 64 bit (or larger) architectures supported.");
 
 			constexpr bool has_consteval =
 #ifdef __cpp_consteval
@@ -312,9 +333,19 @@ namespace cjm
 		constexpr bool is_microsoft_windows_x64 = is_windows_x64 && (compiler == compiler_used::msvc);
 		enum class uint128_calc_mode : std::uint8_t
 		{
+			//fallback arithmetic must be used
 			default_eval = 0x00,
+			//MSVC 64 bit compiler intrinsics available
+			//adx and bmi2 MAY be available
 			msvc_x64,
+			//CLANG or intel's llvm 64-bit compiler targeting windows --
+			//compiler some compiler intrinsics available
+			//adx and bmi2 MAY be available
 			msvc_x64_clang_or_intel_llvm,
+			//Compiler provides a built-in unsigned 128-bit integer
+			//for which std::numeric_limits has been specialized,
+			//use that for most math.  (Usually GCC or Clang
+			//targetting linux)
 			intrinsic_u128,
 		};
 		constexpr uint128_calc_mode init_eval_mode() noexcept;
