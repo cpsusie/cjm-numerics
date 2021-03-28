@@ -64,30 +64,11 @@ namespace cjm
 		namespace math_functions
 		{
 			//todo fixit -- work on making these make more sense in context of library only uint128
-			template<typename TInt>
+			template<cjm::numerics::concepts::integer TInt>
 			constexpr std::make_unsigned_t<TInt> int_abs(TInt val) noexcept;
 
 			template<cjm::numerics::concepts::integer TInt>
 			constexpr TInt int_sign(TInt val) noexcept;
-
-			template<concepts::unsigned_integer TUInt>
-			constexpr TUInt int_gcd(TUInt first, TUInt second) noexcept;
-
-			template<concepts::unsigned_integer TUInt>
-			constexpr TUInt int_lcm(TUInt first, TUInt second) noexcept;
-			
-			template<typename TInt>
-			constexpr TInt floor_log2(TInt val);
-
-			template<cjm::numerics::concepts::integer TInt>
-			constexpr TInt int_pow(TInt radix, unsigned exponent);
-
-			template<typename TUInt>
-			constexpr bool is_uint_power_of_two(TUInt testMe) noexcept;
-
-			constexpr long double ten_to_the_power(int exponent);
-			
-			
 		}
 
 		template<typename Char, typename CharTraits = std::char_traits<Char>>
