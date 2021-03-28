@@ -16,6 +16,26 @@
 // is licensed to you under the same terms under which it was licensed to CJM Screws, LLC.
 // For information about copyright and licensing of the original work of others,
 // see Notices file in cjm/ folder.
+// 
+// This library is modeled on the abseil C++ numerics library.  MOST OF ABSEIL'S CODE HAS BEEN MODIFIED SIGNIFICANTLY BY THIS LIBRARY.
+// Some verbatim reproduction may remain in places.  The following notice was found in abseil's uint128 source code and is reproduced here in
+// accordance with the terms of the Apache 2.0 license, under which Abseil's code was licensed to CJM Screws, LLC:
+
+//
+// Copyright 2017 The Abseil Authors.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 #ifndef CJM_UINT128_INL_
 #define CJM_UINT128_INL_
 #include <cjm/numerics/uint128.hpp>

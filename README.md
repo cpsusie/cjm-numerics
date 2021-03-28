@@ -1,10 +1,11 @@
 # CJM Numerics: (a fixed precision numeric library for C++20)
+Copyright © 2020-2021, CJM Screws, LLC
 ## Summary
-  This **header-only** library for C++ 20 currently provides an **unsigned 128 bit integer** type suitable for direct use or for extending to make other fixed precision types such as signed two's complement integers, larger signed or unsigned integers, rational numbers or flexible units of measure.  The unsigned 128-bit integer is currently feature-complete and extensively tested. Planned future features include a two's complement signed version as well as larger fixed precision integers (256, 512, 1024 bit), up to any arbitrary power of 2 greater than 128.  The larger values will be defined via templates.   Also being considered are rational numbers and units of measure for distance, area and volume.  *Please note that this library **requires C++ 20**.*  **No effort will be made to support older versions of the C++ standard.**  *If a user does not want to benefit specifically from C++20 features, then other extended precision libaries (such as the ones we modeled our algorithms from) may be a better fit.*
+  This **header-only** library for C++ 20 currently provides an **unsigned 128 bit integer** type suitable for direct use or for extending to make other fixed precision types such as signed two's complement integers, larger signed or unsigned integers, rational numbers or flexible units of measure.  The unsigned 128-bit integer is currently feature-complete and extensively tested. Planned future features include a two's complement signed version as well as larger fixed precision integers (256, 512, 1024 bit), up to any arbitrary power of 2 greater than 128.  The larger values will be defined via templates.   Also being considered are rational numbers and units of measure for distance, area and volume.  *Please note that this library **requires C++ 20**.*  **No effort will be made to support older versions of the C++ standard.**  *If a user does not want to benefit specifically from C++20 features, then other extended precision libraries (such as the ones we modeled our algorithms from) may be a better fit.*
   
 ## Quick Start (pre-release)
 
-If you want to use this library now (in a well-tested, but unreleased state), the easiest way is to download the contents of the [src/][3] folder to your configured library include path.  Make sure your IDE settings or build system is set to C++ 20 or later, then attempt to compile the following program:  
+If you want to use this library now (in a well-tested, but unreleased state), the easiest way is to download the contents of the [src/][1] folder to your configured library include path.  Make sure your IDE settings or build system is set to C++ 20 or later, then attempt to compile the following program:  
 ```cpp
 #include <iostream>
 #include <iomanip>
@@ -40,7 +41,7 @@ When this project is released, I plan on including a [vcpkg][2] port for it.
 
 * *uint128* (in <cjm/numerics/uint128>)  
 
-    * This is the unsigned 128 bit integer provided by the libary.  To use it correctly, you will need all the contents presently under [src/][3]. The only include you should need to use directly is `<cjm/numerics/uint128.hpp>`.  
+    * This is the unsigned 128 bit integer provided by the libary.  To use it correctly, you will need all the contents presently under [src/][1]. The only include you should need to use directly is `<cjm/numerics/uint128.hpp>`.  
     
     * The namespaces you may need to use directly are: 
         * `cjm::numerics` (for uint128)
@@ -69,7 +70,7 @@ There are less firm plans to provide:
 
 * *rational<unsigned_integer TRep>* a signed (sign and magnitude) version of urational (but it will use an unsigned integer as its internal representation type).
 
-* *distance*: a unit of measure type modeled off of the standard library's std::chrono::duration type.
+* *distance*: a unit of measure type modeled off of the standard library's `std::chrono::duration` type.
 
 ## Sources
   This library does not pretend to contain any non-trivial original algorithms, but rather attempts to package well-known algorithms successfully used by others in a new format with different design goals.  This project has drawn most heavily from the unsigned and signed 128-bit provided by abseil.io at [abseil's github repository.](https://github.com/abseil/abseil-cpp/blob/master/absl/numeric/int128.h#L100)  It also has considered and adopted some of the work of other multiprecision numeric libraries such as the one provided by [Boost][4], [calccrypto][5], [libdivide][6], and even [Clang's Compiler-Rt][7] itself.  Its design goals, however, are sufficiently different to make it a more useful option in certain scenarios.
@@ -278,6 +279,21 @@ Microsoft Windows 10 Target, (using Microsoft's standard library):
 * Intel's LLVM-based compiler v. 2021.1.2 (x86, x64, Debug and Release)  
 
 Currently, Intel's classic C++ compiler does not support C++ 20 at all.  If it ever supports C++ 20 sufficiently to be compatible with this library, it will be added to the list immediately above.
+  
+### **Note on Big Endian Systems**  
+
+This library was designed to work equally well on big and little endian systems.  The author, however, has no reasonable way to test on a big endian system.  If you encounter issues on big endian systems, please report them.  
+
+## Legal  
+Copyright © 2020-2021 CJM Screws, LLC
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:  
+  
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.  
+  
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+CJM Screws, LLC is a Maryland Limited Liability Company.
+No copyright claimed to unmodified original work of others. The original, unmodified work of others, to the extent included in this library, is licensed to you under the same terms under which it was licensed to CJM Screws, LLC. For information about copyright and licensing of the original work of others, see [Notices][33] file in cjm/ folder.
 
   [1]: https://github.com/cpsusie/Int128/tree/main/src/
   [2]: https://github.com/microsoft/vcpkg
@@ -311,3 +327,4 @@ Currently, Intel's classic C++ compiler does not support C++ 20 at all.  If it e
   [30]: https://github.com/HowardHinnant/date
   [31]: https://github.com/cpsusie/Int128/blob/main/CMakeLists.txt
   [32]: https://github.com/cpsusie/Int128/blob/main/example_code/src/uint128_example/program.cpp
+  [33]: https://github.com/cpsusie/Int128/blob/issues_34_36_38/src/NOTICES.md
