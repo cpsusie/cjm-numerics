@@ -1,4 +1,5 @@
 # Explanation of Future Feature: Extended Precision Multiplication Algorithm
+Copyright © 2020-2021 CJM Screws, LLC  
 
 Future versions of this library will have further extended precision unsigned integer types that will build on uint128.  It is therefore desirable to put forth the algorithm for extended precision multiplication so that it can be expressed generically and effectively and have the best possible performance characteristics.
 
