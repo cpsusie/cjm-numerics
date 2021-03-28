@@ -31,7 +31,7 @@ Compile and run the program.  The output should be:
 lhs [123456789012345678901234] * rhs [432109876543210987654321] == [226810394222294446283585782734362836562].  
 Goodbye!
   
-There is also a dependency-free example code project found [here](https://github.com/cpsusie/Int128/tree/main/example_code/src/uint128_example) for you to review the functionality.  
+There is also a dependency-free example code project found [here](https://github.com/cpsusie/cjm-numerics/tree/main/example_code/src/uint128_example) for you to review the functionality.  
 
 When this project is released, I plan on including a [vcpkg][2] port for it. 
   
@@ -119,8 +119,9 @@ This mostly applies to compilation with GCC or Clang targeting a x64 architectur
 
 11. **Uses x64 compiler intrinsics when compiled for Windows when:**
 *   targeting an x64 Intel / AMD architecture and
-*   using the MSVC compiler or
-    * The clang compiler (currently version 11) that is supplied with Visual Studio or
+*   using one of the following compilers targetting x64 Windows:
+    * The MSVC Compiler,
+    * The clang compiler (currently version 11) that is supplied with Visual Studio, or
     * Intel's llvm-based compiler.  
     
 12. **Can use the ADX and BMI2 intrinsic versions for add with carry and extended precision multiplication when these are available.**  
@@ -163,15 +164,15 @@ This software requires a compiler that conforms, at least partially, to the C++ 
 * [std::endian (standard library feature)][18]
 * [std::is_constant_evaluated (core language and standard library feature)][19]
 * [std::is_nothrow_convertible (standard library feature)][20]
-* [std::remove_cvref (standard library feature)] [18]
-* [std::span<T> (standard library feature)][21]
-* [starts_with, ends_with for std::string_view (standard library feature)] [20]
+* [std::remove_cvref (standard library feature)][21] 
+* [std::span<T> (standard library feature)][22]
+* [starts_with, ends_with for std::string_view (standard library feature)][23] 
 
 2. **Other Requirements**
 
-* [CHAR_BIT][22] must be 8.  That is, a byte must consist of eight bits.
-* [`std::endian::native`][23] must equal [`std::endian::big`][24] or [`std::endian::little`][25].  That is, the system must be big-endian or little endian, excluding mixed-endian or other edge-case platforms.
-* All of the following integer types must be defined have the matching size and [`std::numeric_limits<T>::digits`][26]:
+* [CHAR_BIT][24] must be 8.  That is, a byte must consist of eight bits.
+* [`std::endian::native`][25] must equal [`std::endian::big`][26] or [`std::endian::little`][27].  That is, the system must be big-endian or little endian, excluding mixed-endian or other edge-case platforms.
+* All of the following integer types must be defined have the matching size and [`std::numeric_limits<T>::digits`][28]:
     1. std::uint8_t     size: 1,    digits: 8
     2. std::int8_t      size: 1,    digits: 7
     3. std::uint16_t    size: 2,    digits: 16
@@ -187,11 +188,11 @@ This project (given its one-person authorship and the author's fulltime employme
 
 ### **Unit Test Application**
 
-The [unit test application][27] is the one application in this repository that has external dependencies.  Those dependencies include:
+The [unit test application][29] is the one application in this repository that has external dependencies.  Those dependencies include:
 
-1. [abseil-C++17][28] (vcpkg: abseil[cxx17])
-2. [boost][29] version 1.73+ (vcpkg: boost)
-3. [hinnant/date][30] 3.0.0+ (vcpkg: date)
+1. [abseil-C++17][30] (vcpkg: abseil[cxx17])
+2. [boost][31] version 1.73+ (vcpkg: boost)
+3. [hinnant/date][32] 3.0.0+ (vcpkg: date)
 
 The unit test application must be built and run in Visual Studio 2019 with the dependencies installed as static libraries with a static c-runtime via the following vcpkg triplets: `x86-windows-static` and `x64-windows-static`.
 
@@ -259,7 +260,7 @@ Selected multilib: .;@m64
 > gcc version 10.2.0 (Ubuntu 10.2.0-13ubuntu1) 
 
 
-The CMakeLists.txt file used to build the unit test project (and example project) on linux with both g++ and clang can be found [here][31].
+The CMakeLists.txt file used to build the unit test project (and example project) on linux with both g++ and clang can be found [here][33].
 
 
 If you download the main branch, you can be assured that the unit test project was built successfully and passed in all of the above configurations, summarized:
@@ -271,7 +272,7 @@ If you download the main branch, you can be assured that the unit test project w
 
 ### **Example Code Application**
 
-The [example code application][32] is designed to demonstrate the functionality of the library using code.  Unlike the unit test application, it does not have any external dependencies.  In addition to requiring that the unit test application build and passes under all the configurations listed above, it is also required that the example code application build and execute without errors.  In addition to the configurations used by the unit test application, the following extra compilers/configurations must be verified to build the example code application such that it runs successfully:
+The [example code application][34] is designed to demonstrate the functionality of the library using code.  Unlike the unit test application, it does not have any external dependencies.  In addition to requiring that the unit test application build and passes under all the configurations listed above, it is also required that the example code application build and execute without errors.  In addition to the configurations used by the unit test application, the following extra compilers/configurations must be verified to build the example code application such that it runs successfully:
 
 Microsoft Windows 10 Target, (using Microsoft's standard library):
 
@@ -293,17 +294,17 @@ The above copyright notice and this permission notice shall be included in all c
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 CJM Screws, LLC is a Maryland Limited Liability Company.
-No copyright claimed to unmodified original work of others. The original, unmodified work of others, to the extent included in this library, is licensed to you under the same terms under which it was licensed to CJM Screws, LLC. For information about copyright and licensing of the original work of others, see [Notices][33] file in cjm/ folder.
+No copyright claimed to unmodified original work of others. The original, unmodified work of others, to the extent included in this library, is licensed to you under the same terms under which it was licensed to CJM Screws, LLC. For information about copyright and licensing of the original work of others, see [Notices][35] file in cjm/ folder.
 
-  [1]: https://github.com/cpsusie/Int128/tree/main/src/
+  [1]: https://github.com/cpsusie/cjm-numerics/tree/main/src/
   [2]: https://github.com/microsoft/vcpkg
-  [3]: https://github.com/cpsusie/Int128/tree/main/src/
+  [3]: https://github.com/cpsusie/cjm-numerics/tree/main/src/
   [4]: https://www.boost.org/doc/libs/1_75_0/libs/multiprecision/doc/html/boost_multiprecision/tut/ints/cpp_int.html
   [5]: https://github.com/calccrypto/uint128_t
   [6]: https://github.com/ridiculousfish/libdivide
   [7]: https://github.com/llvm/llvm-project/blob/938d05b814c7fe470201d595afefc02e3371244e/compiler-rt/lib/builtins/udivmodti4.c#L84
-  [8]: https://github.com/cpsusie/Int128/blob/504725bb979d8b734b770a990eddb45c4322b4b0/src/cjm/numerics/cjm_numeric_concepts.hpp#L306
-  [9]: https://github.com/cpsusie/Int128/blob/main/src/cjm/numerics/numerics_configuration.hpp
+  [8]: https://github.com/cpsusie/cjm-numerics/blob/main/src/cjm/numerics/cjm_numeric_concepts.hpp#L321
+  [9]: https://github.com/cpsusie/cjm-numerics/blob/main/src/cjm/numerics/numerics_configuration.hpp
   [10]: https://en.cppreference.com/w/cpp/compiler_support
   [11]: http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2018/p0482r6.html
   [12]: http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2017/p0734r0.pdf
@@ -315,16 +316,18 @@ No copyright claimed to unmodified original work of others. The original, unmodi
   [18]: https://wg21.link/P0463R1
   [19]: https://wg21.link/P0595R2
   [20]: https://wg21.link/P0758R1
-  [21]: https://wg21.link/P0122R7
-  [22]: https://en.cppreference.com/w/cpp/header/climits
-  [23]: https://en.cppreference.com/w/cpp/types/endian
-  [24]: https://en.cppreference.com/w/cpp/types/endian
+  [21]: https://wg21.link/P0550R2
+  [22]: https://wg21.link/P0122R7
+  [23]: http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2018/p0758r1.html
+  [24]: https://en.cppreference.com/w/cpp/header/climits
   [25]: https://en.cppreference.com/w/cpp/types/endian
-  [26]: https://en.cppreference.com/w/cpp/types/numeric_limits/digits
-  [27]: https://github.com/cpsusie/Int128/tree/main/uint128_test_app/src
-  [28]: https://github.com/abseil/abseil-cpp/tree/master/absl
-  [29]: https://github.com/boostorg/boost
-  [30]: https://github.com/HowardHinnant/date
-  [31]: https://github.com/cpsusie/Int128/blob/main/CMakeLists.txt
-  [32]: https://github.com/cpsusie/Int128/blob/main/example_code/src/uint128_example/program.cpp
-  [33]: https://github.com/cpsusie/Int128/blob/issues_34_36_38/src/NOTICES.md
+  [26]: https://en.cppreference.com/w/cpp/types/endian
+  [27]: https://en.cppreference.com/w/cpp/types/endian
+  [28]: https://en.cppreference.com/w/cpp/types/numeric_limits/digits
+  [29]: https://github.com/cpsusie/cjm-numerics/tree/main/uint128_test_app/src
+  [30]: https://github.com/abseil/abseil-cpp/tree/master/absl
+  [31]: https://github.com/boostorg/boost
+  [32]: https://github.com/HowardHinnant/date
+  [33]: https://github.com/cpsusie/cjm-numerics/blob/main/CMakeLists.txt
+  [34]: https://github.com/cpsusie/cjm-numerics/blob/main/example_code/src/uint128_example/program.cpp
+  [35]: https://github.com/cpsusie/cjm-numerics/blob/main/src/NOTICES.md

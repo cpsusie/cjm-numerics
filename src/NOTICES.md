@@ -16,13 +16,15 @@ The components of this library to which CJM Screws, LLC holds copyright, includi
 * [Abseil][2].  [Apache 2.0][3]. See legal information [here](#abseil).
 * [Boost][4] / [John Maddock][5]. [Boost 1.0][6].  See legal information [here](#boost).
 * [LLVM Project][7].  [Apache 2.0 with LLVM exceptions][8].  See legal information [here](#llvm).
+* [Hinnant Date Library][9]. [MIT License][10]. See legal information [here](#hinnant-date).  
+
 ### Abseil
 
 This library was originally modeled off of the abseil C++ numerics library.  Significant portions of the abseil library have been modified by this project, but some amount of verbatim or nearly verbatim duplications of abseil's code may remain in the library.  CJM Screws, LLC claims no copyright to unmodified versions of abseil's intellectual property.  For comparison purposes, the following text files (available in this project's github repository) contain abseil's original unaltered code:
 
-* [abseil_int128_h.txt][9]  
-* [abseil_int128_cpp.txt][10]
-* [int128.cc.orig.txt][11]
+* [abseil_int128_h.txt][11]  
+* [abseil_int128_cpp.txt][12]
+* [int128.cc.orig.txt][13]
 
 Any code owned by abseil contained herein is licensed to you under the terms of the Apache 2.0 license:    
 
@@ -212,8 +214,8 @@ Any code owned by abseil contained herein is licensed to you under the terms of 
 
 This project contains code derived from code owned by the LLVM project.  The two code files that were consulted (used in an optimized special case of 128 bit unsigned integer division) are found verbatim in this project's Github repository for comparison purposes:
 
-* [Llvm_u128div.txt][12]
-* [llvm_int_typedefs.txt][13]  
+* [Llvm_u128div.txt][14]
+* [llvm_int_typedefs.txt][15]  
 
 CJM Screws, LLC claims no copyright to the LLVM's project's unmodified work.  To the extent that this library may contain code to which the LLVM project holds copyright, such code was licensed to CJM Screws, LLC under the terms of the Apache 2.0 License with LLVM Exceptions.  Any such unmodified code (to the extent it may be found within this project) is therefore licensed to you under the terms of the Apache 2.0 License with LLVM exceptions.  Any derivative work based on their code, however, is licensed to you under the terms of the MIT license, as set forth at the top of this document.  To comply with the terms of the Apache 2.0 license with LLVM exceptions is reproduced here:
 > 
@@ -497,7 +499,7 @@ CJM Screws, LLC claims no copyright to the LLVM's project's unmodified work.  To
    
 ### Boost  
 
-Boost's multiprecision library (particularly [cpp_int.hpp][14]) has been consulted in the creation of this library and some portions of code from that library may appear in this project. To the extent that any unmodified, non-derivate code from boost is included in this project, it was licensed to CJM Screws, LLC under the terms of the Boost 1.0 license.  CJM Screws, LLC therefore licenses such portions of code (to the extent they may exist within the project) under the terms of that license.  Any derivate work based on the Boost library is licensed under terms of the MIT license as found at the top of this document.  To comply with the terms of the Boost License, its text is reproduced here:  
+Boost's multiprecision library (particularly [cpp_int.hpp][16]) has been consulted in the creation of this library and some portions of code from that library may appear in this project. To the extent that any unmodified, non-derivate code from boost is included in this project, it was licensed to CJM Screws, LLC under the terms of the Boost 1.0 license.  CJM Screws, LLC therefore licenses such portions of code (to the extent they may exist within the project) under the terms of that license.  Any derivate work based on the Boost library is licensed under terms of the MIT license as found at the top of this document.  To comply with the terms of the Boost License, its text is reproduced here:  
 
 > Boost Software License - Version 1.0 - August 17th, 2003
 > 
@@ -522,7 +524,33 @@ Boost's multiprecision library (particularly [cpp_int.hpp][14]) has been consult
 > FOR ANY DAMAGES OR OTHER LIABILITY, WHETHER IN CONTRACT, TORT OR OTHERWISE,
 > ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 > DEALINGS IN THE SOFTWARE.
->
+>  
+
+### Hinnant-Date  
+
+Unlike Boost, Abseil and LLVM, this project is in no way a derivative work of the Hinnant Date library.  Its unit-test project, however, includes and makes use of the Hinnant Date library.  CJM Screws, LLC, has the right to use the Hinnant Date library under the terms of the MIT license.  The code from the Hinnant library is not included in this project's repository nor directly in any packaged versions of this project in source-code form.  If you download from this project's repository a **pre-compiled and pre-linked** version of the unit test application, the Hinnant code will be included in it in object-code form.  In this case, CJM Screws, LLC will license the code to you under the same terms it was licensed to us: under the MIT license.  The copyright holders and copyright dates of various parts of the Hinnant library vary but are all provided under the MIT license. A copy of these terms is reproduced below to ensure license compliance.  Dates and copyright holders are not included because they vary:  
+  
+> The MIT License (MIT)
+> 
+> Permission is hereby granted, free of charge, to any person obtaining a copy
+> of this software and associated documentation files (the "Software"), to deal
+> in the Software without restriction, including without limitation the rights
+> to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+> copies of the Software, and to permit persons to whom the Software is
+> furnished to do so, subject to the following conditions:
+> 
+> The above copyright notice and this permission notice shall be included in all
+> copies or substantial portions of the Software.
+> 
+> THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+> IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+> FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+> AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+> LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+> OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+> SOFTWARE.
+  
+If you wish to build the unit test project yourself, you will need to download the Hinnant date libary under the terms of whatever license you can acquire it other (again, it is currently offered under the MIT license).  It can be found via a vcpkg and otherwise as described [here][17].  
 
   [1]: https://opensource.org/licenses/MIT
   [2]: https://github.com/cpsusie/Int128/blob/main/originals_code_heavily_drawn_from/abseil_int128_h.txt
@@ -532,9 +560,12 @@ Boost's multiprecision library (particularly [cpp_int.hpp][14]) has been consult
   [6]: https://www.boost.org/LICENSE_1_0.txt
   [7]: https://llvm.org/
   [8]: https://foundation.llvm.org/relicensing/LICENSE.txt
-  [9]: https://github.com/cpsusie/Int128/blob/main/originals_code_heavily_drawn_from/abseil_int128_cpp.txt
-  [10]: https://github.com/cpsusie/Int128/blob/main/originals_code_heavily_drawn_from/int128.cc.orig.txt
-  [11]: https://github.com/cpsusie/Int128/blob/main/originals_code_heavily_drawn_from/Llvm_u128div.txt
-  [12]: https://github.com/cpsusie/Int128/blob/main/originals_code_heavily_drawn_from/llvm_int_typedefs.txt
-  [13]: https://github.com/cpsusie/Int128/blob/main/originals_code_heavily_drawn_from/llvm_int_typedefs.txt
-  [14]: https://github.com/boostorg/multiprecision/blob/develop/include/boost/multiprecision/cpp_int.hpp
+  [9]: https://github.com/HowardHinnant/date
+  [10]: https://github.com/HowardHinnant/date/blob/master/LICENSE.txt
+  [11]: https://github.com/cpsusie/Int128/blob/main/originals_code_heavily_drawn_from/abseil_int128_cpp.txt
+  [12]: https://github.com/cpsusie/Int128/blob/main/originals_code_heavily_drawn_from/int128.cc.orig.txt
+  [13]: https://github.com/cpsusie/Int128/blob/main/originals_code_heavily_drawn_from/Llvm_u128div.txt
+  [14]: https://github.com/cpsusie/Int128/blob/main/originals_code_heavily_drawn_from/llvm_int_typedefs.txt
+  [15]: https://github.com/cpsusie/Int128/blob/main/originals_code_heavily_drawn_from/llvm_int_typedefs.txt
+  [16]: https://github.com/boostorg/multiprecision/blob/develop/include/boost/multiprecision/cpp_int.hpp
+  [17]: https://github.com/HowardHinnant/date#build--test
