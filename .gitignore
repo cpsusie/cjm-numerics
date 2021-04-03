@@ -426,3 +426,4 @@ workspace.xml
 /clang-release-scripted/
 /gcc-release-scripted/Int128
 /listing.asm
+/vcpkg_port/cjm_numerics_uint128/json-examples.txt

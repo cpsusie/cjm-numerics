@@ -73,19 +73,19 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>$(SolutionDir)/headers/;$(VC_IncludePath);$(WindowsSDK_IncludePath);$(SolutionDir)/../../src</IncludePath>
+    <IncludePath>$(SolutionDir)/headers/;$(VC_IncludePath);$(WindowsSDK_IncludePath);$(SolutionDir)/../../src/include</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>$(SolutionDir)/headers/;$(VC_IncludePath);$(WindowsSDK_IncludePath);$(SolutionDir)/../../src</IncludePath>
+    <IncludePath>$(SolutionDir)/headers/;$(VC_IncludePath);$(WindowsSDK_IncludePath);$(SolutionDir)/../../src/include</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>$(SolutionDir)/headers/;$(VC_IncludePath);$(WindowsSDK_IncludePath);$(SolutionDir)/../../src</IncludePath>
+    <IncludePath>$(SolutionDir)/headers/;$(VC_IncludePath);$(WindowsSDK_IncludePath);$(SolutionDir)/../../src/include</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>$(SolutionDir)/headers/;$(VC_IncludePath);$(WindowsSDK_IncludePath);$(SolutionDir)/../../src</IncludePath>
+    <IncludePath>$(SolutionDir)/headers/;$(VC_IncludePath);$(WindowsSDK_IncludePath);$(SolutionDir)/../../src/include</IncludePath>
   </PropertyGroup>
   <PropertyGroup Label="Vcpkg" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <VcpkgUseStatic>true</VcpkgUseStatic>
@@ -181,13 +181,15 @@
     <ClCompile Include="..\cpp\uint128_test_program.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\..\src\cjm\numerics\cjm_configuration.hpp" />
-    <ClInclude Include="..\..\..\src\cjm\numerics\cjm_numeric_concepts.hpp" />
-    <ClInclude Include="..\..\..\src\cjm\numerics\fixed_uint_container.hpp" />
-    <ClInclude Include="..\..\..\src\cjm\numerics\fixed_uint_container_math.hpp" />
-    <ClInclude Include="..\..\..\src\cjm\numerics\numerics.hpp" />
-    <ClInclude Include="..\..\..\src\cjm\numerics\numerics_configuration.hpp" />
-    <ClInclude Include="..\..\..\src\cjm\numerics\uint128.hpp" />
+    <ClInclude Include="..\..\..\src\include\cjm\numerics\cjm_configuration.hpp" />
+    <ClInclude Include="..\..\..\src\include\cjm\numerics\cjm_numeric_concepts.hpp" />
+    <ClInclude Include="..\..\..\src\include\cjm\numerics\fixed_uint_container.hpp" />
+    <ClInclude Include="..\..\..\src\include\cjm\numerics\fixed_uint_container_math.hpp" />
+    <ClInclude Include="..\..\..\src\include\cjm\numerics\numerics.hpp" />
+    <ClInclude Include="..\..\..\src\include\cjm\numerics\numerics_configuration.hpp" />
+    <ClInclude Include="..\..\..\src\include\cjm\numerics\uint128.hpp" />
+    <ClInclude Include="..\..\..\src\include\cjm\string\cjm_string.hpp" />
+    <ClInclude Include="..\..\..\src\include\cjm\string\istream_utils.hpp" />
     <ClInclude Include="..\headers\int128_tests.hpp" />
     <ClInclude Include="..\headers\int128_test_switches.hpp" />
     <ClInclude Include="..\headers\testing.hpp" />
@@ -200,9 +202,10 @@
     <Text Include="..\headers\lshift.txt" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\..\src\cjm\numerics\numerics.inl" />
-    <None Include="..\..\..\src\cjm\numerics\numerics_configuration.inl" />
-    <None Include="..\..\..\src\cjm\numerics\uint128.inl" />
+    <None Include="..\..\..\src\include\cjm\numerics\numerics.inl" />
+    <None Include="..\..\..\src\include\cjm\numerics\numerics_configuration.inl" />
+    <None Include="..\..\..\src\include\cjm\numerics\uint128.inl" />
+    <None Include="..\..\..\src\include\cjm\string\cjm_string.inl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
