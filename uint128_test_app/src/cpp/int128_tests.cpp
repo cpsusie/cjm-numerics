@@ -4416,7 +4416,7 @@ void cjm::uint128_tests::execute_uintcontainer_adc_tests()
 	constexpr auto res = cjm::numerics::fixed_uint_container::add_with_carry(first_addend, second_addend, 0);
 	static_assert(sum == to_uint128_t(res));
 	auto res_runtime = cjm::numerics::fixed_uint_container::add_with_carry(first_addend, second_addend, 0);
-	auto widened = bit_cast<uint128_t>(res_runtime);
+	auto widened = cjm::numerics::bit_cast<uint128_t>(res_runtime);
 	cjm_assert(widened == sum);
 	auto saver = cout_saver{ cout };
 	std::cout << "[" << std::dec << first_addend << "] + [" << second_addend << "] == [" << widened << "]." << newl;
