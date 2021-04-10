@@ -1,0 +1,1 @@
+Directions: copy folder "cjm-numerics-uint128" folder (folder itself + contents) into (?/vcpkg/ports) folder where ? is wherever you have vckpg installed on your system.
