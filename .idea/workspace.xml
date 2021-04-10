@@ -18,7 +18,9 @@
   <component name="ChangeListManager">
     <list default="true" id="8ab5edb8-7d60-4856-834e-1b0d4d4bfdec" name="Default Changelist" comment="Working on new extended precision multiplication code.">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/CMakeLists.txt" beforeDir="false" afterPath="$PROJECT_DIR$/CMakeLists.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/CMakeLists.txt" beforeDir="false" afterPath="$PROJECT_DIR$/src/CMakeLists.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vcpkg_port/cjm_numerics_uint128/portfile.cmake" beforeDir="false" afterPath="$PROJECT_DIR$/vcpkg_port/cjm_numerics_uint128/portfile.cmake" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vcpkg_port/cjm_numerics_uint128/vcpkg.json" beforeDir="false" afterPath="$PROJECT_DIR$/vcpkg_port/cjm_numerics_uint128/vcpkg.json" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -73,7 +75,7 @@
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="cf.first.check.clang-format" value="false" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/example_code/src/uint128_example/program.cpp" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
     <property name="node.js.detected.package.eslint" value="true" />
     <property name="node.js.detected.package.tslint" value="true" />
     <property name="node.js.path.for.package.eslint" value="project" />
@@ -91,12 +93,7 @@
       <recent name="$PROJECT_DIR$/cmake-build-debug" />
     </key>
   </component>
-  <component name="RunManager" selected="CMake Application.EnvironTest">
-    <configuration default="true" type="CLionExternalRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" PASS_PARENT_ENVS_2="true">
-      <method v="2">
-        <option name="CLION.EXTERNAL.BUILD" enabled="true" />
-      </method>
-    </configuration>
+  <component name="RunManager" selected="CMake Application.ExampleCode">
     <configuration name="EnvironTest" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="Int128" TARGET_NAME="EnvironTest" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="Int128" RUN_TARGET_NAME="EnvironTest">
       <method v="2">
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
@@ -165,6 +162,13 @@
       <workItem from="1614492460025" duration="995000" />
       <workItem from="1614533256544" duration="16495000" />
       <workItem from="1617460148759" duration="499000" />
+      <workItem from="1617469448362" duration="1391000" />
+      <workItem from="1617638226149" duration="936000" />
+      <workItem from="1617975607519" duration="1539000" />
+      <workItem from="1618003596119" duration="93000" />
+      <workItem from="1618006573307" duration="353000" />
+      <workItem from="1618016486354" duration="100000" />
+      <workItem from="1618016692901" duration="637000" />
     </task>
     <task id="LOCAL-00001" summary="Add stream extraction operator for vector of bin_op_uint128_t's.  Add unit test.">
       <created>1610297106627</created>
@@ -425,7 +429,35 @@
       <option name="project" value="LOCAL" />
       <updated>1614548121338</updated>
     </task>
-    <option name="localTasksCounter" value="38" />
+    <task id="LOCAL-00038" summary="Update CMakeLists.txt to reflect move of include files from src to /src/include.">
+      <created>1617465782036</created>
+      <option name="number" value="00038" />
+      <option name="presentableId" value="LOCAL-00038" />
+      <option name="project" value="LOCAL" />
+      <updated>1617465782036</updated>
+    </task>
+    <task id="LOCAL-00039" summary="Add reference to new experimental vcpkg project.">
+      <created>1617979363442</created>
+      <option name="number" value="00039" />
+      <option name="presentableId" value="LOCAL-00039" />
+      <option name="project" value="LOCAL" />
+      <updated>1617979363442</updated>
+    </task>
+    <task id="LOCAL-00040" summary="Update workspace.xml.">
+      <created>1617984854335</created>
+      <option name="number" value="00040" />
+      <option name="presentableId" value="LOCAL-00040" />
+      <option name="project" value="LOCAL" />
+      <updated>1617984854335</updated>
+    </task>
+    <task id="LOCAL-00041" summary="Adjust CMakeLists.txt.  Revise include path in port file.">
+      <created>1618007511594</created>
+      <option name="number" value="00041" />
+      <option name="presentableId" value="LOCAL-00041" />
+      <option name="project" value="LOCAL" />
+      <updated>1618007511594</updated>
+    </task>
+    <option name="localTasksCounter" value="42" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -469,6 +501,10 @@
     <MESSAGE value="Add demonstration of signed and unsigned built-in integral conversions to and from uint128 in the example code." />
     <MESSAGE value="Removed bitcast (which is not constexpr in gcc / clang) from constexpr add_with_carry_u64 function." />
     <MESSAGE value="Working on new extended precision multiplication code." />
+    <MESSAGE value="Update CMakeLists.txt to reflect move of include files from src to /src/include." />
+    <MESSAGE value="Add reference to new experimental vcpkg project." />
+    <MESSAGE value="Update workspace.xml." />
+    <MESSAGE value="Adjust CMakeLists.txt.  Revise include path in port file." />
     <option name="LAST_COMMIT_MESSAGE" value="Working on new extended precision multiplication code." />
   </component>
   <component name="XDebuggerManager">

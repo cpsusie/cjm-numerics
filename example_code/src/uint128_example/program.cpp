@@ -70,16 +70,16 @@ namespace cjm::uint128::example_code
 {
 	using uint128_t = numerics::uint128;
 	using divmod_result_t = uint128_t ::divmod_result_t;
-	using namespace uint128_literals;
+	using namespace numerics::uint128_literals;
 	using namespace std::string_literals;
 	using namespace std::string_view_literals;
 	using std::cout;
 	constexpr auto newl = '\n';
 
-	template<concepts::character Char>
+	template<cjm::numerics::concepts::character Char>
 	std::basic_stringstream<Char, std::char_traits<Char>, std::allocator<Char>> make_throwing_sstream();
 
-	template<concepts::unsigned_integer Ui, concepts::character Char = char>
+	template<cjm::numerics::concepts::unsigned_integer Ui, cjm::numerics::concepts::character Char = char>
 	std::basic_string<Char> print_max_digits10();
 
 
@@ -136,14 +136,14 @@ namespace cjm::uint128::example_code
 		return val + 1;
 	}
 
-	template<concepts::character Char>
+	template<cjm::numerics::concepts::character Char>
 	std::basic_stringstream<Char, std::char_traits<Char>, std::allocator<Char>> make_throwing_sstream()
 	{
 		auto ret = std::basic_stringstream<Char>{};
 		ret.exceptions(std::ios::failbit | std::ios::badbit);
 		return ret;
 	}
-	template<concepts::unsigned_integer Ui, concepts::character Char>
+	template<cjm::numerics::concepts::unsigned_integer Ui, cjm::numerics::concepts::character Char>
 	std::basic_string<Char> print_max_digits10()
 	{
 		auto strm = make_throwing_sstream<Char>();
@@ -587,6 +587,7 @@ void cjm::uint128::example_code::demonstrate_unary_operations()
 
 void cjm::uint128::example_code::say_hello()
 {
+	using namespace numerics;
 	cout << "Hello, welcome to the demonstration of CJM's uint128 type!" << newl << newl;
 	cout << "Detected compiler: [" << get_text_narrow(compiler) << "]." << newl;
 	cout << "Calculation mode: [";
@@ -767,7 +768,7 @@ void cjm::uint128::example_code::demonstrate_constexpr_division_and_modulus()
 	cout << "Constexpr hash of first divmod_result_t: [0x" << std::hex << std::setw(std::numeric_limits<size_t>::digits / 4) << std::setfill('0') << hash_1 << "]." << newl;
 	cout << "Constexpr hash of second divmod_result_t: [0x" << std::hex << std::setw(std::numeric_limits<size_t>::digits / 4) << std::setfill('0') << hash_2 << "]." << newl;
 	cout << "Their ordering: [" << ordering_text(comp_res) << "]." << newl;
-	static_assert(concepts::nothrow_hashable<divmod_result_t> && std::totally_ordered<divmod_result_t>, "Meet nothrow hashable and totally ordered concepts.");
+	static_assert(cjm::numerics::concepts::nothrow_hashable<divmod_result_t> && std::totally_ordered<divmod_result_t>, "Meet nothrow hashable and totally ordered concepts.");
 }
 
 void cjm::uint128::example_code::demonstrate_compare_and_hash()
@@ -1116,10 +1117,11 @@ void cjm::uint128::example_code::demonstrate_conversions_to_from_unsigned_integr
 
 void cjm::uint128::example_code::demonstrate_conversions_to_from_floating_points()
 {
+	using namespace cjm::numerics;
 	cout << newl << "This is the to-from floating point example." << newl;
 
 	//cjm::concepts::builtin_floating_point means float, double and long double
-	auto print_three_way_convert = []<concepts::builtin_floating_point Float>
+	auto print_three_way_convert = []<cjm::numerics::concepts::builtin_floating_point Float>
 		(Float orig, uint128_t converted, Float back,
 			std::string_view float_type_name) -> void
 	{

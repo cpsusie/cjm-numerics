@@ -53,12 +53,12 @@ namespace cjm
 	namespace numerics
 	{
 
-		
+
 		namespace uint128_literals
 		{
 			template<char... Chars>
-				requires (sizeof...(Chars) > 0)
-			constexpr uint128 operator"" _u128()
+			requires (sizeof...(Chars) > 0)
+				constexpr uint128 operator"" _u128()
 			{
 				constexpr std::optional<uint128> result = uint128_literals::lit_helper::parse_literal<uint128,
 					Chars...>();
@@ -67,8 +67,8 @@ namespace cjm
 			}
 		}
 		template <typename Char, typename CharTraits, typename Allocator>
-			requires cjm::numerics::concepts::char_with_traits_and_allocator<Char, CharTraits, Allocator>
-		std::basic_ostream<Char, CharTraits>& operator<<(std::basic_ostream<Char, CharTraits>& os, uint128 v)
+		requires cjm::numerics::concepts::char_with_traits_and_allocator<Char, CharTraits, Allocator>
+			std::basic_ostream<Char, CharTraits>& operator<<(std::basic_ostream<Char, CharTraits>& os, uint128 v)
 		{
 			using ios = std::basic_ios<Char, CharTraits>;
 			using iosflags = typename ios::fmtflags;
@@ -77,7 +77,7 @@ namespace cjm
 			std::streamsize width = os.width(0);
 			using str_size_t = std::remove_cvref_t<std::make_signed_t<decltype(rep.size())>>;
 			using common_type_t = std::common_type_t<str_size_t, std::streamsize>;
-			if (static_cast<common_type_t>(width) > static_cast<common_type_t>( rep.size()))
+			if (static_cast<common_type_t>(width) > static_cast<common_type_t>(rep.size()))
 			{
 				const auto width_less_size = static_cast<str_size_t>(static_cast<common_type_t>(width)
 					- static_cast<common_type_t>(rep.size()));
@@ -86,10 +86,10 @@ namespace cjm
 				{
 					rep.append(width_less_size, os.fill());
 				}
-				else if (adjustfield == ios::internal && (flags & ios::showbase) 
+				else if (adjustfield == ios::internal && (flags & ios::showbase)
 					&& (flags & ios::basefield) == ios::hex && v != 0)
 				{
-					rep.insert(2, width_less_size+2, os.fill());
+					rep.insert(2, width_less_size + 2, os.fill());
 				}
 				else
 				{
@@ -100,9 +100,9 @@ namespace cjm
 		}
 
 		template <typename Char, typename CharTraits>
-			requires cjm::numerics::concepts::char_with_traits<Char, CharTraits>
-		std::basic_istream<Char, CharTraits>& operator>>(std::basic_istream<Char, 
-			CharTraits>& is, uint128& v)
+		requires cjm::numerics::concepts::char_with_traits<Char, CharTraits>
+			std::basic_istream<Char, CharTraits>& operator>>(std::basic_istream<Char,
+				CharTraits>& is, uint128& v)
 		{
 			v = 0;
 			if (is.bad() || is.fail())
@@ -117,7 +117,7 @@ namespace cjm
 				is.setstate(std::ios_base::failbit);
 			}
 			std::basic_string<Char, CharTraits> str;
-			if constexpr ( (!cjm::numerics::is_windows) && 
+			if constexpr ((!cjm::numerics::is_windows) &&
 				cjm::numerics::concepts::utf_character<Char>)
 			{
 				Char c{};
@@ -170,14 +170,14 @@ namespace cjm
 			return is;
 		}
 
-		
+
 
 		template<typename Char, typename CharTraits, typename Allocator>
-			requires (cjm::numerics::concepts::utf_character<Char>) && 
-				(cjm::numerics::concepts::char_with_traits_and_allocator<Char,
-					CharTraits, Allocator>)
-		std::basic_string<Char, CharTraits, Allocator> uint128::to_string(uint128 item, 
-			std::ios_base::fmtflags flags)
+		requires (cjm::numerics::concepts::utf_character<Char>) &&
+			(cjm::numerics::concepts::char_with_traits_and_allocator<Char,
+				CharTraits, Allocator>)
+			std::basic_string<Char, CharTraits, Allocator> uint128::to_string(uint128 item,
+				std::ios_base::fmtflags flags)
 		{
 			if constexpr (is_windows)
 			{
@@ -187,27 +187,27 @@ namespace cjm
 				int div_base_log;
 				switch (flags & std::basic_ios<Char, CharTraits>::basefield)
 				{
-					case std::basic_ios<Char, CharTraits>::hex:
-						div = 0x1000000000000000;  // 16^15
-						div_base_log = 15;
-						break;
-					case std::basic_ios<Char, CharTraits>::oct:
-						div = 01000000000000000000000;  // 8^21
-						div_base_log = 21;
-						break;
-					default:  // std::ios::dec
-						div = 10000000000000000000u;  // 10^19
-						div_base_log = 19;
-						break;
+				case std::basic_ios<Char, CharTraits>::hex:
+					div = 0x1000000000000000;  // 16^15
+					div_base_log = 15;
+					break;
+				case std::basic_ios<Char, CharTraits>::oct:
+					div = 01000000000000000000000;  // 8^21
+					div_base_log = 21;
+					break;
+				default:  // std::ios::dec
+					div = 10000000000000000000u;  // 10^19
+					div_base_log = 19;
+					break;
 				}
 				std::basic_stringstream<Char, CharTraits, Allocator> os;
-				std::ios_base::fmtflags copyMask = std::basic_ios<Char, CharTraits>::basefield | std::basic_ios<Char, 
+				std::ios_base::fmtflags copyMask = std::basic_ios<Char, CharTraits>::basefield | std::basic_ios<Char,
 					CharTraits>::showbase | std::basic_ios<Char, CharTraits>::uppercase;
 				os.setf(flags & copyMask, copyMask);
 				uint128 high = item;
-				uint128 low=0;
+				uint128 low = 0;
 				best_safe_div_mod(high, div, &high, &low);
-				uint128 mid=0;
+				uint128 mid = 0;
 				best_safe_div_mod(high, div, &high, &mid);
 				if (high.low_part() != 0)
 				{
@@ -229,15 +229,15 @@ namespace cjm
 				std::string converted_narrow = uint128::to_string<char, std::char_traits<char>, std::allocator<char>>(item, flags);
 				std::basic_string<Char, CharTraits, Allocator> ret;
 				ret.reserve(converted_narrow.size());
-				std::transform(converted_narrow.cbegin(), converted_narrow.cend(), std::back_inserter(ret), [](char c) -> Char {return static_cast<Char>(c);} );
+				std::transform(converted_narrow.cbegin(), converted_narrow.cend(), std::back_inserter(ret), [](char c) -> Char {return static_cast<Char>(c); });
 				return ret;
 			}
 		}
 
 		template<typename Char, typename CharTraits, typename Allocator>
-			requires (!cjm::numerics::concepts::utf_character<Char>) &&
-				(cjm::numerics::concepts::char_with_traits_and_allocator<Char, CharTraits, Allocator>)
-		std::basic_string<Char, CharTraits, Allocator> uint128::to_string(uint128 item, std::ios_base::fmtflags flags)
+		requires (!cjm::numerics::concepts::utf_character<Char>) &&
+			(cjm::numerics::concepts::char_with_traits_and_allocator<Char, CharTraits, Allocator>)
+			std::basic_string<Char, CharTraits, Allocator> uint128::to_string(uint128 item, std::ios_base::fmtflags flags)
 		{
 			constexpr char zero_char_temp = '0';
 			constexpr Char zero_char = static_cast<Char>(zero_char_temp);
@@ -262,9 +262,9 @@ namespace cjm
 			std::ios_base::fmtflags copyMask = std::basic_ios<Char, CharTraits>::basefield | std::basic_ios<Char, CharTraits>::showbase | std::basic_ios<Char, CharTraits>::uppercase;
 			os.setf(flags & copyMask, copyMask);
 			uint128 high = item;
-			uint128 low=0;
+			uint128 low = 0;
 			best_safe_div_mod(high, div, &high, &low);
-			uint128 mid=0;
+			uint128 mid = 0;
 			best_safe_div_mod(high, div, &high, &mid);
 			if (high.low_part() != 0)
 			{
@@ -287,9 +287,9 @@ namespace cjm
 			using ret_t = uint128;
 			constexpr size_t byte_count = sizeof(ret_t);
 			static_assert(byte_count == bytes.size());
- 			static_assert(std::endian::native == std::endian::little || std::endian::native == std::endian::big,
+			static_assert(std::endian::native == std::endian::little || std::endian::native == std::endian::big,
 				"mixed endian not supported by this library.");
-			
+
 			if constexpr (std::endian::native == std::endian::little)
 			{
 				return make_from_bytes_native(bytes);
@@ -332,7 +332,7 @@ namespace cjm
 		{
 			return uint128(high, low);
 		}
-		
+
 		constexpr std::optional<uint128::divmod_result_t> uint128::try_div_mod(uint128 dividend,
 			uint128 divisor) noexcept
 		{
@@ -346,10 +346,10 @@ namespace cjm
 		constexpr uint128::divmod_result_t uint128::unsafe_div_mod(uint128 dividend, uint128 divisor) noexcept //NOLINT (bugprone-exception-escape)
 		{   //exception can only be thrown if natuint128_t is NOT a built-in (i.e. is alias for uint128)
 			//AND calc_mode is intrinsic_u128: this is not possible .. thus linting is suppressed
-			static_assert(calculation_mode != uint128_calc_mode::intrinsic_u128 || !std::is_same_v<natuint128_t, uint128>, 
+			static_assert(calculation_mode != uint128_calc_mode::intrinsic_u128 || !std::is_same_v<natuint128_t, uint128>,
 				"It should not be possible for calc_mode to be intrinsic and have natuint128_t be set as uint128/");
 			assert(divisor != 0);
-			if (std::is_constant_evaluated()) 
+			if (std::is_constant_evaluated())
 			{
 				uint128 quotient{};
 				uint128 remainder{};
@@ -386,7 +386,7 @@ namespace cjm
 					return divmod_result_t{ quotient, remainder };
 				}
 			}// ReSharper restore CppUnreachableCode
-			
+
 		}
 
 
@@ -399,15 +399,15 @@ namespace cjm
 		}
 
 		constexpr uint128::uint128(int v) noexcept
-			: m_limbs{static_cast<std::int64_t>(v)} {}
+			: m_limbs{ static_cast<std::int64_t>(v) } {}
 		constexpr uint128::uint128(unsigned int v) noexcept
 			: m_limbs{ static_cast<int_part>(v) } {}
 		constexpr uint128::uint128(long v) noexcept
-			: m_limbs{static_cast<std::int64_t>(v)} {}
+			: m_limbs{ static_cast<std::int64_t>(v) } {}
 		constexpr uint128::uint128(unsigned long v) noexcept
-			: m_limbs{ static_cast<std::uint64_t>( v) } {}
+			: m_limbs{ static_cast<std::uint64_t>(v) } {}
 		constexpr uint128::uint128(long long v) noexcept
-			: m_limbs{static_cast<std::int64_t>(v)} {}
+			: m_limbs{ static_cast<std::int64_t>(v) } {}
 		constexpr uint128::uint128(unsigned long long v) noexcept
 			: m_limbs{ static_cast<std::uint64_t>(v) } {}
 		constexpr uint128& uint128::operator=(int v) noexcept
@@ -416,7 +416,7 @@ namespace cjm
 			m_limbs.m_high = v < 0 ? std::numeric_limits<std::uint64_t>::max() : 0u;
 			return *this;
 		}
-				
+
 		constexpr uint128& uint128::operator=(unsigned int v) noexcept
 		{
 			m_limbs.m_low = static_cast<int_part>(v);
@@ -455,34 +455,34 @@ namespace cjm
 			m_limbs.m_high = temp.m_limbs.m_high;
 			m_limbs.m_low = temp.m_limbs.m_low;
 		}
-		
+
 		inline uint128::uint128(double d) noexcept : uint128()
 		{
 			auto temp = internal::make_from_floating_point(d);
 			m_limbs.m_high = temp.m_limbs.m_high;
 			m_limbs.m_low = temp.m_limbs.m_low;
 		}
-		
+
 		inline uint128::uint128(long double d) noexcept : uint128()
 		{
 			auto temp = internal::make_from_floating_point(d);
 			m_limbs.m_high = temp.m_limbs.m_high;
 			m_limbs.m_low = temp.m_limbs.m_low;
 		}
-		
+
 		template<typename Chars, typename CharTraits, typename Allocator>
-			requires cjm::numerics::concepts::char_with_traits_and_allocator<Chars, CharTraits, Allocator>
-		uint128 uint128::make_from_string(const std::basic_string<Chars, CharTraits, Allocator>& parse_me)
+		requires cjm::numerics::concepts::char_with_traits_and_allocator<Chars, CharTraits, Allocator>
+			uint128 uint128::make_from_string(const std::basic_string<Chars, CharTraits, Allocator>& parse_me)
 		{
 			return make_from_string(std::basic_string_view<Chars, CharTraits>{parse_me});
 		}
 
 		template<typename Chars, typename CharTraits>
-			requires cjm::numerics::concepts::char_with_traits<Chars, CharTraits>
-		uint128 uint128::make_from_string(std::basic_string_view<Chars, CharTraits> parse_me)
+		requires cjm::numerics::concepts::char_with_traits<Chars, CharTraits>
+			uint128 uint128::make_from_string(std::basic_string_view<Chars, CharTraits> parse_me)
 		{
 			using ph = u128_parsing_helper<Chars, CharTraits>;
-			auto str = std::basic_string<Chars, CharTraits>{parse_me};
+			auto str = std::basic_string<Chars, CharTraits>{ parse_me };
 			auto trimmed = ph::trim_and_strip(str);
 			auto parseFormat = ph::get_format(trimmed);
 			uint128 ret;
@@ -634,7 +634,7 @@ namespace cjm
 
 		constexpr uint128& uint128::operator>>=(unsigned amount) noexcept
 		{
-			assert( amount < std::numeric_limits<uint128>::digits);
+			assert(amount < std::numeric_limits<uint128>::digits);
 			*this = *this >> amount;
 			return *this;
 		}
@@ -648,7 +648,7 @@ namespace cjm
 
 		constexpr uint128& uint128::operator>>=(uint128 amount) noexcept
 		{
-			assert( amount < std::numeric_limits<uint128>::digits);
+			assert(amount < std::numeric_limits<uint128>::digits);
 			*this = *this >> amount;
 			return *this;
 		}
@@ -716,7 +716,7 @@ namespace cjm
 					reversed[reversed.size() - 1 - i] = temp[i];
 				}
 				return reversed;
-			}			
+			}
 		}
 
 		constexpr uint128::byte_array uint128::to_big_endian_arr() const noexcept
@@ -742,13 +742,13 @@ namespace cjm
 		}
 
 		constexpr uint128::uint128(int_part high, int_part low) noexcept
-			: m_limbs{high, low} {}
+			: m_limbs{ high, low } {}
 
 		constexpr size_t uint128::calculate_hash(int_part hi, int_part low) noexcept
 		{
 			static_assert(sizeof(size_t) == 8 || sizeof(size_t) == 4, "Only 32 and 64 bit architecture supported.");
 			size_t hash{ 0 };
-			if constexpr(sizeof(size_t) == 8)
+			if constexpr (sizeof(size_t) == 8)
 			{
 #pragma warning(push)
 #pragma warning (disable: 4244) //this warning pops in in msvc when compiling as 32 bit even though this if constexpr branch never taken in that case.
@@ -783,7 +783,7 @@ namespace cjm
 			static_assert(byteCount == bytes.size());
 			constexpr size_t byte_shift_size = CHAR_BIT;
 			using byte = unsigned char;
-			static_assert(std::endian::native == std::endian::little || std::endian::native == std::endian::big, 
+			static_assert(std::endian::native == std::endian::little || std::endian::native == std::endian::big,
 				"Mixed endian is not supported.");
 			if (std::is_constant_evaluated())
 			{
@@ -806,12 +806,12 @@ namespace cjm
 				else //constexpr (std::endian::native == std::endian::big)
 				{
 					ret_t ret = 0;
-					for (size_t index = 0 ; index < byteCount; ++index)
+					for (size_t index = 0; index < byteCount; ++index)
 					{
 						byte b = bytes[index];
 						auto temp = static_cast<ret_t>(b);
 						//if will become when cast negative, result of subtraction will be bigger than byteCount
-						assert((byteCount - 1 - index) < byteCount); 
+						assert((byteCount - 1 - index) < byteCount);
 						const auto left_shift_amount = static_cast<int>(byteCount - 1 - index);
 						temp <<= left_shift_amount;
 						ret |= temp;
@@ -854,7 +854,7 @@ namespace cjm
 					}
 					else // constexpr (std::endian::native == std::endian::big)
 					{
-						auto all_ones_in_byte = uint128{0xff00'0000'0000'0000, 0};
+						auto all_ones_in_byte = uint128{ 0xff00'0000'0000'0000, 0 };
 						auto ret = byte_array{};
 						for (size_t index = 0; index < ret.size(); ++index)
 						{
@@ -873,7 +873,7 @@ namespace cjm
 				return bit_cast<byte_array, uint128>(convert_me);
 			}
 		}
-		
+
 
 		inline uint128 uint128::lshift_msvc_x64(uint128 shift_me, int shift_amount) noexcept
 		{
@@ -883,11 +883,11 @@ namespace cjm
 			{
 				ret.m_limbs.m_high = shift_me.m_limbs.m_low;
 				ret.m_limbs.m_low = 0;
-				ret.m_limbs.m_high =  (ret.m_limbs.m_high << (shift_amount - 64));
+				ret.m_limbs.m_high = (ret.m_limbs.m_high << (shift_amount - 64));
 			}
 			else
 			{
-				ret.m_limbs.m_high = CJM_LSHIFT128(shift_me.m_limbs.m_low, shift_me.m_limbs.m_high, 
+				ret.m_limbs.m_high = CJM_LSHIFT128(shift_me.m_limbs.m_low, shift_me.m_limbs.m_high,
 					static_cast<unsigned char>(shift_amount));
 				ret.m_limbs.m_low = shift_me.m_limbs.m_low << shift_amount;
 			}
@@ -906,25 +906,25 @@ namespace cjm
 			}
 			else
 			{
-				ret.m_limbs.m_low = CJM_RSHIFT128(shift_me.m_limbs.m_low, shift_me.m_limbs.m_high, 
+				ret.m_limbs.m_low = CJM_RSHIFT128(shift_me.m_limbs.m_low, shift_me.m_limbs.m_high,
 					static_cast<unsigned char>(shift_amount));
 				ret.m_limbs.m_high = shift_me.m_limbs.m_high >> shift_amount;
 			}
 			return ret;
 		}
 
-		constexpr void uint128::constexpr_div_mod_impl(uint128 dividend, uint128 divisor, 
+		constexpr void uint128::constexpr_div_mod_impl(uint128 dividend, uint128 divisor,
 			uint128* quotient_ret, uint128* remainder_ret)
 		{
-		   
+
 			if (divisor == 0)
 			{
 				throw std::domain_error("Division and/or modulus by zero is forbidden.");
 			}
-			unsafe_constexpr_div_mod_impl(dividend, divisor, quotient_ret, remainder_ret);			
+			unsafe_constexpr_div_mod_impl(dividend, divisor, quotient_ret, remainder_ret);
 		}
 
-		constexpr void uint128::unsafe_constexpr_div_mod_impl(uint128 dividend, uint128 divisor, 
+		constexpr void uint128::unsafe_constexpr_div_mod_impl(uint128 dividend, uint128 divisor,
 			uint128* quotient_ret, uint128* remainder_ret) noexcept
 		{
 			assert(divisor != 0);
@@ -996,13 +996,13 @@ namespace cjm
 		{
 			assert(n != 0);
 			auto hp = n.high_part();
-			if ( hp != 0)
+			if (hp != 0)
 			{
 				return std::countl_zero(hp);
 			}
 			return std::numeric_limits<uint128::int_part>::digits + std::countl_zero(n.low_part());
 		}
-		
+
 		template <typename T>
 		constexpr void internal::step(T& n, int& pos, int shift) noexcept
 		{
@@ -1024,7 +1024,7 @@ namespace cjm
 			}
 			else // ReSharper disable once CppUnreachableCode				
 			{
-				if constexpr (calculation_mode == uint128_calc_mode::msvc_x64 || 
+				if constexpr (calculation_mode == uint128_calc_mode::msvc_x64 ||
 					calculation_mode == uint128_calc_mode::msvc_x64_clang_or_intel_llvm)
 				{
 					assert(n != 0);
@@ -1063,12 +1063,12 @@ namespace cjm
 				step<std::uint32_t>(n32, pos, 0x04);
 				return static_cast<int>((std::uint64_t{ 0x3333333322221100 } >> (n32 << 2) & 0x3) + pos);
 			}
-		}	   
+		}
 
 		constexpr std::strong_ordering operator<=>(uint128 lhs, uint128 rhs) noexcept
 		{
-			return lhs == rhs ? std::strong_ordering::equal : 
-				((lhs > rhs) ? std::strong_ordering::greater 
+			return lhs == rhs ? std::strong_ordering::equal :
+				((lhs > rhs) ? std::strong_ordering::greater
 					: std::strong_ordering::less);
 		}
 
@@ -1117,13 +1117,13 @@ namespace cjm
 				{
 					return -static_cast<natuint128_t>(operand);
 				}
-				else if constexpr (calculation_mode == uint128_calc_mode::msvc_x64 
-					|| calculation_mode == 
-						uint128_calc_mode::msvc_x64_clang_or_intel_llvm)
+				else if constexpr (calculation_mode == uint128_calc_mode::msvc_x64
+					|| calculation_mode ==
+					uint128_calc_mode::msvc_x64_clang_or_intel_llvm)
 				{
-					return (uint128{ ~operand.high_part(), 
-						~operand.low_part() } += uint128{1});	  
-		  		}
+					return (uint128{ ~operand.high_part(),
+						~operand.low_part() } += uint128{ 1 });
+				}
 				else // constexpr (calculation_mode == uint128_calc_mode::default_eval)
 				{
 					using intpart = uint128::int_part;
@@ -1170,7 +1170,7 @@ namespace cjm
 			if (std::is_constant_evaluated())
 			{
 				//It is undefined behavior to attempt a shift greater than number of bits in an integral type
-				assert(amount < std::numeric_limits<uint128>::digits && amount > -1);
+				assert(amount < std::numeric_limits<uint128>::digits&& amount > -1);
 				// uint64_t shifts of >= 64 are undefined, so we will need some
 				// special-casing.
 				const auto abs_amount = static_cast<int>(math_functions::int_abs(amount));
@@ -1180,13 +1180,13 @@ namespace cjm
 					{
 						return
 							uint128::make_uint128((lhs.high_part() >> abs_amount),
-							(lhs.low_part() >> abs_amount) |
-								(lhs.high_part() << (static_cast<int>(uint128::int_part_bits) 
-									-abs_amount)));
+								(lhs.low_part() >> abs_amount) |
+								(lhs.high_part() << (static_cast<int>(uint128::int_part_bits)
+									- abs_amount)));
 					}
 					return lhs;
 				}
-				return uint128::make_uint128(0, lhs.high_part() 
+				return uint128::make_uint128(0, lhs.high_part()
 					>> (abs_amount - static_cast<int>(uint128::int_part_bits)));
 			}
 			else // ReSharper disable once CppUnreachableCode				
@@ -1195,15 +1195,15 @@ namespace cjm
 				{
 					return static_cast<natuint128_t>(lhs) >> amount;
 				}
-				else if constexpr (calculation_mode == uint128_calc_mode::msvc_x64 
+				else if constexpr (calculation_mode == uint128_calc_mode::msvc_x64
 					|| calculation_mode == uint128_calc_mode::msvc_x64_clang_or_intel_llvm)
-	  			{
+				{
 					return uint128::rshift_msvc_x64(lhs, amount);
-	  			}
+				}
 				else // constexpr (calculation_mode == uint128_calc_mode::default_eval)
 				{
 					//It is undefined behavior to attempt a shift greater than number of bits in an integral type
-					assert(amount < std::numeric_limits<uint128>::digits 
+					assert(amount < std::numeric_limits<uint128>::digits
 						&& amount > -1);
 					// uint64_t shifts of >= 64 are undefined, so we will need some
 					// special-casing.
@@ -1213,8 +1213,8 @@ namespace cjm
 						if (absAmount != 0)
 						{
 							return uint128::make_uint128((lhs.high_part() >> absAmount),
-														(lhs.low_part() >> absAmount) |
-														(lhs.high_part() << (static_cast<int>(uint128::int_part_bits) -absAmount)));
+								(lhs.low_part() >> absAmount) |
+								(lhs.high_part() << (static_cast<int>(uint128::int_part_bits) - absAmount)));
 						}
 						return lhs;
 					}
@@ -1229,7 +1229,7 @@ namespace cjm
 			if (std::is_constant_evaluated())
 			{
 				//It is undefined behavior to attempt a shift greater than number of bits in an integral type
-				assert(amount < std::numeric_limits<uint128>::digits && amount > -1);
+				assert(amount < std::numeric_limits<uint128>::digits&& amount > -1);
 				// uint64_t shifts of >= 64 are undefined, so we will need some
 				// special-casing.
 				const auto absAmount = static_cast<int>(math_functions::int_abs(amount));
@@ -1238,7 +1238,7 @@ namespace cjm
 					if (absAmount != 0)
 					{
 						return uint128::make_uint128((lhs.high_part() << absAmount) |
-													(lhs.low_part() >> (static_cast<int>(uint128::int_part_bits) - absAmount)), lhs.low_part() << absAmount);
+							(lhs.low_part() >> (static_cast<int>(uint128::int_part_bits) - absAmount)), lhs.low_part() << absAmount);
 					}
 					return lhs;
 				}
@@ -1251,14 +1251,14 @@ namespace cjm
 					return bit_cast<natuint128_t>(lhs) << amount;
 				}
 				else if constexpr (calculation_mode == uint128_calc_mode::msvc_x64 || calculation_mode == uint128_calc_mode::msvc_x64_clang_or_intel_llvm)
-	  			{
-					assert(amount < std::numeric_limits<uint128>::digits && amount > -1);
+				{
+					assert(amount < std::numeric_limits<uint128>::digits&& amount > -1);
 					return uint128::lshift_msvc_x64(lhs, amount);
 				}
 				else // constexpr (calculation_mode == uint128_calc_mode::default_eval)
 				{
 					//It is undefined behavior to attempt a shift greater than number of bits in an integral type
-					assert(amount < std::numeric_limits<uint128>::digits && amount > -1);
+					assert(amount < std::numeric_limits<uint128>::digits&& amount > -1);
 					// uint64_t shifts of >= 64 are undefined, so we will need some
 					// special-casing.
 					const auto absAmount = static_cast<int>(math_functions::int_abs(amount));
@@ -1267,11 +1267,11 @@ namespace cjm
 						if (absAmount != 0)
 						{
 							return uint128::make_uint128((lhs.high_part() << absAmount) |
-														(lhs.low_part() >> (static_cast<int>(uint128::int_part_bits) - absAmount)), lhs.low_part() << absAmount);
+								(lhs.low_part() >> (static_cast<int>(uint128::int_part_bits) - absAmount)), lhs.low_part() << absAmount);
 						}
 						return lhs;
 					}
-					return uint128::make_uint128(lhs.low_part() 
+					return uint128::make_uint128(lhs.low_part()
 						<< (absAmount - static_cast<int>(uint128::int_part_bits)), 0);
 				}
 			}
@@ -1293,12 +1293,12 @@ namespace cjm
 
 		constexpr uint128 operator>>(uint128 lhs, uint128 amount) noexcept
 		{
-			assert(amount < std::numeric_limits<uint128>::digits && static_cast<int>(amount) > -1);
+			assert(amount < std::numeric_limits<uint128>::digits&& static_cast<int>(amount) > -1);
 			return (lhs >> static_cast<int>(amount));
 		}
 		constexpr uint128 operator<<(uint128 lhs, uint128 amount) noexcept
 		{
-			assert(amount < std::numeric_limits<uint128>::digits && static_cast<int>(amount) > -1);
+			assert(amount < std::numeric_limits<uint128>::digits&& static_cast<int>(amount) > -1);
 			return (lhs << static_cast<int>(amount));
 		}
 		//arithmetic operators
@@ -1307,10 +1307,10 @@ namespace cjm
 			if (std::is_constant_evaluated())
 			{
 				auto result = uint128{ lhs.m_limbs.m_high + rhs.m_limbs.m_high,
-													  lhs.m_limbs.m_low + rhs.m_limbs.m_low};
+													  lhs.m_limbs.m_low + rhs.m_limbs.m_low };
 				if (result.m_limbs.m_low < lhs.m_limbs.m_low) // check for carry
 				{
-					++result.m_limbs.m_high;					
+					++result.m_limbs.m_high;
 				}
 				return result;
 			}  // ReSharper disable once CppRedundantElseKeywordInsideCompoundStatement
@@ -1324,10 +1324,10 @@ namespace cjm
 				{
 					uint128 ret = 0;
 					unsigned char carry_in = 0;
-					unsigned char carry_out = CJM_ADDCARRY64(carry_in, 
+					unsigned char carry_out = CJM_ADDCARRY64(carry_in,
 						lhs.m_limbs.m_low, rhs.m_limbs.m_low, &(ret.m_limbs.m_low));
 					carry_in = carry_out;
-					carry_out = CJM_ADDCARRY64(carry_in, lhs.m_limbs.m_high, 
+					carry_out = CJM_ADDCARRY64(carry_in, lhs.m_limbs.m_high,
 						rhs.m_limbs.m_high, &(ret.m_limbs.m_high));
 					return ret;
 				}
@@ -1394,16 +1394,16 @@ namespace cjm
 				int_part b00 = rhs.low_part() & uint128::int_part_bottom_half_bitmask;
 
 				uint128 result = uint128::make_uint128(lhs.high_part() * rhs.low_part() +
-													  lhs.low_part() * rhs.high_part() +
-													  a32 * b32,
-													  a00 * b00);
+					lhs.low_part() * rhs.high_part() +
+					a32 * b32,
+					a00 * b00);
 				result += uint128(a32 * b00) << uint128::int_part_bottom_half_bits;
 				result += uint128(a00 * b32) << uint128::int_part_bottom_half_bits;
 				return result;
 			}// NOLINT(readability-misleading-indentation)
 				// ReSharper disable once CppRedundantElseKeywordInsideCompoundStatement
 			else // ReSharper disable once CppUnreachableCode 
-			{   
+			{
 				if constexpr (calculation_mode == uint128_calc_mode::intrinsic_u128)
 				{
 					return static_cast<natuint128_t>(lhs) * static_cast<natuint128_t>(rhs);
@@ -1414,7 +1414,7 @@ namespace cjm
 					std::uint64_t low_product = CJM_UMUL128(lhs.low_part(), rhs.low_part(), &carry);
 					return uint128::make_uint128(lhs.low_part() * rhs.high_part() + lhs.high_part() * rhs.low_part() + carry, low_product);
 				}
-				else 
+				else
 				{   // constexpr (calculation_mode == uint128_calc_mode::default_eval)
 					using int_part = uint128::int_part;
 					int_part a32 = lhs.low_part() >> uint128::int_part_bottom_half_bits;
@@ -1423,9 +1423,9 @@ namespace cjm
 					int_part b00 = rhs.low_part() & uint128::int_part_bottom_half_bitmask;
 
 					uint128 result = uint128::make_uint128(lhs.high_part() * rhs.low_part() +
-														  lhs.low_part() * rhs.high_part() +
-														  a32 * b32,
-														  a00 * b00);
+						lhs.low_part() * rhs.high_part() +
+						a32 * b32,
+						a00 * b00);
 					result += uint128(a32 * b00) << uint128::int_part_bottom_half_bits;
 					result += uint128(a00 * b32) << uint128::int_part_bottom_half_bits;
 					return result;
@@ -1486,9 +1486,9 @@ namespace cjm
 			}
 			else
 			{
-				if constexpr (calculation_mode == uint128_calc_mode::msvc_x64 
-					|| calculation_mode == 
-						uint128_calc_mode::msvc_x64_clang_or_intel_llvm)
+				if constexpr (calculation_mode == uint128_calc_mode::msvc_x64
+					|| calculation_mode ==
+					uint128_calc_mode::msvc_x64_clang_or_intel_llvm)
 				{
 					int_t ret = 0;
 					carry_out = CJM_ADDCARRY64(carry_in, lhs, rhs, &ret);
@@ -1510,10 +1510,10 @@ namespace cjm
 		constexpr std::uint64_t add_with_carry_u64(std::uint64_t lhs, std::uint64_t rhs,
 			unsigned char carry_in, unsigned char& carry_out) noexcept
 		{
-			return add_with_carry(lhs, rhs, carry_in,  carry_out);
+			return add_with_carry(lhs, rhs, carry_in, carry_out);
 		}
 
-		
+
 		constexpr std::pair<uint128, unsigned char>
 			add_with_carry(uint128 first_addend, uint128 second_addend,
 				unsigned char carry_in) noexcept
@@ -1529,7 +1529,7 @@ namespace cjm
 			}
 			else
 			{
-				if constexpr (calculation_mode == uint128_calc_mode::msvc_x64 
+				if constexpr (calculation_mode == uint128_calc_mode::msvc_x64
 					|| calculation_mode == uint128_calc_mode::msvc_x64_clang_or_intel_llvm)
 				{
 					unsigned char carry_1 = 0;
@@ -1542,10 +1542,10 @@ namespace cjm
 				else if constexpr (calculation_mode == uint128_calc_mode::intrinsic_u128)
 				{
 					unsigned char carry_out = 0;
-					auto temp = cjm::numerics::internal::add_with_carry(cjm::numerics::bit_cast<natuint128_t>(first_addend), 
-							cjm::numerics::bit_cast<natuint128_t>(second_addend), 
-								carry_in, carry_out);
-						 return std::make_pair(temp, carry_out);
+					auto temp = cjm::numerics::internal::add_with_carry(cjm::numerics::bit_cast<natuint128_t>(first_addend),
+						cjm::numerics::bit_cast<natuint128_t>(second_addend),
+						carry_in, carry_out);
+					return std::make_pair(temp, carry_out);
 				}
 				else
 				{
@@ -1576,7 +1576,7 @@ namespace cjm
 			}
 			else
 			{
-				if constexpr (calculation_mode == uint128_calc_mode::msvc_x64 
+				if constexpr (calculation_mode == uint128_calc_mode::msvc_x64
 					|| calculation_mode == uint128_calc_mode::msvc_x64_clang_or_intel_llvm)
 				{
 					int_t ret = 0;
@@ -1597,7 +1597,7 @@ namespace cjm
 			}
 		}
 
-		
+
 		constexpr std::pair<uint128, unsigned char> sub_with_borrow(uint128 minuend,
 			uint128 subtrahend, unsigned char borrow_in) noexcept
 		{
@@ -1607,20 +1607,20 @@ namespace cjm
 				if (borrow_in)
 					--ret;
 				ret -= subtrahend;
-				unsigned char borrow_out = ret > minuend  ? 1 : 0;
+				unsigned char borrow_out = ret > minuend ? 1 : 0;
 				return std::make_pair(ret, borrow_out);
 			}
 			else
 			{
-				if constexpr (calculation_mode == uint128_calc_mode::msvc_x64 
+				if constexpr (calculation_mode == uint128_calc_mode::msvc_x64
 					|| calculation_mode == uint128_calc_mode::msvc_x64_clang_or_intel_llvm)
 				{
 					unsigned char borrow_1 = 0;
 					unsigned char borrow_2 = 0;
 					auto ret = uint128{};
-					ret.m_limbs.m_low = sub_with_borrow(minuend.m_limbs.m_low, 
+					ret.m_limbs.m_low = sub_with_borrow(minuend.m_limbs.m_low,
 						subtrahend.m_limbs.m_low, borrow_in, borrow_1);
-					ret.m_limbs.m_high = sub_with_borrow(minuend.m_limbs.m_high, 
+					ret.m_limbs.m_high = sub_with_borrow(minuend.m_limbs.m_high,
 						subtrahend.m_limbs.m_high, borrow_1, borrow_2);
 					return std::make_pair(ret, borrow_2);
 				}
@@ -1675,7 +1675,7 @@ namespace cjm
 					uint128 remainder = 0;
 					uint128::div_mod_msc_x64_impl(lhs, rhs, &quotient, &remainder);
 					return quotient;
-				} 
+				}
 				else // NOLINT(readability-misleading-indentation)
 				{
 					// constexpr (calculation_mode == uint128_calc_mode::default_eval)  
@@ -1787,10 +1787,10 @@ constexpr cjm::numerics::uint128 std::numeric_limits<cjm::numerics::uint128>::de
 
 
 template<typename Chars, typename CharTraits>
-	requires cjm::numerics::concepts::char_with_traits<Chars, CharTraits>
+requires cjm::numerics::concepts::char_with_traits<Chars, CharTraits>
 constexpr std::array<typename cjm::numerics::u128_parsing_helper<Chars, CharTraits>::sv, 2>
-	cjm::numerics::u128_parsing_helper<Chars, CharTraits>::
-		get_hex_tags()
+cjm::numerics::u128_parsing_helper<Chars, CharTraits>::
+get_hex_tags()
 {
 
 	using namespace std::string_view_literals;
@@ -1822,7 +1822,7 @@ constexpr std::array<typename cjm::numerics::u128_parsing_helper<Chars, CharTrai
 }
 
 template<typename Chars, typename CharTraits>
-	requires cjm::numerics::concepts::char_with_traits<Chars, CharTraits>
+requires cjm::numerics::concepts::char_with_traits<Chars, CharTraits>
 constexpr typename cjm::numerics::u128_parsing_helper<Chars, CharTraits>::sv cjm::numerics::u128_parsing_helper<Chars,
 	CharTraits>::non_decimal_separator()
 {
@@ -1851,9 +1851,9 @@ constexpr typename cjm::numerics::u128_parsing_helper<Chars, CharTraits>::sv cjm
 }
 
 template<typename Chars, typename CharTraits>
-	requires cjm::numerics::concepts::char_with_traits<Chars, CharTraits>
+requires cjm::numerics::concepts::char_with_traits<Chars, CharTraits>
 constexpr typename cjm::numerics::u128_parsing_helper<Chars, CharTraits>::sv
-	cjm::numerics::u128_parsing_helper<Chars, CharTraits>::decimal_separator()
+cjm::numerics::u128_parsing_helper<Chars, CharTraits>::decimal_separator()
 {
 	using namespace std::string_view_literals;
 	if constexpr (std::is_same_v<char_t, char>)
@@ -1879,247 +1879,247 @@ constexpr typename cjm::numerics::u128_parsing_helper<Chars, CharTraits>::sv
 }
 
 template<typename Chars, typename CharTraits>
-	requires cjm::numerics::concepts::char_with_traits<Chars, CharTraits>
+requires cjm::numerics::concepts::char_with_traits<Chars, CharTraits>
 constexpr std::uint8_t cjm::numerics::u128_parsing_helper<Chars, CharTraits>::get_value_hex(char_t c)
 {
 	using namespace std::string_view_literals;
-	
+
 	if constexpr (std::is_same_v<char_t, char>)
 	{
 		switch (c)
 		{
-			case '0':
-				return 0;
-			case '1':
-				return 1;
-			case '2':
-				return 2;
-			case '3':
-				return 3;
-			case '4':
-				return 4;
-			case '5':
-				return 5;
-			case '6':
-				return 6;
-			case '7':
-				return 7;
-			case '8':
-				return 8;
-			case '9':
-				return 9;
-			case 'A':
-			case 'a':
-				return 10;
-			case 'b':
-			case 'B':
-				return 11;
-			case 'c':
-			case 'C':
-				return 12;
-			case 'd':
-			case 'D':
-				return 13;
-			case 'e':
-			case 'E':
-				return 14;
-			case 'f':
-			case 'F':
-				return 15;
-			default:
-				throw std::invalid_argument("Unrecognized character");
+		case '0':
+			return 0;
+		case '1':
+			return 1;
+		case '2':
+			return 2;
+		case '3':
+			return 3;
+		case '4':
+			return 4;
+		case '5':
+			return 5;
+		case '6':
+			return 6;
+		case '7':
+			return 7;
+		case '8':
+			return 8;
+		case '9':
+			return 9;
+		case 'A':
+		case 'a':
+			return 10;
+		case 'b':
+		case 'B':
+			return 11;
+		case 'c':
+		case 'C':
+			return 12;
+		case 'd':
+		case 'D':
+			return 13;
+		case 'e':
+		case 'E':
+			return 14;
+		case 'f':
+		case 'F':
+			return 15;
+		default:
+			throw std::invalid_argument("Unrecognized character");
 		}
 	}
 	else if constexpr (std::is_same_v<char_t, wchar_t>)
 	{
 		switch (c)
 		{
-			case L'0':
-				return 0;
-			case L'1':
-				return 1;
-			case L'2':
-				return 2;
-			case L'3':
-				return 3;
-			case L'4':
-				return 4;
-			case L'5':
-				return 5;
-			case L'6':
-				return 6;
-			case L'7':
-				return 7;
-			case L'8':
-				return 8;
-			case L'9':
-				return 9;
-			case L'A':
-			case L'a':
-				return 10;
-			case L'b':
-			case L'B':
-				return 11;
-			case L'c':
-			case L'C':
-				return 12;
-			case L'd':
-			case L'D':
-				return 13;
-			case L'e':
-			case L'E':
-				return 14;
-			case L'f':
-			case L'F':
-				return 15;
-			default:
-				throw std::invalid_argument("Unrecognized character");
+		case L'0':
+			return 0;
+		case L'1':
+			return 1;
+		case L'2':
+			return 2;
+		case L'3':
+			return 3;
+		case L'4':
+			return 4;
+		case L'5':
+			return 5;
+		case L'6':
+			return 6;
+		case L'7':
+			return 7;
+		case L'8':
+			return 8;
+		case L'9':
+			return 9;
+		case L'A':
+		case L'a':
+			return 10;
+		case L'b':
+		case L'B':
+			return 11;
+		case L'c':
+		case L'C':
+			return 12;
+		case L'd':
+		case L'D':
+			return 13;
+		case L'e':
+		case L'E':
+			return 14;
+		case L'f':
+		case L'F':
+			return 15;
+		default:
+			throw std::invalid_argument("Unrecognized character");
 		}
 	}
 	else if constexpr (std::is_same_v<char_t, char8_t>)
 	{
 		switch (c)
 		{
-			case u8'0':
-				return 0;
-			case u8'1':
-				return 1;
-			case u8'2':
-				return 2;
-			case u8'3':
-				return 3;
-			case u8'4':
-				return 4;
-			case u8'5':
-				return 5;
-			case u8'6':
-				return 6;
-			case u8'7':
-				return 7;
-			case u8'8':
-				return 8;
-			case u8'9':
-				return 9;
-			case u8'A':
-			case u8'a':
-				return 10;
-			case u8'b':
-			case u8'B':
-				return 11;
-			case u8'c':
-			case u8'C':
-				return 12;
-			case u8'd':
-			case u8'D':
-				return 13;
-			case u8'e':
-			case u8'E':
-				return 14;
-			case u8'f':
-			case u8'F':
-				return 15;
-			default:
-				throw std::invalid_argument("Unrecognized character");
+		case u8'0':
+			return 0;
+		case u8'1':
+			return 1;
+		case u8'2':
+			return 2;
+		case u8'3':
+			return 3;
+		case u8'4':
+			return 4;
+		case u8'5':
+			return 5;
+		case u8'6':
+			return 6;
+		case u8'7':
+			return 7;
+		case u8'8':
+			return 8;
+		case u8'9':
+			return 9;
+		case u8'A':
+		case u8'a':
+			return 10;
+		case u8'b':
+		case u8'B':
+			return 11;
+		case u8'c':
+		case u8'C':
+			return 12;
+		case u8'd':
+		case u8'D':
+			return 13;
+		case u8'e':
+		case u8'E':
+			return 14;
+		case u8'f':
+		case u8'F':
+			return 15;
+		default:
+			throw std::invalid_argument("Unrecognized character");
 		}
 	}
 	else if constexpr (std::is_same_v<char_t, char16_t>)
 	{
 		switch (c)
 		{
-			case u'0':
-				return 0;
-			case u'1':
-				return 1;
-			case u'2':
-				return 2;
-			case u'3':
-				return 3;
-			case u'4':
-				return 4;
-			case u'5':
-				return 5;
-			case u'6':
-				return 6;
-			case u'7':
-				return 7;
-			case u'8':
-				return 8;
-			case u'9':
-				return 9;
-			case u'A':
-			case u'a':
-				return 10;
-			case u'b':
-			case u'B':
-				return 11;
-			case u'c':
-			case u'C':
-				return 12;
-			case u'd':
-			case u'D':
-				return 13;
-			case u'e':
-			case u'E':
-				return 14;
-			case u'f':
-			case u'F':
-				return 15;
-			default:
-				throw std::invalid_argument("Unrecognized character");
+		case u'0':
+			return 0;
+		case u'1':
+			return 1;
+		case u'2':
+			return 2;
+		case u'3':
+			return 3;
+		case u'4':
+			return 4;
+		case u'5':
+			return 5;
+		case u'6':
+			return 6;
+		case u'7':
+			return 7;
+		case u'8':
+			return 8;
+		case u'9':
+			return 9;
+		case u'A':
+		case u'a':
+			return 10;
+		case u'b':
+		case u'B':
+			return 11;
+		case u'c':
+		case u'C':
+			return 12;
+		case u'd':
+		case u'D':
+			return 13;
+		case u'e':
+		case u'E':
+			return 14;
+		case u'f':
+		case u'F':
+			return 15;
+		default:
+			throw std::invalid_argument("Unrecognized character");
 		}
 	}
 	else
 	{
 		switch (c)
 		{
-			case U'0':
-				return 0;
-			case U'1':
-				return 1;
-			case U'2':
-				return 2;
-			case U'3':
-				return 3;
-			case U'4':
-				return 4;
-			case U'5':
-				return 5;
-			case U'6':
-				return 6;
-			case U'7':
-				return 7;
-			case U'8':
-				return 8;
-			case U'9':
-				return 9;
-			case U'A':
-			case U'a':
-				return 10;
-			case U'b':
-			case U'B':
-				return 11;
-			case U'c':
-			case U'C':
-				return 12;
-			case U'd':
-			case U'D':
-				return 13;
-			case U'e':
-			case U'E':
-				return 14;
-			case U'f':
-			case U'F':
-				return 15;
-			default:
-				throw std::invalid_argument("Unrecognized character");
+		case U'0':
+			return 0;
+		case U'1':
+			return 1;
+		case U'2':
+			return 2;
+		case U'3':
+			return 3;
+		case U'4':
+			return 4;
+		case U'5':
+			return 5;
+		case U'6':
+			return 6;
+		case U'7':
+			return 7;
+		case U'8':
+			return 8;
+		case U'9':
+			return 9;
+		case U'A':
+		case U'a':
+			return 10;
+		case U'b':
+		case U'B':
+			return 11;
+		case U'c':
+		case U'C':
+			return 12;
+		case U'd':
+		case U'D':
+			return 13;
+		case U'e':
+		case U'E':
+			return 14;
+		case U'f':
+		case U'F':
+			return 15;
+		default:
+			throw std::invalid_argument("Unrecognized character");
 		}
 	}
 }
 
 template<typename Chars, typename CharTraits>
-	requires cjm::numerics::concepts::char_with_traits<Chars, CharTraits>
-constexpr std::pair<std::uint8_t, typename cjm::numerics::u128_parsing_helper<Chars, CharTraits>::sv> 
-	cjm::numerics::u128_parsing_helper<Chars, CharTraits>::get_value_hex(sv text)
+requires cjm::numerics::concepts::char_with_traits<Chars, CharTraits>
+constexpr std::pair<std::uint8_t, typename cjm::numerics::u128_parsing_helper<Chars, CharTraits>::sv>
+cjm::numerics::u128_parsing_helper<Chars, CharTraits>::get_value_hex(sv text)
 {
 	uint8_t high_nibble, low_nibble;
 	auto ret = sv{};
@@ -2145,156 +2145,156 @@ constexpr std::pair<std::uint8_t, typename cjm::numerics::u128_parsing_helper<Ch
 }
 
 template<typename Chars, typename CharTraits>
-	requires cjm::numerics::concepts::char_with_traits<Chars, CharTraits>
-constexpr std::uint8_t 
-	cjm::numerics::u128_parsing_helper<Chars, CharTraits>::get_value_dec(char_t c)
+requires cjm::numerics::concepts::char_with_traits<Chars, CharTraits>
+constexpr std::uint8_t
+cjm::numerics::u128_parsing_helper<Chars, CharTraits>::get_value_dec(char_t c)
 {
 	using namespace std::string_view_literals;
-	
+
 	if constexpr (std::is_same_v<char_t, char>)
 	{
 		switch (c)
 		{
-			case '0':
-				return 0;
-			case '1':
-				return 1;
-			case '2':
-				return 2;
-			case '3':
-				return 3;
-			case '4':
-				return 4;
-			case '5':
-				return 5;
-			case '6':
-				return 6;
-			case '7':
-				return 7;
-			case '8':
-				return 8;
-			case '9':
-				return 9;
-			default:
-				throw std::invalid_argument("Unrecognized character");
+		case '0':
+			return 0;
+		case '1':
+			return 1;
+		case '2':
+			return 2;
+		case '3':
+			return 3;
+		case '4':
+			return 4;
+		case '5':
+			return 5;
+		case '6':
+			return 6;
+		case '7':
+			return 7;
+		case '8':
+			return 8;
+		case '9':
+			return 9;
+		default:
+			throw std::invalid_argument("Unrecognized character");
 		}
 	}
 	else if constexpr (std::is_same_v<char_t, wchar_t>)
 	{
 		switch (c)
 		{
-			case L'0':
-				return 0;
-			case L'1':
-				return 1;
-			case L'2':
-				return 2;
-			case L'3':
-				return 3;
-			case L'4':
-				return 4;
-			case L'5':
-				return 5;
-			case L'6':
-				return 6;
-			case L'7':
-				return 7;
-			case L'8':
-				return 8;
-			case L'9':
-				return 9;
-			default:
-				throw std::invalid_argument("Unrecognized character");
+		case L'0':
+			return 0;
+		case L'1':
+			return 1;
+		case L'2':
+			return 2;
+		case L'3':
+			return 3;
+		case L'4':
+			return 4;
+		case L'5':
+			return 5;
+		case L'6':
+			return 6;
+		case L'7':
+			return 7;
+		case L'8':
+			return 8;
+		case L'9':
+			return 9;
+		default:
+			throw std::invalid_argument("Unrecognized character");
 		}
 	}
 	else if constexpr (std::is_same_v<char_t, char8_t>)
 	{
 		switch (c)
 		{
-			case u8'0':
-				return 0;
-			case u8'1':
-				return 1;
-			case u8'2':
-				return 2;
-			case u8'3':
-				return 3;
-			case u8'4':
-				return 4;
-			case u8'5':
-				return 5;
-			case u8'6':
-				return 6;
-			case u8'7':
-				return 7;
-			case u8'8':
-				return 8;
-			case u8'9':
-				return 9;
-			default:
-				throw std::invalid_argument("Unrecognized character");
+		case u8'0':
+			return 0;
+		case u8'1':
+			return 1;
+		case u8'2':
+			return 2;
+		case u8'3':
+			return 3;
+		case u8'4':
+			return 4;
+		case u8'5':
+			return 5;
+		case u8'6':
+			return 6;
+		case u8'7':
+			return 7;
+		case u8'8':
+			return 8;
+		case u8'9':
+			return 9;
+		default:
+			throw std::invalid_argument("Unrecognized character");
 		}
 	}
 	else if constexpr (std::is_same_v<char_t, char16_t>)
 	{
 		switch (c)
 		{
-			case u'0':
-				return 0;
-			case u'1':
-				return 1;
-			case u'2':
-				return 2;
-			case u'3':
-				return 3;
-			case u'4':
-				return 4;
-			case u'5':
-				return 5;
-			case u'6':
-				return 6;
-			case u'7':
-				return 7;
-			case u'8':
-				return 8;
-			case u'9':
-				return 9;
-			default:
-				throw std::invalid_argument("Unrecognized character");
+		case u'0':
+			return 0;
+		case u'1':
+			return 1;
+		case u'2':
+			return 2;
+		case u'3':
+			return 3;
+		case u'4':
+			return 4;
+		case u'5':
+			return 5;
+		case u'6':
+			return 6;
+		case u'7':
+			return 7;
+		case u'8':
+			return 8;
+		case u'9':
+			return 9;
+		default:
+			throw std::invalid_argument("Unrecognized character");
 		}
 	}
 	else
 	{
 		switch (c)
 		{
-			case U'0':
-				return 0;
-			case U'1':
-				return 1;
-			case U'2':
-				return 2;
-			case U'3':
-				return 3;
-			case U'4':
-				return 4;
-			case U'5':
-				return 5;
-			case U'6':
-				return 6;
-			case U'7':
-				return 7;
-			case U'8':
-				return 8;
-			case U'9':
-				return 9;
-			default:
-				throw std::invalid_argument("Unrecognized character");
+		case U'0':
+			return 0;
+		case U'1':
+			return 1;
+		case U'2':
+			return 2;
+		case U'3':
+			return 3;
+		case U'4':
+			return 4;
+		case U'5':
+			return 5;
+		case U'6':
+			return 6;
+		case U'7':
+			return 7;
+		case U'8':
+			return 8;
+		case U'9':
+			return 9;
+		default:
+			throw std::invalid_argument("Unrecognized character");
 		}
 	}
 }
 
 template<typename Chars, typename CharTraits>
-	requires cjm::numerics::concepts::char_with_traits<Chars, CharTraits>
+requires cjm::numerics::concepts::char_with_traits<Chars, CharTraits>
 constexpr bool cjm::numerics::u128_parsing_helper<Chars, CharTraits>::is_legal_hex_char(char_t c)
 {
 
@@ -2302,70 +2302,70 @@ constexpr bool cjm::numerics::u128_parsing_helper<Chars, CharTraits>::is_legal_h
 	{
 		switch (c)
 		{
-			case '0':
-			case '1':
-			case '2':
-			case '3':
-			case '4':
-			case '5':
-			case '6':
-			case '7':
-			case '8':
-			case '9':
-			case 'A':
-			case 'a':
-			case 'b':
-			case 'B':
-			case 'c':
-			case 'C':
-			case 'd':
-			case 'D':
-			case 'e':
-			case 'E':
-			case 'f':
-			case 'F':
-				return true;
-			default:
-				return false;
+		case '0':
+		case '1':
+		case '2':
+		case '3':
+		case '4':
+		case '5':
+		case '6':
+		case '7':
+		case '8':
+		case '9':
+		case 'A':
+		case 'a':
+		case 'b':
+		case 'B':
+		case 'c':
+		case 'C':
+		case 'd':
+		case 'D':
+		case 'e':
+		case 'E':
+		case 'f':
+		case 'F':
+			return true;
+		default:
+			return false;
 		}
 	}
 	else
 	{
-		switch(static_cast<char>(c))
+		switch (static_cast<char>(c))
 		{
-			case '0':
-			case '1':
-			case '2':
-			case '3':
-			case '4':
-			case '5':
-			case '6':
-			case '7':
-			case '8':
-			case '9':
-			case 'A':
-			case 'a':
-			case 'b':
-			case 'B':
-			case 'c':
-			case 'C':
-			case 'd':
-			case 'D':
-			case 'e':
-			case 'E':
-			case 'f':
-			case 'F':
-				return true;
-			default:
-				return false;
+		case '0':
+		case '1':
+		case '2':
+		case '3':
+		case '4':
+		case '5':
+		case '6':
+		case '7':
+		case '8':
+		case '9':
+		case 'A':
+		case 'a':
+		case 'b':
+		case 'B':
+		case 'c':
+		case 'C':
+		case 'd':
+		case 'D':
+		case 'e':
+		case 'E':
+		case 'f':
+		case 'F':
+			return true;
+		default:
+			return false;
 		}
 	}
 }
 
 template<typename Chars, typename CharTraits>
-	requires cjm::numerics::concepts::char_with_traits<Chars, CharTraits>
+requires cjm::numerics::concepts::char_with_traits<Chars, CharTraits>
 constexpr  cjm::numerics::uint128 cjm::numerics::u128_parsing_helper<Chars, CharTraits>::
-	parse_decimal_str(sv decimal_str)
+parse_decimal_str(sv decimal_str)
 {
 	uint128 ret = 0;
 	uint128 exp = 1;
@@ -2382,14 +2382,14 @@ constexpr  cjm::numerics::uint128 cjm::numerics::u128_parsing_helper<Chars, Char
 
 
 template<typename Chars, typename CharTraits>
-	requires cjm::numerics::concepts::char_with_traits<Chars, CharTraits>
+requires cjm::numerics::concepts::char_with_traits<Chars, CharTraits>
 constexpr  cjm::numerics::uint128 cjm::numerics::u128_parsing_helper<Chars, CharTraits>::
-	parse_hex_str(sv hex_str)
+parse_hex_str(sv hex_str)
 {
 	constexpr char zero = '0';
 	constexpr char_t zero_cast = static_cast<char_t>(zero);
 	auto length = hex_str.length();
-	
+
 	if (length < 1)
 	{
 		throw std::invalid_argument{ "Cannot parse supplied string as 128-bit unsigned integer: string is empty." };
@@ -2419,7 +2419,7 @@ constexpr  cjm::numerics::uint128 cjm::numerics::u128_parsing_helper<Chars, Char
 		{
 			hex_str = hex_str.substr(2, hex_str.size() - 2);
 		}
-		size_t hex_digits = std::count_if(hex_str.cbegin(), hex_str.cend(), 
+		size_t hex_digits = std::count_if(hex_str.cbegin(), hex_str.cend(),
 			[](char_t c) -> bool
 			{
 				return is_legal_hex_char(c);
@@ -2428,29 +2428,29 @@ constexpr  cjm::numerics::uint128 cjm::numerics::u128_parsing_helper<Chars, Char
 		{
 			throw std::invalid_argument{ "Supplied string contains no valid hexadecimal digits." };
 		}
-		
+
 		constexpr size_t max_hex_digits = std::numeric_limits<uint128>::digits / (CHAR_BIT / 2); //max of 32 hex digits
-		
+
 		if (hex_digits > max_hex_digits)
 		{
 			throw std::invalid_argument{ "Supplied string contains too many hex digits to store in uint128." };
 		}
-		
+
 		const size_t shift_result_right_amount = (max_hex_digits - hex_digits) * 4u;
 		//nb. removed vector and just use array.  not only vector not necessary, but clang can't handle in constexpr context yet
 		auto arr = (uint128{}).to_big_endian_arr(); //get an empty zero-filled array
 		size_t idx = 0;
-		
+
 		while (!hex_str.empty()) //i.e. more bytes to go
 		{
 			//get next byte and the remainder of the string not incl byte we just got
 			//if no more bytes, new_hex_str will be empty.
-			auto [byte, new_hex_str] = get_value_hex(hex_str); 
+			auto [byte, new_hex_str] = get_value_hex(hex_str);
 			hex_str = new_hex_str;
 			arr[idx++] = byte;
 		}
 		return (uint128::make_from_bytes_big_endian(arr) >> shift_result_right_amount);
-	}   
+	}
 }
 
 namespace cjm::numerics::internal
@@ -2459,7 +2459,7 @@ namespace cjm::numerics::internal
 	uint128 make_from_floating_point(TFloat v) noexcept
 	{
 		using flt_t = std::remove_cvref_t<TFloat>;
-		if constexpr (std::is_same_v<flt_t, long double> && !sse3_available && 
+		if constexpr (std::is_same_v<flt_t, long double> && !sse3_available &&
 			// ReSharper disable once CppRedundantBooleanExpressionArgument
 			(compiler == compiler_used::clang || compiler == compiler_used::clang_gcc))
 		{
@@ -2468,7 +2468,7 @@ namespace cjm::numerics::internal
 			static_assert(std::numeric_limits<long double>::digits <= 150, "long double digits must <= 150.");
 			// Undefined behavior if v is not finite or cannot fit into uint128.
 			assert(std::isfinite(v) && v > -1 && v < std::ldexp(1.0L, 128));
-			
+
 			v = std::ldexp(v, -100);
 			const auto w0 = static_cast<std::uint64_t>(static_cast<double>(std::trunc(v)));
 			v = std::ldexp(v - static_cast<double>(w0), 50);
@@ -2480,14 +2480,14 @@ namespace cjm::numerics::internal
 		}
 		else
 		{
-			
+
 			// Rounding behavior is towards zero, same as for built-in types.
 			// Undefined behavior if v is NaN or cannot fit into uint128.
 			assert(std::isfinite(v) && v > -1 &&
 				(std::numeric_limits<flt_t>::max_exponent <= 128 ||
 					v < std::ldexp(static_cast<flt_t>(1), 128)));
 
-			if (v >= std::ldexp(static_cast<flt_t>(1), 64)) 
+			if (v >= std::ldexp(static_cast<flt_t>(1), 64))
 			{
 				const auto hi = static_cast<std::uint64_t>(std::ldexp(v, -64));
 				const auto lo = static_cast<std::uint64_t>(v - std::ldexp(static_cast<flt_t>(hi), 64));
@@ -2520,10 +2520,10 @@ namespace cjm::numerics::internal
 		borrow_out = ret > minuend ? 1 : 0;
 		return ret;
 	}
-	
+
 	template<concepts::cjm_unsigned_integer Ui128>
-		requires (sizeof(Ui128) == 16 && !concepts::builtin_128bit_unsigned_integer<Ui128>)
-	Ui128 add_with_carry(Ui128 first_addend, Ui128 second_addend,
+	requires (sizeof(Ui128) == 16 && !concepts::builtin_128bit_unsigned_integer<Ui128>)
+		Ui128 add_with_carry(Ui128 first_addend, Ui128 second_addend,
 			unsigned char carry_in, unsigned char& carry_out) noexcept
 	{
 		Ui128 ret = first_addend;
@@ -2535,9 +2535,9 @@ namespace cjm::numerics::internal
 	}
 
 	template<concepts::cjm_unsigned_integer Ui128>
-		requires (sizeof(Ui128) == 16 && !concepts::builtin_128bit_unsigned_integer<Ui128>)
-	Ui128 sub_with_borrow(Ui128 minuend, Ui128 subtrahend,
-		unsigned char borrow_in, unsigned char& borrow_out) noexcept
+	requires (sizeof(Ui128) == 16 && !concepts::builtin_128bit_unsigned_integer<Ui128>)
+		Ui128 sub_with_borrow(Ui128 minuend, Ui128 subtrahend,
+			unsigned char borrow_in, unsigned char& borrow_out) noexcept
 	{
 		Ui128 ret = minuend;
 		if (borrow_in)
@@ -2546,7 +2546,7 @@ namespace cjm::numerics::internal
 		borrow_out = ret > minuend ? 1 : 0;
 		return ret;
 	}
-	
+
 }
 
 namespace cjm::numerics
@@ -2596,7 +2596,7 @@ namespace cjm::numerics
 	}
 }
 
-namespace
+namespace cjm::numerics::internal::consider_delete
 {
 	using namespace cjm::numerics;
 	using namespace uint128_literals;
@@ -2625,7 +2625,7 @@ constexpr cjm::numerics::uint128 GetZero() noexcept
 	return ret;
 }
 
-inline void cjm::numerics::uint128::instrumented_div_mod(std::basic_ostream<char>& stream, 
+inline void cjm::numerics::uint128::instrumented_div_mod(std::basic_ostream<char>& stream,
 	uint128 dividend, uint128 divisor, uint128* quotient_ret, uint128* remainder_ret)
 {
 	constexpr auto newl = "\n";
@@ -2679,7 +2679,7 @@ inline void cjm::numerics::uint128::instrumented_div_mod(std::basic_ostream<char
 	for (int i = 0; i <= shiftAmount; i++)
 	{
 		stream << "i = " << std::dec << i << " i <= " << shiftAmount
-			   << "= " << (i <= shiftAmount) << std::hex << newl;
+			<< "= " << (i <= shiftAmount) << std::hex << newl;
 		stream << "quotient: 0x" << quotient << newl;
 		quotient <<= 1;
 		stream << "(quotient <<= 1): 0x" << quotient << newl;
@@ -2717,10 +2717,10 @@ inline cjm::numerics::uint128::operator double() const
 inline cjm::numerics::uint128::operator long double() const
 {
 	return static_cast<long double>(m_limbs.m_low) +
-		   std::ldexp(static_cast<long double>(m_limbs.m_high), 64);
+		std::ldexp(static_cast<long double>(m_limbs.m_high), 64);
 }
 
-inline void uint128::best_safe_div_mod(uint128 dividend, uint128 divisor, 
+inline void cjm::numerics::uint128::best_safe_div_mod(uint128 dividend, uint128 divisor,
 	uint128* quotient, uint128* remainder)
 {
 	if (divisor == 0) throw std::domain_error{ "Division and/or modulus by zero is forbidden." };
@@ -2753,13 +2753,13 @@ inline void uint128::best_safe_div_mod(uint128 dividend, uint128 divisor,
 //to using abseil's shift with subtract algorithm as elsewhere
 //rather than using the slow-case handler from clang.
 #ifdef CJM_UDIV_INTRINSIC_AVAILABLE
-inline void uint128::div_mod_msc_x64_impl(uint128 dividend, uint128 divisor, 
+inline void cjm::numerics::uint128::div_mod_msc_x64_impl(uint128 dividend, uint128 divisor,
 	uint128* quotient_ret, uint128* remainder_ret) noexcept
 {
 	constexpr size_t n_utword_bits = sizeof(uint128) * CHAR_BIT;
 	assert(quotient_ret != nullptr && remainder_ret != nullptr && divisor != 0);
-	uint128 quotient=0;
-	uint128 remainder=0;
+	uint128 quotient = 0;
+	uint128 remainder = 0;
 	if (divisor > dividend)
 	{
 		*remainder_ret = dividend;
@@ -2794,10 +2794,10 @@ inline void uint128::div_mod_msc_x64_impl(uint128 dividend, uint128 divisor,
 	return;
 }
 #else
-inline void uint128::div_mod_msc_x64_impl([[maybe_unused]]uint128 dividend,[[maybe_unused]] uint128 divisor, uint128* quotient_ret, uint128* remainder_ret) noexcept
+inline void cjm::numerics::uint128::div_mod_msc_x64_impl([[maybe_unused]] uint128 dividend, [[maybe_unused]] uint128 divisor, uint128* quotient_ret, uint128* remainder_ret) noexcept
 {
 	//do nothing ... in gcc this never gets called but still needs to be there
-	*quotient_ret =0;
+	*quotient_ret = 0;
 	*remainder_ret = 0;
 }
 #endif
@@ -2807,12 +2807,12 @@ namespace cjm::numerics::uint128_literals
 	namespace internal
 	{
 		template<char... Chars>
-			requires (sizeof...(Chars) > 0)
-		struct array_retrieval_helper;
+		requires (sizeof...(Chars) > 0)
+			struct array_retrieval_helper;
 
 		template<char... Chars>
-			requires (sizeof...(Chars) > 0)
-		struct array_retrieval_helper final
+		requires (sizeof...(Chars) > 0)
+			struct array_retrieval_helper final
 		{
 			static CJM_LIT_CONST std::array<char, sizeof...(Chars)> reverse_array();
 			static constexpr std::array<char, sizeof...(Chars)> reversed_array_val = reverse_array();
@@ -2820,8 +2820,8 @@ namespace cjm::numerics::uint128_literals
 		};
 
 		template<char... Chars>
-			requires (sizeof...(Chars) > 0)
-		CJM_LIT_CONST std::array<char, sizeof...(Chars)> array_retrieval_helper<Chars...>::reverse_array()
+		requires (sizeof...(Chars) > 0)
+			CJM_LIT_CONST std::array<char, sizeof...(Chars)> array_retrieval_helper<Chars...>::reverse_array()
 		{
 			std::array<char, sizeof...(Chars)> src{ Chars... };
 			std::array<char, sizeof...(Chars)> ret{};
@@ -2836,8 +2836,8 @@ namespace cjm::numerics::uint128_literals
 	}
 
 	template<lit_type LiteralType>
-		requires (LiteralType == lit_type::Decimal || LiteralType == lit_type::Hexadecimal)
-	CJM_LIT_CONST std::array<std::optional<unsigned short>, 256u> lit_helper::init_digit_lookup()
+	requires (LiteralType == lit_type::Decimal || LiteralType == lit_type::Hexadecimal)
+		CJM_LIT_CONST std::array<std::optional<unsigned short>, 256u> lit_helper::init_digit_lookup()
 	{
 		if constexpr (LiteralType == lit_type::Decimal)
 		{
@@ -3024,8 +3024,8 @@ namespace cjm::numerics::uint128_literals
 	}
 
 	template<char... Chars>
-		requires (sizeof...(Chars) > 0)
-	CJM_LIT_CONST bool lit_helper::are_all_chars_0()
+	requires (sizeof...(Chars) > 0)
+		CJM_LIT_CONST bool lit_helper::are_all_chars_0()
 	{
 		std::array<char, sizeof...(Chars)> arr{ Chars... };
 		for (char c : arr)
@@ -3111,9 +3111,9 @@ namespace cjm::numerics::uint128_literals
 	}
 
 	template<concepts::unsigned_integer Ui, size_t Digits, lit_type LiteralType, char... Chars>
-		requires (sizeof...(Chars) > 0 && sizeof...(Chars) >= Digits && Digits > 0 &&
-			(LiteralType == lit_type::Decimal || LiteralType == lit_type::Hexadecimal))
-	CJM_LIT_CONST std::optional<Ui> lit_helper::execute_literal_parse()
+	requires (sizeof...(Chars) > 0 && sizeof...(Chars) >= Digits && Digits > 0 &&
+		(LiteralType == lit_type::Decimal || LiteralType == lit_type::Hexadecimal))
+		CJM_LIT_CONST std::optional<Ui> lit_helper::execute_literal_parse()
 	{
 		using reverser_t = typename internal::array_retrieval_helper<Chars...>;
 		Ui ret = 0;

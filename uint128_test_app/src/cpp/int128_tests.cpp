@@ -27,7 +27,7 @@ namespace
 
 	constexpr auto hex_char_arr = std::array<char, 16> {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'};
 
-	template<concepts::unsigned_integer Ui, bool HexAndDecimal>
+	template<cjm::numerics::concepts::unsigned_integer Ui, bool HexAndDecimal>
 	constexpr std::array<size_t, (std::numeric_limits<Ui>::digits10 + 2)> init_num_tests_arr() noexcept
 	{
 		auto temp = std::array<size_t, std::numeric_limits<Ui>::digits10 + 2>{};
@@ -4382,7 +4382,7 @@ void cjm::uint128_tests::execute_umult_spec_tests()
 		= cjm::numerics::internal::umult(left_factor_64, right_factor_64);
 	constexpr auto actual_ctime_product_128 = cjm::numerics::internal::umult(left_factor_64, right_factor_64);
 	constexpr auto converted_ctime = uint128_t{ actual_ctime_product_128.m_high, actual_ctime_product_128.m_low };
-	auto converted_rtime = bit_cast<uint128_t>(actual_product_128);
+	auto converted_rtime = cjm::numerics::bit_cast<uint128_t>(actual_product_128);
 
 	std::cout
 		<< "[0x" << std::hex << std::setw(std::numeric_limits<decltype(left_factor_64)>::digits / 4)
@@ -4399,11 +4399,11 @@ void cjm::uint128_tests::execute_umult_spec_tests()
 	
 }
 
-constexpr uint128_t to_uint128_t(const fixed_uint_container::add_carry_result_t<std::uint64_t>& input) noexcept
+constexpr uint128_t to_uint128_t(const cjm::numerics::fixed_uint_container::add_carry_result_t<std::uint64_t>& input) noexcept
 {
-	auto value = static_cast<uint128_t>(fixed_uint_container::get_carry_out<std::uint64_t>(input));
+	auto value = static_cast<uint128_t>(cjm::numerics::fixed_uint_container::get_carry_out<std::uint64_t>(input));
 	value <<= 64;
-	value |= fixed_uint_container::get_sum<std::uint64_t>(input);
+	value |= cjm::numerics::fixed_uint_container::get_sum<std::uint64_t>(input);
 	return value;
 }
 
@@ -4416,7 +4416,7 @@ void cjm::uint128_tests::execute_uintcontainer_adc_tests()
 	constexpr auto res = cjm::numerics::fixed_uint_container::add_with_carry(first_addend, second_addend, 0);
 	static_assert(sum == to_uint128_t(res));
 	auto res_runtime = cjm::numerics::fixed_uint_container::add_with_carry(first_addend, second_addend, 0);
-	auto widened = bit_cast<uint128_t>(res_runtime);
+	auto widened = cjm::numerics::bit_cast<uint128_t>(res_runtime);
 	cjm_assert(widened == sum);
 	auto saver = cout_saver{ cout };
 	std::cout << "[" << std::dec << first_addend << "] + [" << second_addend << "] == [" << widened << "]." << newl;
