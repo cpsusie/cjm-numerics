@@ -12,7 +12,10 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="8ab5edb8-7d60-4856-834e-1b0d4d4bfdec" name="Default Changelist" comment="Working on new extended precision multiplication code." />
+    <list default="true" id="8ab5edb8-7d60-4856-834e-1b0d4d4bfdec" name="Default Changelist" comment="Working on new extended precision multiplication code.">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/quick_start_visual_studio/quick_start_install_vs2019.md" beforeDir="false" afterPath="$PROJECT_DIR$/docs/quick_start_visual_studio/quick_start_install_vs2019.md" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -22,6 +25,7 @@
   <component name="ClangdSettings">
     <option name="formatViaClangd" value="false" />
   </component>
+  <component name="ExecutionTargetManager" SELECTED_TARGET="CMakeBuildProfile:Debug" />
   <component name="Git.Settings">
     <favorite-branches>
       <branch-storage>
@@ -83,10 +87,25 @@
       <recent name="$PROJECT_DIR$/cmake-build-debug" />
     </key>
   </component>
-  <component name="RunManager">
-    <configuration default="true" type="CLionExternalRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" PASS_PARENT_ENVS_2="true">
+  <component name="RunManager" selected="CMake Application.EnvironTest">
+    <configuration name="EnvironTest" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="Int128" TARGET_NAME="EnvironTest" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="Int128" RUN_TARGET_NAME="EnvironTest">
       <method v="2">
-        <option name="CLION.EXTERNAL.BUILD" enabled="true" />
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="ExampleCode" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="Int128" TARGET_NAME="ExampleCode" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="Int128" RUN_TARGET_NAME="ExampleCode">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="Int128" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="Int128" TARGET_NAME="Int128" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="Int128" RUN_TARGET_NAME="Int128">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration default="true" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" PASS_PARENT_ENVS_2="true">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
       </method>
     </configuration>
     <configuration default="true" type="GradleAppRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" PASS_PARENT_ENVS_2="true">
@@ -94,6 +113,11 @@
         <option name="com.jetbrains.cidr.cpp.gradle.execution.GradleNativeBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
       </method>
     </configuration>
+    <list>
+      <item itemvalue="CMake Application.EnvironTest" />
+      <item itemvalue="CMake Application.ExampleCode" />
+      <item itemvalue="CMake Application.Int128" />
+    </list>
   </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="project-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
@@ -145,6 +169,7 @@
       <workItem from="1618016486354" duration="100000" />
       <workItem from="1618016692901" duration="637000" />
       <workItem from="1618082747429" duration="6000" />
+      <workItem from="1619133789829" duration="307000" />
     </task>
     <task id="LOCAL-00001" summary="Add stream extraction operator for vector of bin_op_uint128_t's.  Add unit test.">
       <created>1610297106627</created>
@@ -452,7 +477,6 @@
     <option name="oldMeFiltersMigrated" value="true" />
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Add ctors to unary operation struct.  Add basic unit test for unary operation struct." />
     <MESSAGE value="Add compile time post-increment test.  Add test to generate static assertions for compile-time test." />
     <MESSAGE value="Suppress warnings regarding flags enumeration in switch." />
     <MESSAGE value="Limit effect of suppressions to a GCC environment to not trigger unknown pragma warnings elsewhere." />
@@ -476,11 +500,11 @@
     <MESSAGE value="Add pre/post inc/dec to example code.  Also add section showing unary+ (a no-op for uint128_t)." />
     <MESSAGE value="Add demonstration of signed and unsigned built-in integral conversions to and from uint128 in the example code." />
     <MESSAGE value="Removed bitcast (which is not constexpr in gcc / clang) from constexpr add_with_carry_u64 function." />
-    <MESSAGE value="Working on new extended precision multiplication code." />
     <MESSAGE value="Update CMakeLists.txt to reflect move of include files from src to /src/include." />
     <MESSAGE value="Add reference to new experimental vcpkg project." />
     <MESSAGE value="Update workspace.xml." />
     <MESSAGE value="Adjust CMakeLists.txt.  Revise include path in port file." />
+    <MESSAGE value="Working on new extended precision multiplication code." />
     <option name="LAST_COMMIT_MESSAGE" value="Working on new extended precision multiplication code." />
   </component>
   <component name="XDebuggerManager">

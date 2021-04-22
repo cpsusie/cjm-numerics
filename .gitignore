@@ -427,3 +427,7 @@ workspace.xml
 /gcc-release-scripted/Int128
 /listing.asm
 /vcpkg_port/cjm_numerics_uint128/json-examples.txt
+/src/.idea/misc.xml
+/src/.idea/modules.xml
+/src/.idea/src.iml
+/src/.idea/vcs.xml
