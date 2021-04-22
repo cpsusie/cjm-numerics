@@ -1,5 +1,5 @@
 # CJM Numerics Visual Studio Quick Start Installation Guide
-Copyright © 2020-2021, CJM Screws, LLC
+**Copyright © 2020-2021, CJM Screws, LLC**
 
 This guide provides a walkthrough on how to install this CJM Numerics UInt128 Library for usage with Visual Studio 2019.  It may also apply, with a few variations, to Visual Studio Code.  Please note that this project requires using a C++ compiler that supports C++20.  For Microsoft's compiler, the minimum version is 16.9.3.  
 
@@ -20,8 +20,6 @@ Alternatively you can download vcpkg from my fork of their repository [here][3].
 Assuming, you downloaded vcpkg from Microsoft's repository and have downloaded the port for this library, copy it to vcpkg's ports folder as shown:  
   
 ![Copy over entire folder to Ports](images/downloading_port/copy_folder_to_vcpkg_port_folder.PNG)
-
-
 
 ### Install the Package  
 
@@ -75,6 +73,14 @@ The package cjm-numerics-uint128:x64-windows is header only and can be used from
     target_include_directories(main PRIVATE ${CJM_NUMERICS_UINT128_INCLUDE_DIRS})  
     
 Repeat the command above but this time specify x86-windows: `.\vcpkg.exe install cjm-numerics-uint128:x86-windows`.  The results should be similar to the above.  
+  
+### Create a Console Application To Test Installation  
+  
+Open up Visual Studio and choose "Create a New Project".  Choose an **Empty** *C++* **Console** project for *Windows*, then choose an appropriate name and location for the project.  When satisfied, choose "Create".  The following shows how to do this graphically:  
+  
+![Create Empty Windows Console Application](images/create%20new%20project.PNG)
+
+
   
 
 
