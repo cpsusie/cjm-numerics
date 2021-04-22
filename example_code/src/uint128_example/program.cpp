@@ -45,10 +45,10 @@
 //to prove correctness.  Proof of correctness is available through the uint128_test_app
 //which contains extensive unit tests.  THIS application, unlike uint128_test_app
 //has NO dependencies other than a C++20 compiler that conforms to a subset of the C++20
-//standard a C++20 standard library implementation that does the same.  Please
-// consult this project's repository to learn what subset that is.  (Briefly, on Windows (tested
+//standard and a C++20 standard library implementation that does the same.  Please
+// consult this project's repository to learn what subset that is.  Briefly, on Windows tested
 // 32 and 64 bit Microsoft 19.28+, on Linux - GCC 10.2.0+ and Linux Clang 11.0.0-2+ are known to work in
-// x64 system.  x86 has not been tested.)  Hopefully, the dependency free nature of this header-only library
+// x64 system.  x86 has not been tested.  Hopefully, the dependency free nature of this header-only library
 // and example code application will be convenient for learning about the library.
 
 //NOTE: Intel Classic compiler is not currently supported.  Support will be added when/if Intel Classic
@@ -63,8 +63,7 @@
 	//x86-windows-static (visual studio, microsoft compiler, 32-bit Intel/Amd (x86), static linking of dependencies, including CRT)
 	//x64-linux (g++ 10.2.0 and clang 11.0.0.2 using libstdc++ on Kubuntu 20.10, default linking, using CLion as development environment)
 
-//I did not want to require you to have to build anything beyond what is required by the library for the example / demonstration code
-//because the library itself makes no use of such.
+//Building and executing the example code project requires no extra dependencies.
 
 namespace cjm::uint128::example_code
 {
