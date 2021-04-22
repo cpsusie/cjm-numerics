@@ -78,13 +78,196 @@ Repeat the command above but this time specify x86-windows: `.\vcpkg.exe install
   
 Open up Visual Studio and choose "Create a New Project".  Choose an **Empty** *C++* **Console** project for *Windows*, then choose an appropriate name and location for the project.  When satisfied, choose "Create".  The following shows how to do this graphically:  
   
-![Create Empty Windows Console Application](images/create%20new%20project.PNG)
+![Create Empty Windows Console Application](images/create_new_project.PNG)  
 
+### Add Source File to Test Application
 
+Right click on Source Files and then left click on Add in the context menu.  Choose a "New Item" in the secondary context menu.  Then, in the popup window, choose a C++ file (.cpp), enter then name program.cpp for it, then press add.  Consult the following if you need help:
+
+![Add program.cpp source file to project.](images/add_source_file.png)
+
+### Copy Code into "program.cpp"
+
+Copy the following code into program.cpp:
+
+```cpp
+#include <iostream>
+#include <iomanip>
+#include <cjm/numerics/uint128.hpp>
+
+int main()  // NOLINT(bugprone-exception-escape) (it's a demo)
+{
+	using uint128_t = cjm::numerics::uint128;
+	using namespace cjm::numerics::uint128_literals;
+	constexpr auto newl = '\n';
+	constexpr uint128_t lhs = 123'456'789'012'345'678'901'234_u128;
+	constexpr uint128_t rhs = 432'109'876'543'210'987'654'321_u128;
+	std::cout << "Hello, uint128_t!" << newl;
+	std::cout << "lhs [" << lhs << "] * rhs [" << rhs << "] == [" << (lhs * rhs) << "]." << newl;
+
+	//check if compiler intrinsics used:
+	//should be available if using microsoft compiler targeting x64 Intel or AMD processor
+	std::cout
+		<< "Using msvc x64 intrinsics?: [" << std::boolalpha
+		<< (cjm::numerics::calculation_mode == cjm::numerics::uint128_calc_mode::msvc_x64) << "]" << newl;
+
+	//Check if using built-in unsigned int 128 for runtime math
+	//This type is provided as a language extension by some compilers (NOT msvc)
+	//it is usually only available for 64 bit targets on compilers that provide
+	//this extension
+	std::cout
+		<< "Using built-in uint128 for runtime calculations?: [" << std::boolalpha
+		<< (cjm::numerics::calculation_mode == cjm::numerics::uint128_calc_mode::intrinsic_u128)
+		<< "]." << newl;
+	
+	//On msvc when targeting x64, enabling AVX2 extension will allow us to use compiler intrinsics
+	//supplied by ADX and BMI2 (for add-with-carry and extended precision multiplication)
+	//rather than the default compiler intrinsics for those operations.  Make sure your processor
+	//target supports those extensions before trying this.
+	std::cout
+		<< "Has adx enabled: [" << std::boolalpha << cjm::numerics::intel_adx_available << "]." << newl;
+	std::cout
+		<< "Has bmi2 enabled: [" << std::boolalpha << cjm::numerics::intel_bmi2_available << "]." << newl;
+	std::cout
+		<< "Goodbye!" << std::endl;
+	return 0;
+}
+```
+The code above is also available in the repository [here.](https://raw.githubusercontent.com/cpsusie/cjm-numerics/main/pre_release_quick_start/pre_release_quick_start/pre_release_quick_start.cpp)  After pasting the code, click Build on the menu-bar, choose "Batch Build", select all four configurations in the Batch Build Window, then press the "Build" button.  Consult the following if you need help:  
   
+![Execute Batch Build (Doomed to Fail)](images/batch_build_after_paste.png)  
 
+If the squiggly red lines were not a sufficent hint, this build is doomed to fail.  The primary reason is that Visual Studio 2019 configures new projects to use C++ 14 by default, but this library requires C++ 20.  If you scroll through the error messages in the compilation results you should encounter (probably in more than one place) messages similar to the following text:  
+  
+> Task "CL"  
+    program.cpp  
+    The contents of `<compare>` are available only with `C++20` or later.  
+    The contents of `<optional>` are available only with `C++17` or later.  
+    The contents of `<string_view>` are available only with `C++17` or later.  
+    The contents of `<bit>` are available only with `C++20` or later.  
+    The contents of `<span>` are available only with `C++20` or later.  
+    E:\vcpkg\cjm_vcpkg\installed\x86-windows\include\cjm\numerics\numerics_configuration.hpp(36,1): fatal error C1189: #error:  "CJM NUMERICS UINT128 requires a `C++20` implementation that supports char8_t."  
+    The command exited with code 2.  
+  Done executing task "CL" -- FAILED.  
+Done building target "ClCompile" in project "numerics_install.vcxproj" -- FAILED.  
+Done building project "numerics_install.vcxproj" -- FAILED.  
+Build FAILED.  
+E:\vcpkg\cjm_vcpkg\installed\x86-windows\include\cjm\numerics\numerics_configuration.hpp(36,1): fatal error C1189: #error:  "CJM NUMERICS UINT128 requires a `C++20` implementation that supports char8_t."  
+    0 Warning(s)  
+
+### Configure Project for `C++20`  
+
+To get this project, or any project requiring `C++20` to build, you have to configure MsBuild to use C++20 or later.  To accomplish this:  
+  1. Right click on project
+  2. Choose "Properties" at the bottom of the context menu.  
+  3. Select "General" under Configuration Properies on the popup
+  4. Set "Configurations" to "All Configurations"
+  5. Set "Platforms" to "All Platforms"
+  6. Set C++ Language Standard to "Preview - Features from the Latest C++ Working Draft" (/std:c++latest)  
+  7. Click the "Apply" button
+  8. Click the "Ok" button  
+To assist you with the foregoing, you may consult the following graphic:  
+
+![Configure C++20](images/configure_cpp_20.png)  
+
+### Batch Build the Project (for real this time):  
+
+This time the build should succeed.  As above, choose "Build" on the menu-bar then select batch build.  When the batch build pop-up appears, select all four configurations then click "Build".
+
+![Successful Build Intended](images/successful_batch_build.png)  
+  
+You should see something like the following at the bottom of the build log:  
+
+> Done building project "numerics_install.vcxproj".  
+Build succeeded.  
+    0 Warning(s)  
+    0 Error(s)  
+Time Elapsed 00:00:04.52  
+========== Rebuild All: 4 succeeded, 0 failed, 0 skipped ==========  
+
+Congratulations, you have just built your first multiplatform (x86 and x64 Windows) applications using the CJM Numerics UInt128 library for C++20.  
+
+### Run the Application  
+
+We will be running the application in release mode for both x64 and x86.  Accordingly, in Visual Studio, set Visual Studio into a "Release-x64" configuration as shown:
+  
+![release-x64 mode](images/select_release_x64.PNG)  
+  
+Now, run the application by pressing Ctrl-F5.  
+
+Your output should look like the following:  
+
+> Hello, uint128_t!  
+lhs [123456789012345678901234] * rhs [432109876543210987654321] == [226810394222294446283585782734362836562].  
+Using msvc x64 intrinsics?: [true]  
+Using built-in uint128 for runtime calculations?: [false].  
+Has adx enabled: [false].  
+Has bmi2 enabled: [false].  
+Goodbye!  
+
+Note that "msvc x64 intrinsics" should be true and "built-in uint128" should be false: 1- we are in x64 mode, Windows, so we are using intrinsics; 2- built-in uint128 is used only in a **non-windows** x64 clang or gcc environment.  
+  
+Now, let's switch to x86, Release as shown:  
+  
+![Select 32-bit Release Mode](images/select_release_x86.png)  
+  
+Press Ctrl-F5 to run.  
+
+Output should be something like: 
+
+> Hello, uint128_t!  
+lhs [123456789012345678901234] * rhs [432109876543210987654321] == [226810394222294446283585782734362836562].  
+Using msvc x64 intrinsics?: [false]  
+Using built-in uint128 for runtime calculations?: [false].  
+Has adx enabled: [false].  
+Has bmi2 enabled: [false].  
+Goodbye!  
+
+Notice that x64 instrincis are no longer in use.  Unsurprisingly these are only available in x64 bit mode.  
+
+### (Optional): Enable ADX and BMI2 for x64 Configuration  
+
+If your Intel or AMD processor supports the [ADX and BMI2][5] technologies and you are building for x64 on Windows, you may want to enable these technologies.  Please note that if you build your code with these technologies enabled, it may not (read: probably won't) run correctly on older processors.  The easiest way to handle this is to check whether [all your processor targets support AVX2.][6]  If they do, enabling AVX2 in x64 mode will enable both ADX and BMI2. Assuming you want to enable it, go back into x64 mode as shown:
+ 
+![release-x64 mode](images/select_release_x64.PNG)  
+
+Now, right click on the project, choose properties and the configuration popup should appear again.  Once it does, 
+1.  Set "Configurations" to "All Configurations"
+2.  Set "Platforms" to "x64".
+3.  Go to the Code Generation Tab under C/C++
+4.  Set "Enable Enhanced Instruction Set" to "Advanced Vector Extensions 2" (/arch:AVX2)  
+5.  Click "Apply" button.
+6.  Click "Ok" Button.   
+  
+![Enable AVX2 in x64 for All Configurations](images/enable_avx2_x64.png)
+
+Now, re-run the batch build (either for everything or at least x64-Release).  After it builds, press Ctrl-F5 to run (make sure Visual Studio is in Release-x64 mode).  You're output should now be something like this:  
+
+> Hello, uint128_t!  
+lhs [123456789012345678901234] * rhs [432109876543210987654321] == [226810394222294446283585782734362836562].  
+Using msvc x64 intrinsics?: [true]  
+Using built-in uint128 for runtime calculations?: [false].  
+Has adx enabled: [true].  
+Has bmi2 enabled: [true].  
+Goodbye!  
+
+Note that adx and bmi2 are now set to "true".  
+
+## Manual Installation  
+
+Manual installation consists of 
+1. Downloading the repository from github,
+1. copying the contents of the src folder from the repository to a known location, 
+2. copying all needed copyright and legal notices to a location so you can include them with any code you distribute, then 
+3. setting up Visual Studio to recognize the folder you set up as being a system library include folder.  
+
+## Conclusion  
+
+You are now ready to use the cjm-numerics-uint128 library in all of your C++20 code!
 
   [1]: https://github.com/microsoft/vcpkg
   [2]: https://github.com/cpsusie/cjm-numerics/releases/download/v0.0.0.6-alpha/vcpkg_port_folder_cjm-numerics-uint128.7z
   [3]: https://github.com/cpsusie/vcpkg.git
   [4]: https://vcpkg.readthedocs.io/en/latest/users/integration/
+  [5]: https://www.intel.com/content/dam/www/public/us/en/documents/white-papers/ia-large-integer-arithmetic-paper.pdf
+  [6]: https://en.wikipedia.org/wiki/Advanced_Vector_Extensions#Advanced_Vector_Extensions_2
