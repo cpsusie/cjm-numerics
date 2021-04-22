@@ -1,4 +1,4 @@
-# CJM Numerics Visual Studio Quick Start Installation Guide
+# CJM Numerics Visual Studio 2019 (19.28+ / 16.9.3+) Quick Start Installation Guide
 **Copyright © 2020-2021, CJM Screws, LLC**
 
 This guide provides a walkthrough on how to install this CJM Numerics UInt128 Library for usage with Visual Studio 2019.  It may also apply, with a few variations, to Visual Studio Code.  Please note that this project requires using a C++ compiler that supports C++20.  For Microsoft's compiler, the minimum version is 16.9.3.  
@@ -155,7 +155,7 @@ Build FAILED.
 E:\vcpkg\cjm_vcpkg\installed\x86-windows\include\cjm\numerics\numerics_configuration.hpp(36,1): fatal error C1189: #error:  "CJM NUMERICS UINT128 requires a `C++20` implementation that supports char8_t."  
     0 Warning(s)  
 
-### Configure Project for `C++20`  
+### Configure Project for C++20 
 
 To get this project, or any project requiring `C++20` to build, you have to configure MsBuild to use C++20 or later.  To accomplish this:  
   1. Right click on project
@@ -227,7 +227,7 @@ Notice that x64 instrincis are no longer in use.  Unsurprisingly these are only 
 
 ### (Optional): Enable ADX and BMI2 for x64 Configuration  
 
-If your Intel or AMD processor supports the [ADX and BMI2][5] technologies and you are building for x64 on Windows, you may want to enable these technologies.  Please note that if you build your code with these technologies enabled, it may not (read: probably won't) run correctly on older processors.  The easiest way to handle this is to check whether [all your processor targets support AVX2.][6]  If they do, enabling AVX2 in x64 mode will enable both ADX and BMI2. Assuming you want to enable it, go back into x64 mode as shown:
+If your Intel or AMD processor supports the [ADX and BMI2][5] technologies and you are building for x64 on Windows, you may want to enable these technologies.  Please note that if you build your code with these technologies enabled, it may not (read: probably won't) run correctly on older processors.  The easiest way to handle this is to check whether [all your processor targets support AVX2.][6]  If they do, enabling AVX2 in x64 mode will enable both [ADX][7] and [BMI2][8]. Assuming you want to enable it, go back into x64 mode as shown:
  
 ![release-x64 mode](images/select_release_x64.PNG)  
 
@@ -257,13 +257,125 @@ Note that adx and bmi2 are now set to "true".
 
 Manual installation consists of 
 1. Downloading the repository from github,
-1. copying the contents of the src folder from the repository to a known location, 
-2. copying all needed copyright and legal notices to a location so you can include them with any code you distribute, then 
-3. setting up Visual Studio to recognize the folder you set up as being a system library include folder.  
+2. copying the contents of the src folder from the repository to a known location, 
+3. copying all needed copyright and legal notices to a location so you can include them with any code you distribute, then 
+4. setting up Visual Studio to recognize the folder you set up as being a system library include folder.  
 
-## Conclusion  
+### Download the repository from github then install manually 
 
-You are now ready to use the cjm-numerics-uint128 library in all of your C++20 code!
+Go to the repo's releases page [here][9].  Choose the most recent release and download the zip file as shown:  
+
+![Download Source Code Zipfile](images/downloading_for_manual_install/releases_download_src.PNG)   
+
+Create a folder for storing the include files and one for storing the legal notices files required when redistributing this library.  For example, I created a folder called "E:\cpp_header_only_libraries".  Within that folder are two subfolders: include, where header-only libraries will be stored and cjm-numerics-uint128-notices for legal notices related to this library.  To illustrate:  
+  
+![Manual Install Target Folder Structure](images/downloading_for_manual_install/man_install_folder_structure.png)  
+  
+Now you are ready to do the actual copying.  Copy the txt and md files from the repo archive into your target folder as shown:  
+  
+![Copying legal notices.](images/downloading_for_manual_install/copy_legal_notices.PNG)  
+  
+Now, copy the contents of /src/include (the cjm folder and all its contents, recursively) to the include folder as shown:  
+  
+![Copy include contents](images/downloading_for_manual_install/copy_contents_to_include_folder.png)
+
+### Create a Console Application To Test Installation  
+  
+Open up Visual Studio and choose "Create a New Project".  Choose an **Empty** *C++* **Console** project for *Windows*, then choose an appropriate name and location for the project.  When satisfied, choose "Create".  The following shows how to do this graphically:  
+  
+![Create Empty Windows Console Application](images/create_new_project.PNG)  
+
+### Add Source File to Test Application
+
+Right click on Source Files and then left click on Add in the context menu.  Choose a "New Item" in the secondary context menu.  Then, in the popup window, choose a C++ file (.cpp), enter then name program.cpp for it, then press add.  Consult the following if you need help:
+
+![Add program.cpp source file to project.](images/add_source_file.png)
+
+### Copy Code into "program.cpp"
+
+Copy the following code into program.cpp:
+
+```cpp
+#include <iostream>
+#include <iomanip>
+#include <cjm/numerics/uint128.hpp>
+
+int main()  // NOLINT(bugprone-exception-escape) (it's a demo)
+{
+	using uint128_t = cjm::numerics::uint128;
+	using namespace cjm::numerics::uint128_literals;
+	constexpr auto newl = '\n';
+	constexpr uint128_t lhs = 123'456'789'012'345'678'901'234_u128;
+	constexpr uint128_t rhs = 432'109'876'543'210'987'654'321_u128;
+	std::cout << "Hello, uint128_t!" << newl;
+	std::cout << "lhs [" << lhs << "] * rhs [" << rhs << "] == [" << (lhs * rhs) << "]." << newl;
+
+	//check if compiler intrinsics used:
+	//should be available if using microsoft compiler targeting x64 Intel or AMD processor
+	std::cout
+		<< "Using msvc x64 intrinsics?: [" << std::boolalpha
+		<< (cjm::numerics::calculation_mode == cjm::numerics::uint128_calc_mode::msvc_x64) << "]" << newl;
+
+	//Check if using built-in unsigned int 128 for runtime math
+	//This type is provided as a language extension by some compilers (NOT msvc)
+	//it is usually only available for 64 bit targets on compilers that provide
+	//this extension
+	std::cout
+		<< "Using built-in uint128 for runtime calculations?: [" << std::boolalpha
+		<< (cjm::numerics::calculation_mode == cjm::numerics::uint128_calc_mode::intrinsic_u128)
+		<< "]." << newl;
+	
+	//On msvc when targeting x64, enabling AVX2 extension will allow us to use compiler intrinsics
+	//supplied by ADX and BMI2 (for add-with-carry and extended precision multiplication)
+	//rather than the default compiler intrinsics for those operations.  Make sure your processor
+	//target supports those extensions before trying this.
+	std::cout
+		<< "Has adx enabled: [" << std::boolalpha << cjm::numerics::intel_adx_available << "]." << newl;
+	std::cout
+		<< "Has bmi2 enabled: [" << std::boolalpha << cjm::numerics::intel_bmi2_available << "]." << newl;
+	std::cout
+		<< "Goodbye!" << std::endl;
+	return 0;
+}
+```
+The code above is also available in the repository [here.](https://raw.githubusercontent.com/cpsusie/cjm-numerics/main/pre_release_quick_start/pre_release_quick_start/pre_release_quick_start.cpp)  After pasting the code, click Build on the menu-bar, choose "Batch Build", select all four configurations in the Batch Build Window, then press the "Build" button.  Consult the following if you need help:  
+  
+![Execute Batch Build (Doomed to Fail)](images/batch_build_after_paste.png)  
+
+If the squiggly red lines were not a sufficent hint, this build is doomed to fail.  There are two reasons why it cannot build:
+1.  Visual Studio doesn't know about your new header-only library include folder yet and 
+2.   Visual Studio 2019 configures new projects to use `C++14` by default, but this library requires `C++20`.  
+
+If you scroll through the error messages in the compilation results you should encounter (probably in more than one place) messages similar to the following text:  
+
+>   program.cpp  
+    C:\Users\Christopher Susie\Scratch\numerics_install\numerics_install\program.cpp(3,10): fatal error C1083: Cannot open include file: 'cjm/numerics/uint128.hpp': No such file or directory  
+    The command exited with code 2.  
+  Done executing task "CL" -- FAILED.  
+Done building target "ClCompile" in project "numerics_install.vcxproj" -- FAILED.  
+
+Let's fix the include folder issue first.  Follow the instructions and refer to the illustration below:
+
+1.  Right-click on the project name
+2.  In the context menu, choose properties (at bottom)  
+3.  In the Popup Window, select "VC++ Directories" under "Configuration Properties"
+4.  Set "Configurations" to "All Configurations"
+5.  Set "Platforms" to "All Platforms"  
+6.  Select "Include Directories"
+7.  Click Edit
+8.  On the second popup window, press the "New Folder" button, then double click on the elipsis to show a "Select Folder Dialog" 
+9. Use the "Select Folder Dialog" to navigate to the include folder where you copied the cjm folder from the repository archive.  Once that folder ("include" ... **not** "include/cjm") is chosen
+10. Click the "Select Folder" button
+11. Then click the "Ok" buttons on the "Include Directories" dialog then, back on the initial pop-up,
+12. Click the "Apply" button.  Finally,
+13. Click the "Ok" button.  
+
+![Configure Manual Include Folder](images/configure_include_folder.png)  
+
+At this point, all that remains between you and building the application is enabling `C++20`.  This is identical to the situation that a person following the vcpkg route would find herself in after entering the code.  Thus, continue with the instructions [above.](#configure-project-for-c20)  
+
+
+
 
   [1]: https://github.com/microsoft/vcpkg
   [2]: https://github.com/cpsusie/cjm-numerics/releases/download/v0.0.0.6-alpha/vcpkg_port_folder_cjm-numerics-uint128.7z
@@ -271,3 +383,6 @@ You are now ready to use the cjm-numerics-uint128 library in all of your C++20 c
   [4]: https://vcpkg.readthedocs.io/en/latest/users/integration/
   [5]: https://www.intel.com/content/dam/www/public/us/en/documents/white-papers/ia-large-integer-arithmetic-paper.pdf
   [6]: https://en.wikipedia.org/wiki/Advanced_Vector_Extensions#Advanced_Vector_Extensions_2
+  [7]: https://en.wikipedia.org/wiki/Intel_ADX
+  [8]: https://en.wikipedia.org/wiki/Bit_manipulation_instruction_set#BMI2_(Bit_Manipulation_Instruction_Set_2)
+  [9]: https://github.com/cpsusie/cjm-numerics/releases
