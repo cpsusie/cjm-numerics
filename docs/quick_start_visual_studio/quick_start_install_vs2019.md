@@ -1,5 +1,5 @@
 # CJM Numerics Visual Studio 2019 (19.28+ / 16.9.3+) Quick Start Installation Guide
-**Copyright © 2020-2021, CJM Screws, LLC**
+**Copyright © 2021, CJM Screws, LLC**
 
 This guide provides a walkthrough on how to install this CJM Numerics UInt128 Library for usage with Visual Studio 2019.  It may also apply, with a few variations, to Visual Studio Code.  Please note that this project requires using a C++ compiler that supports C++20.  For Microsoft's compiler, the minimum version is 16.9.3.  
 
