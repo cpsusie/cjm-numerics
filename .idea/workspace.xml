@@ -12,10 +12,7 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="8ab5edb8-7d60-4856-834e-1b0d4d4bfdec" name="Default Changelist" comment="Working on new extended precision multiplication code.">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/quick_start_visual_studio/quick_start_install_vs2019.md" beforeDir="false" afterPath="$PROJECT_DIR$/docs/quick_start_visual_studio/quick_start_install_vs2019.md" afterDir="false" />
-    </list>
+    <list default="true" id="8ab5edb8-7d60-4856-834e-1b0d4d4bfdec" name="Default Changelist" comment="Working on new extended precision multiplication code." />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -25,7 +22,7 @@
   <component name="ClangdSettings">
     <option name="formatViaClangd" value="false" />
   </component>
-  <component name="ExecutionTargetManager" SELECTED_TARGET="CMakeBuildProfile:Debug" />
+  <component name="ExecutionTargetManager" SELECTED_TARGET="CMakeBuildProfile:Release-Clang" />
   <component name="Git.Settings">
     <favorite-branches>
       <branch-storage>
@@ -87,7 +84,7 @@
       <recent name="$PROJECT_DIR$/cmake-build-debug" />
     </key>
   </component>
-  <component name="RunManager" selected="CMake Application.EnvironTest">
+  <component name="RunManager" selected="CMake Application.ExampleCode">
     <configuration name="EnvironTest" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="Int128" TARGET_NAME="EnvironTest" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="Int128" RUN_TARGET_NAME="EnvironTest">
       <method v="2">
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
@@ -99,11 +96,6 @@
       </method>
     </configuration>
     <configuration name="Int128" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="Int128" TARGET_NAME="Int128" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="Int128" RUN_TARGET_NAME="Int128">
-      <method v="2">
-        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
-      </method>
-    </configuration>
-    <configuration default="true" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" PASS_PARENT_ENVS_2="true">
       <method v="2">
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
       </method>
@@ -458,7 +450,14 @@
       <option name="project" value="LOCAL" />
       <updated>1618007511594</updated>
     </task>
-    <option name="localTasksCounter" value="42" />
+    <task id="LOCAL-00042" summary="Update linux/clion quick start guide.">
+      <created>1619213117184</created>
+      <option name="number" value="00042" />
+      <option name="presentableId" value="LOCAL-00042" />
+      <option name="project" value="LOCAL" />
+      <updated>1619213117184</updated>
+    </task>
+    <option name="localTasksCounter" value="43" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -477,7 +476,6 @@
     <option name="oldMeFiltersMigrated" value="true" />
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Add compile time post-increment test.  Add test to generate static assertions for compile-time test." />
     <MESSAGE value="Suppress warnings regarding flags enumeration in switch." />
     <MESSAGE value="Limit effect of suppressions to a GCC environment to not trigger unknown pragma warnings elsewhere." />
     <MESSAGE value="Add routine to parse commandline arguments into vector of switches." />
@@ -505,7 +503,8 @@
     <MESSAGE value="Update workspace.xml." />
     <MESSAGE value="Adjust CMakeLists.txt.  Revise include path in port file." />
     <MESSAGE value="Working on new extended precision multiplication code." />
-    <option name="LAST_COMMIT_MESSAGE" value="Working on new extended precision multiplication code." />
+    <MESSAGE value="Update linux/clion quick start guide." />
+    <option name="LAST_COMMIT_MESSAGE" value="Update linux/clion quick start guide." />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

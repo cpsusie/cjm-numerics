@@ -12,7 +12,7 @@ namespace Cjm.Numerics.Example
     {
         static void Main(string[] args)
         {
-            var workingDirectory = new DirectoryInfo(@"C:\Users\Christopher Susie\Source\Repos\Int128\example_code\src\uint128_example");
+            var workingDirectory = new DirectoryInfo(@"E:\Source\Repos\cjm-numerics\example_code\src\uint128_example");
             var dict = GetRunInfo(workingDirectory);
             if (!Configurations.SetEquals(dict.Keys))
             {
