@@ -1,41 +1,19 @@
 # CJM Numerics: (a fixed precision numeric library for C++20)
 Copyright © 2020-2021, CJM Screws, LLC
 ## Summary
-  This **header-only** library for C++ 20 currently provides an **unsigned 128 bit integer** type suitable for direct use or for extending to make other fixed precision types such as signed two's complement integers, larger signed or unsigned integers, rational numbers or flexible units of measure.  The unsigned 128-bit integer is currently feature-complete and extensively tested. Planned future features include a two's complement signed version as well as larger fixed precision integers (256, 512, 1024 bit), up to any arbitrary power of 2 greater than 128.  The larger values will be defined via templates.   Also being considered are rational numbers and units of measure for distance, area and volume.  *Please note that this library **requires C++ 20**.*  **No effort will be made to support older versions of the C++ standard.**  *If a user does not want to benefit specifically from C++20 features, then other extended precision libraries (such as the ones we modeled our algorithms from) may be a better fit.*
+  This **header-only** library for C++ 20 currently provides an **unsigned 128 bit integer** type suitable for direct use or for extending to make other fixed precision types such as signed two's complement integers, larger signed or unsigned integers, rational numbers or flexible units of measure.  The unsigned 128-bit integer is currently feature-complete and extensively tested. Planned future features include a two's complement signed version as well as larger fixed precision integers (256, 512, 1024 bit), up to any arbitrary power of 2 greater than 128.  The larger values will be defined via templates.   Also being considered are rational numbers and units of measure for distance, area and volume.  *Please note that this library **requires C++ 20**.*  **No effort will be made to support older versions of the C++ standard.**  *If a user does not want to benefit specifically from C++20 features, then other extended precision libraries (such as the ones from which we derived our algorithms) may be a better fit.*  
   
-## Quick Start (pre-release)
+## Quick Start 
 
-If you want to use this library now (in a well-tested, but unreleased state), the easiest way is to download the contents of the [src/][4] folder to your configured library include path.  Make sure your IDE settings or build system is set to C++ 20 or later, then attempt to compile the following program:  
-```cpp
-#include <iostream>
-#include <iomanip>
-#include <cjm/numerics/uint128.hpp>
+If you want to use this library now in a well-tested, but unreleased state, there are two quick start guides available. 
+1.  [Vcpkg or Manual Installation for Windows and Visual Studio 2019 version 16.9.3+.][1]  
+2.  [Vcpkg Installation for Linux with CLion 2020.3.3+ and GCC 10.2.0+ and/or Clang 11.0+.][2] 
 
-int main()
-{
-	using uint128_t = cjm::numerics::uint128;
-	using namespace cjm::numerics::literals;
-	constexpr auto newl = '\n';
-	constexpr uint128_t lhs = 123'456'789'012'345'678'901'234_u128;
-	constexpr uint128_t rhs = 432'109'876'543'210'987'654'321_u128;
-	std::cout << "Hello, uint128_t!" << newl;
-	std::cout << "lhs [" << lhs << "] * rhs [" << rhs << "] == [" << (lhs * rhs) << "]." << newl;
-	std::cout << "Goodbye!" << std::endl;
-	return 0;
-}
-```
-
-Compile and run the program.  The output should be: 
-
-> Hello, uint128_t!  
-lhs [123456789012345678901234] * rhs [432109876543210987654321] == [226810394222294446283585782734362836562].  
-Goodbye! 
-
-For more detailed instructions on installing the library for use in Visual Studio 2019 (Windows), see [Visual Stuio Quick Start Installation Guide][2].
-  
 There is also a dependency-free example code project found [here](https://github.com/cpsusie/cjm-numerics/tree/main/example_code/src/uint128_example) for you to review the functionality.  
 
-When this project is released, I plan on including a [vcpkg][3] port for it. 
+A [vcpkg][3] port is available for this library.  You can download it from the most recent Release from this projects [Releases page][4] on Github (the 7-zip file under assets).  Both quick start guides contain directions for copying the contents of the archive to vcpkg's ports folder.  Also, I maintain a [fork of vcpkg][5] (regularly updated from Microsoft's repo) that includes the port without requiring downloading for releases. When this project has a stable release, I will submit a pull request to have this project included in [Microsoft's vcpkg repo][6].  
+  
+If your system differs significantly from the Quick Start guides (but you have a `C++20` compiler and standard library that meet's this project's [requirements](#compiler--architecture-requirements)), it should not be difficult to install this header-only library if you are familiar with your build system.  Essentially, copying the entire contents of [/src/include][7] into your system's system library include folder should be sufficient.  
   
 ### Library Components
 
@@ -43,7 +21,7 @@ When this project is released, I plan on including a [vcpkg][3] port for it.
 
 * *uint128* (in <cjm/numerics/uint128>)  
 
-    * This is the unsigned 128 bit integer provided by the libary.  To use it correctly, you will need all the contents presently under [src/][4]. The only include you should need to use directly is `<cjm/numerics/uint128.hpp>`.  
+    * This is the unsigned 128 bit integer provided by the libary.  To use it correctly, you will need all the contents presently under [src/][8]. The only include you should need to use directly is `<cjm/numerics/uint128.hpp>`.  
     
     * The namespaces you may need to use directly are: 
         * `cjm::numerics` (for uint128)
@@ -75,14 +53,14 @@ There are less firm plans to provide:
 * *distance*: a unit of measure type modeled off of the standard library's `std::chrono::duration` type.
 
 ## Sources
-  This library does not pretend to contain any non-trivial original algorithms, but rather attempts to package well-known algorithms successfully used by others in a new format with different design goals.  This project has drawn most heavily from the unsigned and signed 128-bit provided by abseil.io at [abseil's github repository.](https://github.com/abseil/abseil-cpp/blob/master/absl/numeric/int128.h#L100)  It also has considered and adopted some of the work of other multiprecision numeric libraries such as the one provided by [Boost][5], [calccrypto][6], [libdivide][7], and even [Clang's Compiler-Rt][8] itself.  Its design goals, however, are sufficiently different to make it a more useful option in certain scenarios.
+  This library does not pretend to contain any non-trivial original algorithms, but rather attempts to package well-known algorithms successfully used by others in a new format with different design goals.  This project has drawn most heavily from the unsigned and signed 128-bit provided by abseil.io at [abseil's github repository.](https://github.com/abseil/abseil-cpp/blob/master/absl/numeric/int128.h#L100)  It also has considered and adopted some of the work of other multiprecision numeric libraries such as the one provided by [Boost][9], [calccrypto][10], [libdivide][11], and even [Clang's Compiler-Rt][12] itself.  Its design goals, however, are sufficiently different to make it a more useful option in certain scenarios.
   
 ## Features / Design Principles
 1.  **Constexpr (nearly) All the Things**
 
 All or nearly all of the operations provided are constexpr-enabled: only floating point conversions and string parsing are runtime only.  Construction, destruction, conversions, assignment, comparisons (including the spaceship operator, <=>) , +,-,*,/,%, all the bitshifts and bitwise operations are constexpr-enabled.
 
-2.  **Full (constexpr!) Support for hexadecimal and decimal literals, including the separator "'"**
+2.  **Full (constexpr) Support for hexadecimal and decimal literals, including the separator "'"**
 
 A constexpr literal operator is provided that allows for the full range of values for an unsigned 128 bit integer whether expressed as a decimal or hexadecimal value.  Errors in the literals are always caught at compile time.  
 
@@ -146,35 +124,35 @@ Support for modules will not be attempted until at least GCC, Clang and Microsof
 
 16. **The best way to document intended functionality is in code, via Concepts**
 
-With C++ 20 the best way to document for other programmers the intended functionality of a type (especially one that might be used in a generic context) is via Concepts.  To that end, the intended functionality of uint128 is demonstrated by the [cjm_unsigned_interger][9] concept. 
+With C++ 20 the best way to document for other programmers the intended functionality of a type (especially one that might be used in a generic context) is via Concepts.  To that end, the intended functionality of uint128 is demonstrated by the [cjm_unsigned_interger][13] concept. 
 
 ## Compiler / Architecture Requirements
 
-Please note that all the requirements listed below are expressed in code and can be found [here][10]. 
+Please note that all the requirements listed below are expressed in code and can be found [here][14]. 
 
-1. [**C++ 20 compliance**][11]  
+1. [**C++ 20 compliance**][15]  
 
 This software requires a compiler that conforms, at least partially, to the C++ 20 ISO standard.  It requires that when you use it, you specify C++ 20 or later as the standard in the arguments you pass to your compiler.  More specifically, it requires *at least* the following C++ 20 features to be supported:
 
-* [char8_t (core language feature)][12]
-* [Concepts (core language feature)][13]
-* [Three way comparison "spaceship" operator <=> (core language feature)][14]
-* [Classes and Structs as non-type template parameters (core language feature)][15]
-* [Bit operations (standard library feature)][16]
-* [char8_t (standard library feature)][17]
-* [Concepts (standard library feature)][18]
-* [std::endian (standard library feature)][19]
-* [std::is_constant_evaluated (core language and standard library feature)][20]
-* [std::is_nothrow_convertible (standard library feature)][21]
-* [std::remove_cvref (standard library feature)][22] 
-* [std::span<T> (standard library feature)][23]
-* [starts_with, ends_with for std::string_view (standard library feature)][24] 
+* [char8_t (core language feature)][16]
+* [Concepts (core language feature)][17]
+* [Three way comparison "spaceship" operator <=> (core language feature)][18]
+* [Classes and Structs as non-type template parameters (core language feature)][19]
+* [Bit operations (standard library feature)][20]
+* [char8_t (standard library feature)][21]
+* [Concepts (standard library feature)][22]
+* [std::endian (standard library feature)][23]
+* [std::is_constant_evaluated (core language and standard library feature)][24]
+* [std::is_nothrow_convertible (standard library feature)][25]
+* [std::remove_cvref (standard library feature)][26] 
+* [std::span<T> (standard library feature)][27]
+* [starts_with, ends_with for std::string_view (standard library feature)][28] 
 
 2. **Other Requirements**
 
-* [CHAR_BIT][25] must be 8.  That is, a byte must consist of eight bits.
-* [`std::endian::native`][26] must equal [`std::endian::big`][27] or [`std::endian::little`][28].  That is, the system must be big-endian or little endian, excluding mixed-endian or other edge-case platforms.
-* All of the following integer types must be defined have the matching size and [`std::numeric_limits<T>::digits`][29]:
+* [CHAR_BIT][29] must be 8.  That is, a byte must consist of eight bits.
+* [`std::endian::native`][30] must equal [`std::endian::big`][31] or [`std::endian::little`][32].  That is, the system must be big-endian or little endian, excluding mixed-endian or other edge-case platforms.
+* All of the following integer types must be defined have the matching size and [`std::numeric_limits<T>::digits`][33]:
     1. std::uint8_t     size: 1,    digits: 8
     2. std::int8_t      size: 1,    digits: 7
     3. std::uint16_t    size: 2,    digits: 16
@@ -190,11 +168,11 @@ This project (given its one-person authorship and the author's fulltime employme
 
 ### **Unit Test Application**
 
-The [unit test application][30] is the one application in this repository that has external dependencies.  Those dependencies include:
+The [unit test application][34] is the one application in this repository that has external dependencies.  Those dependencies include:
 
-1. [abseil-C++17][31] (vcpkg: abseil[cxx17])
-2. [boost][32] version 1.73+ (vcpkg: boost)
-3. [hinnant/date][33] 3.0.0+ (vcpkg: date)
+1. [abseil-C++17][35] (vcpkg: abseil[cxx17])
+2. [boost][36] version 1.73+ (vcpkg: boost)
+3. [hinnant/date][37] 3.0.0+ (vcpkg: date)
 
 The unit test application must be built and run in Visual Studio 2019 with the dependencies installed as static libraries with a static c-runtime via the following vcpkg triplets: `x86-windows-static` and `x64-windows-static`.
 
@@ -262,7 +240,7 @@ Selected multilib: .;@m64
 > gcc version 10.2.0 (Ubuntu 10.2.0-13ubuntu1) 
 
 
-The CMakeLists.txt file used to build the unit test project (and example project) on linux with both g++ and clang can be found [here][34].
+The CMakeLists.txt file used to build the unit test project (and example project) on linux with both g++ and clang can be found [here][38].
 
 
 If you download the main branch, you can be assured that the unit test project was built successfully and passed in all of the above configurations, summarized:
@@ -274,7 +252,7 @@ If you download the main branch, you can be assured that the unit test project w
 
 ### **Example Code Application**
 
-The [example code application][35] is designed to demonstrate the functionality of the library using code.  Unlike the unit test application, it does not have any external dependencies.  In addition to requiring that the unit test application build and passes under all the configurations listed above, it is also required that the example code application build and execute without errors.  In addition to the configurations used by the unit test application, the following extra compilers/configurations must be verified to build the example code application such that it runs successfully:
+The [example code application][39] is designed to demonstrate the functionality of the library using code.  Unlike the unit test application, it does not have any external dependencies.  In addition to requiring that the unit test application build and passes under all the configurations listed above, it is also required that the example code application build and execute without errors.  In addition to the configurations used by the unit test application, the following extra compilers/configurations must be verified to build the example code application such that it runs successfully:
 
 Microsoft Windows 10 Target, (using Microsoft's standard library):
 
@@ -296,41 +274,45 @@ The above copyright notice and this permission notice shall be included in all c
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 CJM Screws, LLC is a Maryland Limited Liability Company.
-No copyright claimed to unmodified original work of others. The original, unmodified work of others, to the extent included in this library, is licensed to you under the same terms under which it was licensed to CJM Screws, LLC. For information about copyright and licensing of the original work of others, see [Notices][36] file in cjm/ folder.
+No copyright claimed to unmodified original work of others. The original, unmodified work of others, to the extent included in this library, is licensed to you under the same terms under which it was licensed to CJM Screws, LLC. For information about copyright and licensing of the original work of others, see [Notices][40] file in cjm/ folder.
 
-  [1]: https://github.com/cpsusie/cjm-numerics/tree/main/src/
-  [2]: docs%2Fquick_start_visual_studio%2Fquick_start_install_vs2019.md
+  [1]: https://github.com/cpsusie/cjm-numerics/blob/main/docs/quick_start_visual_studio/quick_start_install_vs2019.md#cjm-numerics-visual-studio-2019-1928--1693-quick-start-installation-guide
+  [2]: https://github.com/cpsusie/cjm-numerics/blob/main/docs/quick_start_linux_clion/quick_start_install_linux_clion.md
   [3]: https://github.com/microsoft/vcpkg
-  [4]: https://github.com/cpsusie/cjm-numerics/tree/main/src/
-  [5]: https://www.boost.org/doc/libs/1_75_0/libs/multiprecision/doc/html/boost_multiprecision/tut/ints/cpp_int.html
-  [6]: https://github.com/calccrypto/uint128_t
-  [7]: https://github.com/ridiculousfish/libdivide
-  [8]: https://github.com/llvm/llvm-project/blob/938d05b814c7fe470201d595afefc02e3371244e/compiler-rt/lib/builtins/udivmodti4.c#L84
-  [9]: https://github.com/cpsusie/cjm-numerics/blob/main/src/cjm/numerics/cjm_numeric_concepts.hpp#L321
-  [10]: https://github.com/cpsusie/cjm-numerics/blob/main/src/cjm/numerics/numerics_configuration.hpp
-  [11]: https://en.cppreference.com/w/cpp/compiler_support
-  [12]: http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2018/p0482r6.html
-  [13]: http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2017/p0734r0.pdf
-  [14]: http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2017/p0515r3.pdf
-  [15]: http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2018/p0732r2.pdf
-  [16]: http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2019/p0553r4.html
-  [17]: http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2018/p0482r6.html
-  [18]: http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2018/p0898r3.pdf
-  [19]: https://wg21.link/P0463R1
-  [20]: https://wg21.link/P0595R2
-  [21]: https://wg21.link/P0758R1
-  [22]: https://wg21.link/P0550R2
-  [23]: https://wg21.link/P0122R7
-  [24]: http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2018/p0758r1.html
-  [25]: https://en.cppreference.com/w/cpp/header/climits
-  [26]: https://en.cppreference.com/w/cpp/types/endian
-  [27]: https://en.cppreference.com/w/cpp/types/endian
-  [28]: https://en.cppreference.com/w/cpp/types/endian
-  [29]: https://en.cppreference.com/w/cpp/types/numeric_limits/digits
-  [30]: https://github.com/cpsusie/cjm-numerics/tree/main/uint128_test_app/src
-  [31]: https://github.com/abseil/abseil-cpp/tree/master/absl
-  [32]: https://github.com/boostorg/boost
-  [33]: https://github.com/HowardHinnant/date
-  [34]: https://github.com/cpsusie/cjm-numerics/blob/main/CMakeLists.txt
-  [35]: https://github.com/cpsusie/cjm-numerics/blob/main/example_code/src/uint128_example/program.cpp
-  [36]: https://github.com/cpsusie/cjm-numerics/blob/main/src/NOTICES.md
+  [4]: https://github.com/cpsusie/cjm-numerics/releases
+  [5]: https://github.com/cpsusie/vcpkg
+  [6]: https://github.com/microsoft/vcpkg
+  [7]: https://github.com/cpsusie/cjm-numerics/tree/main/src/include
+  [8]: https://github.com/cpsusie/cjm-numerics/tree/main/src/
+  [9]: https://www.boost.org/doc/libs/1_75_0/libs/multiprecision/doc/html/boost_multiprecision/tut/ints/cpp_int.html
+  [10]: https://github.com/calccrypto/uint128_t
+  [11]: https://github.com/ridiculousfish/libdivide
+  [12]: https://github.com/llvm/llvm-project/blob/938d05b814c7fe470201d595afefc02e3371244e/compiler-rt/lib/builtins/udivmodti4.c#L84
+  [13]: https://github.com/cpsusie/cjm-numerics/blob/main/src/cjm/numerics/cjm_numeric_concepts.hpp#L321
+  [14]: https://github.com/cpsusie/cjm-numerics/blob/main/src/cjm/numerics/numerics_configuration.hpp
+  [15]: https://en.cppreference.com/w/cpp/compiler_support
+  [16]: http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2018/p0482r6.html
+  [17]: http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2017/p0734r0.pdf
+  [18]: http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2017/p0515r3.pdf
+  [19]: http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2018/p0732r2.pdf
+  [20]: http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2019/p0553r4.html
+  [21]: http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2018/p0482r6.html
+  [22]: http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2018/p0898r3.pdf
+  [23]: https://wg21.link/P0463R1
+  [24]: https://wg21.link/P0595R2
+  [25]: https://wg21.link/P0758R1
+  [26]: https://wg21.link/P0550R2
+  [27]: https://wg21.link/P0122R7
+  [28]: http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2018/p0758r1.html
+  [29]: https://en.cppreference.com/w/cpp/header/climits
+  [30]: https://en.cppreference.com/w/cpp/types/endian
+  [31]: https://en.cppreference.com/w/cpp/types/endian
+  [32]: https://en.cppreference.com/w/cpp/types/endian
+  [33]: https://en.cppreference.com/w/cpp/types/numeric_limits/digits
+  [34]: https://github.com/cpsusie/cjm-numerics/tree/main/uint128_test_app/src
+  [35]: https://github.com/abseil/abseil-cpp/tree/master/absl
+  [36]: https://github.com/boostorg/boost
+  [37]: https://github.com/HowardHinnant/date
+  [38]: https://github.com/cpsusie/cjm-numerics/blob/main/CMakeLists.txt
+  [39]: https://github.com/cpsusie/cjm-numerics/blob/main/example_code/src/uint128_example/program.cpp
+  [40]: https://github.com/cpsusie/cjm-numerics/blob/main/src/NOTICES.md
