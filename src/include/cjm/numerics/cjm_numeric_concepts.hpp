@@ -536,6 +536,20 @@ namespace cjm::numerics::concepts
 		char_or_wchar_t_with_traits<Char, CharTraits>;
 	
 
+	template<typename T>
+	concept basic_string_stream = 
+		char_with_traits_and_allocator<typename T::char_type, typename T::traits_type, typename T::allocator_type> && 
+		std::default_initializable<T> && 
+		std::movable<T> && 
+		std::derived_from<T, std::basic_iostream<typename T::char_type, typename T::traits_type>> &&
+	requires (const T & x, T & y)
+	{
+		{x.rdbuf()} -> nothrow_convertible<std::add_pointer_t<std::basic_stringbuf<typename T::char_type, typename T::traits_type, typename T::allocator_type>>>;
+		{x.str()} -> nothrow_convertible<std::basic_string<typename T::char_type, typename T::traits_type, typename T::allocator_type>>;
+	};
+
+	//static_assert(basic_string_stream<std::stringstream>);
+	
 	template<typename Allocator>
 	concept char_allocator = std::is_nothrow_convertible_v<std::allocator<char>, Allocator>;
 	template<typename Allocator>

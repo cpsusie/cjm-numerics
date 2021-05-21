@@ -1,7 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="CMakeRunConfigurationManager" shouldGenerate="true" shouldDeleteObsolete="true">
-    <generated />
+    <generated>
+      <config projectName="Int128" targetName="ExampleCode" />
+      <config projectName="Int128" targetName="EnvironTest" />
+      <config projectName="Int128" targetName="Int128" />
+    </generated>
   </component>
   <component name="CMakeSettings">
     <configurations>
@@ -12,7 +16,10 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="8ab5edb8-7d60-4856-834e-1b0d4d4bfdec" name="Default Changelist" comment="Working on new extended precision multiplication code." />
+    <list default="true" id="8ab5edb8-7d60-4856-834e-1b0d4d4bfdec" name="Default Changelist" comment="Fix setfill typo in int128_tests.cpp.">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/uint128_test_app/src/cpp/int128_tests.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/uint128_test_app/src/cpp/int128_tests.cpp" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -22,7 +29,7 @@
   <component name="ClangdSettings">
     <option name="formatViaClangd" value="false" />
   </component>
-  <component name="ExecutionTargetManager" SELECTED_TARGET="CMakeBuildProfile:Release-Clang" />
+  <component name="ExecutionTargetManager" SELECTED_TARGET="CMakeBuildProfile:Debug" />
   <component name="Git.Settings">
     <favorite-branches>
       <branch-storage>
@@ -63,9 +70,12 @@
   <component name="PropertiesComponent">
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
+    <property name="RunOnceActivity.cidr.known.project.marker" value="true" />
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="cf.first.check.clang-format" value="false" />
+    <property name="cidr.known.project.marker" value="true" />
+    <property name="cmake.loaded.for.project" value="true" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$" />
     <property name="node.js.detected.package.eslint" value="true" />
     <property name="node.js.detected.package.tslint" value="true" />
@@ -83,26 +93,30 @@
       <recent name="$PROJECT_DIR$/cmake-build-debug-clang" />
       <recent name="$PROJECT_DIR$/cmake-build-debug" />
     </key>
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/uint128_test_app/src/cpp" />
+      <recent name="$PROJECT_DIR$/uint128_test_app/src/headers" />
+    </key>
   </component>
-  <component name="RunManager" selected="CMake Application.ExampleCode">
-    <configuration name="EnvironTest" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="Int128" TARGET_NAME="EnvironTest" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="Int128" RUN_TARGET_NAME="EnvironTest">
+  <component name="RunManager" selected="CMake Application.Int128">
+    <configuration name="EnvironTest" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="Int128" TARGET_NAME="EnvironTest" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="Int128" RUN_TARGET_NAME="EnvironTest">
       <method v="2">
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
       </method>
     </configuration>
-    <configuration name="ExampleCode" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="Int128" TARGET_NAME="ExampleCode" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="Int128" RUN_TARGET_NAME="ExampleCode">
+    <configuration name="ExampleCode" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="Int128" TARGET_NAME="ExampleCode" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="Int128" RUN_TARGET_NAME="ExampleCode">
       <method v="2">
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
       </method>
     </configuration>
-    <configuration name="Int128" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="Int128" TARGET_NAME="Int128" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="Int128" RUN_TARGET_NAME="Int128">
+    <configuration name="Int128" type="CMakeRunConfiguration" factoryName="Application" PROGRAM_PARAMS="--help" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="Int128" TARGET_NAME="Int128" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="Int128" RUN_TARGET_NAME="Int128">
       <method v="2">
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
       </method>
     </configuration>
-    <configuration default="true" type="GradleAppRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" PASS_PARENT_ENVS_2="true">
+    <configuration default="true" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true">
       <method v="2">
-        <option name="com.jetbrains.cidr.cpp.gradle.execution.GradleNativeBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
       </method>
     </configuration>
     <list>
@@ -162,6 +176,14 @@
       <workItem from="1618016692901" duration="637000" />
       <workItem from="1618082747429" duration="6000" />
       <workItem from="1619133789829" duration="307000" />
+      <workItem from="1619373444196" duration="4252000" />
+      <workItem from="1619377727211" duration="45000" />
+      <workItem from="1619377847575" duration="952000" />
+      <workItem from="1619971478349" duration="1915000" />
+      <workItem from="1620174404650" duration="1151000" />
+      <workItem from="1620210506826" duration="4580000" />
+      <workItem from="1620565602250" duration="6554000" />
+      <workItem from="1621555281537" duration="6083000" />
     </task>
     <task id="LOCAL-00001" summary="Add stream extraction operator for vector of bin_op_uint128_t's.  Add unit test.">
       <created>1610297106627</created>
@@ -457,7 +479,56 @@
       <option name="project" value="LOCAL" />
       <updated>1619213117184</updated>
     </task>
-    <option name="localTasksCounter" value="43" />
+    <task id="LOCAL-00043" summary="Modified last checkin (from Windows) in GCC / Clang linux environment so that it would build there without errors or warnings.  Moved files test_runner.hpp and test_runner.cpp from wrong place to right place.  Update CMakeLists.txt to include test_runner.cpp.">
+      <created>1619377169802</created>
+      <option name="number" value="00043" />
+      <option name="presentableId" value="LOCAL-00043" />
+      <option name="project" value="LOCAL" />
+      <updated>1619377169802</updated>
+    </task>
+    <task id="LOCAL-00044" summary="Rename output_gurad.cpp to output_guard.cpp; Adjust CMakeLists.txt to link against pthread for Int128 test application.">
+      <created>1619972663088</created>
+      <option name="number" value="00044" />
+      <option name="presentableId" value="LOCAL-00044" />
+      <option name="project" value="LOCAL" />
+      <updated>1619972663088</updated>
+    </task>
+    <task id="LOCAL-00045" summary="Making adjustments to last check-in to compensate for clang and gcc's relative lack of C++20 compliance.">
+      <created>1620175535806</created>
+      <option name="number" value="00045" />
+      <option name="presentableId" value="LOCAL-00045" />
+      <option name="project" value="LOCAL" />
+      <updated>1620175535806</updated>
+    </task>
+    <task id="LOCAL-00046" summary="More adjustments to last check-in to compensate for clang and gcc's relative lack of C++20 compliance.">
+      <created>1620226634533</created>
+      <option name="number" value="00046" />
+      <option name="presentableId" value="LOCAL-00046" />
+      <option name="project" value="LOCAL" />
+      <updated>1620226634533</updated>
+    </task>
+    <task id="LOCAL-00047" summary="Made adjustments to code because gcc 10 and clang 11 do not yet support atomic wait and notify operations.  Added code to print core count in environment info.  Miscellaneous refactoring.">
+      <created>1620570817658</created>
+      <option name="number" value="00047" />
+      <option name="presentableId" value="LOCAL-00047" />
+      <option name="project" value="LOCAL" />
+      <updated>1620570817659</updated>
+    </task>
+    <task id="LOCAL-00048" summary="Fixed problem with reference in uint128_test_program.cpp.">
+      <created>1621559195370</created>
+      <option name="number" value="00048" />
+      <option name="presentableId" value="LOCAL-00048" />
+      <option name="project" value="LOCAL" />
+      <updated>1621559195370</updated>
+    </task>
+    <task id="LOCAL-00049" summary="Fix setfill typo in int128_tests.cpp.">
+      <created>1621561121387</created>
+      <option name="number" value="00049" />
+      <option name="presentableId" value="LOCAL-00049" />
+      <option name="project" value="LOCAL" />
+      <updated>1621561121387</updated>
+    </task>
+    <option name="localTasksCounter" value="50" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -476,13 +547,6 @@
     <option name="oldMeFiltersMigrated" value="true" />
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Suppress warnings regarding flags enumeration in switch." />
-    <MESSAGE value="Limit effect of suppressions to a GCC environment to not trigger unknown pragma warnings elsewhere." />
-    <MESSAGE value="Add routine to parse commandline arguments into vector of switches." />
-    <MESSAGE value="Fixed complaint Clang had about extra qualifier.  Add test files for gcc / clang cmake environment." />
-    <MESSAGE value="Update CMakeLists.txt (gcc/clang) to include translation units added to project in msvc." />
-    <MESSAGE value="Add unit tests for double and long double along with an assert_close_enough method." />
-    <MESSAGE value="Fix several minor problems with safe float conversion tests." />
     <MESSAGE value="Update cmake file to link abseil; update print_environ info to print info about built-in floating point types." />
     <MESSAGE value="Update add script file for libc++." />
     <MESSAGE value="Update CMakeLists.txt to reflect new library include location." />
@@ -504,14 +568,21 @@
     <MESSAGE value="Adjust CMakeLists.txt.  Revise include path in port file." />
     <MESSAGE value="Working on new extended precision multiplication code." />
     <MESSAGE value="Update linux/clion quick start guide." />
-    <option name="LAST_COMMIT_MESSAGE" value="Update linux/clion quick start guide." />
+    <MESSAGE value="Modified last checkin (from Windows) in GCC / Clang linux environment so that it would build there without errors or warnings.  Moved files test_runner.hpp and test_runner.cpp from wrong place to right place.  Update CMakeLists.txt to include test_runner.cpp." />
+    <MESSAGE value="Rename output_gurad.cpp to output_guard.cpp; Adjust CMakeLists.txt to link against pthread for Int128 test application." />
+    <MESSAGE value="Making adjustments to last check-in to compensate for clang and gcc's relative lack of C++20 compliance." />
+    <MESSAGE value="More adjustments to last check-in to compensate for clang and gcc's relative lack of C++20 compliance." />
+    <MESSAGE value="Made adjustments to code because gcc 10 and clang 11 do not yet support atomic wait and notify operations.  Added code to print core count in environment info.  Miscellaneous refactoring." />
+    <MESSAGE value="Fixed problem with reference in uint128_test_program.cpp." />
+    <MESSAGE value="Fix setfill typo in int128_tests.cpp." />
+    <option name="LAST_COMMIT_MESSAGE" value="Fix setfill typo in int128_tests.cpp." />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
       <breakpoints>
         <line-breakpoint type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
           <url>file://$PROJECT_DIR$/uint128_test_app/src/cpp/int128_tests.cpp</url>
-          <line>4223</line>
+          <line>4601</line>
           <option name="timeStamp" value="2" />
         </line-breakpoint>
         <line-breakpoint type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
@@ -526,8 +597,23 @@
         </line-breakpoint>
         <line-breakpoint type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
           <url>file://$PROJECT_DIR$/uint128_test_app/src/cpp/int128_tests.cpp</url>
-          <line>4263</line>
+          <line>4641</line>
           <option name="timeStamp" value="5" />
+        </line-breakpoint>
+        <line-breakpoint type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
+          <url>file://$PROJECT_DIR$/uint128_test_app/src/cpp/int128_tests.cpp</url>
+          <line>1010</line>
+          <option name="timeStamp" value="6" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
+          <url>file://$PROJECT_DIR$/uint128_test_app/src/cpp/output_guard.cpp</url>
+          <line>293</line>
+          <option name="timeStamp" value="18" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
+          <url>file://$PROJECT_DIR$/uint128_test_app/src/cpp/int128_tests.cpp</url>
+          <line>754</line>
+          <option name="timeStamp" value="20" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>

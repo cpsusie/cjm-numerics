@@ -72,6 +72,22 @@ _deps
 mono_crash.*
 
 # Build results
+[Dd]ebug-[Cc]lang/
+[Dd]ebug-[Ll]lvm--[Ii]ntel/
+[Dd]ebug-[Mm]icrosoft/
+
+[Rr]elease-[Cc]lang/
+[Rr]elease-[Ll]lvm-[Ii]ntel/
+[Rr]elease-[Mm]icrosoft/
+
+[Ii]nst-[Dd]bg-[Ii]ntl/
+[Ii]nst-[Dd]bg-[Cc]l/
+[Ii]nst-[Dd]bg-[Mm]s/
+
+[Ii]nst-[Rr]el-[Ii]ntl/
+[Ii]nst-[Rr]el-[Cc]l/
+[Ii]nst-[Rr]el-[Mm]s/
+
 [Dd]ebug/
 [Dd]ebugPublic/
 [Rr]elease/
@@ -166,6 +182,10 @@ ipch/
 *.cachefile
 *.VC.db
 *.VC.VC.opendb
+
+# Visual Studio CSharp Compilation Artifacts
+*.exe.recipe
+*.FileListAbsolute.txt
 
 # Visual Studio profiler
 *.psess
@@ -433,3 +453,4 @@ workspace.xml
 /src/.idea/vcs.xml
 /out/build/x64-Debug/.cmake/api/v1/query/client-MicrosoftVS
 /out/build/x64-Debug
+/uint128_test_app/src/WinInt128/base_test*.txt

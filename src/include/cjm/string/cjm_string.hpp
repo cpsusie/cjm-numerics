@@ -73,6 +73,14 @@ namespace cjm::string
 	using path_str_t = std::filesystem::path::string_type;
 	using path_sv_t = std::basic_string_view<path_char_t>;
 	using path_format_t = std::filesystem::path::format;
+
+
+	template<numerics::concepts::basic_string_stream TStringStream>
+	auto move_extract_string(TStringStream&& stream)
+		-> std::basic_string<typename TStringStream::char_type, typename TStringStream::traits_type, typename TStringStream::allocator_type>
+	{
+		return std::move((*(stream.rdbuf())).str());
+	}
 	
 	template<typename Char, typename CharTraits = std::char_traits<Char>, typename Allocator = std::allocator<Char>>
 		requires numerics::concepts::char_with_traits_and_allocator<Char, CharTraits, Allocator>
@@ -132,7 +140,7 @@ namespace cjm::string
 		friend std::basic_string<Char, CharTraits, Allocator> trim(const std::basic_string<Char, CharTraits, Allocator>& trimMe);
 		template<typename Char, typename CharTraits>
 			requires cjm::numerics::concepts::char_with_traits<Char, CharTraits>
-		friend std::basic_string_view<Char, CharTraits> trim_as_sv(std::basic_string_view<Char, CharTraits> trimMe);
+		friend std::basic_string_view<Char, CharTraits> trim_as_sv(std::basic_string_view<Char, CharTraits> trim_me);
 		template<typename Char, typename CharTraits, typename Allocator>
 			requires cjm::numerics::concepts::char_with_traits_and_allocator<Char, CharTraits, Allocator>
 		friend std::basic_string<Char, CharTraits, Allocator> trim(std::basic_string<Char, CharTraits, Allocator>&& trim_me);
@@ -152,6 +160,51 @@ namespace cjm::string
 			requires cjm::numerics::concepts::char_with_traits<Char, CharTraits>
 		static void rtrim(std::basic_string_view<Char, CharTraits>& r_trim_me);
 
+	};
+
+	template<typename Char, typename Traits = std::char_traits<Char>>
+		requires (cjm::numerics::concepts::char_or_wchar_t_with_traits<Char, Traits>)
+	struct case_ignoring_trimmed_ordinal_compare
+	{
+		std::weak_ordering compare(std::basic_string_view<Char, Traits> lhs, std::basic_string_view<Char, Traits> rhs) const noexcept
+		{
+			using char_t = typename std::basic_string_view<Char, Traits>::value_type;
+			auto l_trimmed = trim_as_sv(lhs);
+			auto r_trimmed = trim_as_sv(rhs);
+
+			if (l_trimmed.empty())
+			{
+				return r_trimmed.empty() ? std::weak_ordering::equivalent : std::weak_ordering::less;
+			}
+			if (r_trimmed.empty())
+			{
+				return l_trimmed.empty() ? std::weak_ordering::equivalent : std::weak_ordering::greater;
+			}
+
+			const size_t shorter = std::min(l_trimmed.size(), r_trimmed.size());
+			const auto locale = std::locale("");
+			for (size_t i = 0; i < shorter; ++i)
+			{
+				char l_char_temp = std::tolower<char_t>(lhs[i], locale);
+				char r_char_temp = std::tolower<char_t>(rhs[i], locale);
+				if (auto temp = l_char_temp <=> r_char_temp; temp != std::strong_ordering::equivalent)
+				{
+					return temp;
+				}
+			}
+			return l_trimmed.size() <=> r_trimmed.size();			
+		}
+	};
+
+	template<typename Char, typename Traits = std::char_traits<Char>>
+		requires (cjm::numerics::concepts::char_or_wchar_t_with_traits<Char, Traits>)
+	struct case_ignoring_trimmed_ordinal_less
+	{
+		bool operator()(std::basic_string_view<Char, Traits> lhs, std::basic_string_view<Char, Traits> rhs) const noexcept
+		{
+			return s_comparer.compare(lhs, rhs) == std::weak_ordering::less;
+		}
+		static constexpr auto s_comparer = case_ignoring_trimmed_ordinal_compare<Char, Traits>{};
 	};
 
 	
