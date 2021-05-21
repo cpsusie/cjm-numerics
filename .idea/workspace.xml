@@ -99,6 +99,11 @@
     </key>
   </component>
   <component name="RunManager" selected="CMake Application.Int128">
+    <configuration default="true" type="CLionExternalRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true">
+      <method v="2">
+        <option name="CLION.EXTERNAL.BUILD" enabled="true" />
+      </method>
+    </configuration>
     <configuration name="EnvironTest" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="Int128" TARGET_NAME="EnvironTest" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="Int128" RUN_TARGET_NAME="EnvironTest">
       <method v="2">
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
@@ -109,7 +114,7 @@
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
       </method>
     </configuration>
-    <configuration name="Int128" type="CMakeRunConfiguration" factoryName="Application" PROGRAM_PARAMS="--help" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="Int128" TARGET_NAME="Int128" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="Int128" RUN_TARGET_NAME="Int128">
+    <configuration name="Int128" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="Int128" TARGET_NAME="Int128" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="Int128" RUN_TARGET_NAME="Int128">
       <method v="2">
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
       </method>
