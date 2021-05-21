@@ -17,6 +17,7 @@
 // For information about copyright and licensing of the original work of others,
 // see Notices file in cjm/ folder.
 #include "int128_tests.hpp"
+#include "test_runner.hpp"
 #include <ios>
 namespace
 {
@@ -24,9 +25,51 @@ namespace
 	using uint128_ctrl = boost::multiprecision::uint128_t;
 	using namespace cjm::testing;
 	using cjm::testing::newl;
-
+	using namespace std::chrono_literals;
 	constexpr auto hex_char_arr = std::array<char, 16> {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'};
 
+	std::shared_ptr<output_guard::dedicated_output> output_guard_ptr{};
+	void init_output_guard();
+	inline cjm::uint128_tests::test_func_lookup_t init_test_func_lookup();
+	const cjm::uint128_tests::test_func_lookup_t test_func_lookup = init_test_func_lookup();
+
+
+	cjm::uint128_tests::test_func_lookup_t init_test_func_lookup()
+	{
+		using namespace cjm::uint128_tests;
+		constexpr auto& all_funcs = all_the_tests;
+		test_func_lookup_t ret;
+		std::transform(all_funcs.cbegin(), all_funcs.cend(), std::inserter(ret, ret.end()), [](const std::pair<test_func_t, std::string_view>& src) -> std::pair< std::string_view, test_func_t>
+		{
+				return std::make_pair(src.second, src.first);
+		});
+		assert(ret.size() == all_funcs.size());
+		return ret;
+	}
+
+	#ifdef _MSC_VER  
+	#pragma warning(push) 
+	#pragma warning (disable:4996) //using deprecated c++17 version until GCC/Clang-Gcc support atomic shared_ptr
+	#endif
+	void init_output_guard()	
+	{
+		std::shared_ptr<output_guard::dedicated_output>	current = std::atomic_load(&output_guard_ptr);
+		if (!current)
+		{
+			std::shared_ptr<output_guard::dedicated_output> should_be_now = nullptr;
+			std::shared_ptr<output_guard::dedicated_output> want_to_be = output_guard::dedicated_output
+				::make_dedicated_output(std::cout,
+					std::cerr);
+			std::atomic_compare_exchange_strong(&output_guard_ptr, &should_be_now, want_to_be);
+			current = std::atomic_load(&output_guard_ptr);
+		}
+		assert(current != nullptr);		
+	}
+	#ifdef _MSC_VER
+	#pragma warning(pop)
+	#endif		
+	
+	
 	template<cjm::numerics::concepts::unsigned_integer Ui, bool HexAndDecimal>
 	constexpr std::array<size_t, (std::numeric_limits<Ui>::digits10 + 2)> init_num_tests_arr() noexcept
 	{
@@ -116,7 +159,7 @@ namespace
 	}
 
 	template<typename VectorOfOperations>
-	void execute_test_file(std::string_view op_type, const std::filesystem::path& file)
+	void execute_test_file(std::string_view op_type, const std::filesystem::path& file, std::basic_ostream<char>& cout, [[maybe_unused]] std::basic_ostream<char>& cerr)
 	{
 		using namespace cjm::uint128_tests;
 		
@@ -133,7 +176,7 @@ namespace
 				istream >> op_vec;
 			}
 			const size_t num_ops = op_vec.size();
-			std::cout 
+			cout 
 				<< "Successfully read " << num_ops << " " << op_type << " operations from file [" 
 				<< file << "]." << newl;
 
@@ -143,32 +186,32 @@ namespace
 				op.calculate_result();
 				cjm_assert(op.has_result() && op.has_correct_result());
 			}
-			std::cout << "All " << num_ops << " tests from file [" << file << "] PASSED." << newl;
+			cout << "All " << num_ops << " tests from file [" << file << "] PASSED." << newl;
 		}
 		catch (const std::ios::failure& ex)
 		{
 			if (opened)
 			{
-				std::cerr 
+				cerr 
 					<< "Unable to parse contents of file [" << file 
 					<< "] as " << op_type << " operations.  Message: [" 
 					<< ex.what() << "]." << newl;
 			}
 			else
 			{
-				std::cerr << "Unable to open " << op_type << " operations file [" << file << "] -- Message: [" << ex.what() << "]." << newl;
+				cerr << "Unable to open " << op_type << " operations file [" << file << "] -- Message: [" << ex.what() << "]." << newl;
 			}
 			throw;
 		}
 		catch (const cjm::testing::testing_failure&)
 		{
-			std::cerr << "A test from: [" << file << "] FAILED!" << newl;
+			cerr << "A test from: [" << file << "] FAILED!" << newl;
 			if (ptr_current)
 			{
-				std::cerr << "A " << op_type << " operation failed.  As a static_assertion it has the form: \"";
-				append_static_assertion(std::cerr, *ptr_current) << "\"." << newl;
+				cerr << "A " << op_type << " operation failed.  As a static_assertion it has the form: \"";
+				append_static_assertion(cerr, *ptr_current) << "\"." << newl;
 				auto dump_file = create_failing_op_pathname(ptr_current->op_code());
-				std::cerr << "Will attempt to serialize the failing operation to [" << dump_file << "]";
+				cerr << "Will attempt to serialize the failing operation to [" << dump_file << "]";
 				try
 				{
 					auto ostream = cjm::string::make_throwing_ofstream<char>(dump_file);
@@ -176,21 +219,21 @@ namespace
 				}
 				catch (const std::exception& ex)
 				{
-					std::cerr << "Unable to serialize failing item to file because of exception.  "
+					cerr << "Unable to serialize failing item to file because of exception.  "
 						<< "Msg: [" << ex.what() << "]." << newl;
-					std::cerr << "Serializing to stderr instead (between brackets): ["
+					cerr << "Serializing to stderr instead (between brackets): ["
 						<< *ptr_current << "]." << newl;
 				}
 			}
 			else
 			{
-				std::cerr << "Unable to determine which test from the file failed." << newl;
+				cerr << "Unable to determine which test from the file failed." << newl;
 			}
 			throw;
 		}
 		catch (const std::exception& ex)
 		{
-			std::cerr << "An unexpected error occurred. Msg: [" << ex.what() << "]." << newl;
+			cerr << "An unexpected error occurred. Msg: [" << ex.what() << "]." << newl;
 			throw;
 		}
 	}
@@ -264,7 +307,6 @@ namespace
 		}
 	}
 	
-	
 }
 
 void cjm::uint128_tests::validate_divmod_op(const binary_op_u128_t& op)
@@ -320,7 +362,143 @@ cjm::uint128_tests::uint128_t cjm::uint128_tests::to_test(const ctrl_uint128_t& 
 	const std::uint64_t high_part = static_cast<std::uint64_t>(convert >> 64);
 	return uint128_t::make_uint128(high_part, low_part);
 }
-void cjm::uint128_tests::print_floating_point_info()
+#ifdef _MSC_VER  
+#pragma warning(push) 
+#pragma warning (disable:4996) //using deprecated c++17 version until GCC/Clang-Gcc support atomic shared_ptr
+#endif
+std::shared_ptr<cjm::testing::output_guard::dedicated_output> cjm::uint128_tests::get_dedicated()
+{
+	auto sp = std::atomic_load(&output_guard_ptr);
+	if (sp == nullptr)
+	{
+		init_output_guard();
+		sp = std::atomic_load(&output_guard_ptr);
+	}
+	assert(sp != nullptr);
+	return sp;
+}
+#ifdef _MSC_VER
+#pragma warning(pop)
+#endif		
+
+void cjm::uint128_tests::execute_uint128_tests_threaded()
+{
+	unsigned num_threads = std::max(2u, std::thread::hardware_concurrency());
+	auto dedicated = get_dedicated();
+	if (dedicated->is_running())
+	{
+		dedicated->clear_queue_and_pause();
+	}
+	dedicated->restart(create_test_battery_results_filename());
+	{
+		auto cout = dedicated->cout_proxy();
+		cout << "Using num threads: [" << num_threads << "]." << newl;
+	}
+	std::vector<std::pair<std::string_view, cjm::uint128_tests::test_func_t>> tests;
+	{
+		auto cerr = dedicated->cerr_proxy();
+		tests = build_test_vector(
+			std::nullopt, cerr);
+	}
+	std::vector<test_result> passing_test_results;
+	std::vector<test_result> failing_test_results;
+	{
+		auto runner = test_runner{ std::move(tests), get_test_clock(), dedicated };
+		assert(runner.status() == test_runner_status::ready);
+		auto result = runner.execute_and_wait_join();
+		passing_test_results = std::move(result.first);
+		failing_test_results = std::move(result.second);
+	}
+
+	if (dedicated->has_file_out_proxy())
+	{
+		{
+			auto fout = dedicated->file_out_proxy();
+			auto cout = dedicated->cout_proxy();
+			auto cerr = dedicated->cerr_proxy();
+			if (failing_test_results.empty())
+			{
+				cout << "All [" << passing_test_results.size() << "] tests PASSED." << newl << newl;
+				for (const auto& result : passing_test_results)
+				{
+					fout << "Test [" << result.name() << "] results " << newl;
+					fout << "\t[" << result << "]." << newl << newl;
+				}
+			}
+			else
+			{
+				cout << "Of the [" << passing_test_results.size() + failing_test_results.size() << "] tests, [" << passing_test_results.size() << "] PASSED and [" << failing_test_results.size() << "] FAILED." << newl;
+				fout << "Of the [" << passing_test_results.size() + failing_test_results.size() << "] tests, [" << passing_test_results.size() << "] PASSED and [" << failing_test_results.size() << "] FAILED." << newl;
+				fout << "Passing Results: " << newl;
+				for (const auto& result : passing_test_results)
+				{
+					fout << "Test [" << result.name() << "] results " << newl;
+					fout << "\t[" << result << "]." << newl << newl;
+				}
+				fout << "Done Passing results." << newl << newl << newl;
+				fout << "Failing Results: " << newl;
+				cerr << "Failing Results: " << newl;
+				for (const auto& result : failing_test_results)
+				{
+					fout << "Test [" << result.name() << "] results " << newl;
+					fout << "\t[" << result << "]." << newl << newl;
+					cerr << "Test [" << result.name() << "] results " << newl;
+					cerr << "\t[" << result << "]." << newl << newl;
+				}
+				fout << "Done failing results." << newl << newl << newl;
+				cerr << "Done failing results." << newl << newl << newl;
+			}			
+		}
+	}
+	else
+	{
+		auto cout = dedicated->cout_proxy();
+		auto cerr = dedicated->cerr_proxy();
+		if (failing_test_results.empty())
+		{
+			cout << "All [" << passing_test_results.size() << "] tests PASSED." << newl << newl;
+		}
+		cout << "Of the [" << passing_test_results.size() + failing_test_results.size() << "] tests, [" << passing_test_results.size() << "] PASSED and [" << failing_test_results.size() << "] FAILED." << newl;
+		cerr << "Of the [" << passing_test_results.size() + failing_test_results.size() << "] tests, [" << passing_test_results.size() << "] PASSED and [" << failing_test_results.size() << "] FAILED." << newl;
+		cerr << "Failing Results: " << newl;
+		for (const auto& result : failing_test_results)
+		{
+			cerr << "Test [" << result.name() << "] results " << newl;
+			cerr << "\t[" << result << "]." << newl << newl;
+		}
+		cerr << "Done failing results." << newl << newl << newl;		
+	}
+	
+}
+
+void cjm::uint128_tests::execute_specified_tests(std::span<std::string_view> test_names, unsigned max_threads)
+{
+	if (max_threads < 2)
+		max_threads = 2;
+	auto dedicated = get_dedicated();
+	if (dedicated->is_running())
+	{
+		dedicated->clear_queue_and_pause();
+	}
+	dedicated->restart(create_test_battery_results_filename());
+	assert(dedicated->has_file_out_proxy());
+	std::vector<std::pair<std::string_view, cjm::uint128_tests::test_func_t>> tests; 
+	{
+		auto cerr = dedicated->cerr_proxy();
+		tests = build_test_vector(
+			test_names, cerr);
+	}
+	auto runner = test_runner{ std::move(tests), get_test_clock(), dedicated, max_threads };
+	{
+		auto cout = dedicated->cout_proxy();
+		cout << "runner status: [" << runner.status() << "]." << newl;
+	}
+	std::pair<std::vector<test_result>, std::vector<test_result>> results = runner.execute_and_wait_join();
+	auto cout = dedicated->cout_proxy();
+	cout << "Passing results: [" << results.first.size() << "]; Failing results: [" << results.second.size() << "]." << newl;
+}
+
+void cjm::uint128_tests::print_floating_point_info([[maybe_unused]] std::basic_ostream<char>& cout, [[maybe_unused]] std::basic_ostream<char>& cerr)
 {
 	constexpr bool is_float_iec = std::numeric_limits<float>::is_iec559;
 	constexpr bool is_double_iec = std::numeric_limits<double>::is_iec559;
@@ -382,36 +560,58 @@ void cjm::uint128_tests::print_floating_point_info()
 	}
 	cout << "Done printing floating point information." << newl << newl;
 }
-void cjm::uint128_tests::print_alignments()
+
+void cjm::uint128_tests::print_available_tests([[maybe_unused]] std::basic_ostream<char>& cout, [[maybe_unused]] std::basic_ostream<char>& cerr)
 {
-	std::cout << newl << "PRINTING ALIGNMENTS:" << newl;
-	std::cout << "\tAlignof unsigned short: [" << alignof(unsigned short) << "]." << newl;
-	std::cout << "\tAlignof unsigned int: [" << alignof(unsigned int) << "]." << newl;
-	std::cout << "\tAlignof unsigned long: [" << alignof(unsigned long) << "]." << newl;
-	std::cout << "\tAlignof unsigned long long: [" << alignof(unsigned long long) << "]." << newl;
-	std::cout << "\tAlignof size_t: [" << alignof(size_t) << "]." << newl;
-	std::cout << "\tAlignof uintmax_t: [" << alignof(std::uintmax_t) << "]." << newl;
+	try
+	{
+		size_t test_no = 0;
+		cout << "Going to print all [" << test_func_lookup.size() << "] tests: " << newl;
+		std::for_each(test_func_lookup.begin(), test_func_lookup.end(), [&test_no, &cout](const auto& pair) -> void
+		{
+			cout << "Test#: \t[" << ++test_no << "]: \t \"" << pair.first << "\"" << newl;
+		});
+		cout << "Done printing available tests." << newl << newl;
+	}
+	catch (const std::exception& ex)
+	{
+		cerr << "Exception thrown while trying to print available tests.  Msg: [" << ex.what() << "]." << newl;
+		throw;
+	}
+}
+
+
+
+void cjm::uint128_tests::print_alignments([[maybe_unused]] std::basic_ostream<char>& cout, [[maybe_unused]] std::basic_ostream<char>& cerr)
+{
+	cout << newl << "PRINTING ALIGNMENTS:" << newl;
+	cout << "\tAlignof unsigned short: [" << alignof(unsigned short) << "]." << newl;
+	cout << "\tAlignof unsigned int: [" << alignof(unsigned int) << "]." << newl;
+	cout << "\tAlignof unsigned long: [" << alignof(unsigned long) << "]." << newl;
+	cout << "\tAlignof unsigned long long: [" << alignof(unsigned long long) << "]." << newl;
+	cout << "\tAlignof size_t: [" << alignof(size_t) << "]." << newl;
+	cout << "\tAlignof uintmax_t: [" << alignof(std::uintmax_t) << "]." << newl;
 	if constexpr (numerics::has_intrinsic_u128)
 	{
-		std::cout << "\tAlignof built-in unsigned 128 bit integer: [" << alignof(numerics::natuint128_t) << "]." << newl;
+		cout << "\tAlignof built-in unsigned 128 bit integer: [" << alignof(numerics::natuint128_t) << "]." << newl;
 	}
 	else
 	{
-		std::cout << "\tunsigned 128 bit integer unavailable in this environment." << newl;
+		cout << "\tunsigned 128 bit integer unavailable in this environment." << newl;
 	}
 	
-	std::cout << "\tAlignof char: [" << alignof(char) << "]." << newl;
-	std::cout << "\tAlignof wide character: [" << alignof(wchar_t) << "]." << newl;
-	std::cout << "\tAlignof cjm::numerics::uint128: [" << alignof(numerics::uint128) << "]." << newl;
-	std::cout << "\tAlignof float: [" << alignof(float) << "]." << newl;
-	std::cout << "\tAlignof double: [" << alignof(double) << "]." << newl;
-	std::cout << "\tAlignof long double: [" << alignof(long double) << "]." << newl;
-	std::cout << "\tAlignof pointer to object: [" << alignof(std::uintptr_t) << "]." << newl;
-	std::cout << "\tAlignof most aligned built-in: [" << alignof(std::max_align_t) << "]." << newl;
-	std::cout << "DONE PRINTING ALIGNMENTS" << newl;
+	cout << "\tAlignof char: [" << alignof(char) << "]." << newl;
+	cout << "\tAlignof wide character: [" << alignof(wchar_t) << "]." << newl;
+	cout << "\tAlignof cjm::numerics::uint128: [" << alignof(numerics::uint128) << "]." << newl;
+	cout << "\tAlignof float: [" << alignof(float) << "]." << newl;
+	cout << "\tAlignof double: [" << alignof(double) << "]." << newl;
+	cout << "\tAlignof long double: [" << alignof(long double) << "]." << newl;
+	cout << "\tAlignof pointer to object: [" << alignof(std::uintptr_t) << "]." << newl;
+	cout << "\tAlignof most aligned built-in: [" << alignof(std::max_align_t) << "]." << newl;
+	cout << "DONE PRINTING ALIGNMENTS" << newl;
 }
 
-void cjm::uint128_tests::save_random_unary_ops_to_file(std::filesystem::path target)
+void cjm::uint128_tests::save_random_unary_ops_to_file(std::filesystem::path target, std::basic_ostream<char>& cout, [[maybe_unused]] std::basic_ostream<char>& cerr)
 {
 	auto random = generate_random_standard_test_ops();
 	{
@@ -419,54 +619,93 @@ void cjm::uint128_tests::save_random_unary_ops_to_file(std::filesystem::path tar
 		fstrm << random;
 	}
 	cjm_assert(std::filesystem::exists(target));
-	std::cout << "Successfully wrote [" << random.size() << "] unary operations to file [" << target << "]" << newl;
+	cout << "Successfully wrote [" << random.size() << "] unary operations to file [" << target << "]" << newl;
 }
 
-void cjm::uint128_tests::save_random_binary_ops_to_file(std::filesystem::path target)
+void cjm::uint128_tests::save_random_binary_ops_to_file(std::filesystem::path target, std::basic_ostream<char>& cout, [[maybe_unused]] std::basic_ostream<char>& cerr)
 {
-	auto random = generate_divmod_ops(10, true);
+	auto random = generate_divmod_ops(10, true, cerr);
 	{
 		auto fstrm = string::make_throwing_ofstream<char>(target);
 		fstrm << random;
 	}
 	cjm_assert(std::filesystem::exists(target));
-	std::cout << "Successfully wrote [" << random.size() << "] binary operations to file [" << target << "]" << newl;
+	cout << "Successfully wrote [" << random.size() << "] binary operations to file [" << target << "]" << newl;
 }
 
-void cjm::uint128_tests::execute_test_switch(const test_switch& test_switch)
+void cjm::uint128_tests::execute_help(std::basic_ostream<char>& cout, [[maybe_unused]] std::basic_ostream<char>& cerr)
 {
-	switch (test_switch.mode())  // NOLINT(clang-diagnostic-switch-enum)
-	{
-	case test_mode::print_environ_info:
-		print_environ_data();
-		break;
-	case test_mode::run_default_tests:
-		execute_uint128_tests();
-		break;
-	case test_mode::execute_unary_from_file: 
-		execute_unary_test_file(test_switch.file_path().value());
-		break;
-	case test_mode::execute_binary_from_file:
-		execute_binary_test_file(test_switch.file_path().value());
-		break;
-	default:
+	auto longest = std::max_element(switches::switch_detail_lookup.cbegin(), switches::switch_detail_lookup.cend(), [](const auto& first, const auto& second) -> bool
 		{
-			auto strm = string::make_throwing_sstream<char>();
-			strm << "Switch [" << test_switch.mode() << "] has not yet been implemented." << newl;
-			throw std::logic_error{ strm.str() };
+			return first.first.first.size() < second.first.first.size();
+		});
+	assert(longest != switches::switch_detail_lookup.cend());
+	size_t length = longest != switches::switch_detail_lookup.cend() ? longest->first.first.size() : 12;
+
+	auto pad = [=](std::basic_ostream<char>& os, std::string_view text) -> std::basic_ostream<char>&
+	{
+		os << text;
+		if (text.length() < length)
+		{
+			auto diff = length - text.length();
+			for (size_t i = 0; i <= diff; ++i)
+			{
+				os << ' ';
+			}
 		}
-		break;
+		return os;
+	};
+	
+	cout << "Switches include: " << newl;
+	for (const auto& info : switches::switch_detail_lookup)
+	{
+		cout << "\t";
+		(pad(cout, info.first.first)) << "\t" << info.second << newl;
+	}
+	cout << switches::get_usage_examples_all_modes();
+	cout << newl;
+}
+
+void cjm::uint128_tests::execute_specified_test(std::string_view test_name, std::basic_ostream<char>& cout,
+                                                std::basic_ostream<char>& cerr)
+{
+	const test_func_lookup_t& lookup = cjm::uint128_tests::get_test_func_lookup();
+	if (const auto test = lookup.find(test_name); test != lookup.end())
+	{
+		auto obj = test_obj{ std::string{test->first},  test->second, get_test_clock() };
+		cout << "Will execute test: [" << obj.test_name() << "]." << newl;
+		const auto result = obj.try_execute();
+		if (auto res = get_result(result); res.has_value())
+		{
+			cout << "\tResult of test: " << newl;
+			cout << "\t\t" << res.value() << newl;
+		}
+		else
+		{
+			auto msg = get_error_msg(result);
+			cerr << "\tError executing test [" << obj.test_name() << "]: " << newl;
+			if (!msg.empty())
+			{
+				cerr << "\t\tErr msg: [" << msg << "]." << newl;
+			}
+		}
+		cout << "Done with test: [" << test_name << "]." << newl << newl;		
+	}
+	else
+	{
+		cerr << "Test named [" << test_name << "] does not exist and cannot be executed." << newl;
 	}
 }
 
-void cjm::uint128_tests::execute_unary_test_file(const std::filesystem::path& file)
+
+void cjm::uint128_tests::execute_unary_test_file(const std::filesystem::path& file, std::basic_ostream<char>& cout, [[maybe_unused]] std::basic_ostream<char>& cerr)
 {
-	execute_test_file<unary_op_u128_vect_t>("unary"sv, file);
+	execute_test_file<unary_op_u128_vect_t>("unary"sv, file, cout, cerr);
 }
 
-void cjm::uint128_tests::execute_binary_test_file(const std::filesystem::path& file)
+void cjm::uint128_tests::execute_binary_test_file(const std::filesystem::path& file, std::basic_ostream<char>& cout, [[maybe_unused]] std::basic_ostream<char>& cerr)
 {
-	execute_test_file<binary_op_u128_vect_t>("binary"sv, file);
+	execute_test_file<binary_op_u128_vect_t>("binary"sv, file, cout, cerr);
 }
 
 void cjm::uint128_tests::run_test_application(std::span<test_switch> switches)
@@ -478,14 +717,46 @@ void cjm::uint128_tests::run_test_application(std::span<test_switch> switches)
 	//cjm_assert_equal(to_test(0x98908bf90a64f3d8da5beb787031b0f6_cppui128), 0x98908bf90a64f3d8da5beb787031b0f6_u128, "0x98908bf90a64f3d8da5beb787031b0f6"sv);
 	//cjm_assert_equal(to_test(0x98908bf90a64f3d8da5beb787031b0f3_cppui128), 0x98908bf90a64f3d8da5beb787031b0f6_u128, "0x98908bf90a64f3d8da5beb787031b0f6"sv);
 	//generate_then_print_literal_tests();
-	
+	auto ptr = get_dedicated();
+	if (!ptr->is_running())
+	{
+		ptr->restart();
+		assert(ptr->is_running());
+	}
 	if (switches.empty())
 	{
-		print_environ_data();
-		execute_uint128_tests();
+		//if no switches are provided, the full battery of tests will be run.
+		ptr->clear_queue_and_pause();
+		ptr->restart();
+	
+		execute_uint128_tests_threaded();
+		auto file_out_path = ptr->get_file_out_proxy_path();
+		ptr->clear_queue_and_pause();
+		ptr->restart();
+		bool output_path_exists = file_out_path.has_value() && std::filesystem::exists(*file_out_path);
+		{
+			std::optional<output_guard::output_proxy> proxy = output_path_exists ? ptr->cout_proxy() : ptr->cerr_proxy();
+			if (proxy.has_value())
+			{
+				std::basic_ostream<char>& out = *proxy;
+				if (output_path_exists)
+				{
+					out << "Successfully wrote test result detail to: [" << *file_out_path << "]." << newl;
+				}
+				else
+				{
+					out << "Unable to verify successful write of test result detail to: [" << *file_out_path << "]." << newl;
+				}
+			}
+		}
 	}
 	else
 	{
+		const auto has_help = std::find_if(switches.begin(), switches.end(), 
+			[](const test_switch& sw) -> bool {return sw.mode() == test_mode::help; }) != switches.end();
+		const auto has_list = std::find_if(switches.begin(), switches.end(), 
+			[](const test_switch& sw) -> bool {return sw.mode() == test_mode::list_tests;
+			}) != switches.end();
 		const auto has_print_environ = std::find_if(
 			switches.begin(), switches.end(),
 		[](const test_switch& ts) -> bool
@@ -497,79 +768,139 @@ void cjm::uint128_tests::run_test_application(std::span<test_switch> switches)
 			{
 					return ts.mode() == test_mode::run_default_tests;
 			}) != switches.end();
+		if (has_help)
+		{
+			{
+				auto cout = ptr->cout_proxy();
+				auto cerr = ptr->cerr_proxy();
+				execute_help(cout, cerr);
+			}
+			ptr->clear_queue_and_pause();
+			return;			
+		}
 		if (has_print_environ)
 		{
-			std::cout << "Executing switch [" << test_mode::print_environ_info << "]: " << newl;
-			print_environ_data();
-			std::cout << "Done executing switch [" << test_mode::print_environ_info << "] " << newl << newl;
+			auto cout = ptr->cout_proxy();
+			auto cerr = ptr->cerr_proxy();
+			cout << "Executing switch [" << test_mode::print_environ_info << "]: " << newl;
+			print_environ_data(cout, cerr);
+			cout << "Done executing switch [" << test_mode::print_environ_info << "] " << newl << newl;
+		}
+		if (has_list)
+		{
+			auto cout = ptr->cout_proxy();
+			auto cerr = ptr->cerr_proxy();
+			print_available_tests(cout, cerr);
 		}
 		if (has_execute_battery)
 		{
-			std::cout << "Executing switch [" << test_mode::run_default_tests << "]: " << newl;
-			execute_uint128_tests();
-			std::cout << "Done executing switch [" << test_mode::run_default_tests << "] " << newl << newl;
+			ptr->clear_queue_and_pause();
+			ptr->restart();
+			ptr = get_dedicated();			
+			{
+				auto cout = ptr->cout_proxy();
+				auto cerr = ptr->cerr_proxy();
+				print_available_tests(cout, cerr);
+
+				cout << "Executing switch [" << test_mode::run_default_tests << "]: " << newl;
+			}
+			//demo_multithread_tests();
+			//execute_uint128_tests();
+			execute_uint128_tests_threaded();
+			{
+				auto cout = ptr->cout_proxy();
+				cout << "Done executing switch [" << test_mode::run_default_tests << "] " << newl << newl;				
+			}
+			auto file_out_path = ptr->get_file_out_proxy_path();
+			ptr->clear_queue_and_pause();
+			ptr->restart();
+			bool output_path_exists = file_out_path.has_value() && std::filesystem::exists(*file_out_path);
+			{
+				std::optional<output_guard::output_proxy> proxy = output_path_exists ? ptr->cout_proxy() : ptr->cerr_proxy();
+				if (proxy.has_value())
+				{
+					std::basic_ostream<char>& out = *proxy;
+					if (output_path_exists)
+					{
+						out << "Successfully wrote test result detail to: [" << *file_out_path << "]." << newl;
+					}
+					else
+					{
+						out << "Unable to verify successful write of test result detail to: [" << *file_out_path << "]." << newl;
+					}
+				}
+			}
+			
 		}
+
 		for (const auto& test_switch : switches)
 		{
+			auto cout = ptr->cout_proxy();
+			auto cerr = ptr->cerr_proxy();
 			const auto mode = test_switch.mode();
 			if (mode == test_mode::execute_unary_from_file)
 			{
-				execute_unary_test_file(test_switch.file_path().value());
+				execute_unary_test_file(test_switch.file_path().value(), cout, cerr);
 			}
 			else if (mode == test_mode::execute_binary_from_file)
 			{
-				execute_binary_test_file(test_switch.file_path().value());
+				execute_binary_test_file(test_switch.file_path().value(), cout, cerr);
+			}
+			else if (mode == test_mode::run_specific_test)
+			{
+				execute_specified_test(test_switch.test_name(), cout, cerr);
 			}
 		}
 	}
+	ptr->clear_queue_and_pause();
 }
 
-void cjm::uint128_tests::print_sizes()
+void cjm::uint128_tests::print_sizes([[maybe_unused]] std::basic_ostream<char>& cout, [[maybe_unused]] std::basic_ostream<char>& cerr)
 {
-	std::cout << newl << "PRINTING SIZES:" << newl;
-	std::cout << "\tCHAR_BIT: " << CHAR_BIT << " bits per byte on this system." << newl;
-	std::cout << "\tSizeof unsigned short: [" << sizeof(unsigned short) << "]." << newl;
-	std::cout << "\tSizeof unsigned int: [" << sizeof(unsigned int) << "]." << newl;
-	std::cout << "\tSizeof unsigned long: [" << sizeof(unsigned long) << "]." << newl;
-	std::cout << "\tSizeof unsigned long long: [" << sizeof(unsigned long long) << "]." << newl;
-	std::cout << "\tSizeof size_t: [" << sizeof(size_t) << "]." << newl;
-	std::cout << "\tSizeof uintmax_t: [" << sizeof(std::uintmax_t) << "]." << newl;
+	cout << newl << "PRINTING SIZES:" << newl;
+	cout << "\tCHAR_BIT: " << CHAR_BIT << " bits per byte on this system." << newl;
+	cout << "\tSizeof unsigned short: [" << sizeof(unsigned short) << "]." << newl;
+	cout << "\tSizeof unsigned int: [" << sizeof(unsigned int) << "]." << newl;
+	cout << "\tSizeof unsigned long: [" << sizeof(unsigned long) << "]." << newl;
+	cout << "\tSizeof unsigned long long: [" << sizeof(unsigned long long) << "]." << newl;
+	cout << "\tSizeof size_t: [" << sizeof(size_t) << "]." << newl;
+	cout << "\tSizeof uintmax_t: [" << sizeof(std::uintmax_t) << "]." << newl;
 	if constexpr (numerics::has_intrinsic_u128)
 	{
-		std::cout << "\tSizeof built-in unsigned 128 bit integer: [" << sizeof(numerics::natuint128_t) << "]." << newl;
+		cout << "\tSizeof built-in unsigned 128 bit integer: [" << sizeof(numerics::natuint128_t) << "]." << newl;
 	}
 	else
 	{
-		std::cout << "\tunsigned 128 bit integer unavailable in this environment." << newl;
+		cout << "\tunsigned 128 bit integer unavailable in this environment." << newl;
 	}
 	if constexpr (std::is_signed_v<char>)
 	{
-		std::cout << "\tchar is signed in this implementation." << newl;
+		cout << "\tchar is signed in this implementation." << newl;
 	}
 	else
 	{
-		std::cout << "\tchar is unsigned in this implementation." << newl;
+		cout << "\tchar is unsigned in this implementation." << newl;
 	}
 
-	std::cout << "\tSizeof wide character: [" << sizeof(wchar_t) << "]." << newl;
+	cout << "\tSizeof wide character: [" << sizeof(wchar_t) << "]." << newl;
 	if constexpr (std::is_signed_v<wchar_t>)
 	{
-		std::cout << "\tWide character is signed in this implementation." << newl;
+		cout << "\tWide character is signed in this implementation." << newl;
 	}
 	else
 	{
-		std::cout << "\tWide character is unsigned in this implementation." << newl;
+		cout << "\tWide character is unsigned in this implementation." << newl;
 	}
 
-	std::cout << "\tSizeof cjm::numerics::uint128: [" << sizeof(numerics::uint128) << "]." << newl;
-	std::cout << "\tSizeof float: [" << sizeof(float) << "]." << newl;
-	std::cout << "\tSizeof double: [" << sizeof(double) << "]." << newl;
-	std::cout << "\tSizeof long double: [" << sizeof(long double) << "]." << newl;
-	std::cout << "\tSizeof pointer to object: [" << sizeof(std::uintptr_t) << "]." << newl;
-	std::cout << "\tSizeof most aligned built-in: [" << sizeof(std::max_align_t) << "]." << newl;
-	std::cout << "DONE PRINTING SIZES" << newl;
+	cout << "\tSizeof cjm::numerics::uint128: [" << sizeof(numerics::uint128) << "]." << newl;
+	cout << "\tSizeof float: [" << sizeof(float) << "]." << newl;
+	cout << "\tSizeof double: [" << sizeof(double) << "]." << newl;
+	cout << "\tSizeof long double: [" << sizeof(long double) << "]." << newl;
+	cout << "\tSizeof pointer to object: [" << sizeof(std::uintptr_t) << "]." << newl;
+	cout << "\tSizeof most aligned built-in: [" << sizeof(std::max_align_t) << "]." << newl;
+	cout << "DONE PRINTING SIZES" << newl;
 }
-void cjm::uint128_tests::print_environ_data()
+void cjm::uint128_tests::print_environ_data([[maybe_unused]] std::basic_ostream<char>& cout, [[maybe_unused]] std::basic_ostream<char>& cerr)
 {
 	cout << "ENVIRONMENT DATA: " << newl;
 	cout << "Detected compiler: [" << numerics::compiler << "]." << newl;
@@ -597,19 +928,21 @@ void cjm::uint128_tests::print_environ_data()
 	{
 		cout << "Intel BMI2: [NOT AVAILABLE]." << newl;
 	}
-	
-	print_sizes();
-	print_alignments();
-	print_floating_point_info();
-	print_constexpr_bitcast_available();
-	print_uint128_eval_mode();
-	print_cpp20_bitops_available();
-	print_builtin_uint128_data_if_present();
-	print_whether_has_consteval();
+
+	cout << "Execution Cores for concurrency: [" << std::thread::hardware_concurrency() << "]." << newl;
+
+	print_sizes(cout, cerr);
+	print_alignments(cout, cerr);
+	print_floating_point_info(cout, cerr);
+	print_constexpr_bitcast_available(cout, cerr);
+	print_uint128_eval_mode(cout, cerr);
+	print_cpp20_bitops_available(cout, cerr);
+	print_builtin_uint128_data_if_present(cout, cerr);
+	print_whether_has_consteval(cout, cerr);
 	cout << "END ENVIRONMENT DATA" << newl << newl;
 }
 
-void cjm::uint128_tests::execute_ascii_char_interconversions()
+void cjm::uint128_tests::execute_ascii_char_interconversions([[maybe_unused]] std::basic_ostream<char>& cout, [[maybe_unused]] std::basic_ostream<char>& cerr)
 {
 	for (int i = 0; i <= std::numeric_limits<char>::max(); ++i)
 	{
@@ -627,7 +960,7 @@ void cjm::uint128_tests::execute_ascii_char_interconversions()
 	}
 }
 
-void cjm::uint128_tests::execute_div_mod_zero_dividend_nonzero_divisor_tests()
+void cjm::uint128_tests::execute_div_mod_zero_dividend_nonzero_divisor_tests([[maybe_unused]] std::basic_ostream<char>& cout, [[maybe_unused]] std::basic_ostream<char>& cerr)
 {
 	constexpr auto dividend = 0_u128;
 	constexpr auto divisor = 0xd00d_u128;
@@ -640,32 +973,32 @@ void cjm::uint128_tests::execute_div_mod_zero_dividend_nonzero_divisor_tests()
 	cjm_assert(res.has_value() && res->quotient == 0 && res->remainder == 0);
 }
 
-void cjm::uint128_tests::execute_div_mod_by_zero_tests()
+void cjm::uint128_tests::execute_div_mod_by_zero_tests([[maybe_unused]] std::basic_ostream<char>& cout, [[maybe_unused]] std::basic_ostream<char>& cerr)
 {
 	using namespace testing;
 	
-	cjm_assert_throws<std::domain_error>([]() -> void
+	cjm_assert_throws<std::domain_error>([&]() -> void
 	{
 		const auto dividend = 0xd00d_u128;
 		const auto divisor = 0_u128;
 		const auto quotient = dividend / divisor;
-	   std::cerr << "You should never see this value: [" << quotient << "]." << newl;
+		cerr << "You should never see this value: [" << quotient << "]." << newl;
 	});
 
-	cjm_assert_throws<std::domain_error>([]() -> void
+	cjm_assert_throws<std::domain_error>([&]() -> void
 	{
 		const auto dividend = 0xd00d_u128;
 		const auto divisor = 0_u128;
 		const auto remainder = dividend % divisor;
-		std::cerr << "You should never see this value: [" << remainder << "]." << newl;
+		cerr << "You should never see this value: [" << remainder << "]." << newl;
 	});
 
-	cjm_assert_throws<std::domain_error>([]() -> void
+	cjm_assert_throws<std::domain_error>([&]() -> void
 	{
 		const auto dividend = 0xd00d_u128;
 		const auto divisor = 0_u128;
 		const auto result = uint128_t::div_mod(dividend, divisor);
-		std::cerr << "You should never see this value: [Quotient: " << result.quotient << "; remainder: " << result.remainder << "]." << newl;
+		cerr << "You should never see this value: [Quotient: " << result.quotient << "; remainder: " << result.remainder << "]." << newl;
 	});
 	cjm_assert(uint128_t::try_div_mod(0xd00d_u128, 0_u128) == std::nullopt);
 	
@@ -675,11 +1008,20 @@ void cjm::uint128_tests::execute_uint128_tests()
 {
 	using tconst_prov_t [[maybe_unused]] = u128_testing_constant_providers::testing_constant_provider<uint128_t>;
 	static_assert(tconst_prov_t::maximum + tconst_prov_t::one == tconst_prov_t::zero);
-	cout_saver saver{ cout };
-	constexpr auto two_fifty_five = 0xff_u128;
-	constexpr auto all_at_ends = 0xff00'0000'0000'0000'0000'0000'0000'0000_u128;
-	static_assert(((two_fifty_five << (15 * 8)) == all_at_ends) && ((all_at_ends >> (15 * 8)) == two_fifty_five));
-	cout << "BEGINNING STANDARD TEST BATTERY." << newl;
+	auto guard_ptr = get_dedicated();
+	std::filesystem::path path;
+	{
+		auto cout = guard_ptr->cout_proxy();
+		cout_saver saver{ cout };
+		constexpr auto two_fifty_five = 0xff_u128;
+		constexpr auto all_at_ends = 0xff00'0000'0000'0000'0000'0000'0000'0000_u128;
+		static_assert(((two_fifty_five << (15 * 8)) == all_at_ends) && ((all_at_ends >> (15 * 8)) == two_fifty_five));
+		cout << "BEGINNING STANDARD TEST BATTERY." << newl;
+		path = create_test_battery_results_filename();
+		cout << "Test results will be saved to: [" << path << "]." << newl;
+	}
+	guard_ptr->clear_queue_and_pause();
+	guard_ptr->restart(path);
 	execute_test(execute_generate_addition_ops_rt_ser_deser_test, "generate_addition_ops_rt_ser_deser_test"sv);
 
 	execute_test(execute_issue27_bug_test, "issue27_bug_test");
@@ -690,26 +1032,31 @@ void cjm::uint128_tests::execute_uint128_tests()
 	execute_test(execute_binary_operation_rt_ser_tests, "binary_operation_rt_ser_tests"sv);
 	execute_test(execute_print_generated_filename_test, "print_generated_filename_test"sv);
 	execute_test(execute_string_parse_test, "string_parse_text"sv);
+	
 	execute_test(execute_basic_multiplication_test, "basic_multiplication_test"sv);
 	execute_test(test_fls, "test_fls"sv);
 	execute_test(execute_builtin_u128fls_test_if_avail, "builtin_u128fls_test_if_avail"sv);
 	execute_test(execute_first_bin_op_test, "first_bin_op_test"sv);
 	execute_test(execute_div_mod_by_zero_tests, "div_mod_zero_tests"sv);
+
 	execute_test(execute_div_mod_zero_dividend_nonzero_divisor_tests, "div_mod_zero_dividend_nonzero_divisor_tests"sv);
 	execute_test(execute_gen_comp_ops_test, "gen_comp_ops_test"sv);
 	execute_test(execute_ascii_char_interconversions, "ascii_char_interconversions"sv);
 	execute_test(execute_trim_tests, "trim_tests"sv);
 	execute_test(execute_stream_insert_bin_op_test, "stream_insert_bin_op_test"sv);
+	
 	execute_test(execute_addition_tests, "addition_tests"sv);
 	execute_test(execute_shift_tests, "shift_tests"sv);
 	execute_test(execute_bw_tests, "bw_tests"sv);
 	execute_test(execute_subtraction_tests, "subtraction_tests"sv);
 	execute_test(execute_comparison_tests, "comparison_tests"sv);
+	
 	execute_test(execute_multiplication_tests, "multiplication_tests"sv);
 	execute_test(execute_failing_division_test_1, "failing_division_test_1"sv);
 	execute_test(execute_failing_division_test_2, "failing_division_test_2"sv);
 	execute_test(execute_failing_modulus_test_1, "failing_modulus_test_1"sv);
 	execute_test(execute_division_modulus_tests, "division_modulus_tests"sv);
+	
 	execute_test(execute_unary_op_code_rt_serialization_tests, "unary_op_code_rt_serialization_tests"sv);
 	execute_test(execute_unary_op_basic_test, "unary_op_basic_test"sv);
 	execute_test(execute_unary_op_post_stat_assert_test, "unary_op_post_stat_assert_test"sv);
@@ -749,11 +1096,14 @@ void cjm::uint128_tests::execute_uint128_tests()
 	execute_test(execute_umult_spec_tests, "umult_spec_tests"sv);
 	execute_test(execute_uintcontainer_adc_tests, "uintcontainer_adc_tests"sv);
 
-	cout << "STANDARD TEST BATTERY: All tests PASSED." << newl;
-	static_assert(most_sign_set_bit(2_u128) == 1);
+	{
+		auto cout = guard_ptr->cout_proxy();
+		cout << "STANDARD TEST BATTERY: All tests PASSED." << newl;
+		static_assert(most_sign_set_bit(2_u128) == 1);
+	}
 }
 
-void cjm::uint128_tests::execute_parse_file_test(std::string_view path, size_t expected_ops)
+void cjm::uint128_tests::execute_parse_file_test(std::string_view path, size_t expected_ops, std::basic_ostream<char>& cout, [[maybe_unused]] std::basic_ostream<char>& cerr)
 {
 	auto op_vec = binary_op_u128_vect_t{};
 	try
@@ -763,20 +1113,20 @@ void cjm::uint128_tests::execute_parse_file_test(std::string_view path, size_t e
 	}
 	catch (const std::exception& ex)
 	{
-		std::cerr << "Error opening reading or parsing file: [" << path << "]. Msg: [" << ex.what() << "]." << newl;
+		cerr << "Error opening reading or parsing file: [" << path << "]. Msg: [" << ex.what() << "]." << newl;
 		throw;
 	}
-	std::cout << "Read: " << op_vec.size() << " operations from [" << path << "]." << newl;
+	cout << "Read: " << op_vec.size() << " operations from [" << path << "]." << newl;
 	cjm_assert(expected_ops == op_vec.size());
 }
-void cjm::uint128_tests::execute_unary_op_post_stat_assert_test()
+void cjm::uint128_tests::execute_unary_op_post_stat_assert_test([[maybe_unused]] std::basic_ostream<char>& cout, [[maybe_unused]] std::basic_ostream<char>& cerr)
 {
 	auto post_inc = unary_op_u128_t{unary_op::post_increment, 1_u128};
 	auto post_dec = unary_op_u128_t{unary_op::post_decrement, 1_u128};
-	append_static_assertion(std::cout, post_inc) << newl;
-	append_static_assertion(std::cout, post_dec) << newl;
+	append_static_assertion(cout, post_inc) << newl;
+	append_static_assertion(cout, post_dec) << newl;
 }
-void cjm::uint128_tests::execute_test_convert_to_double()
+void cjm::uint128_tests::execute_test_convert_to_double([[maybe_unused]] std::basic_ostream<char>& cout, [[maybe_unused]] std::basic_ostream<char>& cerr)
 {
 	constexpr auto oh_d00d_big_src = 0xc0de'd00d'dad0'0000'0000'0000'0000'0000_u128;
 	constexpr auto oh_d00d_half_src = 0xc0de'd00d'dad0'0000_u128;
@@ -797,20 +1147,20 @@ void cjm::uint128_tests::execute_test_convert_to_double()
 	const flt_t ctrl_oh_d00d_big = static_cast<flt_t>(oh_d00d_big_ctrl);
 	const flt_t ctrl_oh_d00d_half = static_cast<flt_t>(oh_d00d_half_ctrl);
 	const flt_t alt_ctrl_oh_d00d_big = static_cast<flt_t>(oh_d00d_big_alt_ctrl);
-	cjm_assert_close_enough(static_cast<uint128_t>(zero), 0_u128);
-	cjm_assert_close_enough(static_cast<uint128_t>(one), 1_u128);
-	cjm_assert_close_enough(static_cast<uint128_t>(zero_point_zero_one), 0_u128);
-	cjm_assert_close_enough(static_cast<uint128_t>(big_ass_num), 0x8000'0000'0000'0000'0000'0000'0000'0000_u128);
-	cjm_assert_close_enough(static_cast<uint128_t>(not_quite_as_big_ass_num), 0x8000'0000'0000'0000_u128);
+	cjm_assert_close_enough(static_cast<uint128_t>(zero), 0_u128, cout);
+	cjm_assert_close_enough(static_cast<uint128_t>(one), 1_u128, cout);
+	cjm_assert_close_enough(static_cast<uint128_t>(zero_point_zero_one), 0_u128, cout);
+	cjm_assert_close_enough(static_cast<uint128_t>(big_ass_num), 0x8000'0000'0000'0000'0000'0000'0000'0000_u128, cout);
+	cjm_assert_close_enough(static_cast<uint128_t>(not_quite_as_big_ass_num), 0x8000'0000'0000'0000_u128, cout);
 	const auto rt_oh_d00d_big = static_cast<uint128_t>(oh_d00d_big);
 	const auto rt_oh_d00d_half = static_cast<uint128_t>(oh_d00d_half);
-	cjm_assert_close_enough(rt_oh_d00d_big, oh_d00d_big_src);
-	cjm_assert_close_enough(rt_oh_d00d_half, oh_d00d_half_src);
+	cjm_assert_close_enough(rt_oh_d00d_big, oh_d00d_big_src, cout);
+	cjm_assert_close_enough(rt_oh_d00d_half, oh_d00d_half_src, cout);
 	cjm_assert_equal(static_cast<uint128_t>(ctrl_oh_d00d_big), oh_d00d_big_src);
 	cjm_assert_equal(static_cast<uint128_t>(alt_ctrl_oh_d00d_big), oh_d00d_big_src);
 	cjm_assert_equal(static_cast<uint128_t>(ctrl_oh_d00d_half), oh_d00d_half_src);
 }
-void cjm::uint128_tests::execute_test_convert_to_long_double()
+void cjm::uint128_tests::execute_test_convert_to_long_double([[maybe_unused]] std::basic_ostream<char>& cout, [[maybe_unused]] std::basic_ostream<char>& cerr)
 {
 	using flt_t = long double;
 	constexpr auto oh_d00d_big_src = 0xc0de'd00d'dad0'0000'0000'0000'0000'0000_u128;
@@ -831,15 +1181,15 @@ void cjm::uint128_tests::execute_test_convert_to_long_double()
 	const flt_t ctrl_oh_d00d_big = static_cast<flt_t>(oh_d00d_big_ctrl);
 	const flt_t ctrl_oh_d00d_half = static_cast<flt_t>(oh_d00d_half_ctrl);
 	const flt_t alt_ctrl_oh_d00d_big = static_cast<flt_t>(oh_d00d_big_alt_ctrl);
-	cjm_assert_close_enough(static_cast<uint128_t>(zero), 0_u128);
-	cjm_assert_close_enough(static_cast<uint128_t>(one), 1_u128);
-	cjm_assert_close_enough(static_cast<uint128_t>(zero_point_zero_one), 0_u128);
-	cjm_assert_close_enough(static_cast<uint128_t>(big_ass_num), 0x8000'0000'0000'0000'0000'0000'0000'0000_u128);
-	cjm_assert_close_enough(static_cast<uint128_t>(not_quite_as_big_ass_num), 0x8000'0000'0000'0000_u128);
+	cjm_assert_close_enough(static_cast<uint128_t>(zero), 0_u128, cout);
+	cjm_assert_close_enough(static_cast<uint128_t>(one), 1_u128, cout);
+	cjm_assert_close_enough(static_cast<uint128_t>(zero_point_zero_one), 0_u128, cout);
+	cjm_assert_close_enough(static_cast<uint128_t>(big_ass_num), 0x8000'0000'0000'0000'0000'0000'0000'0000_u128, cout);
+	cjm_assert_close_enough(static_cast<uint128_t>(not_quite_as_big_ass_num), 0x8000'0000'0000'0000_u128, cout);
 	const auto rt_oh_d00d_big = static_cast<uint128_t>(oh_d00d_big);
 	const auto rt_oh_d00d_half = static_cast<uint128_t>(oh_d00d_half);
-	cjm_assert_close_enough(rt_oh_d00d_big, oh_d00d_big_src);
-	cjm_assert_close_enough(rt_oh_d00d_half, oh_d00d_half_src);
+	cjm_assert_close_enough(rt_oh_d00d_big, oh_d00d_big_src, cout);
+	cjm_assert_close_enough(rt_oh_d00d_half, oh_d00d_half_src, cout);
 	cjm_assert_equal(static_cast<uint128_t>(ctrl_oh_d00d_big), rt_oh_d00d_big);
 	cjm_assert_equal(static_cast<uint128_t>(alt_ctrl_oh_d00d_big), rt_oh_d00d_big);
 	cjm_assert_equal(static_cast<uint128_t>(ctrl_oh_d00d_half), rt_oh_d00d_half);
@@ -847,7 +1197,7 @@ void cjm::uint128_tests::execute_test_convert_to_long_double()
    
 }
 
-void cjm::uint128_tests::execute_throwing_float_conversion_test()
+void cjm::uint128_tests::execute_throwing_float_conversion_test([[maybe_unused]] std::basic_ostream<char>& cout, [[maybe_unused]] std::basic_ostream<char>& cerr)
 {
 	constexpr float max_float = std::numeric_limits<float>::max();
 	constexpr double max_double = std::numeric_limits<double>::max();
@@ -864,43 +1214,43 @@ void cjm::uint128_tests::execute_throwing_float_conversion_test()
 
 	if (max_float_exceeds)
 	{
-		cjm_assert_throws<std::invalid_argument>([]()-> void
+		cjm_assert_throws<std::invalid_argument>([&cerr]()-> void
 		{
 				const auto converted = numerics::safe_from_floating_or_throw(max_float);
-				std::cerr << "You should never see this: " << converted << newl;
+				cerr << "You should never see this: " << converted << newl;
 		});
 	}
 	if (max_double_exceeds)
 	{
-		cjm_assert_throws<std::invalid_argument>([]()-> void
+		cjm_assert_throws<std::invalid_argument>([&cerr]()-> void
 		{
 				const auto converted = numerics::safe_from_floating_or_throw(max_double);
-				std::cerr << "You should never see this: " << converted << newl;
+				cerr << "You should never see this: " << converted << newl;
 		});
 	}
 	if (max_ld_exceeds)
 	{
-		cjm_assert_throws<std::invalid_argument>([]()-> void
+		cjm_assert_throws<std::invalid_argument>([&cerr]()-> void
 		{
 				const auto converted = numerics::safe_from_floating_or_throw(max_l_d);
-				std::cerr << "You should never see this: " << converted << newl;
+				cerr << "You should never see this: " << converted << newl;
 		});
 	}
 
-	cjm_assert_throws<std::invalid_argument>([]()-> void
+	cjm_assert_throws<std::invalid_argument>([&cerr]()-> void
 	{
 		const auto converted = numerics::safe_from_floating_or_throw(-1.01f);
-		std::cerr << "You should never see this: " << converted << newl;
+		cerr << "You should never see this: " << converted << newl;
 	});
-	cjm_assert_throws<std::invalid_argument>([]()-> void
+	cjm_assert_throws<std::invalid_argument>([&cerr]()-> void
 	{
 		const auto converted = numerics::safe_from_floating_or_throw(-1.01);
-		std::cerr << "You should never see this: " << converted << newl;
+		cerr << "You should never see this: " << converted << newl;
 	});
-	cjm_assert_throws<std::invalid_argument>([]()-> void
+	cjm_assert_throws<std::invalid_argument>([&cerr]()-> void
 	{
 		const auto converted = numerics::safe_from_floating_or_throw(-1.01L);
-		std::cerr << "You should never see this: " << converted << newl;
+		cerr << "You should never see this: " << converted << newl;
 	});
 	{
 		using flt_t = float;
@@ -910,11 +1260,11 @@ void cjm::uint128_tests::execute_throwing_float_conversion_test()
 		const flt_t big_ass_num = static_cast<flt_t>(0x8000'0000'0000'0000'0000'0000'0000'0000_u128);
 		const flt_t not_quite_as_big_ass_num = static_cast<flt_t>(0x8000'0000'0000'0000_u128);
 
-		cjm_assert_close_enough(numerics::safe_from_floating_or_throw(zero), 0_u128);
-		cjm_assert_close_enough(numerics::safe_from_floating_or_throw(one), 1_u128);
-		cjm_assert_close_enough(numerics::safe_from_floating_or_throw(zero_point_zero_one), 0_u128);
-		cjm_assert_close_enough(numerics::safe_from_floating_or_throw(big_ass_num), 0x8000'0000'0000'0000'0000'0000'0000'0000_u128);
-		cjm_assert_close_enough(numerics::safe_from_floating_or_throw(not_quite_as_big_ass_num), 0x8000'0000'0000'0000_u128);
+		cjm_assert_close_enough(numerics::safe_from_floating_or_throw(zero), 0_u128, cout);
+		cjm_assert_close_enough(numerics::safe_from_floating_or_throw(one), 1_u128, cout);
+		cjm_assert_close_enough(numerics::safe_from_floating_or_throw(zero_point_zero_one), 0_u128, cout);
+		cjm_assert_close_enough(numerics::safe_from_floating_or_throw(big_ass_num), 0x8000'0000'0000'0000'0000'0000'0000'0000_u128, cout);
+		cjm_assert_close_enough(numerics::safe_from_floating_or_throw(not_quite_as_big_ass_num), 0x8000'0000'0000'0000_u128, cout);
 	}
 	{
 		using flt_t = double;
@@ -924,11 +1274,11 @@ void cjm::uint128_tests::execute_throwing_float_conversion_test()
 		const flt_t big_ass_num = static_cast<flt_t>(0x8000'0000'0000'0000'0000'0000'0000'0000_u128);
 		const flt_t not_quite_as_big_ass_num = static_cast<flt_t>(0x8000'0000'0000'0000_u128);
 
-		cjm_assert_close_enough(numerics::safe_from_floating_or_throw(zero), 0_u128);
-		cjm_assert_close_enough(numerics::safe_from_floating_or_throw(one), 1_u128);
-		cjm_assert_close_enough(numerics::safe_from_floating_or_throw(zero_point_zero_one), 0_u128);
-		cjm_assert_close_enough(numerics::safe_from_floating_or_throw(big_ass_num), 0x8000'0000'0000'0000'0000'0000'0000'0000_u128);
-		cjm_assert_close_enough(numerics::safe_from_floating_or_throw(not_quite_as_big_ass_num), 0x8000'0000'0000'0000_u128);
+		cjm_assert_close_enough(numerics::safe_from_floating_or_throw(zero), 0_u128, cout);
+		cjm_assert_close_enough(numerics::safe_from_floating_or_throw(one), 1_u128, cout);
+		cjm_assert_close_enough(numerics::safe_from_floating_or_throw(zero_point_zero_one), 0_u128, cout);
+		cjm_assert_close_enough(numerics::safe_from_floating_or_throw(big_ass_num), 0x8000'0000'0000'0000'0000'0000'0000'0000_u128, cout);
+		cjm_assert_close_enough(numerics::safe_from_floating_or_throw(not_quite_as_big_ass_num), 0x8000'0000'0000'0000_u128, cout);
 	}
 	{
 		using flt_t = long double;
@@ -938,15 +1288,15 @@ void cjm::uint128_tests::execute_throwing_float_conversion_test()
 		const flt_t big_ass_num = static_cast<flt_t>(0x8000'0000'0000'0000'0000'0000'0000'0000_u128);
 		const flt_t not_quite_as_big_ass_num = static_cast<flt_t>(0x8000'0000'0000'0000_u128);
 
-		cjm_assert_close_enough(numerics::safe_from_floating_or_throw(zero), 0_u128);
-		cjm_assert_close_enough(numerics::safe_from_floating_or_throw(one), 1_u128);
-		cjm_assert_close_enough(numerics::safe_from_floating_or_throw(zero_point_zero_one), 0_u128);
-		cjm_assert_close_enough(numerics::safe_from_floating_or_throw(big_ass_num), 0x8000'0000'0000'0000'0000'0000'0000'0000_u128);
-		cjm_assert_close_enough(numerics::safe_from_floating_or_throw(not_quite_as_big_ass_num), 0x8000'0000'0000'0000_u128);
+		cjm_assert_close_enough(numerics::safe_from_floating_or_throw(zero), 0_u128, cout);
+		cjm_assert_close_enough(numerics::safe_from_floating_or_throw(one), 1_u128, cout);
+		cjm_assert_close_enough(numerics::safe_from_floating_or_throw(zero_point_zero_one), 0_u128, cout);
+		cjm_assert_close_enough(numerics::safe_from_floating_or_throw(big_ass_num), 0x8000'0000'0000'0000'0000'0000'0000'0000_u128, cout);
+		cjm_assert_close_enough(numerics::safe_from_floating_or_throw(not_quite_as_big_ass_num), 0x8000'0000'0000'0000_u128, cout);
 	}
 }
 
-void cjm::uint128_tests::execute_safe_float_conversions_test()
+void cjm::uint128_tests::execute_safe_float_conversions_test([[maybe_unused]] std::basic_ostream<char>& cout, [[maybe_unused]] std::basic_ostream<char>& cerr)
 {
 	constexpr float max_float = std::numeric_limits<float>::max();
 	constexpr double max_double = std::numeric_limits<double>::max();
@@ -998,11 +1348,11 @@ void cjm::uint128_tests::execute_safe_float_conversions_test()
 		const flt_t big_ass_num = static_cast<flt_t>(0x8000'0000'0000'0000'0000'0000'0000'0000_u128);
 		const flt_t not_quite_as_big_ass_num = static_cast<flt_t>(0x8000'0000'0000'0000_u128);
 
-		cjm_assert_close_enough(numerics::safe_from_floating(zero), 0_u128);
-		cjm_assert_close_enough(numerics::safe_from_floating(one), 1_u128);
-		cjm_assert_close_enough(numerics::safe_from_floating(zero_point_zero_one), 0_u128);
-		cjm_assert_close_enough(numerics::safe_from_floating(big_ass_num), 0x8000'0000'0000'0000'0000'0000'0000'0000_u128);
-		cjm_assert_close_enough(numerics::safe_from_floating(not_quite_as_big_ass_num), 0x8000'0000'0000'0000_u128);
+		cjm_assert_close_enough(numerics::safe_from_floating(zero), 0_u128, cout);
+		cjm_assert_close_enough(numerics::safe_from_floating(one), 1_u128, cout);
+		cjm_assert_close_enough(numerics::safe_from_floating(zero_point_zero_one), 0_u128, cout);
+		cjm_assert_close_enough(numerics::safe_from_floating(big_ass_num), 0x8000'0000'0000'0000'0000'0000'0000'0000_u128, cout);
+		cjm_assert_close_enough(numerics::safe_from_floating(not_quite_as_big_ass_num), 0x8000'0000'0000'0000_u128, cout);
 	}
 	{
 		using flt_t = double;
@@ -1012,11 +1362,11 @@ void cjm::uint128_tests::execute_safe_float_conversions_test()
 		const flt_t big_ass_num = static_cast<flt_t>(0x8000'0000'0000'0000'0000'0000'0000'0000_u128);
 		const flt_t not_quite_as_big_ass_num = static_cast<flt_t>(0x8000'0000'0000'0000_u128);
 
-		cjm_assert_close_enough(numerics::safe_from_floating(zero), 0_u128);
-		cjm_assert_close_enough(numerics::safe_from_floating(one), 1_u128);
-		cjm_assert_close_enough(numerics::safe_from_floating(zero_point_zero_one), 0_u128);
-		cjm_assert_close_enough(numerics::safe_from_floating(big_ass_num), 0x8000'0000'0000'0000'0000'0000'0000'0000_u128);
-		cjm_assert_close_enough(numerics::safe_from_floating(not_quite_as_big_ass_num), 0x8000'0000'0000'0000_u128);
+		cjm_assert_close_enough(numerics::safe_from_floating(zero), 0_u128, cout);
+		cjm_assert_close_enough(numerics::safe_from_floating(one), 1_u128, cout);
+		cjm_assert_close_enough(numerics::safe_from_floating(zero_point_zero_one), 0_u128, cout);
+		cjm_assert_close_enough(numerics::safe_from_floating(big_ass_num), 0x8000'0000'0000'0000'0000'0000'0000'0000_u128, cout);
+		cjm_assert_close_enough(numerics::safe_from_floating(not_quite_as_big_ass_num), 0x8000'0000'0000'0000_u128, cout);
 	}
 	{
 		using flt_t = long double;
@@ -1026,19 +1376,19 @@ void cjm::uint128_tests::execute_safe_float_conversions_test()
 		const flt_t big_ass_num = static_cast<flt_t>(0x8000'0000'0000'0000'0000'0000'0000'0000_u128);
 		const flt_t not_quite_as_big_ass_num = static_cast<flt_t>(0x8000'0000'0000'0000_u128);
 
-		cjm_assert_close_enough(numerics::safe_from_floating(zero), 0_u128);
-		cjm_assert_close_enough(numerics::safe_from_floating(one), 1_u128);
-		cjm_assert_close_enough(numerics::safe_from_floating(zero_point_zero_one), 0_u128);
-		cjm_assert_close_enough(numerics::safe_from_floating(big_ass_num), 0x8000'0000'0000'0000'0000'0000'0000'0000_u128);
-		cjm_assert_close_enough(numerics::safe_from_floating(not_quite_as_big_ass_num), 0x8000'0000'0000'0000_u128);
+		cjm_assert_close_enough(numerics::safe_from_floating(zero), 0_u128, cout);
+		cjm_assert_close_enough(numerics::safe_from_floating(one), 1_u128, cout);
+		cjm_assert_close_enough(numerics::safe_from_floating(zero_point_zero_one), 0_u128, cout);
+		cjm_assert_close_enough(numerics::safe_from_floating(big_ass_num), 0x8000'0000'0000'0000'0000'0000'0000'0000_u128, cout);
+		cjm_assert_close_enough(numerics::safe_from_floating(not_quite_as_big_ass_num), 0x8000'0000'0000'0000_u128, cout);
 	}
 }
 
-void cjm::uint128_tests::execute_controlled_from_float_conversion_test()
+void cjm::uint128_tests::execute_controlled_from_float_conversion_test([[maybe_unused]] std::basic_ostream<char>& cout, [[maybe_unused]] std::basic_ostream<char>& cerr)
 {
 	constexpr size_t num_tests = 10'000;
 	auto rgen = generator::rgen{};
-	std::cout << newl << "Executing " << num_tests << " from float conversion tests:" << newl;
+	cout << newl << "Executing " << num_tests << " from float conversion tests:" << newl;
 	{
 		size_t executed = 0;
 		do 
@@ -1047,8 +1397,8 @@ void cjm::uint128_tests::execute_controlled_from_float_conversion_test()
 			test_convert_float_value(test_val);
 		} while (++executed < num_tests);
 	}
-	std::cout << "All " << num_tests << " tests passed for float." << newl;
-	std::cout << "Executing " << num_tests << " from double conversion tests:" << newl;
+	cout << "All " << num_tests << " tests passed for float." << newl;
+	cout << "Executing " << num_tests << " from double conversion tests:" << newl;
 	{
 		size_t executed = 0;
 		do
@@ -1057,8 +1407,8 @@ void cjm::uint128_tests::execute_controlled_from_float_conversion_test()
 			test_convert_float_value(test_val);
 		} while (++executed < num_tests);
 	}
-	std::cout << "All " << num_tests << " tests passed for double." << newl;
-	std::cout << "Executing " << num_tests << " from long double conversion tests:" << newl;
+	cout << "All " << num_tests << " tests passed for double." << newl;
+	cout << "Executing " << num_tests << " from long double conversion tests:" << newl;
 	{
 		size_t executed = 0;
 		do
@@ -1067,11 +1417,11 @@ void cjm::uint128_tests::execute_controlled_from_float_conversion_test()
 			test_convert_float_value(test_val);
 		} while (++executed < num_tests);
 	}
-	std::cout << "All " << num_tests << " tests passed for long double." << newl;
+	cout << "All " << num_tests << " tests passed for long double." << newl;
 	
 }
 
-void cjm::uint128_tests::execute_controlled_float_rt_conversion_test()
+void cjm::uint128_tests::execute_controlled_float_rt_conversion_test([[maybe_unused]] std::basic_ostream<char>& cout, [[maybe_unused]] std::basic_ostream<char>& cerr)
 {
 	constexpr size_t num_values = 7;
 	auto values = std::array<uint128_t, num_values>
@@ -1104,7 +1454,7 @@ void cjm::uint128_tests::execute_controlled_float_rt_conversion_test()
 	cout << "long double passed." << newl;
 }
 
-void cjm::uint128_tests::execute_hash_dx()
+void cjm::uint128_tests::execute_hash_dx([[maybe_unused]] std::basic_ostream<char>& cout, [[maybe_unused]] std::basic_ostream<char>& cerr)
 {
 	constexpr size_t num_hashes = 1'000'000;
 	auto gen = generator::rgen{};
@@ -1136,7 +1486,7 @@ void cjm::uint128_tests::execute_hash_dx()
 	}
 	catch (const std::bad_alloc& ex)
 	{
-		std::cerr
+		cerr
 			<< "HASH_DX ran out of memory and could not be completed.  "
 			<<"This will not count as a failed test, but no diagnostic "
 			<<"info can be provided. Consider reducing num_hashes (currently: "
@@ -1146,13 +1496,14 @@ void cjm::uint128_tests::execute_hash_dx()
 		return;
 	}
 	
-	std::cout << "Of " << num_hashes << " uint128_t's, " << unique_values
+	cout
+		<< "Of " << num_hashes << " uint128_t's, " << unique_values
 		<< " unique values were generated.  Those values were reduced to "
 		<< unique_hashes << " unique hashes." << " There were " << difference
 		<< " colliding hash values." << newl;
 }
 
-void cjm::uint128_tests::execute_issue_10_strm_insrt_test()
+void cjm::uint128_tests::execute_issue_10_strm_insrt_test([[maybe_unused]] std::basic_ostream<char>& cout, [[maybe_unused]] std::basic_ostream<char>& cerr)
 {
 	using pair_t = std::pair<uint128_t, size_t>;
 	using tuple_t = std::tuple<uint128_t, size_t, std::string>;
@@ -1201,17 +1552,19 @@ void cjm::uint128_tests::execute_issue_10_strm_insrt_test()
 	}
 	catch (const testing_failure& ex)
 	{
-		auto saver = cout_saver{ std::cerr };
-		std::cerr << std::dec;
-		std::cerr << newl << "\tTest failed.  One or more string's were not the expected length." << newl;
+		auto saver = cout_saver{ cerr };
+		cerr << std::dec;
+		cerr << newl << "\tTest failed.  One or more string's were not the expected length." << newl;
 		if (!setw_res_vec.empty())
 		{
-			std::cerr   << "\tThe following " << setw_res_vec.size()
-						<< " results were made with setw and have unexpected lengths:" << newl;
+			cerr
+				<< "\tThe following " << setw_res_vec.size()
+				<< " results were made with setw and have unexpected lengths:" << newl;
+
 			for (const auto& [value, length,
 				text] : setw_res_vec)
 			{
-				std::cerr
+				cerr
 					<< "\t\tFor value: [0x" << std::hex << value
 					<< "], expected width: [" << std::dec
 					<< length << "]; text: [" << text << "]; actual length: ["
@@ -1220,26 +1573,27 @@ void cjm::uint128_tests::execute_issue_10_strm_insrt_test()
 		}
 		if (!nosetw_res_vec.empty())
 		{
-			std::cerr << "\tThe following " << nosetw_res_vec.size()
+			cerr
+				<< "\tThe following " << nosetw_res_vec.size()
 				<< " results were made WITHOUT setw and have unexpected lengths:" << newl;
 			for (const auto& [value, length,
 				text] : setw_res_vec)
 			{
-				std::cerr
+				cerr
 					<< "\t\tFor value: [0x" << std::hex << value
 					<< "], expected width: [" << std::dec
 					<< length << "]; text: [" << text << "]; actual length: ["
 					<< text.length() << "]." << newl;
 			}
 		}
-		std::cerr
+		cerr
 			<< "Done printing failing results.  Original exception msg: ["
 			<< ex.what() << "]." << newl;
 		throw;
 	}	
 }
 
-void cjm::uint128_tests::execute_issue_10_showbase_test()
+void cjm::uint128_tests::execute_issue_10_showbase_test([[maybe_unused]] std::basic_ostream<char>& cout, [[maybe_unused]] std::basic_ostream<char>& cerr)
 {
 	using namespace std::string_view_literals;
 	constexpr auto one = 0x01_u128;
@@ -1286,7 +1640,7 @@ void cjm::uint128_tests::execute_issue_10_showbase_test()
 	
 }
 
-void cjm::uint128_tests::execute_test_convert_to_float()
+void cjm::uint128_tests::execute_test_convert_to_float([[maybe_unused]] std::basic_ostream<char>& cout, [[maybe_unused]] std::basic_ostream<char>& cerr)
 {
 	using flt_t = float;
 	constexpr auto oh_d00d_big_src = 0xc0de'd00d'dad0'0000'0000'0000'0000'0000_u128;
@@ -1308,169 +1662,169 @@ void cjm::uint128_tests::execute_test_convert_to_float()
 	const flt_t ctrl_oh_d00d_half = static_cast<flt_t>(oh_d00d_half_ctrl);
 	const flt_t alt_ctrl_oh_d00d_big = static_cast<flt_t>(oh_d00d_big_alt_ctrl);
 
-	cjm_assert_close_enough(static_cast<uint128_t>(zero), 0_u128);
-	cjm_assert_close_enough(static_cast<uint128_t>(one), 1_u128);
-	cjm_assert_close_enough(static_cast<uint128_t>(zero_point_zero_one), 0_u128);
-	cjm_assert_close_enough(static_cast<uint128_t>(big_ass_num), 0x8000'0000'0000'0000'0000'0000'0000'0000_u128);
-	cjm_assert_close_enough(static_cast<uint128_t>(not_quite_as_big_ass_num), 0x8000'0000'0000'0000_u128);
-	cjm_assert_close_enough(static_cast<uint128_t>(oh_d00d_big), oh_d00d_big_src);
-	cjm_assert_close_enough(static_cast<uint128_t>(oh_d00d_half), oh_d00d_half_src);
+	cjm_assert_close_enough(static_cast<uint128_t>(zero), 0_u128, cout);
+	cjm_assert_close_enough(static_cast<uint128_t>(one), 1_u128, cout);
+	cjm_assert_close_enough(static_cast<uint128_t>(zero_point_zero_one), 0_u128, cout);
+	cjm_assert_close_enough(static_cast<uint128_t>(big_ass_num), 0x8000'0000'0000'0000'0000'0000'0000'0000_u128, cout);
+	cjm_assert_close_enough(static_cast<uint128_t>(not_quite_as_big_ass_num), 0x8000'0000'0000'0000_u128, cout);
+	cjm_assert_close_enough(static_cast<uint128_t>(oh_d00d_big), oh_d00d_big_src, cout);
+	cjm_assert_close_enough(static_cast<uint128_t>(oh_d00d_half), oh_d00d_half_src, cout);
 	const auto rt_oh_d00d_big = static_cast<uint128_t>(oh_d00d_big);
 	const auto rt_oh_d00d_half = static_cast<uint128_t>(oh_d00d_half);
-	cjm_assert_close_enough(rt_oh_d00d_big, oh_d00d_big_src);
-	cjm_assert_close_enough(rt_oh_d00d_half, oh_d00d_half_src);
+	cjm_assert_close_enough(rt_oh_d00d_big, oh_d00d_big_src, cout);
+	cjm_assert_close_enough(rt_oh_d00d_half, oh_d00d_half_src, cout);
 	cjm_assert_equal(static_cast<uint128_t>(ctrl_oh_d00d_big), rt_oh_d00d_big);
 	cjm_assert_equal(static_cast<uint128_t>(alt_ctrl_oh_d00d_big), rt_oh_d00d_big);
 	cjm_assert_equal(static_cast<uint128_t>(ctrl_oh_d00d_half), rt_oh_d00d_half);
 	
 }
 
-void cjm::uint128_tests::execute_unary_op_pre_inc_test()
+void cjm::uint128_tests::execute_unary_op_pre_inc_test([[maybe_unused]] std::basic_ostream<char>& cout, [[maybe_unused]] std::basic_ostream<char>& cerr)
 {
 	constexpr auto test_name = "unary_op_pre_inc_test"sv;
 	auto op_vec = generate_specified_un_ops(unary_op::pre_increment, 5, true);
 	for (auto& itm : op_vec)
 	{
-		test_unary_operation(itm, test_name);
+		test_unary_operation(itm, test_name, cout, cerr);
 	}
 	//print_n_static_assertions(op_vec, 10_szt);
 }
 
-void cjm::uint128_tests::execute_unary_op_post_inc_test()
+void cjm::uint128_tests::execute_unary_op_post_inc_test([[maybe_unused]] std::basic_ostream<char>& cout, [[maybe_unused]] std::basic_ostream<char>& cerr)
 {
 	constexpr auto test_name = "unary_op_post_inc_test"sv;
 	auto op_vec = generate_specified_un_ops(unary_op::post_increment, 5, true);
 	for (auto& itm : op_vec)
 	{
-		test_unary_operation(itm, test_name);
+		test_unary_operation(itm, test_name, cout, cerr);
 	}
 	//print_n_static_assertions(op_vec, 10_szt);
 }
 
-void cjm::uint128_tests::execute_unary_op_pre_dec_test()
+void cjm::uint128_tests::execute_unary_op_pre_dec_test([[maybe_unused]] std::basic_ostream<char>& cout, [[maybe_unused]] std::basic_ostream<char>& cerr)
 {
 	constexpr auto test_name = "unary_op_pre_dec_test"sv;
 	auto op_vec = generate_specified_un_ops(unary_op::pre_decrement, 5, true);
 	for (auto& itm : op_vec)
 	{
-		test_unary_operation(itm, test_name);
+		test_unary_operation(itm, test_name, cout, cerr);
 	}
 	//print_n_static_assertions(op_vec, 10_szt);
 }
 
-void cjm::uint128_tests::execute_unary_op_post_dec_test()
+void cjm::uint128_tests::execute_unary_op_post_dec_test([[maybe_unused]] std::basic_ostream<char>& cout, [[maybe_unused]] std::basic_ostream<char>& cerr)
 {
 	constexpr auto test_name = "unary_op_post_dec_test"sv;
 	auto op_vec = generate_specified_un_ops(unary_op::post_decrement, 5, true);
 	for (auto& itm : op_vec)
 	{
-		test_unary_operation(itm, test_name);
+		test_unary_operation(itm, test_name, cout, cerr);
 	}
 }
 
-void cjm::uint128_tests::execute_unary_op_unary_plus_test()
+void cjm::uint128_tests::execute_unary_op_unary_plus_test([[maybe_unused]] std::basic_ostream<char>& cout, [[maybe_unused]] std::basic_ostream<char>& cerr)
 {
 	constexpr auto test_name = "unary_op_unary_plus_test"sv;
 	auto op_vec = generate_specified_un_ops(unary_op::unary_plus, 5, true);
 	for (auto& itm : op_vec)
 	{
-		test_unary_operation(itm, test_name);
+		test_unary_operation(itm, test_name, cout, cerr);
 	}
 	//print_n_static_assertions(op_vec, 10_szt);
 }
 
-void cjm::uint128_tests::execute_unary_op_unary_minus_test()
+void cjm::uint128_tests::execute_unary_op_unary_minus_test([[maybe_unused]] std::basic_ostream<char>& cout, [[maybe_unused]] std::basic_ostream<char>& cerr)
 {
 	constexpr auto test_name = "unary_op_unary_minus_test"sv;
 	auto op_vec = generate_specified_un_ops(unary_op::unary_minus, 5, true);
 	for (auto& itm : op_vec)
 	{
-		test_unary_operation(itm, test_name);
+		test_unary_operation(itm, test_name, cout, cerr);
 	}
 	//print_n_static_assertions(op_vec, 10_szt);
 }
 
-void cjm::uint128_tests::execute_unary_op_bitwise_not_test()
+void cjm::uint128_tests::execute_unary_op_bitwise_not_test([[maybe_unused]] std::basic_ostream<char>& cout, [[maybe_unused]] std::basic_ostream<char>& cerr)
 {
 	constexpr auto test_name = "unary_op_bitwise_not_test"sv;
 	auto op_vec = generate_specified_un_ops(unary_op::bitwise_not, 5, true);
 	for (auto& itm : op_vec)
 	{
-		test_unary_operation(itm, test_name);
+		test_unary_operation(itm, test_name, cout, cerr);
 	}
 	//print_n_static_assertions(op_vec, 10_szt);
 }
 
-void cjm::uint128_tests::execute_unary_op_bool_cast_test()
+void cjm::uint128_tests::execute_unary_op_bool_cast_test([[maybe_unused]] std::basic_ostream<char>& cout, [[maybe_unused]] std::basic_ostream<char>& cerr)
 {
 	constexpr auto test_name = "unary_op_bool_cast_test"sv;
 	auto op_vec = generate_specified_un_ops(unary_op::bool_cast, 5, true);
 	for (auto& itm : op_vec)
 	{
-		test_unary_operation(itm, test_name);
+		test_unary_operation(itm, test_name, cout, cerr);
 	}
 	//print_n_static_assertions(op_vec, 10_szt);
 }
 
-void cjm::uint128_tests::execute_unary_op_logical_negation_test()
+void cjm::uint128_tests::execute_unary_op_logical_negation_test([[maybe_unused]] std::basic_ostream<char>& cout, [[maybe_unused]] std::basic_ostream<char>& cerr)
 {
 	constexpr auto test_name = "unary_op_logical_negation_test"sv;
 	auto op_vec = generate_specified_un_ops(unary_op::logical_negation, 5, true);
 	for (auto& itm : op_vec)
 	{
-		test_unary_operation(itm, test_name);
+		test_unary_operation(itm, test_name, cout, cerr);
 	}
 	//print_n_static_assertions(op_vec, 10_szt);
 }
 
-void cjm::uint128_tests::print_n_static_assertions(const binary_op_u128_vect_t& op_vec, size_t n)
+void cjm::uint128_tests::print_n_static_assertions(const binary_op_u128_vect_t& op_vec, size_t n, std::basic_ostream<char>& cout, [[maybe_unused]] std::basic_ostream<char>& cerr)
 {
 	auto saver = cout_saver{ cout };
 	if (op_vec.empty())
 	{
-		std::cerr << "Cannot print " << std::dec << n << " static assertions: vector contains no operations." << newl;
+		cerr << "Cannot print " << std::dec << n << " static assertions: vector contains no operations." << newl;
 	}
 	else
 	{
 		if (op_vec.size() < n)
 		{
-			std::cerr << "Cannot print " << std::dec << n << " static assertions: vector contains only " << op_vec.size() << " operations.  Will print " << op_vec.size() << " assertions instead." << newl;
+			cerr << "Cannot print " << std::dec << n << " static assertions: vector contains only " << op_vec.size() << " operations.  Will print " << op_vec.size() << " assertions instead." << newl;
 			n = op_vec.size();			
 		}
-		std::cout << " Printing " << std::dec << n << " static assertions: " << newl;
+		cout << " Printing " << std::dec << n << " static assertions: " << newl;
 		for (size_t i = 0; i < n; ++i)
 		{
-			append_static_assertion(std::cout, op_vec[i]) << newl;
+			append_static_assertion(cout, op_vec[i]) << newl;
 		}
-		std::cout << "DONE printing " << std::dec << n << " static assertions: " << newl;
+		cout << "DONE printing " << std::dec << n << " static assertions: " << newl;
 	}	
 }
 
-void cjm::uint128_tests::print_n_static_assertions(const cjm::uint128_tests::unary_op_u128_vect_t& op_vec, size_t n)
+void cjm::uint128_tests::print_n_static_assertions(const cjm::uint128_tests::unary_op_u128_vect_t& op_vec, size_t n, std::basic_ostream<char>& cout, [[maybe_unused]] std::basic_ostream<char>& cerr)
 {
 	auto saver = cout_saver{cout};
 	if (op_vec.empty())
 	{
-		std::cerr << "Cannot print " << std::dec << n << " static assertions: vector contains no operations." << newl;
+		cerr << "Cannot print " << std::dec << n << " static assertions: vector contains no operations." << newl;
 	}
 	else
 	{
 		if (op_vec.size() < n)
 		{
-			std::cerr << "Cannot print " << std::dec << n << " static assertions: vector contains only " << op_vec.size() << " operations.  Will print " << op_vec.size() << " assertions instead." << newl;
+			cerr << "Cannot print " << std::dec << n << " static assertions: vector contains only " << op_vec.size() << " operations.  Will print " << op_vec.size() << " assertions instead." << newl;
 			n = op_vec.size();
 		}
-		std::cout << " Printing " << std::dec << n << " static assertions: " << newl;
+		cout << " Printing " << std::dec << n << " static assertions: " << newl;
 		for (size_t i = 0; i < n; ++i)
 		{
-			append_static_assertion(std::cout, op_vec[i]) << newl;
+			append_static_assertion(cout, op_vec[i]) << newl;
 		}
-		std::cout << "DONE printing " << std::dec << n << " static assertions: " << newl;
+		cout << "DONE printing " << std::dec << n << " static assertions: " << newl;
 	}
 }
 
 
-void cjm::uint128_tests::execute_basic_test_one()
+void cjm::uint128_tests::execute_basic_test_one([[maybe_unused]] std::basic_ostream<char>& cout, [[maybe_unused]] std::basic_ostream<char>& cerr)
 {
 	constexpr uint128_t big = 0xc0de'd00d'fea2'b00b'c0de'd00d'fea2'b00b_u128;
 	cout_saver saver{cout};
@@ -1479,7 +1833,7 @@ void cjm::uint128_tests::execute_basic_test_one()
 }
 
 
-void cjm::uint128_tests::execute_string_parse_test()
+void cjm::uint128_tests::execute_string_parse_test([[maybe_unused]] std::basic_ostream<char>& cout, [[maybe_unused]] std::basic_ostream<char>& cerr)
 {
 	constexpr uint128_t test_hex = 0xc0de'd00d'face'cafe'babe'b00b'fea2'dad0_u128;
 	constexpr uint128_t test_dec = 256'368'684'942'083'501'355'085'096'987'188'714'192_u128;
@@ -1582,16 +1936,16 @@ void cjm::uint128_tests::execute_string_parse_test()
 
 }
 
-void cjm::uint128_tests::execute_basic_multiplication_test()
+void cjm::uint128_tests::execute_basic_multiplication_test([[maybe_unused]] std::basic_ostream<char>& cout, [[maybe_unused]] std::basic_ostream<char>& cerr)
 {
 	using cjm::testing::cjm_assert;
 	using namespace numerics::uint128_literals;
 
-	auto print_res = [](uint128_t res, std::string_view n) -> void
+	auto print_res = [&](uint128_t res, std::string_view n) -> void
 	{
 		auto saver = cout_saver{ cout };
-		std::cout << n << " hex: [0x" << std::hex << std::setw(32) << std::setfill('0') << res << "]." << newl;
-		std::cout << n << " dec: [" << std::dec << res << "]." << newl;
+		cout << n << " hex: [0x" << std::hex << std::setw(32) << std::setfill('0') << res << "]." << newl;
+		cout << n << " dec: [" << std::dec << res << "]." << newl;
 	};
 
 	constexpr uint128_t zero = 0;
@@ -1637,11 +1991,11 @@ void cjm::uint128_tests::execute_basic_multiplication_test()
 
 
 	ctrl_uint128_t ctrl_fit_times_big_one = to_ctrl(test_fit_times_big_one);
-	test_interconversion(ctrl_fit_times_big_one, test_fit_times_big_one);
+	test_interconversion(ctrl_fit_times_big_one, test_fit_times_big_one, cout, cerr);
 	ctrl_uint128_t ctrl_big_one = to_ctrl(big_one);
-	test_interconversion(ctrl_big_one, big_one);
+	test_interconversion(ctrl_big_one, big_one, cout, cerr);
 	ctrl_uint128_t ctrl_fit_64 = to_ctrl(fit_64);
-	test_interconversion(ctrl_fit_64, fit_64);
+	test_interconversion(ctrl_fit_64, fit_64, cout, cerr);
 
 	{
 		auto save_me = cout_saver{ cout };
@@ -1677,7 +2031,7 @@ void cjm::uint128_tests::execute_basic_multiplication_test()
 	
 }
 
-void cjm::uint128_tests::test_fls()
+void cjm::uint128_tests::test_fls([[maybe_unused]] std::basic_ostream<char>& cout, [[maybe_unused]] std::basic_ostream<char>& cerr)
 {
 	constexpr auto final_test = 0x8000'0000'0000'0000u;
 	constexpr auto final_res = cjm::numerics::internal::fls_default(final_test);
@@ -1698,7 +2052,8 @@ void cjm::uint128_tests::test_fls()
 	cout << "For [0x" << std::hex << std::setw(16) << std::setfill('0') << final_test << "], the result is: [" << std::dec << final_res << "]." << newl;
 }
 
-void cjm::uint128_tests::test_interconversion(const ctrl_uint128_t& control, uint128_t test)
+void cjm::uint128_tests::test_interconversion(const ctrl_uint128_t& control, uint128_t test,
+		[[maybe_unused]] std::basic_ostream<char>& cout, [[maybe_unused]] std::basic_ostream<char>& cerr)
 {
 	const uint128_t ctrl_to_test = to_test(control);
 	const ctrl_uint128_t test_to_control = to_ctrl(test);
@@ -1706,7 +2061,7 @@ void cjm::uint128_tests::test_interconversion(const ctrl_uint128_t& control, uin
 }
 
 
-void cjm::uint128_tests::print_uint128_eval_mode()
+void cjm::uint128_tests::print_uint128_eval_mode([[maybe_unused]] std::basic_ostream<char>& cout, [[maybe_unused]] std::basic_ostream<char>& cerr)
 {
 	using namespace numerics;
 	cout_saver o_saver{cout};
@@ -1728,14 +2083,14 @@ void cjm::uint128_tests::print_uint128_eval_mode()
 	}
 	cout << "Arithmetic mode: [" << eval_text << "]." << newl;
 }
-void cjm::uint128_tests::print_cpp20_bitops_available()
+void cjm::uint128_tests::print_cpp20_bitops_available([[maybe_unused]] std::basic_ostream<char>& cout, [[maybe_unused]] std::basic_ostream<char>& cerr)
 {
 	constexpr auto avail_text = bool_to_yes_no(cjm::numerics::has_cpp20_bitops);
 	using namespace numerics;
 	cout_saver o_saver{cout};
 	cout << "Are C++20 bit operations available?: ["sv << avail_text << "]."sv << newl;
 }
-void cjm::uint128_tests::print_constexpr_bitcast_available()
+void cjm::uint128_tests::print_constexpr_bitcast_available([[maybe_unused]] std::basic_ostream<char>& cout, [[maybe_unused]] std::basic_ostream<char>& cerr)
 {
 	constexpr auto avail_text = bool_to_yes_no(cjm::numerics::constexpr_bit_casting);
 	using namespace numerics;
@@ -1743,13 +2098,13 @@ void cjm::uint128_tests::print_constexpr_bitcast_available()
 	cout << "Is constexpr bitcasting available?: [" << avail_text << "]." << newl;
 }
 
-void cjm::uint128_tests::print_whether_has_consteval()
+void cjm::uint128_tests::print_whether_has_consteval([[maybe_unused]] std::basic_ostream<char>& cout, [[maybe_unused]] std::basic_ostream<char>& cerr)
 {
-	auto saver = cout_saver{ std::cout };
+	auto saver = cout_saver{ cout };
 	cout << "Is consteval (immediate function) available?: [" << std::boolalpha << cjm::numerics::internal::has_consteval << "]." << newl;
 }
 
-void cjm::uint128_tests::print_builtin_uint128_data_if_present()
+void cjm::uint128_tests::print_builtin_uint128_data_if_present([[maybe_unused]] std::basic_ostream<char>& cout, [[maybe_unused]] std::basic_ostream<char>& cerr)
 {
 	if constexpr (cjm::numerics::calculation_mode == numerics::uint128_calc_mode::intrinsic_u128)
 	{
@@ -1767,26 +2122,26 @@ void cjm::uint128_tests::print_builtin_uint128_data_if_present()
 		cout << "No built-in  uint128 data available." << newl;
 	}
 }
-void cjm::uint128_tests::execute_first_bin_op_test()
+void cjm::uint128_tests::execute_first_bin_op_test([[maybe_unused]] std::basic_ostream<char>& cout, [[maybe_unused]] std::basic_ostream<char>& cerr)
 {
 	using bin_op_t = binary_operation<uint128_t, uint128_ctrl>;
 	constexpr auto hash_width = std::numeric_limits<size_t>::digits / 4;
 	//perform statically as well:
 	static_assert(0x1_u128 + 0x2_u128 == 0x3_u128);
-	auto saver = cout_saver {std::cout};
+	auto saver = cout_saver {cout};
 	auto op = bin_op_t { binary_op::add, 1_u128, 2_u128 };
 	op.calculate_result();
 	cjm_assert(op.has_correct_result());
 	const auto& res = op.result();
 	cjm_assert(res.value().first == res.value().second);
-	std::cout << "Here is the first binary operation:" << newl;
-	append_static_assertion(std::cout, op);
-	std::cout << "Done appending the assertion." << newl;
+	cout << "Here is the first binary operation:" << newl;
+	append_static_assertion(cout, op);
+	cout << "Done appending the assertion." << newl;
 	size_t hash = std::hash<binary_operation<uint128_t, uint128_ctrl>>{}(op);
-	std::cout   << "hash code for op is: [0x" << std::hex
+	cout   << "hash code for op is: [0x" << std::hex
 				<< std::setw(hash_width) << std::setfill('0')
 				<< hash << "]." << newl;
-	std::cout << "serialized operation: [" << op << "]" << newl;
+	cout << "serialized operation: [" << op << "]" << newl;
 	auto ss = string::make_throwing_sstream<char>();
 	ss << op;
 	bin_op_t round_tripped;
@@ -1800,39 +2155,39 @@ void cjm::uint128_tests::execute_first_bin_op_test()
 	cjm_deny(nothrow_op_2.has_result());
 	cjm_deny(nothrow_op_3.has_result());
 	cjm_deny(nothrow_op_4.has_result());
-	cjm_assert_throws<std::invalid_argument>([]() -> void
+	cjm_assert_throws<std::invalid_argument>([&]() -> void
 	{
 		auto never_see_me = bin_op_t{binary_op::left_shift, 0, 128};
-		std::cerr << "You should never see this: [" << never_see_me << "]." << newl;
+		cerr << "You should never see this: [" << never_see_me << "]." << newl;
 	});
-	cjm_assert_throws<std::invalid_argument>([]() -> void
+	cjm_assert_throws<std::invalid_argument>([&]() -> void
 	{
 		auto never_see_me = bin_op_t{binary_op::right_shift, 0, 128};
-		std::cerr << "You should never see this: [" << never_see_me << "]." << newl;
+		cerr << "You should never see this: [" << never_see_me << "]." << newl;
 	});
-	cjm_assert_throws<std::invalid_argument>([]() -> void
+	cjm_assert_throws<std::invalid_argument>([&]() -> void
 	{
 		auto never_see_me = bin_op_t{binary_op::divide, 0, 0};
-		std::cerr << "You should never see this: [" << never_see_me << "]." << newl;
+		cerr << "You should never see this: [" << never_see_me << "]." << newl;
 	});
-	cjm_assert_throws<std::invalid_argument>([]() -> void
+	cjm_assert_throws<std::invalid_argument>([&]() -> void
 	{
 		 auto never_see_me = bin_op_t{binary_op::divide, 1, 0};
-		 std::cerr << "You should never see this: [" << never_see_me << "]." << newl;
+		 cerr << "You should never see this: [" << never_see_me << "]." << newl;
 	});
-	cjm_assert_throws<std::invalid_argument>([]() -> void
+	cjm_assert_throws<std::invalid_argument>([&]() -> void
 	{
 		auto never_see_me = bin_op_t{binary_op::modulus, 0, 0};
-		std::cerr << "You should never see this: [" << never_see_me << "]." << newl;
+		cerr << "You should never see this: [" << never_see_me << "]." << newl;
 	});
-	cjm_assert_throws<std::invalid_argument>([]() -> void
+	cjm_assert_throws<std::invalid_argument>([&]() -> void
 	{
 		auto never_see_me = bin_op_t{binary_op::modulus, 1, 0};
-		std::cerr << "You should never see this: [" << never_see_me << "]." << newl;
+		cerr << "You should never see this: [" << never_see_me << "]." << newl;
 	});
  }
 
-void cjm::uint128_tests::execute_gen_comp_ops_test()
+void cjm::uint128_tests::execute_gen_comp_ops_test([[maybe_unused]] std::basic_ostream<char>& cout, [[maybe_unused]] std::basic_ostream<char>& cerr)
 {
 	constexpr ctrl_uint128_t cmax = std::numeric_limits<ctrl_uint128_t>::max();
 	constexpr uint128_t  tmax = std::numeric_limits<uint128_t>::max();
@@ -2431,7 +2786,7 @@ cjm::uint128_tests::binary_op cjm::uint128_tests::parse_binary_op_symbol(cjm::ui
 	throw std::invalid_argument{"Supplied text is not a binary operation symbol."};
 }
 
-void cjm::uint128_tests::execute_binary_operation_rt_ser_tests()
+void cjm::uint128_tests::execute_binary_operation_rt_ser_tests([[maybe_unused]] std::basic_ostream<char>& cout, [[maybe_unused]] std::basic_ostream<char>& cerr)
 {
 	auto n_stream = string::make_throwing_sstream<char>();
 	auto w_stream = string::make_throwing_sstream<wchar_t>();
@@ -2472,7 +2827,7 @@ void cjm::uint128_tests::execute_binary_operation_rt_ser_tests()
 	
 }
 
-void cjm::uint128_tests::execute_unary_operation_rt_serialization_tests()
+void cjm::uint128_tests::execute_unary_operation_rt_serialization_tests([[maybe_unused]] std::basic_ostream<char>& cout, [[maybe_unused]] std::basic_ostream<char>& cerr)
 {
 	auto n_stream = string::make_throwing_sstream<char>();
 	auto w_stream = string::make_throwing_sstream<wchar_t>();
@@ -2511,7 +2866,7 @@ void cjm::uint128_tests::execute_unary_operation_rt_serialization_tests()
 	rt_val = bad_rt_val;
 }
 
-void cjm::uint128_tests::execute_trim_tests()
+void cjm::uint128_tests::execute_trim_tests([[maybe_unused]] std::basic_ostream<char>& cout, [[maybe_unused]] std::basic_ostream<char>& cerr)
 {
 
 	using namespace std::string_literals;
@@ -2529,7 +2884,7 @@ void cjm::uint128_tests::execute_trim_tests()
 	cjm_deny(x == should_be);
 }
 
-void cjm::uint128_tests::execute_stream_insert_bin_op_test()
+void cjm::uint128_tests::execute_stream_insert_bin_op_test([[maybe_unused]] std::basic_ostream<char>& cout, [[maybe_unused]] std::basic_ostream<char>& cerr)
 {
 	auto default_init_wrong_val = [](binary_op o) -> binary_op
 	{
@@ -2580,14 +2935,14 @@ void cjm::uint128_tests::execute_stream_insert_bin_op_test()
 	}
 }
 
-void cjm::uint128_tests::execute_print_generated_filename_test()
+void cjm::uint128_tests::execute_print_generated_filename_test([[maybe_unused]] std::basic_ostream<char>& cout, [[maybe_unused]] std::basic_ostream<char>& cerr)
 {
 	auto file_name_addition = create_generated_op_filename(binary_op::add);
 	cjm_deny(file_name_addition.empty());
-	std::cout << "GENERATED FILENAME FOR ADDITION: [" << file_name_addition << "]." << newl;
+	cout << "GENERATED FILENAME FOR ADDITION: [" << file_name_addition << "]." << newl;
 }
 
-void cjm::uint128_tests::execute_generate_addition_ops_rt_ser_deser_test()
+void cjm::uint128_tests::execute_generate_addition_ops_rt_ser_deser_test([[maybe_unused]] std::basic_ostream<char>& cout, [[maybe_unused]] std::basic_ostream<char>& cerr) 
 {
 	constexpr binary_op operation = binary_op::add;
 	constexpr size_t ops = 1'000;
@@ -2595,14 +2950,14 @@ void cjm::uint128_tests::execute_generate_addition_ops_rt_ser_deser_test()
 	constexpr size_t num_standard_ops = ((num_standard_values * num_standard_values) + num_standard_values) / 2;
 	constexpr size_t num_expected = ops + num_standard_ops;
 	
-	auto op_vect = generate_easy_ops(ops, operation, true);
+	auto op_vect = generate_easy_ops(ops, operation, true, cerr);
 	cjm_assert(op_vect.size() == num_expected);
 	auto file_name = create_generated_op_filename(operation);
 	{
 		auto ofstream = string::make_throwing_ofstream<char>(file_name);
 		ofstream << op_vect;
 	}
-	std::cout << "Wrote " << op_vect.size() << " operations to [" << file_name << "]." << std::endl;
+	cout << "Wrote " << op_vect.size() << " operations to [" << file_name << "]." << std::endl;
 	std::filesystem::path file = file_name;
 	auto rt_op_vec = binary_op_u128_vect_t{};
 	try
@@ -2620,7 +2975,7 @@ void cjm::uint128_tests::execute_generate_addition_ops_rt_ser_deser_test()
 	}
 	catch (const std::exception& ex)
 	{
-		std::cerr << "Exception thrown after writing to file [" << file_name << "]. Msg: [" << ex.what() << "]." << newl;
+		cerr << "Exception thrown after writing to file [" << file_name << "]. Msg: [" << ex.what() << "]." << newl;
 		try
 		{
 			if (std::filesystem::exists(file_name))
@@ -2630,7 +2985,7 @@ void cjm::uint128_tests::execute_generate_addition_ops_rt_ser_deser_test()
 		}
 		catch (const std::exception& ex2)
 		{
-			std::cerr << "Exception throw deleting file [" << file_name << "]. Msg: [" << ex2.what() << "]." << newl;
+			cerr << "Exception throw deleting file [" << file_name << "]. Msg: [" << ex2.what() << "]." << newl;
 		}
 		throw;
 	}
@@ -2644,13 +2999,13 @@ void cjm::uint128_tests::execute_generate_addition_ops_rt_ser_deser_test()
 	}
 	catch (const std::exception& ex)
 	{
-		std::cerr << "Exception throw deleting file [" << file_name << "]. Msg: [" << ex.what() << "]." << newl;
+		cerr << "Exception throw deleting file [" << file_name << "]. Msg: [" << ex.what() << "]." << newl;
 	}
 	cjm_assert(rt_op_vec == op_vect);
-	std::cout << "The round tripped vector is identical to the source vector." << newl;
+	cout << "The round tripped vector is identical to the source vector." << newl;
 }
 
-void cjm::uint128_tests::execute_unary_operation_vec_rt_serialization_tests()
+void cjm::uint128_tests::execute_unary_operation_vec_rt_serialization_tests([[maybe_unused]] std::basic_ostream<char>& cout, [[maybe_unused]] std::basic_ostream<char>& cerr)
 {
 	constexpr auto& arr = u128_testing_constant_providers::testing_constant_provider<uint128_t>::all_values;
 	constexpr size_t num_standard_values = arr.size();
@@ -2673,7 +3028,7 @@ void cjm::uint128_tests::execute_unary_operation_vec_rt_serialization_tests()
 		ofstream << op_vect;
 	}
 	
-	std::cout << "Wrote " << op_vect.size() << " operations to [" << file_name << "]." << newl;
+	cout << "Wrote " << op_vect.size() << " operations to [" << file_name << "]." << newl;
 	std::filesystem::path file = file_name;
 	auto rt_op_vec = unary_op_u128_vect_t{};
 	try
@@ -2691,7 +3046,7 @@ void cjm::uint128_tests::execute_unary_operation_vec_rt_serialization_tests()
 	}
 	catch (const std::exception& ex)
 	{
-		std::cerr << "Exception thrown after writing to file [" << file_name << "]. Msg: [" << ex.what() << "]." << newl;
+		cerr << "Exception thrown after writing to file [" << file_name << "]. Msg: [" << ex.what() << "]." << newl;
 		try
 		{
 			if (std::filesystem::exists(file_name))
@@ -2701,7 +3056,7 @@ void cjm::uint128_tests::execute_unary_operation_vec_rt_serialization_tests()
 		}
 		catch (const std::exception& ex2)
 		{
-			std::cerr << "Exception throw deleting file [" << file_name << "]. Msg: [" << ex2.what() << "]." << newl;
+			cerr << "Exception throw deleting file [" << file_name << "]. Msg: [" << ex2.what() << "]." << newl;
 		}
 		throw;
 	}
@@ -2715,13 +3070,13 @@ void cjm::uint128_tests::execute_unary_operation_vec_rt_serialization_tests()
 	}
 	catch (const std::exception& ex)
 	{
-		std::cerr << "Exception throw deleting file [" << file_name << "]. Msg: [" << ex.what() << "]." << newl;
+		cerr << "Exception throw deleting file [" << file_name << "]. Msg: [" << ex.what() << "]." << newl;
 	}
 	cjm_assert(rt_op_vec == op_vect);
-	std::cout << "The round tripped vector is identical to the source vector." << newl;
+	cout << "The round tripped vector is identical to the source vector." << newl;
 }
 
-void cjm::uint128_tests::execute_addition_tests()
+void cjm::uint128_tests::execute_addition_tests([[maybe_unused]] std::basic_ostream<char>& cout, [[maybe_unused]] std::basic_ostream<char>& cerr)
 {
 	constexpr auto test_name = "addition_tests"sv;
 	constexpr binary_op operation = binary_op::add;
@@ -2730,18 +3085,18 @@ void cjm::uint128_tests::execute_addition_tests()
 	constexpr size_t num_standard_ops = ((num_standard_values * num_standard_values) + num_standard_values) / 2;
 	constexpr size_t num_expected = ops + num_standard_ops;
 
-	auto op_vect = generate_easy_ops(ops, operation, true);
+	auto op_vect = generate_easy_ops(ops, operation, true, cerr);
 	cjm_assert(op_vect.size() == num_expected);
-	std::cout << "  Executing " << op_vect.size() << " addition tests: " << newl;
+	cout << "  Executing " << op_vect.size() << " addition tests: " << newl;
 	for (auto& binary_operation : op_vect)
 	{
-		test_binary_operation(binary_operation, test_name);
+		test_binary_operation(binary_operation, test_name, cout, cerr);
 	}
-	std::cout << "All " << op_vect.size() << " tests PASS." << newl;
+	cout << "All " << op_vect.size() << " tests PASS." << newl;
 	//print_n_static_assertions(op_vect, num_standard_ops);
 }
 
-void cjm::uint128_tests::execute_subtraction_tests()
+void cjm::uint128_tests::execute_subtraction_tests([[maybe_unused]] std::basic_ostream<char>& cout, [[maybe_unused]] std::basic_ostream<char>& cerr)
 {
 	constexpr auto test_name = "subtraction_tests"sv;
 	constexpr binary_op operation = binary_op::subtract;
@@ -2750,18 +3105,18 @@ void cjm::uint128_tests::execute_subtraction_tests()
 	constexpr size_t num_standard_ops = ((num_standard_values * num_standard_values) + num_standard_values) / 2;
 	constexpr size_t num_expected = ops + num_standard_ops;
 
-	auto op_vect = generate_easy_ops(ops, operation, true);
+	auto op_vect = generate_easy_ops(ops, operation, true, cerr);
 	cjm_assert(op_vect.size() == num_expected);
-	std::cout << "  Executing " << op_vect.size() << " subtraction tests: " << newl;
+	cout << "  Executing " << op_vect.size() << " subtraction tests: " << newl;
 	for (auto& binary_operation : op_vect)
 	{
-		test_binary_operation(binary_operation, test_name);
+		test_binary_operation(binary_operation, test_name, cout, cerr);
 	}
-	std::cout << "All " << op_vect.size() << " tests PASS." << newl;
+	cout << "All " << op_vect.size() << " tests PASS." << newl;
 	//print_n_static_assertions(op_vect, num_standard_ops);
 }
 
-void cjm::uint128_tests::execute_shift_tests()
+void cjm::uint128_tests::execute_shift_tests([[maybe_unused]] std::basic_ostream<char>& cout, [[maybe_unused]] std::basic_ostream<char>& cerr)
 {
 	constexpr auto test_name = "shift_tests"sv;
 	constexpr size_t rand_ops = 10;
@@ -2769,18 +3124,19 @@ void cjm::uint128_tests::execute_shift_tests()
 	constexpr size_t expected_standard_ops = u128_testing_constant_providers::testing_constant_provider<uint128_t>::all_values.size() * 128 * 2;
 	constexpr size_t expected_random_ops = rand_ops;
 	constexpr size_t expected_total = expected_random_ops + expected_standard_ops;
-	auto op_vec = generate_shift_ops(rand_ops, true);
+	auto op_vec = generate_shift_ops(rand_ops, true, cerr);
 	cjm_assert(op_vec.size() == expected_total);
-	std::cout << "  Executing " << op_vec.size() << " shifting tests: " << newl;
+	cout << "  Executing " << op_vec.size() << " shifting tests: " << newl;
 	for (auto& binary_operation : op_vec)
 	{
-		test_binary_operation(binary_operation, test_name);
+		test_binary_operation(binary_operation, test_name, cout, cerr);
 	}
-	std::cout << "All " << op_vec.size() << " tests PASS." << newl;
+	cout << "All " << op_vec.size() << " tests PASS." << newl;
 	//print_n_static_assertions(op_vec, expected_standard_ops);
 }
 
-void cjm::uint128_tests::execute_bw_tests()
+void cjm::uint128_tests::execute_bw_tests([[maybe_unused]] std::basic_ostream<char>& cout, 
+	std::basic_ostream<char>& cerr)
 {
 	constexpr auto test_name = "bw_tests"sv;
 	constexpr size_t rand_ops = 102;
@@ -2789,20 +3145,20 @@ void cjm::uint128_tests::execute_bw_tests()
 	constexpr size_t expected_standard_ops = (((num_standard_values * num_standard_values) + num_standard_values) / 2) * 3;
 	constexpr size_t expected_random_ops = rand_ops;
 	constexpr size_t expected_total = expected_random_ops + expected_standard_ops;
-	auto op_vec = generate_bw_ops(rand_ops, true);
+	auto op_vec = generate_bw_ops(rand_ops, true, cerr);
 	cjm_assert(op_vec.size() == expected_total);
-	std::cout << "  Executing " << op_vec.size() << " shifting tests: " << newl;
+	cout << "  Executing " << op_vec.size() << " shifting tests: " << newl;
 	for (auto& binary_operation : op_vec)
 	{
-		test_binary_operation(binary_operation, test_name);
+		test_binary_operation(binary_operation, test_name, cout, cerr);
 	}
-	std::cout << "All " << op_vec.size() << " tests PASS." << newl;
+	cout << "All " << op_vec.size() << " tests PASS." << newl;
 	auto rgen = generator::rgen{};
 	rgen.shuffle(op_vec, expected_standard_ops);
 	//print_n_static_assertions(op_vec, expected_standard_ops / 3);
 }
 
-void cjm::uint128_tests::execute_comparison_tests()
+void cjm::uint128_tests::execute_comparison_tests([[maybe_unused]] std::basic_ostream<char>& cout, [[maybe_unused]] std::basic_ostream<char>& cerr)
 {
 	constexpr auto test_name = "comparison_tests"sv;
 	constexpr binary_op operation = binary_op::compare;
@@ -2811,18 +3167,18 @@ void cjm::uint128_tests::execute_comparison_tests()
 	constexpr size_t num_standard_ops = ((num_standard_values * num_standard_values) + num_standard_values) / 2;
 	constexpr size_t num_expected = ops + num_standard_ops;
 
-	auto op_vect = generate_easy_ops(ops, operation, true);
+	auto op_vect = generate_easy_ops(ops, operation, true, cerr);
 	cjm_assert(op_vect.size() == num_expected);
-	std::cout << "  Executing " << op_vect.size() << " comparison tests: " << newl;
+	cout << "  Executing " << op_vect.size() << " comparison tests: " << newl;
 	for (auto& binary_operation : op_vect)
 	{
-		test_binary_operation(binary_operation, test_name);
+		test_binary_operation(binary_operation, test_name, cout, cerr);
 	}
-	std::cout << "All " << op_vect.size() << " tests PASS." << newl;
+	cout << "All " << op_vect.size() << " tests PASS." << newl;
 	//print_n_static_assertions(op_vect, num_standard_ops);
 }
 
-void cjm::uint128_tests::execute_multiplication_tests()
+void cjm::uint128_tests::execute_multiplication_tests([[maybe_unused]] std::basic_ostream<char>& cout, [[maybe_unused]] std::basic_ostream<char>& cerr)
 {
 	constexpr auto test_name = "multiplication_tests"sv;
 	constexpr size_t ops_per_range = 250;
@@ -2834,17 +3190,17 @@ void cjm::uint128_tests::execute_multiplication_tests()
 		+ num_standard_values) / 2;
 	constexpr size_t num_expected = ops + num_standard_ops;
 
-	auto op_vec = generate_mult_ops(ops_per_range, true);
+	auto op_vec = generate_mult_ops(ops_per_range, true, cerr);
 	cjm_assert(num_expected == op_vec.size());
 	for (auto& binary_operation : op_vec)
 	{
-		test_binary_operation(binary_operation, test_name);
+		test_binary_operation(binary_operation, test_name, cout, cerr);
 	}
-	std::cout << "All " << op_vec.size() << " tests PASS." << newl;
+	cout << "All " << op_vec.size() << " tests PASS." << newl;
 	//print_n_static_assertions(op_vec, num_standard_ops);
 }
 
-void cjm::uint128_tests::execute_failing_division_test_1()
+void cjm::uint128_tests::execute_failing_division_test_1([[maybe_unused]] std::basic_ostream<char>& cout, [[maybe_unused]] std::basic_ostream<char>& cerr)
 {
 	uint128_t dividend = 0;
 	uint128_t divisor = 1;
@@ -2864,16 +3220,16 @@ void cjm::uint128_tests::execute_failing_division_test_1()
 
 	auto op = binary_op_u128_t{ binary_op::divide, dividend, divisor };
 	auto mod_ver = binary_op_u128_t{ binary_op::modulus, dividend, divisor };
-	test_binary_operation(op, "failing_division_test_1"sv);
-	test_binary_operation(mod_ver, "failing_division_test_1_modulus_ver"sv);
+	test_binary_operation(op, "failing_division_test_1"sv, cout, cerr);
+	test_binary_operation(mod_ver, "failing_division_test_1_modulus_ver"sv, cout, cerr);
 	cjm_assert(op.has_correct_result());
-//	std::cout << "Printing static assertions from failing_division_test_1:" << newl;
+//	cout << "Printing static assertions from failing_division_test_1:" << newl;
 //	append_static_assertion(cout, op) << newl;
 //	append_static_assertion(cout, mod_ver) << newl;
-//	std::cout << "Done printing static assertions." << newl;
+//	cout << "Done printing static assertions." << newl;
 }
 
-void cjm::uint128_tests::execute_failing_division_test_2()
+void cjm::uint128_tests::execute_failing_division_test_2([[maybe_unused]] std::basic_ostream<char>& cout, [[maybe_unused]] std::basic_ostream<char>& cerr)
 {
 	constexpr auto test_name = "failing_division_test_2"sv;
 	auto op_text = "/;256368684943268248658307433575740207117;16109687965047641490155963133754044755;"sv;
@@ -2882,7 +3238,7 @@ void cjm::uint128_tests::execute_failing_division_test_2()
 	auto control_lhs = to_ctrl(lhs);
 	auto control_rhs = to_ctrl(rhs);
 	auto control_res = control_lhs / control_rhs;
-	std::cout << "This operation should indicate: [" << control_lhs << " / " << control_rhs << " == " << control_res << "]." << newl;
+	cout << "This operation should indicate: [" << control_lhs << " / " << control_rhs << " == " << control_res << "]." << newl;
 
 	static_assert((lhs / rhs) == 15_u128);
 	
@@ -2891,23 +3247,22 @@ void cjm::uint128_tests::execute_failing_division_test_2()
 	stream << op_text;
 	binary_op_u128_t temp;
 	stream >> temp;
-	std::cout << "About to test deserialization:..." << newl;
+	cout << "About to test deserialization:..." << newl;
 	cjm_assert(lhs == temp.left_operand() && rhs == temp.right_operand());
 	cjm_assert(temp.op_code() == binary_op::divide);
-	std::cout << "Deserialization succeeded." << newl;
+	cout << "Deserialization succeeded." << newl;
 
 	auto res = temp.left_operand() / temp.right_operand();
 	cjm_assert(to_ctrl(res) == control_res);
-	std::cout << "Result: [" << res << "]" << newl;
+	cout << "Result: [" << res << "]" << newl;
 
 	temp.calculate_result();
-	std::cout << "Printing static assertions from " << test_name << ": " << newl;
+	cout << "Printing static assertions from " << test_name << ": " << newl;
 	append_static_assertion(cout, temp) << newl;
-	test_binary_operation(temp, test_name);
-	
+	test_binary_operation(temp, test_name, cout, cerr);	
 }
 
-void cjm::uint128_tests::execute_failing_modulus_test_1()
+void cjm::uint128_tests::execute_failing_modulus_test_1([[maybe_unused]] std::basic_ostream<char>& cout, [[maybe_unused]] std::basic_ostream<char>& cerr)
 {
 	constexpr auto test_name = "failing_modulus_test_1"sv;
 	auto op_text = "%;295990755071965901746234089551998857227;168021802658398834664238297099768481736;"sv;
@@ -2915,10 +3270,10 @@ void cjm::uint128_tests::execute_failing_modulus_test_1()
 	stream << op_text;
 	binary_op_u128_t temp;
 	stream >> temp;
-	test_binary_operation(temp, test_name);
+	test_binary_operation(temp, test_name, cout, cerr);
 }
 
-void cjm::uint128_tests::execute_division_modulus_tests()
+void cjm::uint128_tests::execute_division_modulus_tests([[maybe_unused]] std::basic_ostream<char>& cout, [[maybe_unused]] std::basic_ostream<char>& cerr)
 {
 	constexpr auto test_name = "division_modulus_tests"sv;
 	constexpr size_t ops_per_range = 250;
@@ -2927,22 +3282,22 @@ void cjm::uint128_tests::execute_division_modulus_tests()
 	constexpr size_t num_rnd_ops = ops_per_range * num_ranges;
 	constexpr size_t num_expected = num_rnd_ops + num_standard_values;
 
-	auto op_vec = generate_divmod_ops(ops_per_range, true);
+	auto op_vec = generate_divmod_ops(ops_per_range, true, cerr);
 	cjm_assert(num_expected == op_vec.size());
 	for (auto& binary_operation : op_vec)
 	{
-		test_binary_operation(binary_operation, test_name);
+		test_binary_operation(binary_operation, test_name, cout, cerr);
 	}
-	std::cout << "All " << std::dec << op_vec.size() << " tests PASS." << newl;
+	cout << "All " << std::dec << op_vec.size() << " tests PASS." << newl;
 	/*auto rgen = generator::rgen{};
 	rgen.shuffle(op_vec, op_vec.size());
-	std::cout << "Going to print static assertions: " << newl;
+	cout << "Going to print static assertions: " << newl;
 	print_n_static_assertions(op_vec, 25);
-	std::cout << newl << "Done printing static assertions." << newl;*/
+	cout << newl << "Done printing static assertions." << newl;*/
 }
 
 
-void cjm::uint128_tests::execute_unary_op_code_rt_serialization_tests()
+void cjm::uint128_tests::execute_unary_op_code_rt_serialization_tests([[maybe_unused]] std::basic_ostream<char>& cout, [[maybe_unused]] std::basic_ostream<char>& cerr)
 {
 	auto test_rt_ser = [] (unary_op code) -> void
 	{
@@ -2995,7 +3350,7 @@ void cjm::uint128_tests::execute_unary_op_code_rt_serialization_tests()
 	test_rt_ser(unary_op::logical_negation);
 }
 
-void cjm::uint128_tests::execute_unary_op_basic_test()
+void cjm::uint128_tests::execute_unary_op_basic_test([[maybe_unused]] std::basic_ostream<char>& cout, [[maybe_unused]] std::basic_ostream<char>& cerr)
 {
 	constexpr auto first_operand = 0xdead'beef'badd'f00d_u128;
 	constexpr auto second_operand = 0xcafe'babe'600d'b00b_u128;
@@ -3012,6 +3367,27 @@ void cjm::uint128_tests::execute_unary_op_basic_test()
 	cjm_assert(second_res.has_value() && second_res.value().first == second_res->second && !unary_op_2.has_post_result() && second_res->first == second_op_expected_res);
 	cjm_deny(unary_op_1 == unary_op_2);
 
+}
+
+std::filesystem::path cjm::uint128_tests::create_test_battery_results_filename()
+{
+	using namespace date;
+	auto stamp = std::chrono::system_clock::now();
+	auto date_part = std::chrono::floor<days>(stamp);
+	auto time_part = make_time(stamp - date_part);
+	auto ymd = year_month_day{ date_part };
+	auto hms = hh_mm_ss{ time_part };
+	auto ss = cjm::string::make_throwing_sstream<char>();
+	
+	ss
+		<< base_test_battery_res_filename << "_"
+		<<  ymd.year() << "_" << std::setw(2)
+		<< std::setfill('0') << ymd.month() << "_"
+		<< ymd.day() << "_" << std::setw(2) << std::setfill('0')
+		<< hms.hours().count() << "_" << std::setw(2) << std::setfill('0')
+		<< hms.minutes().count() << "_" << std::setw(2) << std::setfill('0')
+		<< hms.seconds().count() << "Z." << cjm::uint128_tests::op_extension;
+	return std::filesystem::path{ ss.str() };
 }
 
 std::filesystem::path cjm::uint128_tests::create_generated_op_filename(binary_op op)
@@ -3124,7 +3500,7 @@ cjm::uint128_tests::unary_op_u128_vect_t cjm::uint128_tests::generate_specified_
 }
 
 cjm::uint128_tests::binary_op_u128_vect_t cjm::uint128_tests::generate_easy_ops(size_t num_ops, binary_op op,
-																				bool include_standard_tests)
+																				bool include_standard_tests, [[maybe_unused]] std::basic_ostream<char>& cerr)
 {
 	if (op == binary_op::divide || op == binary_op::modulus || op == binary_op::left_shift || op == binary_op::right_shift)
 		throw std::invalid_argument{ "This function cannot be used for division, modulus or bit shifting: those operations may cause undefined behavior if the right operand is improper." };
@@ -3156,7 +3532,7 @@ cjm::uint128_tests::binary_op_u128_vect_t cjm::uint128_tests::generate_easy_ops(
 }
 
 cjm::uint128_tests::binary_op_u128_vect_t cjm::uint128_tests::generate_shift_ops(size_t num_ops,
-	bool include_standard_tests)
+	bool include_standard_tests, [[maybe_unused]] std::basic_ostream<char>& cerr)
 {
 	using provider_t = u128_testing_constant_providers::testing_constant_provider<uint128_t>;
 	binary_op_u128_vect_t ret;
@@ -3175,9 +3551,10 @@ cjm::uint128_tests::binary_op_u128_vect_t cjm::uint128_tests::generate_shift_ops
 		if (num_ops % 2 != 0)
 		{
 			const auto old = num_ops++;
-			std::cerr   << "Num_ops must be divisible by two: creating "
-						<< num_ops << " operations rather than specified value of "
-						<< old << " operations." << newl;			
+			cerr
+				<< "Num_ops must be divisible by two: creating "
+				<< num_ops << " operations rather than specified value of "
+				<< old << " operations." << newl;			
 		}
 		if (ret.capacity() < ret.size() + num_ops)
 		{
@@ -3199,7 +3576,7 @@ cjm::uint128_tests::binary_op_u128_vect_t cjm::uint128_tests::generate_shift_ops
 }
 
 cjm::uint128_tests::binary_op_u128_vect_t cjm::uint128_tests::generate_bw_ops(size_t num_ops,
-	bool include_standard_tests)
+	bool include_standard_tests, [[maybe_unused]] std::basic_ostream<char>& cerr)
 {
 	using provider_t = u128_testing_constant_providers::testing_constant_provider<uint128_t>;
 	binary_op_u128_vect_t ret;
@@ -3220,11 +3597,11 @@ cjm::uint128_tests::binary_op_u128_vect_t cjm::uint128_tests::generate_bw_ops(si
 		auto mod = num_ops % 3;
 		if (mod != 0)
 		{
-			auto saver = cout_saver{ std::cerr };
+			auto saver = cout_saver{ cerr };
 			auto old = num_ops;
 			num_ops += (3 - mod);
 			assert(num_ops % 3 == 0);
-			std::cerr   << "Unable to produce " << std::dec << old
+			cerr   << "Unable to produce " << std::dec << old
 						<< " bitwise operations: the number is not divisible by 3."
 						<< "  Will produce " << num_ops
 						<< " bitwise operations instead." << newl;			
@@ -3250,7 +3627,7 @@ cjm::uint128_tests::binary_op_u128_vect_t cjm::uint128_tests::generate_bw_ops(si
 }
 
 cjm::uint128_tests::binary_op_u128_vect_t cjm::uint128_tests::generate_mult_ops(size_t num_each_range,
-	bool include_standard_tests)
+	bool include_standard_tests, [[maybe_unused]] std::basic_ostream<char>& cerr)
 {
 	using provider_t = u128_testing_constant_providers::testing_constant_provider<uint128_t>;
 	binary_op_u128_vect_t ret;
@@ -3313,9 +3690,9 @@ cjm::uint128_tests::binary_op_u128_vect_t cjm::uint128_tests::generate_mult_ops(
 }
 
 cjm::uint128_tests::binary_op_u128_vect_t cjm::uint128_tests::generate_divmod_ops(size_t num_each_range,
-	bool include_standard_tests)
+	bool include_standard_tests, [[maybe_unused]] std::basic_ostream<char>& cerr)
 {
-	auto saver = cout_saver{ std::cerr };
+	auto saver = cout_saver{ cerr };
 	constexpr auto num_ranges = 4;
 	binary_op_u128_vect_t ret;
 	if (include_standard_tests)
@@ -3328,9 +3705,10 @@ cjm::uint128_tests::binary_op_u128_vect_t cjm::uint128_tests::generate_divmod_op
 		if (num_each_range % 2 != 0)
 		{
 			auto old = num_each_range++;
-			std::cerr   << "Cannot add " << std::dec << old
-						<< " operations per range -- not even.  Will add "
-						<< std::dec << num_each_range << " ops instead." << newl;
+			cerr
+				<< "Cannot add " << std::dec << old
+				<< " operations per range -- not even.  Will add "
+				<< std::dec << num_each_range << " ops instead." << newl;
 		}
 
 		const auto to_add = num_each_range * num_ranges;
@@ -3562,7 +3940,7 @@ void cjm::uint128_tests::insert_standard_divmod_ops(binary_op_u128_vect_t& op_ve
 	//172 operations total.
 }
 
-void cjm::uint128_tests::test_binary_operation(binary_op_u128_t& op, std::string_view test_name)
+void cjm::uint128_tests::test_binary_operation(binary_op_u128_t& op, std::string_view test_name, [[maybe_unused]]  std::basic_ostream<char>& cout, [[maybe_unused]] std::basic_ostream<char>& cerr)
 {
 	using result_t = typename binary_op_u128_t::result_t;
 	result_t result = std::nullopt;
@@ -3579,7 +3957,7 @@ void cjm::uint128_tests::test_binary_operation(binary_op_u128_t& op, std::string
 		bool result_equals = result.value().first == result.value().second;
 		if (!has_correct || !result_equals)
 		{
-			std::cerr << "Error ... has_correct: [" << std::boolalpha << has_correct << "]; result_equals: [" << result_equals << "]." << newl;
+			cerr << "Error ... has_correct: [" << std::boolalpha << has_correct << "]; result_equals: [" << result_equals << "]." << newl;
 		}
 		cjm_assert( has_correct && result_equals);
 		if (op.op_code() == binary_op::divide || op.op_code() == binary_op::modulus)
@@ -3589,19 +3967,19 @@ void cjm::uint128_tests::test_binary_operation(binary_op_u128_t& op, std::string
 	}
 	catch (const testing::testing_failure& ex)
 	{
-		auto saver = cout_saver{ std::cerr };
-		std::cerr << "Test: [" << test_name << "], failed -- exception (" << ex.what() << ") thrown." << newl;
-		std::cerr << "Operation: [" << op.op_code() << "]; Left operand: [" << std::dec << op.left_operand() << "]; Right operand: [" << op.right_operand() << "]." << newl;
+		auto saver = cout_saver{ cerr };
+		cerr << "Test: [" << test_name << "], failed -- exception (" << ex.what() << ") thrown." << newl;
+		cerr << "Operation: [" << op.op_code() << "]; Left operand: [" << std::dec << op.left_operand() << "]; Right operand: [" << op.right_operand() << "]." << newl;
 		if (result.has_value())
 		{
-			std::cerr << "Result of operation.  Actual: [" << std::dec << result->first << "]; Expected by control: [" << std::dec << result->second << "]." << newl;
+			cerr << "Result of operation.  Actual: [" << std::dec << result->first << "]; Expected by control: [" << std::dec << result->second << "]." << newl;
 		}
 		else
 		{
-			std::cerr << "No result available." << newl;
+			cerr << "No result available." << newl;
 		}
 		auto path = create_failing_op_pathname(op.op_code());
-		std::cerr << "Going to write failing operation to [" << path << "]: " << newl;
+		cerr << "Going to write failing operation to [" << path << "]: " << newl;
 		bool except_file_write = false;
 		try
 		{
@@ -3611,21 +3989,21 @@ void cjm::uint128_tests::test_binary_operation(binary_op_u128_t& op, std::string
 		catch (const std::exception& ex2)
 		{
 			except_file_write = true;
-			std::cerr << "Unable to write failing operation to file [" << path << "]: exception thrown with msg: [" << ex2.what() << "]." << newl;
+			cerr << "Unable to write failing operation to file [" << path << "]: exception thrown with msg: [" << ex2.what() << "]." << newl;
 		}
 		if (except_file_write)
 		{
-			std::cerr << "Logging failing operation to stderr instead (between square brackets): [" << op << "]." << newl;
+			cerr << "Logging failing operation to stderr instead (between square brackets): [" << op << "]." << newl;
 		}
 		else
 		{
-			std::cerr << "Successfully wrote failing operation to: [" << path << "]." << newl;
+			cerr << "Successfully wrote failing operation to: [" << path << "]." << newl;
 		}
 		throw;
 	}
 }
 
-void cjm::uint128_tests::test_unary_operation(unary_op_u128_t& op, std::string_view test_name)
+void cjm::uint128_tests::test_unary_operation(unary_op_u128_t& op, std::string_view test_name, [[maybe_unused]] std::basic_ostream<char>& cout, [[maybe_unused]] std::basic_ostream<char>& cerr)
 {
 	try
 	{
@@ -3639,12 +4017,12 @@ void cjm::uint128_tests::test_unary_operation(unary_op_u128_t& op, std::string_v
 	}
 	catch (const testing::testing_failure& ex)
 	{
-		auto saver = cout_saver{ std::cerr };
-		std::cerr << "Test: [" << test_name << "], failed -- exception (" << ex.what() << ") thrown." << newl;
-		std::cerr << "Operation: [" << op.op_code() << "]; Left operand: [" << std::dec << op.operand() << "]." << newl;
+		auto saver = cout_saver{ cerr };
+		cerr << "Test: [" << test_name << "], failed -- exception (" << ex.what() << ") thrown." << newl;
+		cerr << "Operation: [" << op.op_code() << "]; Left operand: [" << std::dec << op.operand() << "]." << newl;
 
 		auto path = create_failing_op_pathname(op.op_code());
-		std::cerr << "Going to write failing operation to [" << path << "]: " << newl;
+		cerr << "Going to write failing operation to [" << path << "]: " << newl;
 		bool except_file_write = false;
 		try
 		{
@@ -3654,15 +4032,15 @@ void cjm::uint128_tests::test_unary_operation(unary_op_u128_t& op, std::string_v
 		catch (const std::exception& ex2)
 		{
 			except_file_write = true;
-			std::cerr << "Unable to write failing operation to file [" << path << "]: exception thrown with msg: [" << ex2.what() << "]." << newl;
+			cerr << "Unable to write failing operation to file [" << path << "]: exception thrown with msg: [" << ex2.what() << "]." << newl;
 		}
 		if (except_file_write)
 		{
-			std::cerr << "Logging failing operation to stderr instead (between square brackets): [" << op << "]." << newl;
+			cerr << "Logging failing operation to stderr instead (between square brackets): [" << op << "]." << newl;
 		}
 		else
 		{
-			std::cerr << "Successfully wrote failing operation to: [" << path << "]." << newl;
+			cerr << "Successfully wrote failing operation to: [" << path << "]." << newl;
 		}
 		throw;
 	}
@@ -4052,26 +4430,26 @@ void cjm::uint128_tests::generator::rgen::shuffle(binary_op_u128_vect_t& vec, si
 	assert(end <= vec.end());
 	std::shuffle(begin, end, m_gen->m_twister);		
 }
-void cjm::uint128_tests::execute_builtin_add_with_carry_test()
+void cjm::uint128_tests::execute_builtin_add_with_carry_test([[maybe_unused]] std::basic_ostream<char>& cout, [[maybe_unused]] std::basic_ostream<char>& cerr)
 {
 	if constexpr (cjm::numerics::concepts::builtin_128bit_unsigned_integer<cjm::numerics::natuint128_t>)
 	{
 		using nat_u128_t = cjm::numerics::natuint128_t;
 
-		auto print_input = [] (unsigned char in, uint128_t lhs, uint128_t rhs) -> void
+		auto print_input = [&] (unsigned char in, uint128_t lhs, uint128_t rhs) -> void
 		{
 			auto saver = cout_saver{cout};
-			std::cout
+			cout
 				<< "Executing add with carry for inputs -- carry in: [" << std::dec
 				<< static_cast<unsigned>(in) << "], lhs: [0x" << std::hex << std::setw(32)
 				<< std::setfill('0') << lhs << "], rhs: [0x" << std::hex << std::setw(32)
 				<< std::setfill('0') << rhs << "]." << newl;
 		};
 
-		auto print_sum = [] (unsigned char out, uint128_t sum) -> void
+		auto print_sum = [&] (unsigned char out, uint128_t sum) -> void
 		{
 			auto saver = cout_saver{cout};
-			std::cout
+			cout
 				<< "Result: sum: [0x" << std::hex << std::setw(32) << std::setfill('0')
 				<< sum << "], out: [" << std::dec
 				<< static_cast<unsigned>(out) << "]." << newl;
@@ -4099,30 +4477,30 @@ void cjm::uint128_tests::execute_builtin_add_with_carry_test()
 	}
 	else
 	{
-		std::cout << "NOT EXECUTING BECAUSE BUILT-IN UINT128 NOT AVAILABLE." << newl;
+		cout << "NOT EXECUTING BECAUSE BUILT-IN UINT128 NOT AVAILABLE." << newl;
 	}
 }
 
-void cjm::uint128_tests::execute_builtin_sub_with_borrow_test()
+void cjm::uint128_tests::execute_builtin_sub_with_borrow_test([[maybe_unused]] std::basic_ostream<char>& cout, [[maybe_unused]] std::basic_ostream<char>& cerr)
 {
 	if constexpr (cjm::numerics::concepts::builtin_128bit_unsigned_integer<cjm::numerics::natuint128_t>)
 	{
 		using nat_u128_t = cjm::numerics::natuint128_t;
 
-		auto print_input = [] (unsigned char in, uint128_t lhs, uint128_t rhs) -> void
+		auto print_input = [&] (unsigned char in, uint128_t lhs, uint128_t rhs) -> void
 		{
 			auto saver = cout_saver{cout};
-			std::cout
-					<< "Executing sub with borrow for inputs -- borrow in: [" << std::dec
-					<< static_cast<unsigned>(in) << "], lhs: [0x" << std::hex << std::setw(32)
-					<< std::setfill('0') << lhs << "], rhs: [0x" << std::hex << std::setw(32)
-					<< std::setfill('0') << rhs << "]." << newl;
+			cout
+				<< "Executing sub with borrow for inputs -- borrow in: [" << std::dec
+				<< static_cast<unsigned>(in) << "], lhs: [0x" << std::hex << std::setw(32)
+				<< std::setfill('0') << lhs << "], rhs: [0x" << std::hex << std::setw(32)
+				<< std::setfill('0') << rhs << "]." << newl;
 		};
 
-		auto print_sum = [] (unsigned char out, uint128_t difference) -> void
+		auto print_sum = [&] (unsigned char out, uint128_t difference) -> void
 		{
 			auto saver = cout_saver{cout};
-			std::cout
+				cout
 					<< "Result: difference: [0x" << std::hex << std::setw(32) << std::setfill('0')
 					<< difference << "], out: [" << std::dec
 					<< static_cast<unsigned>(out) << "]." << newl << newl;
@@ -4186,11 +4564,11 @@ void cjm::uint128_tests::execute_builtin_sub_with_borrow_test()
 	}
 	else
 	{
-		std::cout << "NOT EXECUTING BECAUSE BUILT-IN UINT128 NOT AVAILABLE." << newl;
+		cout << "NOT EXECUTING BECAUSE BUILT-IN UINT128 NOT AVAILABLE." << newl;
 	}
 }
 
-void cjm::uint128_tests::execute_basic_u128_adc_test()
+void cjm::uint128_tests::execute_basic_u128_adc_test([[maybe_unused]] std::basic_ostream<char>& cout, [[maybe_unused]] std::basic_ostream<char>& cerr)
 {
 	constexpr auto addend_1_left = 0xdead'beef'600d'f00d'ffff'ffff'ffff'ffff_u128;
 	constexpr auto addend_1_right = 0xffff'ffff'ffff'ffff'c0de'd00d'fea2'b00b_u128;
@@ -4237,7 +4615,7 @@ void cjm::uint128_tests::execute_basic_u128_adc_test()
 	cjm_assert((actual_carry_out_4 != 0) == (ctime_res_4.second != 0));
 }
 
-void cjm::uint128_tests::execute_basic_u128_sbb_test()
+void cjm::uint128_tests::execute_basic_u128_sbb_test([[maybe_unused]] std::basic_ostream<char>& cout, [[maybe_unused]] std::basic_ostream<char>& cerr)
 {
 	constexpr auto subtrahend_1 = 0xdead'beef'600d'f00d'ffff'ffff'ffff'ffff_u128;
 	constexpr auto minuend_1 = 0xffff'ffff'ffff'ffff'c0de'd00d'fea2'b00b_u128;
@@ -4311,7 +4689,7 @@ void cjm::uint128_tests::execute_basic_u128_sbb_test()
 	cjm_assert(actual_diff_4_bin == ctime_res_4_bin.first && ((act_bout_4_bin != 0) == (ctime_res_4_bin.second != 0)));
 }
 
-void cjm::uint128_tests::execute_umult_spec_tests()
+void cjm::uint128_tests::execute_umult_spec_tests([[maybe_unused]] std::basic_ostream<char>& cout, [[maybe_unused]] std::basic_ostream<char>& cerr)
 {
 	constexpr std::uint16_t left_factor_16 = 0xfe'a2;
 	constexpr std::uint16_t right_factor_16 = 0xf0'0f;
@@ -4319,8 +4697,8 @@ void cjm::uint128_tests::execute_umult_spec_tests()
 	static_assert(cjm::numerics::internal::concepts::is_uint_16_or_32_t<std::uint16_t>);
 	auto actual_product_32 = cjm::numerics::internal::umult(left_factor_16, right_factor_16);
 	constexpr auto actual_ctime_product_32 = cjm::numerics::internal::umult(left_factor_16, right_factor_16);
-	auto saver = testing::cout_saver{std::cout};
-	std::cout
+	auto saver = testing::cout_saver{cout};
+	cout
 		<< "[0x" << std::hex << std::setw(std::numeric_limits<decltype(left_factor_16)>::digits / 4)
 		<< std::setfill('0') << left_factor_16 << "] * [0x" << std::hex
 		<< std::setw(std::numeric_limits<decltype(right_factor_16)>::digits / 4) << std::setfill('0')
@@ -4340,13 +4718,13 @@ void cjm::uint128_tests::execute_umult_spec_tests()
 	auto actual_product_16 = cjm::numerics::internal::umult(left_factor_8, right_factor_8);
 	constexpr auto actual_ctime_product_16 = cjm::numerics::internal::umult(left_factor_8, right_factor_8);
 
-	std::cout
-			<< "[0x" << std::hex << std::setw(std::numeric_limits<decltype(left_factor_8)>::digits / 4)
-			<< std::setfill('0') << (+left_factor_8) << "] * [0x" << std::hex
-			<< std::setw(std::numeric_limits<decltype(right_factor_8)>::digits / 4) << std::setfill('0')
-			<< (+right_factor_8) << "] == [0x" << std::hex
-			<< std::setw(std::numeric_limits<decltype(actual_product_16)>::digits / 4)
-			<< std::setfill('0') << actual_product_16 << "]." << newl;
+	cout
+		<< "[0x" << std::hex << std::setw(std::numeric_limits<decltype(left_factor_8)>::digits / 4)
+		<< std::setfill('0') << (+left_factor_8) << "] * [0x" << std::hex
+		<< std::setw(std::numeric_limits<decltype(right_factor_8)>::digits / 4) << std::setfill('0')
+		<< (+right_factor_8) << "] == [0x" << std::hex
+		<< std::setw(std::numeric_limits<decltype(actual_product_16)>::digits / 4)
+		<< std::setfill('0') << actual_product_16 << "]." << newl;
 
 	//runtime assert
 	cjm_assert(actual_product_16 == expected_product_16);
@@ -4360,13 +4738,13 @@ void cjm::uint128_tests::execute_umult_spec_tests()
 	auto actual_product_64 = cjm::numerics::internal::umult(left_factor_32, right_factor_32);
 	constexpr auto actual_ctime_product_64 = cjm::numerics::internal::umult(left_factor_32, right_factor_32);
 
-	std::cout
-			<< "[0x" << std::hex << std::setw(std::numeric_limits<decltype(left_factor_32)>::digits / 4)
-			<< std::setfill('0') << left_factor_32 << "] * [0x" << std::hex
-			<< std::setw(std::numeric_limits<decltype(right_factor_32)>::digits / 4) << std::setfill('0')
-			<< right_factor_32 << "] == [0x" << std::hex
-			<< std::setw(std::numeric_limits<decltype(actual_product_64)>::digits / 4)
-			<< std::setfill('0') << actual_product_64 << "]." << newl;
+	cout
+		<< "[0x" << std::hex << std::setw(std::numeric_limits<decltype(left_factor_32)>::digits / 4)
+		<< std::setfill('0') << left_factor_32 << "] * [0x" << std::hex
+		<< std::setw(std::numeric_limits<decltype(right_factor_32)>::digits / 4) << std::setfill('0')
+		<< right_factor_32 << "] == [0x" << std::hex
+		<< std::setw(std::numeric_limits<decltype(actual_product_64)>::digits / 4)
+		<< std::setfill('0') << actual_product_64 << "]." << newl;
 
 	//runtime assert
 	cjm_assert(actual_product_64 == expected_product_64);
@@ -4384,7 +4762,7 @@ void cjm::uint128_tests::execute_umult_spec_tests()
 	constexpr auto converted_ctime = uint128_t{ actual_ctime_product_128.m_high, actual_ctime_product_128.m_low };
 	auto converted_rtime = cjm::numerics::bit_cast<uint128_t>(actual_product_128);
 
-	std::cout
+	cout
 		<< "[0x" << std::hex << std::setw(std::numeric_limits<decltype(left_factor_64)>::digits / 4)
 		<< std::setfill('0') << left_factor_64 << "] * [0x" << std::hex
 		<< std::setw(std::numeric_limits<decltype(right_factor_64)>::digits / 4) << std::setfill('0')
@@ -4407,7 +4785,7 @@ constexpr uint128_t to_uint128_t(const cjm::numerics::fixed_uint_container::add_
 	return value;
 }
 
-void cjm::uint128_tests::execute_uintcontainer_adc_tests()
+void cjm::uint128_tests::execute_uintcontainer_adc_tests([[maybe_unused]] std::basic_ostream<char>& cout, [[maybe_unused]] std::basic_ostream<char>& cerr)
 {
 	constexpr std::uint64_t first_addend  = 13'897'774'258'637'163'262ull;
 	constexpr std::uint64_t second_addend = 13'456'386'308'122'210'317ull;
@@ -4418,12 +4796,12 @@ void cjm::uint128_tests::execute_uintcontainer_adc_tests()
 	auto res_runtime = cjm::numerics::fixed_uint_container::add_with_carry(first_addend, second_addend, 0);
 	auto widened = cjm::numerics::bit_cast<uint128_t>(res_runtime);
 	cjm_assert(widened == sum);
-	auto saver = cout_saver{ cout };
-	std::cout << "[" << std::dec << first_addend << "] + [" << second_addend << "] == [" << widened << "]." << newl;
+	auto saver = cout_saver{ cout};
+	cout << "[" << std::dec << first_addend << "] + [" << second_addend << "] == [" << widened << "]." << newl;
 	
 }
 
-void cjm::uint128_tests::execute_issue27_bug_test()
+void cjm::uint128_tests::execute_issue27_bug_test([[maybe_unused]] std::basic_ostream<char>& cout, [[maybe_unused]] std::basic_ostream<char>& cerr)
 {
 	constexpr auto expected_value = 0xc0de'd00d'ea75'dead'beef'600d'f00d_u128;
 	constexpr auto narrow_text = "0xc0ded00dea75deadbeef600df00d"sv;
@@ -4467,9 +4845,9 @@ void cjm::uint128_tests::execute_issue27_bug_test()
 	cjm_assert(utf32_result == expected_value);
 }
 
-void cjm::uint128_tests::execute_literal_test()
+void cjm::uint128_tests::execute_literal_test([[maybe_unused]] std::basic_ostream<char>& cout, [[maybe_unused]] std::basic_ostream<char>& cerr)
 {
-	std::cout << "Beginning single digit hex literal tests..." << newl;
+	cout << "Beginning single digit hex literal tests..." << newl;
 	cjm_assert_equal(to_test(ctrl_uint128_t{ 0x0 }), 0x0_u128, "0x0"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ 0x1 }), 0x1_u128, "0x1"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ 0x2 }), 0x2_u128, "0x2"sv);
@@ -4486,9 +4864,9 @@ void cjm::uint128_tests::execute_literal_test()
 	cjm_assert_equal(to_test(ctrl_uint128_t{ 0xd }), 0xd_u128, "0xd"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ 0xe }), 0xe_u128, "0xe"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ 0xf }), 0xf_u128, "0xf"sv);
-	std::cout << "End single digit hex literal tests..." << newl;
+	cout << "End single digit hex literal tests..." << newl;
 
-	std::cout << "Begin single digit decimal literal tests..." << newl;
+	cout << "Begin single digit decimal literal tests..." << newl;
 	cjm_assert_equal(to_test(ctrl_uint128_t{ 0 }), 0_u128, "0"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ 1 }), 1_u128, "1"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ 2 }), 2_u128, "2"sv);
@@ -4499,505 +4877,505 @@ void cjm::uint128_tests::execute_literal_test()
 	cjm_assert_equal(to_test(ctrl_uint128_t{ 7 }), 7_u128, "7"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ 8 }), 8_u128, "8"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ 9 }), 9_u128, "9"sv);
-	std::cout << "End single digit decimal literal tests..." << newl;
+	cout << "End single digit decimal literal tests..." << newl;
 
-	std::cout << "Begin 2 digit hex literal tests..." << newl;
+	cout << "Begin 2 digit hex literal tests..." << newl;
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "0xa8" }), 0xa8_u128, "0xa8"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "0x40" }), 0x40_u128, "0x40"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "0x49" }), 0x49_u128, "0x49"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "0x25" }), 0x25_u128, "0x25"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "0xf1" }), 0xf1_u128, "0xf1"sv);
-	std::cout << "End 2 digit hex literal tests..." << newl;
+	cout << "End 2 digit hex literal tests..." << newl;
 
-	std::cout << "Begin 2 digit decimal literal tests..." << newl;
+	cout << "Begin 2 digit decimal literal tests..." << newl;
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "53" }), 53_u128, "53"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "92" }), 92_u128, "92"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "18" }), 18_u128, "18"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "67" }), 67_u128, "67"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "74" }), 74_u128, "74"sv);
-	std::cout << "End 2 digit decimal literal tests..." << newl;
+	cout << "End 2 digit decimal literal tests..." << newl;
 
-	std::cout << "Begin 3 digit hex literal tests..." << newl;
+	cout << "Begin 3 digit hex literal tests..." << newl;
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "0xe65" }), 0xe65_u128, "0xe65"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "0x5ee" }), 0x5ee_u128, "0x5ee"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "0x8c3" }), 0x8c3_u128, "0x8c3"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "0xf3f" }), 0xf3f_u128, "0xf3f"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "0xc1c" }), 0xc1c_u128, "0xc1c"sv);
-	std::cout << "End 3 digit hex literal tests..." << newl;
+	cout << "End 3 digit hex literal tests..." << newl;
 
-	std::cout << "Begin 3 digit decimal literal tests..." << newl;
+	cout << "Begin 3 digit decimal literal tests..." << newl;
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "161" }), 161_u128, "161"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "292" }), 292_u128, "292"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "694" }), 694_u128, "694"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "369" }), 369_u128, "369"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "374" }), 374_u128, "374"sv);
-	std::cout << "End 3 digit decimal literal tests..." << newl;
+	cout << "End 3 digit decimal literal tests..." << newl;
 
-	std::cout << "Begin 4 digit hex literal tests..." << newl;
+	cout << "Begin 4 digit hex literal tests..." << newl;
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "0xf6a6" }), 0xf6a6_u128, "0xf6a6"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "0x962c" }), 0x962c_u128, "0x962c"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "0x13a2" }), 0x13a2_u128, "0x13a2"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "0x7940" }), 0x7940_u128, "0x7940"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "0x441e" }), 0x441e_u128, "0x441e"sv);
-	std::cout << "End 4 digit hex literal tests..." << newl;
+	cout << "End 4 digit hex literal tests..." << newl;
 
-	std::cout << "Begin 4 digit decimal literal tests..." << newl;
+	cout << "Begin 4 digit decimal literal tests..." << newl;
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "6958" }), 6958_u128, "6958"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "8152" }), 8152_u128, "8152"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "1733" }), 1733_u128, "1733"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "5465" }), 5465_u128, "5465"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "3886" }), 3886_u128, "3886"sv);
-	std::cout << "End 4 digit decimal literal tests..." << newl;
+	cout << "End 4 digit decimal literal tests..." << newl;
 
-	std::cout << "Begin 5 digit hex literal tests..." << newl;
+	cout << "Begin 5 digit hex literal tests..." << newl;
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "0x71f0e" }), 0x71f0e_u128, "0x71f0e"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "0x7ec83" }), 0x7ec83_u128, "0x7ec83"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "0x4ae6f" }), 0x4ae6f_u128, "0x4ae6f"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "0xb7f07" }), 0xb7f07_u128, "0xb7f07"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "0xcf4ec" }), 0xcf4ec_u128, "0xcf4ec"sv);
-	std::cout << "End 5 digit hex literal tests..." << newl;
+	cout << "End 5 digit hex literal tests..." << newl;
 
-	std::cout << "Begin 5 digit decimal literal tests..." << newl;
+	cout << "Begin 5 digit decimal literal tests..." << newl;
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "77283" }), 77283_u128, "77283"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "58414" }), 58414_u128, "58414"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "50152" }), 50152_u128, "50152"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "45123" }), 45123_u128, "45123"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "43501" }), 43501_u128, "43501"sv);
-	std::cout << "End 5 digit decimal literal tests..." << newl;
+	cout << "End 5 digit decimal literal tests..." << newl;
 
-	std::cout << "Begin 6 digit hex literal tests..." << newl;
+	cout << "Begin 6 digit hex literal tests..." << newl;
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "0xb91a13" }), 0xb91a13_u128, "0xb91a13"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "0x921adb" }), 0x921adb_u128, "0x921adb"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "0xeec80a" }), 0xeec80a_u128, "0xeec80a"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "0x74ca68" }), 0x74ca68_u128, "0x74ca68"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "0xa161d4" }), 0xa161d4_u128, "0xa161d4"sv);
-	std::cout << "End 6 digit hex literal tests..." << newl;
+	cout << "End 6 digit hex literal tests..." << newl;
 
-	std::cout << "Begin 6 digit decimal literal tests..." << newl;
+	cout << "Begin 6 digit decimal literal tests..." << newl;
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "892654" }), 892654_u128, "892654"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "210889" }), 210889_u128, "210889"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "873926" }), 873926_u128, "873926"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "872750" }), 872750_u128, "872750"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "225912" }), 225912_u128, "225912"sv);
-	std::cout << "End 6 digit decimal literal tests..." << newl;
+	cout << "End 6 digit decimal literal tests..." << newl;
 
-	std::cout << "Begin 7 digit hex literal tests..." << newl;
+	cout << "Begin 7 digit hex literal tests..." << newl;
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "0x097e7e5" }), 0x097e7e5_u128, "0x097e7e5"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "0x44ef74b" }), 0x44ef74b_u128, "0x44ef74b"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "0x6cea0f7" }), 0x6cea0f7_u128, "0x6cea0f7"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "0xd581803" }), 0xd581803_u128, "0xd581803"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "0x2efc1f9" }), 0x2efc1f9_u128, "0x2efc1f9"sv);
-	std::cout << "End 7 digit hex literal tests..." << newl;
+	cout << "End 7 digit hex literal tests..." << newl;
 
-	std::cout << "Begin 7 digit decimal literal tests..." << newl;
+	cout << "Begin 7 digit decimal literal tests..." << newl;
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "3381953" }), 3381953_u128, "3381953"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "6385320" }), 6385320_u128, "6385320"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "2313918" }), 2313918_u128, "2313918"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "2873174" }), 2873174_u128, "2873174"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "9951700" }), 9951700_u128, "9951700"sv);
-	std::cout << "End 7 digit decimal literal tests..." << newl;
+	cout << "End 7 digit decimal literal tests..." << newl;
 
-	std::cout << "Begin 8 digit hex literal tests..." << newl;
+	cout << "Begin 8 digit hex literal tests..." << newl;
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "0xe3866ee1" }), 0xe3866ee1_u128, "0xe3866ee1"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "0x75892b60" }), 0x75892b60_u128, "0x75892b60"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "0x8c93acb1" }), 0x8c93acb1_u128, "0x8c93acb1"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "0x0a72152e" }), 0x0a72152e_u128, "0x0a72152e"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "0x3ec096b7" }), 0x3ec096b7_u128, "0x3ec096b7"sv);
-	std::cout << "End 8 digit hex literal tests..." << newl;
+	cout << "End 8 digit hex literal tests..." << newl;
 
-	std::cout << "Begin 8 digit decimal literal tests..." << newl;
+	cout << "Begin 8 digit decimal literal tests..." << newl;
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "11598152" }), 11598152_u128, "11598152"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "40602245" }), 40602245_u128, "40602245"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "28245587" }), 28245587_u128, "28245587"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "32705753" }), 32705753_u128, "32705753"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "48429011" }), 48429011_u128, "48429011"sv);
-	std::cout << "End 8 digit decimal literal tests..." << newl;
+	cout << "End 8 digit decimal literal tests..." << newl;
 
-	std::cout << "Begin 9 digit hex literal tests..." << newl;
+	cout << "Begin 9 digit hex literal tests..." << newl;
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "0xf2667090b" }), 0xf2667090b_u128, "0xf2667090b"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "0xb310c1ee9" }), 0xb310c1ee9_u128, "0xb310c1ee9"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "0x041ed7de9" }), 0x041ed7de9_u128, "0x041ed7de9"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "0x410fd258e" }), 0x410fd258e_u128, "0x410fd258e"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "0x948beed3b" }), 0x948beed3b_u128, "0x948beed3b"sv);
-	std::cout << "End 9 digit hex literal tests..." << newl;
+	cout << "End 9 digit hex literal tests..." << newl;
 
-	std::cout << "Begin 9 digit decimal literal tests..." << newl;
+	cout << "Begin 9 digit decimal literal tests..." << newl;
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "551968750" }), 551968750_u128, "551968750"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "638237546" }), 638237546_u128, "638237546"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "131417069" }), 131417069_u128, "131417069"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "103255397" }), 103255397_u128, "103255397"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "420808281" }), 420808281_u128, "420808281"sv);
-	std::cout << "End 9 digit decimal literal tests..." << newl;
+	cout << "End 9 digit decimal literal tests..." << newl;
 
-	std::cout << "Begin 10 digit hex literal tests..." << newl;
+	cout << "Begin 10 digit hex literal tests..." << newl;
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "0x739a04bf99" }), 0x739a04bf99_u128, "0x739a04bf99"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "0x9108bd23e5" }), 0x9108bd23e5_u128, "0x9108bd23e5"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "0xab323f9e14" }), 0xab323f9e14_u128, "0xab323f9e14"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "0x359e29a981" }), 0x359e29a981_u128, "0x359e29a981"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "0xa7576d58be" }), 0xa7576d58be_u128, "0xa7576d58be"sv);
-	std::cout << "End 10 digit hex literal tests..." << newl;
+	cout << "End 10 digit hex literal tests..." << newl;
 
-	std::cout << "Begin 10 digit decimal literal tests..." << newl;
+	cout << "Begin 10 digit decimal literal tests..." << newl;
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "3681653863" }), 3681653863_u128, "3681653863"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "2423934938" }), 2423934938_u128, "2423934938"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "2183423382" }), 2183423382_u128, "2183423382"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "5641480195" }), 5641480195_u128, "5641480195"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "2151507309" }), 2151507309_u128, "2151507309"sv);
-	std::cout << "End 10 digit decimal literal tests..." << newl;
+	cout << "End 10 digit decimal literal tests..." << newl;
 
-	std::cout << "Begin 11 digit hex literal tests..." << newl;
+	cout << "Begin 11 digit hex literal tests..." << newl;
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "0x54eafebcac3" }), 0x54eafebcac3_u128, "0x54eafebcac3"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "0x88cd8fb70dc" }), 0x88cd8fb70dc_u128, "0x88cd8fb70dc"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "0xba854f5137d" }), 0xba854f5137d_u128, "0xba854f5137d"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "0x90fc1b67c8c" }), 0x90fc1b67c8c_u128, "0x90fc1b67c8c"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "0xecd1be313fd" }), 0xecd1be313fd_u128, "0xecd1be313fd"sv);
-	std::cout << "End 11 digit hex literal tests..." << newl;
+	cout << "End 11 digit hex literal tests..." << newl;
 
-	std::cout << "Begin 11 digit decimal literal tests..." << newl;
+	cout << "Begin 11 digit decimal literal tests..." << newl;
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "27395111710" }), 27395111710_u128, "27395111710"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "52570782213" }), 52570782213_u128, "52570782213"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "54167263522" }), 54167263522_u128, "54167263522"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "71946009954" }), 71946009954_u128, "71946009954"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "43902233596" }), 43902233596_u128, "43902233596"sv);
-	std::cout << "End 11 digit decimal literal tests..." << newl;
+	cout << "End 11 digit decimal literal tests..." << newl;
 
-	std::cout << "Begin 12 digit hex literal tests..." << newl;
+	cout << "Begin 12 digit hex literal tests..." << newl;
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "0x4500ed7f36c1" }), 0x4500ed7f36c1_u128, "0x4500ed7f36c1"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "0x5a0e6d4a6541" }), 0x5a0e6d4a6541_u128, "0x5a0e6d4a6541"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "0xf649135b3eca" }), 0xf649135b3eca_u128, "0xf649135b3eca"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "0x994aa0f99408" }), 0x994aa0f99408_u128, "0x994aa0f99408"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "0xe158ee495104" }), 0xe158ee495104_u128, "0xe158ee495104"sv);
-	std::cout << "End 12 digit hex literal tests..." << newl;
+	cout << "End 12 digit hex literal tests..." << newl;
 
-	std::cout << "Begin 12 digit decimal literal tests..." << newl;
+	cout << "Begin 12 digit decimal literal tests..." << newl;
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "564131105399" }), 564131105399_u128, "564131105399"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "851696496832" }), 851696496832_u128, "851696496832"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "787312722049" }), 787312722049_u128, "787312722049"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "926366390794" }), 926366390794_u128, "926366390794"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "711603834446" }), 711603834446_u128, "711603834446"sv);
-	std::cout << "End 12 digit decimal literal tests..." << newl;
+	cout << "End 12 digit decimal literal tests..." << newl;
 
-	std::cout << "Begin 13 digit hex literal tests..." << newl;
+	cout << "Begin 13 digit hex literal tests..." << newl;
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "0x6bc793355c212" }), 0x6bc793355c212_u128, "0x6bc793355c212"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "0x01417ade2d35c" }), 0x01417ade2d35c_u128, "0x01417ade2d35c"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "0x45bd83616c624" }), 0x45bd83616c624_u128, "0x45bd83616c624"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "0x929e582ac8cc5" }), 0x929e582ac8cc5_u128, "0x929e582ac8cc5"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "0xd82b11852bbb2" }), 0xd82b11852bbb2_u128, "0xd82b11852bbb2"sv);
-	std::cout << "End 13 digit hex literal tests..." << newl;
+	cout << "End 13 digit hex literal tests..." << newl;
 
-	std::cout << "Begin 13 digit decimal literal tests..." << newl;
+	cout << "Begin 13 digit decimal literal tests..." << newl;
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "5010678957531" }), 5010678957531_u128, "5010678957531"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "5916439284821" }), 5916439284821_u128, "5916439284821"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "6893333363335" }), 6893333363335_u128, "6893333363335"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "9643585652391" }), 9643585652391_u128, "9643585652391"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "5764610944471" }), 5764610944471_u128, "5764610944471"sv);
-	std::cout << "End 13 digit decimal literal tests..." << newl;
+	cout << "End 13 digit decimal literal tests..." << newl;
 
-	std::cout << "Begin 14 digit hex literal tests..." << newl;
+	cout << "Begin 14 digit hex literal tests..." << newl;
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "0x138fcbd6b4d95e" }), 0x138fcbd6b4d95e_u128, "0x138fcbd6b4d95e"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "0xac38afefb692c2" }), 0xac38afefb692c2_u128, "0xac38afefb692c2"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "0x2e144054929eb1" }), 0x2e144054929eb1_u128, "0x2e144054929eb1"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "0xd9a328be93dfef" }), 0xd9a328be93dfef_u128, "0xd9a328be93dfef"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "0xb1f2fc7252b642" }), 0xb1f2fc7252b642_u128, "0xb1f2fc7252b642"sv);
-	std::cout << "End 14 digit hex literal tests..." << newl;
+	cout << "End 14 digit hex literal tests..." << newl;
 
-	std::cout << "Begin 14 digit decimal literal tests..." << newl;
+	cout << "Begin 14 digit decimal literal tests..." << newl;
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "15743401181148" }), 15743401181148_u128, "15743401181148"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "71204038313303" }), 71204038313303_u128, "71204038313303"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "89240585450833" }), 89240585450833_u128, "89240585450833"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "30824121461694" }), 30824121461694_u128, "30824121461694"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "83336589252615" }), 83336589252615_u128, "83336589252615"sv);
-	std::cout << "End 14 digit decimal literal tests..." << newl;
+	cout << "End 14 digit decimal literal tests..." << newl;
 
-	std::cout << "Begin 15 digit hex literal tests..." << newl;
+	cout << "Begin 15 digit hex literal tests..." << newl;
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "0xd5746d5d75feef1" }), 0xd5746d5d75feef1_u128, "0xd5746d5d75feef1"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "0x08e9184343246bc" }), 0x08e9184343246bc_u128, "0x08e9184343246bc"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "0x0df5b96df7199bb" }), 0x0df5b96df7199bb_u128, "0x0df5b96df7199bb"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "0xc532a8c98942b6f" }), 0xc532a8c98942b6f_u128, "0xc532a8c98942b6f"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "0xfa09eaebfa4e8b6" }), 0xfa09eaebfa4e8b6_u128, "0xfa09eaebfa4e8b6"sv);
-	std::cout << "End 15 digit hex literal tests..." << newl;
+	cout << "End 15 digit hex literal tests..." << newl;
 
-	std::cout << "Begin 15 digit decimal literal tests..." << newl;
+	cout << "Begin 15 digit decimal literal tests..." << newl;
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "899143729224474" }), 899143729224474_u128, "899143729224474"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "141194965711942" }), 141194965711942_u128, "141194965711942"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "576143944425034" }), 576143944425034_u128, "576143944425034"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "521346230373490" }), 521346230373490_u128, "521346230373490"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "122570844038145" }), 122570844038145_u128, "122570844038145"sv);
-	std::cout << "End 15 digit decimal literal tests..." << newl;
+	cout << "End 15 digit decimal literal tests..." << newl;
 
-	std::cout << "Begin 16 digit hex literal tests..." << newl;
+	cout << "Begin 16 digit hex literal tests..." << newl;
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "0x09925387c37f9294" }), 0x09925387c37f9294_u128, "0x09925387c37f9294"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "0xb65f979e74922b87" }), 0xb65f979e74922b87_u128, "0xb65f979e74922b87"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "0xc107cc710eac4d79" }), 0xc107cc710eac4d79_u128, "0xc107cc710eac4d79"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "0xf0a09b4043fb36c0" }), 0xf0a09b4043fb36c0_u128, "0xf0a09b4043fb36c0"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "0xabbeccf7bc59cc23" }), 0xabbeccf7bc59cc23_u128, "0xabbeccf7bc59cc23"sv);
-	std::cout << "End 16 digit hex literal tests..." << newl;
+	cout << "End 16 digit hex literal tests..." << newl;
 
-	std::cout << "Begin 16 digit decimal literal tests..." << newl;
+	cout << "Begin 16 digit decimal literal tests..." << newl;
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "6894682934528874" }), 6894682934528874_u128, "6894682934528874"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "2185372000648954" }), 2185372000648954_u128, "2185372000648954"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "9809517029227668" }), 9809517029227668_u128, "9809517029227668"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "6043988758872243" }), 6043988758872243_u128, "6043988758872243"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "2574959293830917" }), 2574959293830917_u128, "2574959293830917"sv);
-	std::cout << "End 16 digit decimal literal tests..." << newl;
+	cout << "End 16 digit decimal literal tests..." << newl;
 
-	std::cout << "Begin 17 digit hex literal tests..." << newl;
+	cout << "Begin 17 digit hex literal tests..." << newl;
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "0x560bff9204c1b9141" }), 0x560bff9204c1b9141_u128, "0x560bff9204c1b9141"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "0x126c6c63885f31f2b" }), 0x126c6c63885f31f2b_u128, "0x126c6c63885f31f2b"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "0xa3490f60036a39b6a" }), 0xa3490f60036a39b6a_u128, "0xa3490f60036a39b6a"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "0x06226fd0e44276bb5" }), 0x06226fd0e44276bb5_u128, "0x06226fd0e44276bb5"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "0x5a44f5d790a3f9ec7" }), 0x5a44f5d790a3f9ec7_u128, "0x5a44f5d790a3f9ec7"sv);
-	std::cout << "End 17 digit hex literal tests..." << newl;
+	cout << "End 17 digit hex literal tests..." << newl;
 
-	std::cout << "Begin 17 digit decimal literal tests..." << newl;
+	cout << "Begin 17 digit decimal literal tests..." << newl;
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "31069982170914479" }), 31069982170914479_u128, "31069982170914479"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "14582690360123422" }), 14582690360123422_u128, "14582690360123422"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "56485144834117324" }), 56485144834117324_u128, "56485144834117324"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "64723502656848771" }), 64723502656848771_u128, "64723502656848771"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "15545599109386577" }), 15545599109386577_u128, "15545599109386577"sv);
-	std::cout << "End 17 digit decimal literal tests..." << newl;
+	cout << "End 17 digit decimal literal tests..." << newl;
 
-	std::cout << "Begin 18 digit hex literal tests..." << newl;
+	cout << "Begin 18 digit hex literal tests..." << newl;
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "0xcb92451ffa219fb0cf" }), 0xcb92451ffa219fb0cf_u128, "0xcb92451ffa219fb0cf"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "0xf78f1640f13ec33dc7" }), 0xf78f1640f13ec33dc7_u128, "0xf78f1640f13ec33dc7"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "0x9bf37ac963796b51aa" }), 0x9bf37ac963796b51aa_u128, "0x9bf37ac963796b51aa"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "0x8966c9a6ac5e65e07b" }), 0x8966c9a6ac5e65e07b_u128, "0x8966c9a6ac5e65e07b"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "0x46e0398b9179675cfe" }), 0x46e0398b9179675cfe_u128, "0x46e0398b9179675cfe"sv);
-	std::cout << "End 18 digit hex literal tests..." << newl;
+	cout << "End 18 digit hex literal tests..." << newl;
 
-	std::cout << "Begin 18 digit decimal literal tests..." << newl;
+	cout << "Begin 18 digit decimal literal tests..." << newl;
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "634320558329735749" }), 634320558329735749_u128, "634320558329735749"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "417855220141871972" }), 417855220141871972_u128, "417855220141871972"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "534290238317387553" }), 534290238317387553_u128, "534290238317387553"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "970998737874495372" }), 970998737874495372_u128, "970998737874495372"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "387869420158849531" }), 387869420158849531_u128, "387869420158849531"sv);
-	std::cout << "End 18 digit decimal literal tests..." << newl;
+	cout << "End 18 digit decimal literal tests..." << newl;
 
-	std::cout << "Begin 19 digit hex literal tests..." << newl;
+	cout << "Begin 19 digit hex literal tests..." << newl;
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "0x99693e264934eae2dd7" }), 0x99693e264934eae2dd7_u128, "0x99693e264934eae2dd7"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "0xb1523b4234be846c860" }), 0xb1523b4234be846c860_u128, "0xb1523b4234be846c860"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "0xcd6898dcb4f8efde777" }), 0xcd6898dcb4f8efde777_u128, "0xcd6898dcb4f8efde777"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "0xf4e3b28a94eacc3348a" }), 0xf4e3b28a94eacc3348a_u128, "0xf4e3b28a94eacc3348a"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "0x8b3378bbc51e868faf7" }), 0x8b3378bbc51e868faf7_u128, "0x8b3378bbc51e868faf7"sv);
-	std::cout << "End 19 digit hex literal tests..." << newl;
+	cout << "End 19 digit hex literal tests..." << newl;
 
-	std::cout << "Begin 19 digit decimal literal tests..." << newl;
+	cout << "Begin 19 digit decimal literal tests..." << newl;
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "7488761567462008154" }), 7488761567462008154_u128, "7488761567462008154"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "9292196408585599067" }), 9292196408585599067_u128, "9292196408585599067"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "5728690975437488562" }), 5728690975437488562_u128, "5728690975437488562"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "5199885297471073614" }), 5199885297471073614_u128, "5199885297471073614"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "5315340657807934018" }), 5315340657807934018_u128, "5315340657807934018"sv);
-	std::cout << "End 19 digit decimal literal tests..." << newl;
+	cout << "End 19 digit decimal literal tests..." << newl;
 
-	std::cout << "Begin 20 digit hex literal tests..." << newl;
+	cout << "Begin 20 digit hex literal tests..." << newl;
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "0x4d53bff4ad7ac93b2b99" }), 0x4d53bff4ad7ac93b2b99_u128, "0x4d53bff4ad7ac93b2b99"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "0xcabe4060bf2f825f718e" }), 0xcabe4060bf2f825f718e_u128, "0xcabe4060bf2f825f718e"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "0x1146b1f820b25191d8af" }), 0x1146b1f820b25191d8af_u128, "0x1146b1f820b25191d8af"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "0x8df7638ab7b3706c1ecd" }), 0x8df7638ab7b3706c1ecd_u128, "0x8df7638ab7b3706c1ecd"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "0x1516b9758df78167e5fa" }), 0x1516b9758df78167e5fa_u128, "0x1516b9758df78167e5fa"sv);
-	std::cout << "End 20 digit hex literal tests..." << newl;
+	cout << "End 20 digit hex literal tests..." << newl;
 
-	std::cout << "Begin 20 digit decimal literal tests..." << newl;
+	cout << "Begin 20 digit decimal literal tests..." << newl;
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "88103549888338422025" }), 88103549888338422025_u128, "88103549888338422025"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "68702126617805365963" }), 68702126617805365963_u128, "68702126617805365963"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "63344348402450333446" }), 63344348402450333446_u128, "63344348402450333446"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "12326989625342666066" }), 12326989625342666066_u128, "12326989625342666066"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "58945895557763372932" }), 58945895557763372932_u128, "58945895557763372932"sv);
-	std::cout << "End 20 digit decimal literal tests..." << newl;
+	cout << "End 20 digit decimal literal tests..." << newl;
 
-	std::cout << "Begin 21 digit hex literal tests..." << newl;
+	cout << "Begin 21 digit hex literal tests..." << newl;
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "0xe1bfbd22d4717ad05259a" }), 0xe1bfbd22d4717ad05259a_u128, "0xe1bfbd22d4717ad05259a"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "0x2dcb4ecf53e7d6f2aa6f7" }), 0x2dcb4ecf53e7d6f2aa6f7_u128, "0x2dcb4ecf53e7d6f2aa6f7"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "0xe6543160acf5395cba866" }), 0xe6543160acf5395cba866_u128, "0xe6543160acf5395cba866"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "0x4baaec3b382b23d09d335" }), 0x4baaec3b382b23d09d335_u128, "0x4baaec3b382b23d09d335"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "0x19e437cca3b5109171512" }), 0x19e437cca3b5109171512_u128, "0x19e437cca3b5109171512"sv);
-	std::cout << "End 21 digit hex literal tests..." << newl;
+	cout << "End 21 digit hex literal tests..." << newl;
 
-	std::cout << "Begin 21 digit decimal literal tests..." << newl;
+	cout << "Begin 21 digit decimal literal tests..." << newl;
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "994186040960193280634" }), 994186040960193280634_u128, "994186040960193280634"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "548371444819620614296" }), 548371444819620614296_u128, "548371444819620614296"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "728001727256220560165" }), 728001727256220560165_u128, "728001727256220560165"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "113052864341767335574" }), 113052864341767335574_u128, "113052864341767335574"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "908809312226596937120" }), 908809312226596937120_u128, "908809312226596937120"sv);
-	std::cout << "End 21 digit decimal literal tests..." << newl;
+	cout << "End 21 digit decimal literal tests..." << newl;
 
-	std::cout << "Begin 22 digit hex literal tests..." << newl;
+	cout << "Begin 22 digit hex literal tests..." << newl;
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "0x74f0e0ceb36c68f1754636" }), 0x74f0e0ceb36c68f1754636_u128, "0x74f0e0ceb36c68f1754636"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "0xd49f81950864a9e27387dc" }), 0xd49f81950864a9e27387dc_u128, "0xd49f81950864a9e27387dc"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "0x27bb9883535d177102f5e0" }), 0x27bb9883535d177102f5e0_u128, "0x27bb9883535d177102f5e0"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "0xe95d022d7c138f006bd066" }), 0xe95d022d7c138f006bd066_u128, "0xe95d022d7c138f006bd066"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "0xee4db8118b360e787362d1" }), 0xee4db8118b360e787362d1_u128, "0xee4db8118b360e787362d1"sv);
-	std::cout << "End 22 digit hex literal tests..." << newl;
+	cout << "End 22 digit hex literal tests..." << newl;
 
-	std::cout << "Begin 22 digit decimal literal tests..." << newl;
+	cout << "Begin 22 digit decimal literal tests..." << newl;
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "7462610915640073872647" }), 7462610915640073872647_u128, "7462610915640073872647"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "9510259020244264999011" }), 9510259020244264999011_u128, "9510259020244264999011"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "6526373392714906107579" }), 6526373392714906107579_u128, "6526373392714906107579"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "9280913339351554966547" }), 9280913339351554966547_u128, "9280913339351554966547"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "7389204218221194685513" }), 7389204218221194685513_u128, "7389204218221194685513"sv);
-	std::cout << "End 22 digit decimal literal tests..." << newl;
+	cout << "End 22 digit decimal literal tests..." << newl;
 
-	std::cout << "Begin 23 digit hex literal tests..." << newl;
+	cout << "Begin 23 digit hex literal tests..." << newl;
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "0x7319ae9a32c39beea4d2b8e" }), 0x7319ae9a32c39beea4d2b8e_u128, "0x7319ae9a32c39beea4d2b8e"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "0x1d3b5638a520dc718e58ffb" }), 0x1d3b5638a520dc718e58ffb_u128, "0x1d3b5638a520dc718e58ffb"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "0xc4282fc3ac0260ac01d22ed" }), 0xc4282fc3ac0260ac01d22ed_u128, "0xc4282fc3ac0260ac01d22ed"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "0x8eb4eaa48eb412024c83e98" }), 0x8eb4eaa48eb412024c83e98_u128, "0x8eb4eaa48eb412024c83e98"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "0xc836d42bf34038465a38a87" }), 0xc836d42bf34038465a38a87_u128, "0xc836d42bf34038465a38a87"sv);
-	std::cout << "End 23 digit hex literal tests..." << newl;
+	cout << "End 23 digit hex literal tests..." << newl;
 
-	std::cout << "Begin 23 digit decimal literal tests..." << newl;
+	cout << "Begin 23 digit decimal literal tests..." << newl;
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "12441301274496335645733" }), 12441301274496335645733_u128, "12441301274496335645733"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "11670309304772857707038" }), 11670309304772857707038_u128, "11670309304772857707038"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "81489474363966142065392" }), 81489474363966142065392_u128, "81489474363966142065392"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "32007160093358686971493" }), 32007160093358686971493_u128, "32007160093358686971493"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "73242488230820464485822" }), 73242488230820464485822_u128, "73242488230820464485822"sv);
-	std::cout << "End 23 digit decimal literal tests..." << newl;
+	cout << "End 23 digit decimal literal tests..." << newl;
 
-	std::cout << "Begin 24 digit hex literal tests..." << newl;
+	cout << "Begin 24 digit hex literal tests..." << newl;
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "0x274365f29c5bca5979733fcd" }), 0x274365f29c5bca5979733fcd_u128, "0x274365f29c5bca5979733fcd"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "0xbf95d106473e4cc1fb8e1792" }), 0xbf95d106473e4cc1fb8e1792_u128, "0xbf95d106473e4cc1fb8e1792"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "0x55e6356d23a818a24b28f7e0" }), 0x55e6356d23a818a24b28f7e0_u128, "0x55e6356d23a818a24b28f7e0"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "0x4c8f88751c893fe07540fa0c" }), 0x4c8f88751c893fe07540fa0c_u128, "0x4c8f88751c893fe07540fa0c"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "0x48f404c60650432ec0b0c03c" }), 0x48f404c60650432ec0b0c03c_u128, "0x48f404c60650432ec0b0c03c"sv);
-	std::cout << "End 24 digit hex literal tests..." << newl;
+	cout << "End 24 digit hex literal tests..." << newl;
 
-	std::cout << "Begin 24 digit decimal literal tests..." << newl;
+	cout << "Begin 24 digit decimal literal tests..." << newl;
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "409909085547757069186596" }), 409909085547757069186596_u128, "409909085547757069186596"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "741617182721104298875048" }), 741617182721104298875048_u128, "741617182721104298875048"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "834614413010799880980977" }), 834614413010799880980977_u128, "834614413010799880980977"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "547499797537311195932087" }), 547499797537311195932087_u128, "547499797537311195932087"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "372886308085665112660059" }), 372886308085665112660059_u128, "372886308085665112660059"sv);
-	std::cout << "End 24 digit decimal literal tests..." << newl;
+	cout << "End 24 digit decimal literal tests..." << newl;
 
-	std::cout << "Begin 25 digit hex literal tests..." << newl;
+	cout << "Begin 25 digit hex literal tests..." << newl;
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "0x1593c3eaecacdb487fa735899" }), 0x1593c3eaecacdb487fa735899_u128, "0x1593c3eaecacdb487fa735899"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "0xf81b77e0ab14f1b9f578b0e13" }), 0xf81b77e0ab14f1b9f578b0e13_u128, "0xf81b77e0ab14f1b9f578b0e13"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "0x35b13684b2ffdd8934beb0ea9" }), 0x35b13684b2ffdd8934beb0ea9_u128, "0x35b13684b2ffdd8934beb0ea9"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "0xec83361f3e70e900d4a901c21" }), 0xec83361f3e70e900d4a901c21_u128, "0xec83361f3e70e900d4a901c21"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "0x548cd44742a19ba1b76a5f950" }), 0x548cd44742a19ba1b76a5f950_u128, "0x548cd44742a19ba1b76a5f950"sv);
-	std::cout << "End 25 digit hex literal tests..." << newl;
+	cout << "End 25 digit hex literal tests..." << newl;
 
-	std::cout << "Begin 25 digit decimal literal tests..." << newl;
+	cout << "Begin 25 digit decimal literal tests..." << newl;
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "9377254784523933187870136" }), 9377254784523933187870136_u128, "9377254784523933187870136"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "6114724258425701920202859" }), 6114724258425701920202859_u128, "6114724258425701920202859"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "6309012230012981936339199" }), 6309012230012981936339199_u128, "6309012230012981936339199"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "3203853433829122773687621" }), 3203853433829122773687621_u128, "3203853433829122773687621"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "5656085179642274678338685" }), 5656085179642274678338685_u128, "5656085179642274678338685"sv);
-	std::cout << "End 25 digit decimal literal tests..." << newl;
+	cout << "End 25 digit decimal literal tests..." << newl;
 
-	std::cout << "Begin 26 digit hex literal tests..." << newl;
+	cout << "Begin 26 digit hex literal tests..." << newl;
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "0x949a4e7b7185291ff551a28e9e" }), 0x949a4e7b7185291ff551a28e9e_u128, "0x949a4e7b7185291ff551a28e9e"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "0xe3489c9d225c8429d2be7e549f" }), 0xe3489c9d225c8429d2be7e549f_u128, "0xe3489c9d225c8429d2be7e549f"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "0x509af6f9d731c151962cf77999" }), 0x509af6f9d731c151962cf77999_u128, "0x509af6f9d731c151962cf77999"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "0xe7c01f7ae2703a2ce841b19de5" }), 0xe7c01f7ae2703a2ce841b19de5_u128, "0xe7c01f7ae2703a2ce841b19de5"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "0xe0d9ce9a58462b9b13a6b8553e" }), 0xe0d9ce9a58462b9b13a6b8553e_u128, "0xe0d9ce9a58462b9b13a6b8553e"sv);
-	std::cout << "End 26 digit hex literal tests..." << newl;
+	cout << "End 26 digit hex literal tests..." << newl;
 
-	std::cout << "Begin 26 digit decimal literal tests..." << newl;
+	cout << "Begin 26 digit decimal literal tests..." << newl;
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "50487514300570755466971541" }), 50487514300570755466971541_u128, "50487514300570755466971541"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "55733877632973150917588851" }), 55733877632973150917588851_u128, "55733877632973150917588851"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "96127995512797197262990390" }), 96127995512797197262990390_u128, "96127995512797197262990390"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "79136460918641922068341211" }), 79136460918641922068341211_u128, "79136460918641922068341211"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "45788616200047977101412244" }), 45788616200047977101412244_u128, "45788616200047977101412244"sv);
-	std::cout << "End 26 digit decimal literal tests..." << newl;
+	cout << "End 26 digit decimal literal tests..." << newl;
 
-	std::cout << "Begin 27 digit hex literal tests..." << newl;
+	cout << "Begin 27 digit hex literal tests..." << newl;
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "0xaf06ebf00c6c2548340c0678030" }), 0xaf06ebf00c6c2548340c0678030_u128, "0xaf06ebf00c6c2548340c0678030"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "0x1b30093897e5399342a9ae7cf91" }), 0x1b30093897e5399342a9ae7cf91_u128, "0x1b30093897e5399342a9ae7cf91"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "0x95802dfeb7924100e8b7a5a42d3" }), 0x95802dfeb7924100e8b7a5a42d3_u128, "0x95802dfeb7924100e8b7a5a42d3"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "0xfe6b76c1607dab4b90573e70062" }), 0xfe6b76c1607dab4b90573e70062_u128, "0xfe6b76c1607dab4b90573e70062"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "0x9dec5ae788c3a21e6250720e8b6" }), 0x9dec5ae788c3a21e6250720e8b6_u128, "0x9dec5ae788c3a21e6250720e8b6"sv);
-	std::cout << "End 27 digit hex literal tests..." << newl;
+	cout << "End 27 digit hex literal tests..." << newl;
 
-	std::cout << "Begin 27 digit decimal literal tests..." << newl;
+	cout << "Begin 27 digit decimal literal tests..." << newl;
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "555408221911463147108790008" }), 555408221911463147108790008_u128, "555408221911463147108790008"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "183159222826764875851354364" }), 183159222826764875851354364_u128, "183159222826764875851354364"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "513141717159055236365766172" }), 513141717159055236365766172_u128, "513141717159055236365766172"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "248062555063247312721930171" }), 248062555063247312721930171_u128, "248062555063247312721930171"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "580018905437049014429124525" }), 580018905437049014429124525_u128, "580018905437049014429124525"sv);
-	std::cout << "End 27 digit decimal literal tests..." << newl;
+	cout << "End 27 digit decimal literal tests..." << newl;
 
-	std::cout << "Begin 28 digit hex literal tests..." << newl;
+	cout << "Begin 28 digit hex literal tests..." << newl;
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "0xb96a2442bc12ef1657b006a1eaf4" }), 0xb96a2442bc12ef1657b006a1eaf4_u128, "0xb96a2442bc12ef1657b006a1eaf4"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "0x1b3776a74457a9a4014483712057" }), 0x1b3776a74457a9a4014483712057_u128, "0x1b3776a74457a9a4014483712057"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "0x57557b5e8078db716cc881f3668e" }), 0x57557b5e8078db716cc881f3668e_u128, "0x57557b5e8078db716cc881f3668e"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "0x31b8a288ffbba12ff4000176c41d" }), 0x31b8a288ffbba12ff4000176c41d_u128, "0x31b8a288ffbba12ff4000176c41d"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "0xcaf98e5fcbd659e035780ac39e5b" }), 0xcaf98e5fcbd659e035780ac39e5b_u128, "0xcaf98e5fcbd659e035780ac39e5b"sv);
-	std::cout << "End 28 digit hex literal tests..." << newl;
+	cout << "End 28 digit hex literal tests..." << newl;
 
-	std::cout << "Begin 28 digit decimal literal tests..." << newl;
+	cout << "Begin 28 digit decimal literal tests..." << newl;
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "5340483565643130671055043100" }), 5340483565643130671055043100_u128, "5340483565643130671055043100"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "9872310643723015677233761160" }), 9872310643723015677233761160_u128, "9872310643723015677233761160"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "4691605661678649177686315717" }), 4691605661678649177686315717_u128, "4691605661678649177686315717"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "8901588280316220976092285548" }), 8901588280316220976092285548_u128, "8901588280316220976092285548"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "5034890168301328917736513614" }), 5034890168301328917736513614_u128, "5034890168301328917736513614"sv);
-	std::cout << "End 28 digit decimal literal tests..." << newl;
+	cout << "End 28 digit decimal literal tests..." << newl;
 
-	std::cout << "Begin 29 digit hex literal tests..." << newl;
+	cout << "Begin 29 digit hex literal tests..." << newl;
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "0x67ee962aa85c3f020349f0b0ff7cb" }), 0x67ee962aa85c3f020349f0b0ff7cb_u128, "0x67ee962aa85c3f020349f0b0ff7cb"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "0x3a7595cb10e64bb02713ff5dacdab" }), 0x3a7595cb10e64bb02713ff5dacdab_u128, "0x3a7595cb10e64bb02713ff5dacdab"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "0xa5df0354c11bb5461993e12e3309a" }), 0xa5df0354c11bb5461993e12e3309a_u128, "0xa5df0354c11bb5461993e12e3309a"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "0x1b2f96ad73e74d0ae74188818bf64" }), 0x1b2f96ad73e74d0ae74188818bf64_u128, "0x1b2f96ad73e74d0ae74188818bf64"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "0xded54fdef3a0ee9e13abaf309d89d" }), 0xded54fdef3a0ee9e13abaf309d89d_u128, "0xded54fdef3a0ee9e13abaf309d89d"sv);
-	std::cout << "End 29 digit hex literal tests..." << newl;
+	cout << "End 29 digit hex literal tests..." << newl;
 
-	std::cout << "Begin 29 digit decimal literal tests..." << newl;
+	cout << "Begin 29 digit decimal literal tests..." << newl;
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "45352839094777993068243294868" }), 45352839094777993068243294868_u128, "45352839094777993068243294868"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "92219620551123172264403502557" }), 92219620551123172264403502557_u128, "92219620551123172264403502557"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "10223169707068171196643105625" }), 10223169707068171196643105625_u128, "10223169707068171196643105625"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "69881121214294085778538857590" }), 69881121214294085778538857590_u128, "69881121214294085778538857590"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "19306925075854883958151467032" }), 19306925075854883958151467032_u128, "19306925075854883958151467032"sv);
-	std::cout << "End 29 digit decimal literal tests..." << newl;
+	cout << "End 29 digit decimal literal tests..." << newl;
 
-	std::cout << "Begin 30 digit hex literal tests..." << newl;
+	cout << "Begin 30 digit hex literal tests..." << newl;
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "0x1166e3e6acc87bbde6e91259d70f66" }), 0x1166e3e6acc87bbde6e91259d70f66_u128, "0x1166e3e6acc87bbde6e91259d70f66"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "0xdd2d150f7598708f8ebdc249c7a785" }), 0xdd2d150f7598708f8ebdc249c7a785_u128, "0xdd2d150f7598708f8ebdc249c7a785"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "0xe2547c3cc4aa68a0f1ff98e8fd66cd" }), 0xe2547c3cc4aa68a0f1ff98e8fd66cd_u128, "0xe2547c3cc4aa68a0f1ff98e8fd66cd"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "0x2a64580b01c0b743765187b5e3c20d" }), 0x2a64580b01c0b743765187b5e3c20d_u128, "0x2a64580b01c0b743765187b5e3c20d"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "0x55eb0ab7f63d6c931662ce9e919e8a" }), 0x55eb0ab7f63d6c931662ce9e919e8a_u128, "0x55eb0ab7f63d6c931662ce9e919e8a"sv);
-	std::cout << "End 30 digit hex literal tests..." << newl;
+	cout << "End 30 digit hex literal tests..." << newl;
 
-	std::cout << "Begin 30 digit decimal literal tests..." << newl;
+	cout << "Begin 30 digit decimal literal tests..." << newl;
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "687760243228157494055674669782" }), 687760243228157494055674669782_u128, "687760243228157494055674669782"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "802402324940527575873192691939" }), 802402324940527575873192691939_u128, "802402324940527575873192691939"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "310785433584936830421779872911" }), 310785433584936830421779872911_u128, "310785433584936830421779872911"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "520050801271555854950350829700" }), 520050801271555854950350829700_u128, "520050801271555854950350829700"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "701061752887740889722342317518" }), 701061752887740889722342317518_u128, "701061752887740889722342317518"sv);
-	std::cout << "End 30 digit decimal literal tests..." << newl;
+	cout << "End 30 digit decimal literal tests..." << newl;
 
-	std::cout << "Begin 31 digit hex literal tests..." << newl;
+	cout << "Begin 31 digit hex literal tests..." << newl;
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "0x79dafc551c3c8ea1fe598e668eb95c3" }), 0x79dafc551c3c8ea1fe598e668eb95c3_u128, "0x79dafc551c3c8ea1fe598e668eb95c3"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "0x1279116d454357dd1b55a70fa9c095d" }), 0x1279116d454357dd1b55a70fa9c095d_u128, "0x1279116d454357dd1b55a70fa9c095d"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "0xd53e9b3898de86ec53a518f9aa8deaa" }), 0xd53e9b3898de86ec53a518f9aa8deaa_u128, "0xd53e9b3898de86ec53a518f9aa8deaa"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "0x09e437573475fefd2849a09cf67f8f0" }), 0x09e437573475fefd2849a09cf67f8f0_u128, "0x09e437573475fefd2849a09cf67f8f0"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "0xbcefb3fc71f3dd03ab62a7f9e30b34c" }), 0xbcefb3fc71f3dd03ab62a7f9e30b34c_u128, "0xbcefb3fc71f3dd03ab62a7f9e30b34c"sv);
-	std::cout << "End 31 digit hex literal tests..." << newl;
+	cout << "End 31 digit hex literal tests..." << newl;
 
-	std::cout << "Begin 31 digit decimal literal tests..." << newl;
+	cout << "Begin 31 digit decimal literal tests..." << newl;
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "3109445587782285157232850251609" }), 3109445587782285157232850251609_u128, "3109445587782285157232850251609"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "2487464038076863230619266272378" }), 2487464038076863230619266272378_u128, "2487464038076863230619266272378"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "2354660307095417264030667492032" }), 2354660307095417264030667492032_u128, "2354660307095417264030667492032"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "7779604928055265487605000602899" }), 7779604928055265487605000602899_u128, "7779604928055265487605000602899"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "8463572621800622535228310288732" }), 8463572621800622535228310288732_u128, "8463572621800622535228310288732"sv);
-	std::cout << "End 31 digit decimal literal tests..." << newl;
+	cout << "End 31 digit decimal literal tests..." << newl;
 
-	std::cout << "Begin 32 digit hex literal tests..." << newl;
+	cout << "Begin 32 digit hex literal tests..." << newl;
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "0xe9451c875fe187ce0032d7b61b9d59e9" }), 0xe9451c875fe187ce0032d7b61b9d59e9_u128, "0xe9451c875fe187ce0032d7b61b9d59e9"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "0xd993e4a95cbe4a7c43a6a3d1ee517194" }), 0xd993e4a95cbe4a7c43a6a3d1ee517194_u128, "0xd993e4a95cbe4a7c43a6a3d1ee517194"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "0x856675107792d9c749ba4dcb1d5ca2be" }), 0x856675107792d9c749ba4dcb1d5ca2be_u128, "0x856675107792d9c749ba4dcb1d5ca2be"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "0xf8a842cb247db35c442a471d402b3864" }), 0xf8a842cb247db35c442a471d402b3864_u128, "0xf8a842cb247db35c442a471d402b3864"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "0xf38daa5ae7818d02d227a2817440c35f" }), 0xf38daa5ae7818d02d227a2817440c35f_u128, "0xf38daa5ae7818d02d227a2817440c35f"sv);
-	std::cout << "End 32 digit hex literal tests..." << newl;
+	cout << "End 32 digit hex literal tests..." << newl;
 
-	std::cout << "Begin 32 digit decimal literal tests..." << newl;
+	cout << "Begin 32 digit decimal literal tests..." << newl;
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "60109703877362215053664934490261" }), 60109703877362215053664934490261_u128, "60109703877362215053664934490261"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "96927727383453023442639088831597" }), 96927727383453023442639088831597_u128, "96927727383453023442639088831597"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "70628480265238664304453412784600" }), 70628480265238664304453412784600_u128, "70628480265238664304453412784600"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "74770308902922250807480071980540" }), 74770308902922250807480071980540_u128, "74770308902922250807480071980540"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "43030408543380403174155045611034" }), 43030408543380403174155045611034_u128, "43030408543380403174155045611034"sv);
-	std::cout << "End 32 digit decimal literal tests..." << newl;
+	cout << "End 32 digit decimal literal tests..." << newl;
 
-	std::cout << "Begin 33 digit decimal literal tests..." << newl;
+	cout << "Begin 33 digit decimal literal tests..." << newl;
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "500075789468993843055168989686367" }), 500075789468993843055168989686367_u128, "500075789468993843055168989686367"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "446206476790895848311038556056171" }), 446206476790895848311038556056171_u128, "446206476790895848311038556056171"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "573159404543773378202145359748632" }), 573159404543773378202145359748632_u128, "573159404543773378202145359748632"sv);
@@ -5008,9 +5386,9 @@ void cjm::uint128_tests::execute_literal_test()
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "282331240550807462543706669044164" }), 282331240550807462543706669044164_u128, "282331240550807462543706669044164"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "616919910029163576668018919156945" }), 616919910029163576668018919156945_u128, "616919910029163576668018919156945"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "381413817121565341004042719227380" }), 381413817121565341004042719227380_u128, "381413817121565341004042719227380"sv);
-	std::cout << "End 33 digit decimal literal tests..." << newl;
+	cout << "End 33 digit decimal literal tests..." << newl;
 
-	std::cout << "Begin 34 digit decimal literal tests..." << newl;
+	cout << "Begin 34 digit decimal literal tests..." << newl;
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "3174927285700513083252925216322802" }), 3174927285700513083252925216322802_u128, "3174927285700513083252925216322802"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "9376018350915097336378554914914498" }), 9376018350915097336378554914914498_u128, "9376018350915097336378554914914498"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "3349603832525919887329855350720780" }), 3349603832525919887329855350720780_u128, "3349603832525919887329855350720780"sv);
@@ -5021,9 +5399,9 @@ void cjm::uint128_tests::execute_literal_test()
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "1608431238830376902779085144221593" }), 1608431238830376902779085144221593_u128, "1608431238830376902779085144221593"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "5850813900654754340991822037321402" }), 5850813900654754340991822037321402_u128, "5850813900654754340991822037321402"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "4633784172695947409659918432138873" }), 4633784172695947409659918432138873_u128, "4633784172695947409659918432138873"sv);
-	std::cout << "End 34 digit decimal literal tests..." << newl;
+	cout << "End 34 digit decimal literal tests..." << newl;
 
-	std::cout << "Begin 35 digit decimal literal tests..." << newl;
+	cout << "Begin 35 digit decimal literal tests..." << newl;
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "17259654675846973731563272432212094" }), 17259654675846973731563272432212094_u128, "17259654675846973731563272432212094"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "96621553725731346202959931798482265" }), 96621553725731346202959931798482265_u128, "96621553725731346202959931798482265"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "60648495012063071058753811029343264" }), 60648495012063071058753811029343264_u128, "60648495012063071058753811029343264"sv);
@@ -5034,9 +5412,9 @@ void cjm::uint128_tests::execute_literal_test()
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "95097923203643201030160438962716452" }), 95097923203643201030160438962716452_u128, "95097923203643201030160438962716452"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "18338353642732329850883637657114044" }), 18338353642732329850883637657114044_u128, "18338353642732329850883637657114044"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "19952022127765064952040784919482782" }), 19952022127765064952040784919482782_u128, "19952022127765064952040784919482782"sv);
-	std::cout << "End 35 digit decimal literal tests..." << newl;
+	cout << "End 35 digit decimal literal tests..." << newl;
 
-	std::cout << "Begin 36 digit decimal literal tests..." << newl;
+	cout << "Begin 36 digit decimal literal tests..." << newl;
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "226072537861963855027010324332781406" }), 226072537861963855027010324332781406_u128, "226072537861963855027010324332781406"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "892029965184704636224052951647163529" }), 892029965184704636224052951647163529_u128, "892029965184704636224052951647163529"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "505673735313684392579935793301913539" }), 505673735313684392579935793301913539_u128, "505673735313684392579935793301913539"sv);
@@ -5047,9 +5425,9 @@ void cjm::uint128_tests::execute_literal_test()
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "196691147152783028117808547927092806" }), 196691147152783028117808547927092806_u128, "196691147152783028117808547927092806"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "776666083014738948301546796265421238" }), 776666083014738948301546796265421238_u128, "776666083014738948301546796265421238"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "577915043121580633598737755095983346" }), 577915043121580633598737755095983346_u128, "577915043121580633598737755095983346"sv);
-	std::cout << "End 36 digit decimal literal tests..." << newl;
+	cout << "End 36 digit decimal literal tests..." << newl;
 
-	std::cout << "Begin 37 digit decimal literal tests..." << newl;
+	cout << "Begin 37 digit decimal literal tests..." << newl;
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "9768304718275935340386999471767116696" }), 9768304718275935340386999471767116696_u128, "9768304718275935340386999471767116696"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "4182401100296040938330311828815699810" }), 4182401100296040938330311828815699810_u128, "4182401100296040938330311828815699810"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "4333742971602265085511171822078019656" }), 4333742971602265085511171822078019656_u128, "4333742971602265085511171822078019656"sv);
@@ -5060,9 +5438,9 @@ void cjm::uint128_tests::execute_literal_test()
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "7291071613207749671121409368273313924" }), 7291071613207749671121409368273313924_u128, "7291071613207749671121409368273313924"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "9733017147267909447007957640081150462" }), 9733017147267909447007957640081150462_u128, "9733017147267909447007957640081150462"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "5570081610655235492714591004576354875" }), 5570081610655235492714591004576354875_u128, "5570081610655235492714591004576354875"sv);
-	std::cout << "End 37 digit decimal literal tests..." << newl;
+	cout << "End 37 digit decimal literal tests..." << newl;
 
-	std::cout << "Begin 38 digit decimal literal tests..." << newl;
+	cout << "Begin 38 digit decimal literal tests..." << newl;
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "93601647113226868556580660006490889575" }), 93601647113226868556580660006490889575_u128, "93601647113226868556580660006490889575"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "53690935288163170969117411637211594848" }), 53690935288163170969117411637211594848_u128, "53690935288163170969117411637211594848"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "32063254837094168053787400753965539765" }), 32063254837094168053787400753965539765_u128, "32063254837094168053787400753965539765"sv);
@@ -5073,9 +5451,9 @@ void cjm::uint128_tests::execute_literal_test()
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "83224560689407622794553953507784305729" }), 83224560689407622794553953507784305729_u128, "83224560689407622794553953507784305729"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "10090718434292515600637655101522700108" }), 10090718434292515600637655101522700108_u128, "10090718434292515600637655101522700108"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "66009911210991920739378434906987259386" }), 66009911210991920739378434906987259386_u128, "66009911210991920739378434906987259386"sv);
-	std::cout << "End 38 digit decimal literal tests..." << newl;
+	cout << "End 38 digit decimal literal tests..." << newl;
 
-	std::cout << "Begin 39 digit decimal literal tests..." << newl;
+	cout << "Begin 39 digit decimal literal tests..." << newl;
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "340185592574115266867233957625061256432" }), 340185592574115266867233957625061256432_u128, "340185592574115266867233957625061256432"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "201761860872477485139816079489830737715" }), 201761860872477485139816079489830737715_u128, "201761860872477485139816079489830737715"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "241768129843747398380848007426742685294" }), 241768129843747398380848007426742685294_u128, "241768129843747398380848007426742685294"sv);
@@ -5086,8 +5464,13 @@ void cjm::uint128_tests::execute_literal_test()
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "246328830188481326098015363584017882931" }), 246328830188481326098015363584017882931_u128, "246328830188481326098015363584017882931"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "115189086700490636927931486807940316249" }), 115189086700490636927931486807940316249_u128, "115189086700490636927931486807940316249"sv);
 	cjm_assert_equal(to_test(ctrl_uint128_t{ "195680483610558517134018811288019513635" }), 195680483610558517134018811288019513635_u128, "195680483610558517134018811288019513635"sv);
-	std::cout << "End 39 digit decimal literal tests..." << newl;
-} 
+	cout << "End 39 digit decimal literal tests..." << newl;
+}
+
+const cjm::uint128_tests::test_func_lookup_t& cjm::uint128_tests::get_test_func_lookup() noexcept
+{
+	return test_func_lookup;
+}
 
 std::basic_ostream<char>& cjm::uint128_tests::operator<<(std::basic_ostream<char>& os, lit_type v)
 {
@@ -5254,7 +5637,7 @@ std::vector<std::string> cjm::uint128_tests::generate_literal_tests()
 	using namespace cjm::numerics::uint128_literals;
 	using namespace boost::multiprecision::literals;
 	
-	vec.emplace_back("\tstd::cout << \"Beginning single digit hex literal tests...\";\n");
+	vec.emplace_back("\tcout << \"Beginning single digit hex literal tests...\";\n");
 	vec.emplace_back("\tcjm_assert_equal(to_test(ctrl_uint128_t{0x0}), 0x0_u128, \"0x0\"sv);\n");
 	vec.emplace_back("\tcjm_assert_equal(to_test(ctrl_uint128_t{0x1}), 0x1_u128, \"0x1\"sv);\n");
 	vec.emplace_back("\tcjm_assert_equal(to_test(ctrl_uint128_t{0x2}), 0x2_u128, \"0x2\"sv);\n");
@@ -5271,9 +5654,9 @@ std::vector<std::string> cjm::uint128_tests::generate_literal_tests()
 	vec.emplace_back("\tcjm_assert_equal(to_test(ctrl_uint128_t{0xd}), 0xd_u128, \"0xd\"sv);\n");
 	vec.emplace_back("\tcjm_assert_equal(to_test(ctrl_uint128_t{0xe}), 0xe_u128, \"0xe\"sv);\n");
 	vec.emplace_back("\tcjm_assert_equal(to_test(ctrl_uint128_t{0xf}), 0xf_u128, \"0xf\"sv);\n");
-	vec.emplace_back("\tstd::cout << \"End single digit hex literal tests...\";\n\n");
+	vec.emplace_back("\tcout << \"End single digit hex literal tests...\";\n\n");
 
-	vec.emplace_back("\tstd::cout << \"Begin single digit decimal literal tests...\";\n");
+	vec.emplace_back("\tcout << \"Begin single digit decimal literal tests...\";\n");
 	vec.emplace_back("\tcjm_assert_equal(to_test(ctrl_uint128_t{0), 0_u128, \"0\"sv);\n");
 	vec.emplace_back("\tcjm_assert_equal(to_test(ctrl_uint128_t{1}), 1_u128, \"1\"sv);\n");
 	vec.emplace_back("\tcjm_assert_equal(to_test(ctrl_uint128_t{2}), 2_u128, \"2\"sv);\n");
@@ -5284,14 +5667,14 @@ std::vector<std::string> cjm::uint128_tests::generate_literal_tests()
 	vec.emplace_back("\tcjm_assert_equal(to_test(ctrl_uint128_t{7}), 7_u128, \"7\"sv);\n");
 	vec.emplace_back("\tcjm_assert_equal(to_test(ctrl_uint128_t{8}), 8_u128, \"8\"sv);\n");
 	vec.emplace_back("\tcjm_assert_equal(to_test(ctrl_uint128_t{9}), 9_u128, \"9\"sv);\n");
-	vec.emplace_back("\tstd::cout << \"End single digit decimal literal tests...\";\n\n");
+	vec.emplace_back("\tcout << \"End single digit decimal literal tests...\";\n\n");
 
 	auto get_entry_exit_line = [](size_t num, bool entry, bool hex) -> std::string
 	{
 		std::string_view hex_or_dec = hex ? "hex"sv : "decimal"sv;
 		std::string_view begin_end = entry ? "Begin"sv : "End"sv;
 		auto strm = string::make_throwing_sstream<char>();
-		strm << "\tstd::cout << \"" << begin_end << " " << num << " digit " << hex_or_dec << " literal tests...\" << newl;\n";
+		strm << "\tcout << \"" << begin_end << " " << num << " digit " << hex_or_dec << " literal tests...\" << newl;\n";
 		return strm.str();
 	};
 	auto rgen = generator::rgen{};
@@ -5332,39 +5715,37 @@ std::vector<std::string> cjm::uint128_tests::generate_literal_tests()
 	return vec;
 }
 
-void cjm::uint128_tests::generate_then_print_literal_tests()
+void cjm::uint128_tests::generate_then_print_literal_tests(std::basic_ostream<char>& cout)
 {
-	std::cout << "Generating literal tests." << newl;
+	cout << "Generating literal tests." << newl;
 	auto vec = generate_literal_tests();
-	std::cout << "Literal tests generated and will be printed ...." << newl;
+	cout << "Literal tests generated and will be printed ...." << newl;
 
 	for (const auto& str : vec)
 	{
-		std::cout << str;
+		cout << str;
 	}
-	std::cout << newl << newl << "Done printing generated literal tests." << newl; 
+	cout << newl << newl << "Done printing generated literal tests." << newl; 
 }
 
 
 #ifdef CJM_HAVE_BUILTIN_128
-void cjm::uint128_tests::execute_builtin_u128fls_test_if_avail()
+void cjm::uint128_tests::execute_builtin_u128fls_test_if_avail([[maybe_unused]] std::basic_ostream<char>& cout, [[maybe_unused]] std::basic_ostream<char>& cerr)
 {
 	static_assert(cjm::numerics::concepts::can_find_most_significant_set_bitpos<unsigned __int128>);
 	unsigned __int128 x = 3;
 	auto most_sign_bit = cjm::numerics::most_sign_set_bit(x);
-	std::cout << "Test for 3 yields bitpos: [" << most_sign_bit << "]." << newl;
+	cout << "Test for 3 yields bitpos: [" << most_sign_bit << "]." << newl;
 	cjm_assert(most_sign_bit == 1);
 	x <<= 120;
 	most_sign_bit = cjm::numerics::most_sign_set_bit(x);
-	std::cout << "Test for (3 << 120) yields: [" << most_sign_bit << "]." << newl;
+	cout << "Test for (3 << 120) yields: [" << most_sign_bit << "]." << newl;
 	cjm_assert(most_sign_bit == 121);
 
 }
 #else
-void cjm::uint128_tests::execute_builtin_u128fls_test_if_avail()
+void cjm::uint128_tests::execute_builtin_u128fls_test_if_avail([[maybe_unused]] std::basic_ostream<char>& cout, [[maybe_unused]] std::basic_ostream<char>& cerr)
 {
-	std::cout << "Will not test builtin_u128_fls because not available in this environment." << newl;
+	cout << "Will not test builtin_u128_fls because not available in this environment." << newl;
 }
-
-
 #endif

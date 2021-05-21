@@ -41,6 +41,7 @@
 #include <cjm/numerics/numerics.hpp>
 #include <cjm/numerics/cjm_numeric_concepts.hpp>
 #include <cjm/string/istream_utils.hpp>
+#include <variant>
 namespace cjm::uint128_tests::switches
 {
 	class test_switch;
@@ -61,7 +62,7 @@ namespace cjm::uint128_tests::switches
 	using sv_t = std::string_view;
 	using str_t = std::string;
 	using test_mode_underlying_t = std::uint16_t;
-	constexpr std::array<sv_t, 3> switch_tokens = {"--"sv,"-"sv,"/"sv };
+	[[maybe_unused]] constexpr std::array switch_tokens = {"--"sv,"-"sv,"/"sv };
 	enum class test_mode : test_mode_underlying_t;
 	constexpr test_mode operator|(test_mode lhs, test_mode rhs) noexcept;
 	constexpr test_mode operator&(test_mode lhs, test_mode rhs) noexcept;
@@ -74,7 +75,6 @@ namespace cjm::uint128_tests::switches
 	constexpr std::optional<bool> needs_parameter(test_mode individual_flag) noexcept;
 	constexpr std::optional<bool> should_not_have_parameter(test_mode individual_flag) noexcept;
 	constexpr bool is_unspecified_or_combo_of_known_flags(test_mode mode) noexcept;
-	constexpr std::optional<std::string_view> get_text_for_flag_combo(test_mode mode) noexcept;
 	constexpr std::optional<std::string_view> get_text_for_indiv_flag(test_mode mode) noexcept;
 	std::string get_text_any_mode(test_mode mode);
 	std::pair<std::string, std::vector<std::string>> normalize_and_stringify_console_args(int argc, char* argv[]);
@@ -90,28 +90,52 @@ namespace cjm::uint128_tests::switches
 		execute_unary_from_file = 0x01,
 		execute_binary_from_file = 0x02,
 		print_environ_info = 0x04,
-		run_default_tests = 0x08
+		run_default_tests = 0x08,
+		list_tests = 0x10,
+		run_specific_test = 0x20,
+		help = 0x40
 	};
 	using text_mode_t = std::pair<sv_t, test_mode>;
-
 	constexpr bool is_single_specified_flag(test_mode mode) noexcept;
-	constexpr size_t num_specified_flags = 4;
-	constexpr auto individual_specified_flags = std::array<test_mode, num_specified_flags>
+	
+	constexpr auto individual_specified_flags = std::array
 	{
 		test_mode::execute_unary_from_file,
 		test_mode::execute_binary_from_file,
 		test_mode::print_environ_info,
-		test_mode::run_default_tests
+		test_mode::run_default_tests,
+		test_mode::list_tests,
+		test_mode::run_specific_test,
+		test_mode::help 
 	};
-	constexpr auto text_mode_lookup = std::array<text_mode_t, num_specified_flags>
+	constexpr auto text_mode_lookup = std::array
 	{
 		std::make_pair("unary_from_file"sv, test_mode::execute_unary_from_file),
 		std::make_pair("binary_from_file"sv, test_mode::execute_binary_from_file),
 		std::make_pair("environ"sv, test_mode::print_environ_info),
-		std::make_pair("default_tests"sv, test_mode::run_default_tests)
+		std::make_pair("default_tests"sv, test_mode::run_default_tests),
+		std::make_pair("list"sv, test_mode::list_tests),
+		std::make_pair("specific_test"sv, test_mode::run_specific_test),
+		std::make_pair("help"sv, test_mode::help)
 	};
-	constexpr auto flags_requiring_parameter = std::array<test_mode, 2>{test_mode::execute_unary_from_file,
-		test_mode::execute_binary_from_file};
+
+	constexpr auto switch_detail_lookup = std::array
+	{
+		std::make_pair(text_mode_lookup.at(0), "Execute unary operations tests as specified in unary operations text file."sv),
+		std::make_pair(text_mode_lookup.at(1), "Execute binary operations tests as binary in unary operations text file."sv),
+		std::make_pair(text_mode_lookup.at(2), "Print environmental information."sv),
+		std::make_pair(text_mode_lookup.at(3), "Run all tests in default battery, logging summary of result to standard output and detail to a log file."sv),
+		std::make_pair(text_mode_lookup.at(4), "List all tests in the default battery."sv),
+		std::make_pair(text_mode_lookup.at(5), "Run the specified test from the default battery."sv),
+		std::make_pair(text_mode_lookup.at(6), "Print this information."sv)
+	};
+
+	std::string get_usage_examples_all_modes();
+	std::stringstream& append_usage_example(std::stringstream& ss, test_mode mode);
+	std::string get_usage_example(test_mode mode);
+	
+	constexpr auto flags_requiring_parameter = std::array{test_mode::execute_unary_from_file,
+		test_mode::execute_binary_from_file, test_mode::run_specific_test};
 	std::weak_ordering operator<=>(const test_switch& lhs, const test_switch& rhs) noexcept;
 
 	bool starts_with_switch_token(sv_t text) noexcept;
@@ -123,7 +147,8 @@ namespace cjm::uint128_tests::switches
 		using path_t = std::filesystem::path;
 		[[nodiscard]] test_mode mode() const noexcept;
 		[[nodiscard]] size_t hash_code() const noexcept;
-		[[nodiscard]] const std::optional<std::filesystem::path>& file_path() const noexcept;
+		[[nodiscard]] std::optional<std::filesystem::path> file_path() const noexcept;
+		[[nodiscard]] std::string_view test_name() const noexcept;
 
 		test_switch();
 		test_switch(test_mode mode, std::optional<std::string> parameter);
@@ -152,7 +177,7 @@ namespace cjm::uint128_tests::switches
 
 	public:
 		explicit unrecognized_switch(sv_t unknown_switch_text);
-		~unrecognized_switch() override = default;
+		
 	private:
 		explicit unrecognized_switch(const std::string& arg);
 		static std::string create_message(std::string_view unrecognized_switch_text);
@@ -317,83 +342,25 @@ constexpr std::optional<bool> cjm::uint128_tests::switches::should_not_have_para
 constexpr bool cjm::uint128_tests::switches::is_unspecified_or_combo_of_known_flags(test_mode mode) noexcept
 {
 	if (mode == test_mode::unspecified) return true;
-
-	constexpr auto inverse_mask = ~(test_mode::print_environ_info | test_mode::run_default_tests | test_mode::execute_binary_from_file | test_mode::execute_unary_from_file);
+	test_mode ret = test_mode::unspecified;
+	for (size_t i = 1; i < individual_specified_flags.size(); ++i)
+	{
+		ret |= individual_specified_flags[i];
+	}
+	const auto inverse_mask = ~ret;
 	return  (mode & inverse_mask) == test_mode::unspecified;	
 }
 
-#ifdef CJM_DETECTED_GCC
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wswitch"
-#endif
-constexpr std::optional<std::string_view> cjm::uint128_tests::switches::get_text_for_flag_combo(test_mode mode) noexcept
+ constexpr std::optional<std::string_view> cjm::uint128_tests::switches::
+	get_text_for_indiv_flag(test_mode mode) noexcept
 {
 	using namespace std::string_view_literals;
-	if (!is_unspecified_or_combo_of_known_flags(mode)) return std::nullopt;
-	switch (mode)
+	for (const auto& pair : text_mode_lookup)
 	{
-	case test_mode::unspecified: 
-		return "unspecified"sv;		
-	case test_mode::execute_unary_from_file:
-		return "execute_unary_from_file"sv;
-	case test_mode::execute_binary_from_file: 
-		return "execute_binary_from_file"sv;
-	case test_mode::print_environ_info:
-		return "print_environ_info"sv;
-	case test_mode::run_default_tests:
-			return "run_default_tests"sv;
-		// ReSharper disable CppRedundantParentheses
-	case (test_mode::execute_unary_from_file | test_mode::execute_binary_from_file | test_mode::print_environ_info | test_mode::run_default_tests):
-		return "execute_unary_from_file | execute_binary_from_file | print_environ_info | run_default_tests"sv;
-	case (test_mode::execute_unary_from_file | test_mode::execute_binary_from_file | test_mode::print_environ_info ):
-		return "execute_unary_from_file | execute_binary_from_file | print_environ_info"sv;
-	case (test_mode::execute_unary_from_file | test_mode::execute_binary_from_file |  test_mode::run_default_tests):
-		return "execute_unary_from_file | execute_binary_from_file | run_default_tests"sv;
-	case (test_mode::execute_unary_from_file | test_mode::print_environ_info | test_mode::run_default_tests):
-		return "test_mode::execute_unary_from_file | test_mode::print_environ_info | test_mode::run_default_tests"sv;
-	case (test_mode::execute_unary_from_file | test_mode::execute_binary_from_file):
-		return "test_mode::execute_unary_from_file | test_mode::execute_binary_from_file"sv;
-	case (test_mode::execute_unary_from_file | test_mode::print_environ_info):
-		return "test_mode::execute_unary_from_file | test_mode::print_environ_info"sv;
-	case (test_mode::execute_unary_from_file | test_mode::run_default_tests):
-		return "test_mode::execute_unary_from_file | test_mode::run_default_tests"sv;
-	case (test_mode::execute_binary_from_file | test_mode::print_environ_info | test_mode::run_default_tests):
-		return "test_mode::execute_binary_from_file | test_mode::print_environ_info | test_mode::run_default_tests"sv;
-	case (test_mode::execute_binary_from_file | test_mode::print_environ_info):
-		return "test_mode::execute_binary_from_file | test_mode::print_environ_info"sv;
-	case (test_mode::execute_binary_from_file | test_mode::run_default_tests):
-		return "test_mode::execute_binary_from_file | test_mode::run_default_tests"sv;
-	case (test_mode::print_environ_info | test_mode::run_default_tests):
-		return "test_mode::print_environ_info | test_mode::run_default_tests"sv;
-	default: 
-		return std::nullopt;
-		// ReSharper restore CppRedundantParentheses
+		if (pair.second == mode)
+			return pair.first;
 	}
-}
-#ifdef CJM_DETECTED_GCC
-#pragma GCC diagnostic pop
-#endif
-
-constexpr std::optional<std::string_view> cjm::uint128_tests::switches::
-get_text_for_indiv_flag(test_mode mode) noexcept
-{
-	using namespace std::string_view_literals;
-	if (mode != test_mode::unspecified && !is_single_specified_flag(mode)) return std::nullopt;
-	switch (mode)
-	{
-	case test_mode::unspecified: 
-		return "unspecified"sv;
-	case test_mode::execute_unary_from_file:
-		return "execute_unary_from_file"sv;		
-	case test_mode::execute_binary_from_file: 
-		return "execute_binary_from_file"sv;	
-	case test_mode::print_environ_info: 
-		return "print_environ_info"sv;		
-	case test_mode::run_default_tests:
-		return "run_default_tests"sv;		
-	default:  // NOLINT(clang-diagnostic-covered-switch-default) 
-		return std::nullopt;//better than undefined behavior....
-	}
+	return std::nullopt;
 }
 
 

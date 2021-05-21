@@ -57,14 +57,34 @@
 #include <absl/numeric/int128.h>
 #include <cjm/numerics/fixed_uint_container_math.hpp>
 #include "umult.hpp"
-
+#include "output_guard.hpp"
+#include<functional>
+#include <fstream>
+#include <map>
+#include <thread>
 namespace cjm::uint128_tests::generator
 {
 	class rgen;
 }
 
+
+
 namespace cjm::uint128_tests
 {
+	template<typename Invocable>
+	concept invocable = requires (Invocable i)
+	{
+		{i()} -> std::convertible_to<void>;
+	};
+
+	template<typename TFunctionLike>
+	concept test_invocable = std::convertible_to<TFunctionLike, std::function<void(std::basic_ostream<char>&, std::basic_ostream<char>&)>> &&
+		requires (TFunctionLike & func_like, std::basic_ostream<char>&cout, std::basic_ostream<char>&cerr)
+	{
+		{func_like(cout, cerr)} -> std::convertible_to<void>;
+	};
+	
+	
 	using ctrl_uint128_t = boost::multiprecision::uint128_t;
 	using alt_ctrl_uint128_t = absl::uint128;
 	using uint128_t = numerics::uint128;
@@ -74,7 +94,6 @@ namespace cjm::uint128_tests
 	using namespace std::string_view_literals;
 	using testing::cjm_assert;
 	using testing::cjm_deny;
-	using std::cout;
 	constexpr auto newl = '\n';
 	using cout_saver = boost::io::ios_flags_saver;
 	using switches::test_switch;
@@ -88,12 +107,9 @@ namespace cjm::uint128_tests
 	class bad_unary_op;
 	class divmod_fail_match;
 
-	template<typename Invocable>
-	concept invocable = requires (Invocable i)
-	{
-		{i()} -> std::convertible_to<void>;
-	};
-	
+	constexpr auto multithread_test_demo_tests = std::array{ "addition_tests"sv, "hash_dx"sv, "issue_10_strm_insrt_test"sv,"binary_operation_rt_ser_tests"sv, "unary_operation_vec_rt_serialization_tests"sv, "division_modulus_tests"sv };
+
+
 	template<typename TestTypeUi, typename ControlTypeUi>
 	concept test_uint_and_control_set =
 		cjm::numerics::concepts::cjm_unsigned_integer<TestTypeUi> &&
@@ -101,12 +117,12 @@ namespace cjm::uint128_tests
 		std::numeric_limits<TestTypeUi>::digits ==
 		std::numeric_limits<ControlTypeUi>::digits;
 
-	template<typename TestType = uint128_t , typename ControlType = ctrl_uint128_t>
-		requires (test_uint_and_control_set<TestType, ControlType>)
-	struct binary_operation;
+	template<typename TestType = uint128_t, typename ControlType = ctrl_uint128_t>
+	requires (test_uint_and_control_set<TestType, ControlType>)
+		struct binary_operation;
 	template<typename TestType, typename ControlType>
-		requires (test_uint_and_control_set<TestType, ControlType>)
-	struct unary_operation;
+	requires (test_uint_and_control_set<TestType, ControlType>)
+		struct unary_operation;
 	using binary_op_u128_t = binary_operation<uint128_t, ctrl_uint128_t>;
 	using binary_op_u128_vect_t = std::vector<binary_op_u128_t>;
 	using unary_op_u128_t = unary_operation<uint128_t, ctrl_uint128_t>;
@@ -117,120 +133,144 @@ namespace cjm::uint128_tests
 	/// </summary>
 	/// <param name="op">the result</param>
 	void validate_divmod_op(const binary_op_u128_t& op);
-		
-	template<invocable Invocable>
+
+	template<test_invocable Invocable>
 	void execute_test(Invocable test, std::string_view test_name);
+
 	alt_ctrl_uint128_t to_alt_ctrl(uint128_t convert) noexcept;
 	uint128_t to_test(alt_ctrl_uint128_t convert) noexcept;
 	ctrl_uint128_t to_ctrl(uint128_t convert);
 	uint128_t to_test(const ctrl_uint128_t& convert);
 
-	void print_environ_data();
-	void print_sizes();
-	void print_alignments();
-	void print_floating_point_info();
+	std::shared_ptr<cjm::testing::output_guard::dedicated_output> get_dedicated();
+
+	void execute_specified_tests(std::span<std::string_view> tests, unsigned max_threads = 0);
 	
+	void print_environ_data(std::basic_ostream<char>& cout, std::basic_ostream<char>& cerr);
+	void print_sizes(std::basic_ostream<char>& cout, std::basic_ostream<char>& cerr);
+	void print_alignments(std::basic_ostream<char>& cout, std::basic_ostream<char>& cerr);
+	void print_floating_point_info(std::basic_ostream<char>& cout, std::basic_ostream<char>& cerr);
+
+	void print_available_tests(std::basic_ostream<char>& cout, std::basic_ostream<char>& cerr);
+	void execute_uint128_tests_threaded();
 	void execute_uint128_tests();
 	constexpr size_t pow_2_arr_size = 63;
 	constexpr std::array<std::uint64_t, pow_2_arr_size> get_pow2_arr();
 	constexpr std::array<int, pow_2_arr_size> get_pow2_res_arr();
-	[[maybe_unused]] void save_random_unary_ops_to_file(std::filesystem::path target);
-	[[maybe_unused]] void save_random_binary_ops_to_file(std::filesystem::path target);
-	void execute_test_switch(const test_switch& test_switch);
-	void execute_unary_test_file(const std::filesystem::path& file);
-	void execute_binary_test_file(const std::filesystem::path& file);
+	[[maybe_unused]] void save_random_unary_ops_to_file(std::filesystem::path target,
+		std::basic_ostream<char>& cout, std::basic_ostream<char>& cerr);
+	[[maybe_unused]] void save_random_binary_ops_to_file(std::filesystem::path target,
+		std::basic_ostream<char>& cout, std::basic_ostream<char>& cerr);
+	void execute_help(std::basic_ostream<char>& cout, std::basic_ostream<char>& cerr);
+	void execute_specified_test(std::string_view test_name, std::basic_ostream<char>& cout, std::basic_ostream<char>& cerr);
+	void execute_unary_test_file(const std::filesystem::path& file, std::basic_ostream<char>& cout, std::basic_ostream<char>& cerr);
+	void execute_binary_test_file(const std::filesystem::path& file, std::basic_ostream<char>& cout, std::basic_ostream<char>& cerr);
 	void run_test_application(std::span<test_switch> switches);
-	void execute_binary_operation_rt_ser_tests();
-	void execute_trim_tests();
-	void execute_ascii_char_interconversions();
-	void execute_div_mod_zero_dividend_nonzero_divisor_tests();
-	void execute_div_mod_by_zero_tests();
-	void execute_basic_test_one();
-	void execute_string_parse_test();
-	void execute_basic_multiplication_test();
-	void test_fls();
-	void print_uint128_eval_mode();
-	void print_constexpr_bitcast_available();
-	void print_cpp20_bitops_available();
-	void print_builtin_uint128_data_if_present();
-	void print_whether_has_consteval();
-	void test_interconversion(const ctrl_uint128_t& control, uint128_t test);
-	void execute_builtin_u128fls_test_if_avail();
-	void execute_first_bin_op_test();
-	void execute_gen_comp_ops_test();
-	void execute_stream_insert_bin_op_test();
-	void execute_print_generated_filename_test();
-	void execute_generate_addition_ops_rt_ser_deser_test();
-	void execute_addition_tests();
-	void execute_subtraction_tests();
-	void execute_shift_tests();
-	void execute_bw_tests();
-	void execute_comparison_tests();
-	void execute_multiplication_tests();
-	void execute_failing_division_test_1();
-	void execute_failing_division_test_2();
-	void execute_failing_modulus_test_1();
-	void execute_division_modulus_tests();
-	void execute_unary_op_code_rt_serialization_tests();
-	void execute_unary_operation_rt_serialization_tests();
-	void execute_unary_operation_vec_rt_serialization_tests();
-	void execute_unary_op_basic_test();
-	void execute_parse_file_test(std::string_view path, size_t expected_ops);
-	void execute_unary_op_post_stat_assert_test();
-	void execute_test_convert_to_float();
-	void execute_test_convert_to_double();
-	void execute_test_convert_to_long_double();
-	void execute_throwing_float_conversion_test();
-	void execute_safe_float_conversions_test();
-	void execute_controlled_from_float_conversion_test();
-	void execute_controlled_float_rt_conversion_test();
-		
-	void execute_hash_dx();
-	void execute_issue_10_strm_insrt_test();
-	void execute_issue_10_showbase_test();
+	void execute_binary_operation_rt_ser_tests(std::basic_ostream<char>& cout, std::basic_ostream<char>& cerr);
+	void execute_trim_tests(std::basic_ostream<char>& cout, std::basic_ostream<char>& cerr);
+	void execute_ascii_char_interconversions(std::basic_ostream<char>& cout, std::basic_ostream<char>& cerr);
+	void execute_div_mod_zero_dividend_nonzero_divisor_tests(std::basic_ostream<char>& cout, std::basic_ostream<char>& cerr);
+	void execute_div_mod_by_zero_tests(std::basic_ostream<char>& cout, std::basic_ostream<char>& cerr);
+	void execute_basic_test_one(std::basic_ostream<char>& cout, std::basic_ostream<char>& cerr);
+	void execute_string_parse_test(std::basic_ostream<char>& cout, std::basic_ostream<char>& cerr);
+	void execute_basic_multiplication_test(std::basic_ostream<char>& cout, std::basic_ostream<char>& cerr);
+	void test_fls(std::basic_ostream<char>& cout, std::basic_ostream<char>& cerr);
+	void print_uint128_eval_mode(std::basic_ostream<char>& cout, std::basic_ostream<char>& cerr);
+	void print_constexpr_bitcast_available(std::basic_ostream<char>& cout, std::basic_ostream<char>& cerr);
+	void print_cpp20_bitops_available(std::basic_ostream<char>& cout, std::basic_ostream<char>& cerr);
+	void print_builtin_uint128_data_if_present(std::basic_ostream<char>& cout, std::basic_ostream<char>& cerr);
+	void print_whether_has_consteval(std::basic_ostream<char>& cout, std::basic_ostream<char>& cerr);
+	void test_interconversion(const ctrl_uint128_t& control, uint128_t test, std::basic_ostream<char>& cout, std::basic_ostream<char>& cerr);
+	void execute_builtin_u128fls_test_if_avail(std::basic_ostream<char>& cout, std::basic_ostream<char>& cerr);
+	void execute_first_bin_op_test(std::basic_ostream<char>& cout, std::basic_ostream<char>& cerr);
+	void execute_gen_comp_ops_test(std::basic_ostream<char>& cout, std::basic_ostream<char>& cerr);
+	void execute_stream_insert_bin_op_test(std::basic_ostream<char>& cout, std::basic_ostream<char>& cerr);
+	void execute_print_generated_filename_test(std::basic_ostream<char>& cout, std::basic_ostream<char>& cerr);
+	void execute_generate_addition_ops_rt_ser_deser_test(std::basic_ostream<char>& cout, std::basic_ostream<char>& cerr);
+	void execute_addition_tests(std::basic_ostream<char>& cout, std::basic_ostream<char>& cerr);
+	void execute_subtraction_tests(std::basic_ostream<char>& cout, std::basic_ostream<char>& cerr);
+	void execute_shift_tests(std::basic_ostream<char>& cout, std::basic_ostream<char>& cerr);
+	void execute_bw_tests(std::basic_ostream<char>& cout, std::basic_ostream<char>& cerr);
+	void execute_comparison_tests(std::basic_ostream<char>& cout, std::basic_ostream<char>& cerr);
+	void execute_multiplication_tests(std::basic_ostream<char>& cout, std::basic_ostream<char>& cerr);
+	void execute_failing_division_test_1(std::basic_ostream<char>& cout, std::basic_ostream<char>& cerr);
+	void execute_failing_division_test_2(std::basic_ostream<char>& cout, std::basic_ostream<char>& cerr);
+	void execute_failing_modulus_test_1(std::basic_ostream<char>& cout, std::basic_ostream<char>& cerr);
+	void execute_division_modulus_tests(std::basic_ostream<char>& cout, std::basic_ostream<char>& cerr);
+	void execute_unary_op_code_rt_serialization_tests(std::basic_ostream<char>& cout, std::basic_ostream<char>& cerr);
+	void execute_unary_operation_rt_serialization_tests(std::basic_ostream<char>& cout, std::basic_ostream<char>& cerr);
+	void execute_unary_operation_vec_rt_serialization_tests(std::basic_ostream<char>& cout, std::basic_ostream<char>& cerr);
+	void execute_unary_op_basic_test(std::basic_ostream<char>& cout, std::basic_ostream<char>& cerr);
+	void execute_parse_file_test(std::string_view path, size_t expected_ops, std::basic_ostream<char>& cout, std::basic_ostream<char>& cerr);
+	void execute_unary_op_post_stat_assert_test(std::basic_ostream<char>& cout, std::basic_ostream<char>& cerr);
+	void execute_test_convert_to_float(std::basic_ostream<char>& cout, std::basic_ostream<char>& cerr);
+	void execute_test_convert_to_double(std::basic_ostream<char>& cout, std::basic_ostream<char>& cerr);
+	void execute_test_convert_to_long_double(std::basic_ostream<char>& cout, std::basic_ostream<char>& cerr);
+	void execute_throwing_float_conversion_test(std::basic_ostream<char>& cout, std::basic_ostream<char>& cerr);
+	void execute_safe_float_conversions_test(std::basic_ostream<char>& cout, std::basic_ostream<char>& cerr);
+	void execute_controlled_from_float_conversion_test(std::basic_ostream<char>& cout, std::basic_ostream<char>& cerr);
+	void execute_controlled_float_rt_conversion_test(std::basic_ostream<char>& cout, std::basic_ostream<char>& cerr);
+
+	void execute_hash_dx(std::basic_ostream<char>& cout, std::basic_ostream<char>& cerr);
+	void execute_issue_10_strm_insrt_test(std::basic_ostream<char>& cout, std::basic_ostream<char>& cerr);
+	void execute_issue_10_showbase_test(std::basic_ostream<char>& cout, std::basic_ostream<char>& cerr);
+
+	void execute_unary_op_pre_inc_test(std::basic_ostream<char>& cout, std::basic_ostream<char>& cerr);
+	void execute_unary_op_post_inc_test(std::basic_ostream<char>& cout, std::basic_ostream<char>& cerr);
+	void execute_unary_op_pre_dec_test(std::basic_ostream<char>& cout, std::basic_ostream<char>& cerr);
+	void execute_unary_op_post_dec_test(std::basic_ostream<char>& cout, std::basic_ostream<char>& cerr);
+	void execute_unary_op_unary_plus_test(std::basic_ostream<char>& cout, std::basic_ostream<char>& cerr);
+
+	void execute_unary_op_unary_minus_test(std::basic_ostream<char>& cout, std::basic_ostream<char>& cerr);
+	void execute_unary_op_bitwise_not_test(std::basic_ostream<char>& cout, std::basic_ostream<char>& cerr);
+	void execute_unary_op_bool_cast_test(std::basic_ostream<char>& cout, std::basic_ostream<char>& cerr);
+	void execute_unary_op_logical_negation_test(std::basic_ostream<char>& cout, std::basic_ostream<char>& cerr);
+
+	void execute_builtin_add_with_carry_test(std::basic_ostream<char>& cout, std::basic_ostream<char>& cerr);
+	void execute_basic_u128_adc_test(std::basic_ostream<char>& cout, std::basic_ostream<char>& cerr);
+	void execute_basic_u128_sbb_test(std::basic_ostream<char>& cout, std::basic_ostream<char>& cerr);
+	void execute_builtin_sub_with_borrow_test(std::basic_ostream<char>& cout, std::basic_ostream<char>& cerr);
+
+	void execute_umult_spec_tests(std::basic_ostream<char>& cout, std::basic_ostream<char>& cerr);
+	void execute_uintcontainer_adc_tests(std::basic_ostream<char>& cout, std::basic_ostream<char>& cerr);
+
+	void execute_issue27_bug_test(std::basic_ostream<char>& cout, std::basic_ostream<char>& cerr);
+	void execute_literal_test(std::basic_ostream<char>& cout, std::basic_ostream<char>& cerr);
+
+	using test_func_t = std::add_const_t<decltype(&execute_literal_test)>;
+	//static_assert(test_invocable<test_func_t>);
+	using test_func_lookup_t = std::map<std::string_view, test_func_t, cjm::string::case_ignoring_trimmed_ordinal_less<char>>;
+
+	const test_func_lookup_t& get_test_func_lookup() noexcept;
+
 	
-	void execute_unary_op_pre_inc_test();
-	void execute_unary_op_post_inc_test();
-	void execute_unary_op_pre_dec_test();
-	void execute_unary_op_post_dec_test();
-	void execute_unary_op_unary_plus_test();
-
-	void execute_unary_op_unary_minus_test();
-	void execute_unary_op_bitwise_not_test();
-	void execute_unary_op_bool_cast_test();
-	void execute_unary_op_logical_negation_test();
-
-	void execute_builtin_add_with_carry_test();
-	void execute_basic_u128_adc_test();
-	void execute_basic_u128_sbb_test();
-	void execute_builtin_sub_with_borrow_test();
-
-	void execute_umult_spec_tests();
-	void execute_uintcontainer_adc_tests();
-
-	void execute_issue27_bug_test();
-	void execute_literal_test();
-
 	std::basic_ostream<char>& operator<<(std::basic_ostream<char>&, lit_type v);
-	
+
 	std::pair<ctrl_uint128_t, std::string> create_random_dec_n_digits_long(size_t decimal_digits, generator::rgen& gen);
 	std::pair<ctrl_uint128_t, std::string> create_random_hex_n_digits_long(size_t hex_digits, generator::rgen& gen);
 	std::string generate_literal_test(lit_type literal_type, size_t num_digits, generator::rgen& gen);
 	std::vector<std::string> generate_literal_tests();
-	void generate_then_print_literal_tests();
-	
-	[[maybe_unused]] void print_n_static_assertions(const binary_op_u128_vect_t& op_vec, size_t n);
-	[[maybe_unused]] void print_n_static_assertions(const unary_op_u128_vect_t& op_vec, size_t n);
+	void generate_then_print_literal_tests(std::basic_ostream<char>& cout);
+
+	[[maybe_unused]] void print_n_static_assertions(const binary_op_u128_vect_t& op_vec, size_t n,
+		std::basic_ostream<char>& cout, std::basic_ostream<char>& cerr);
+	[[maybe_unused]] void print_n_static_assertions(const unary_op_u128_vect_t& op_vec, size_t n, 
+		std::basic_ostream<char>& cout, std::basic_ostream<char>& cerr);
+	constexpr auto base_test_battery_res_filename = "base_test_battery_results"sv;
 	constexpr auto base_un_op_filename = "unary_ops"sv;
 	constexpr auto base_bin_op_filename = "binary_ops"sv;
 	constexpr auto op_failed_test_tag = "failed_test"sv;
 	constexpr auto op_generated_tag = "generated"sv;
 	constexpr auto op_extension = "txt"sv;
+
+	
+	
+	std::filesystem::path create_test_battery_results_filename();
 	std::filesystem::path create_generated_op_filename(binary_op op);
 	std::filesystem::path create_failing_op_pathname(binary_op op);
 	std::filesystem::path create_generated_op_filename(unary_op op);
 	std::filesystem::path create_failing_op_pathname(unary_op op);
-	
+
 	template<numerics::concepts::character Char>
 	std::basic_ostream<Char, std::char_traits<Char>>& operator<<(std::basic_ostream<Char,
 		std::char_traits<Char>>&os, const binary_op_u128_t& op);
@@ -254,7 +294,7 @@ namespace cjm::uint128_tests
 	template<numerics::concepts::character Char>
 	std::basic_istream<Char, std::char_traits<Char>>& operator>>(std::basic_istream<Char,
 		std::char_traits<Char>>&is, unary_op_u128_t& op);
-	
+
 	template<numerics::concepts::character Char>
 	std::basic_ostream<Char, std::char_traits<Char>>& operator<<(std::basic_ostream<Char,
 		std::char_traits<Char>>&os, const unary_op_u128_vect_t& op);
@@ -262,7 +302,7 @@ namespace cjm::uint128_tests
 	template<numerics::concepts::character Char>
 	std::basic_istream<Char, std::char_traits<Char>>& operator>>(std::basic_istream<Char,
 		std::char_traits<Char>>&is, unary_op_u128_vect_t& op);
-	
+
 	template<numerics::concepts::character Char>
 	binary_op_u128_t parse(std::basic_string_view<Char> sv);
 
@@ -271,19 +311,19 @@ namespace cjm::uint128_tests
 
 	unary_op_u128_vect_t generate_random_standard_test_ops();
 	unary_op_u128_vect_t generate_post_inc_dec_ops(size_t num_ops_each_type, bool include_standard_tests);
-	unary_op_u128_vect_t generate_specified_un_ops(unary_op op_code, size_t num_rnd_ops, 
+	unary_op_u128_vect_t generate_specified_un_ops(unary_op op_code, size_t num_rnd_ops,
 		bool include_standard_tests);
-	
-	binary_op_u128_vect_t generate_easy_ops(size_t num_ops, binary_op op, bool include_standard_tests);
-	binary_op_u128_vect_t generate_shift_ops(size_t num_ops, bool include_standard_tests);
-	binary_op_u128_vect_t generate_bw_ops(size_t num_ops, bool include_standard_tests);
-	binary_op_u128_vect_t generate_mult_ops(size_t num_each_range, bool include_standard_tests);
-	binary_op_u128_vect_t generate_divmod_ops(size_t num_each_range, bool include_standard_tests);
-	void insert_standard_divmod_ops(binary_op_u128_vect_t& op_vec);
-	
 
-	void test_binary_operation(binary_op_u128_t& op, std::string_view test_name);
-	void test_unary_operation(unary_op_u128_t& op, std::string_view test_name);
+	binary_op_u128_vect_t generate_easy_ops(size_t num_ops, binary_op op, bool include_standard_tests, std::basic_ostream<char>& cerr);
+	binary_op_u128_vect_t generate_shift_ops(size_t num_ops, bool include_standard_tests, std::basic_ostream<char>& cerr);
+	binary_op_u128_vect_t generate_bw_ops(size_t num_ops, bool include_standard_tests, std::basic_ostream<char>& cerr);
+	binary_op_u128_vect_t generate_mult_ops(size_t num_each_range, bool include_standard_tests, std::basic_ostream<char>& cerr);
+	binary_op_u128_vect_t generate_divmod_ops(size_t num_each_range, bool include_standard_tests, std::basic_ostream<char>& cerr);
+	void insert_standard_divmod_ops(binary_op_u128_vect_t& op_vec);
+
+
+	void test_binary_operation(binary_op_u128_t& op, std::string_view test_name, std::basic_ostream<char>& cout, std::basic_ostream<char>& cerr);
+	void test_unary_operation(unary_op_u128_t& op, std::string_view test_name, std::basic_ostream<char>& cout, std::basic_ostream<char>& cerr);
 	namespace u128_testing_constant_providers
 	{
 		namespace concepts
@@ -291,9 +331,9 @@ namespace cjm::uint128_tests
 			//Must be a cjm_unsigned_integer or a built-in, unsigned integer that is no larger than 64 bits.
 			template<typename T>
 			concept supports_testing_constant_provider =
-			//EITHER: (integer AND unsigned AND size <= 64)
+				//EITHER: (integer AND unsigned AND size <= 64)
 				(std::numeric_limits<T>::is_integer && !std::numeric_limits<T>::is_signed && std::is_fundamental_v<T> &&
-				sizeof(T) <= sizeof(std::uint64_t)) || cjm::numerics::concepts::cjm_unsigned_integer<T>;
+					sizeof(T) <= sizeof(std::uint64_t)) || cjm::numerics::concepts::cjm_unsigned_integer<T>;
 		}
 
 		template<concepts::supports_testing_constant_provider T>
@@ -306,9 +346,9 @@ namespace cjm::uint128_tests
 			using half_uint_t = std::uint8_t;
 
 			static constexpr full_uint_t maximum = std::numeric_limits<full_uint_t>::max();
-			static constexpr full_uint_t max_less_one = maximum - full_uint_t{1};
+			static constexpr full_uint_t max_less_one = maximum - full_uint_t{ 1 };
 			static constexpr full_uint_t zero = std::numeric_limits<full_uint_t>::min();
-			static constexpr full_uint_t one = zero + full_uint_t{1};
+			static constexpr full_uint_t one = zero + full_uint_t{ 1 };
 			static constexpr full_uint_t maximum_half = std::numeric_limits<half_uint_t>::max() >> (std::numeric_limits<half_uint_t>::digits / 2);
 			static constexpr full_uint_t maximum_half_less_one = maximum_half - 1;
 			static constexpr full_uint_t maximum_half_plus_one = maximum_half + 1;
@@ -328,9 +368,9 @@ namespace cjm::uint128_tests
 			using half_uint_t = std::uint8_t;
 
 			static constexpr full_uint_t maximum = std::numeric_limits<full_uint_t>::max();
-			static constexpr full_uint_t max_less_one = maximum - full_uint_t{1};
+			static constexpr full_uint_t max_less_one = maximum - full_uint_t{ 1 };
 			static constexpr full_uint_t zero = std::numeric_limits<full_uint_t>::min();
-			static constexpr full_uint_t one = zero + full_uint_t{1};
+			static constexpr full_uint_t one = zero + full_uint_t{ 1 };
 			static constexpr full_uint_t maximum_half = std::numeric_limits<half_uint_t>::max();
 			static constexpr full_uint_t maximum_half_less_one = maximum_half - 1;
 			static constexpr full_uint_t maximum_half_plus_one = maximum_half + 1;
@@ -349,9 +389,9 @@ namespace cjm::uint128_tests
 			using half_uint_t = std::uint16_t;
 
 			static constexpr full_uint_t maximum = std::numeric_limits<full_uint_t>::max();
-			static constexpr full_uint_t max_less_one = maximum - full_uint_t{1};
+			static constexpr full_uint_t max_less_one = maximum - full_uint_t{ 1 };
 			static constexpr full_uint_t zero = std::numeric_limits<full_uint_t>::min();
-			static constexpr full_uint_t one = zero + full_uint_t{1};
+			static constexpr full_uint_t one = zero + full_uint_t{ 1 };
 			static constexpr full_uint_t maximum_half = std::numeric_limits<half_uint_t>::max();
 			static constexpr full_uint_t maximum_half_less_one = maximum_half - 1;
 			static constexpr full_uint_t maximum_half_plus_one = maximum_half + 1;
@@ -370,9 +410,9 @@ namespace cjm::uint128_tests
 			using half_uint_t = std::uint32_t;
 
 			static constexpr full_uint_t maximum = std::numeric_limits<full_uint_t>::max();
-			static constexpr full_uint_t max_less_one = maximum - full_uint_t{1};
+			static constexpr full_uint_t max_less_one = maximum - full_uint_t{ 1 };
 			static constexpr full_uint_t zero = std::numeric_limits<full_uint_t>::min();
-			static constexpr full_uint_t one = zero + full_uint_t{1};
+			static constexpr full_uint_t one = zero + full_uint_t{ 1 };
 			static constexpr full_uint_t maximum_half = std::numeric_limits<half_uint_t>::max();
 			static constexpr full_uint_t maximum_half_less_one = maximum_half - 1;
 			static constexpr full_uint_t maximum_half_plus_one = maximum_half + 1;
@@ -391,25 +431,25 @@ namespace cjm::uint128_tests
 			using half_uint_t = typename T::int_part;
 			static constexpr size_t full_digits = std::numeric_limits<full_uint_t>::digits;
 			static constexpr size_t half_digits = std::numeric_limits<half_uint_t>::digits;
-				  	
+
 			static constexpr full_uint_t maximum = std::numeric_limits<full_uint_t>::max();
-			static constexpr full_uint_t max_less_one = maximum - full_uint_t{1};
+			static constexpr full_uint_t max_less_one = maximum - full_uint_t{ 1 };
 			static constexpr full_uint_t zero = std::numeric_limits<full_uint_t>::min();
-			static constexpr full_uint_t one = zero + full_uint_t{1};
+			static constexpr full_uint_t one = zero + full_uint_t{ 1 };
 			static constexpr full_uint_t signed_version_min_bit_pattern_full = 1_u128 << (full_digits - 1);
 			static constexpr full_uint_t signed_version_min_bit_pattern_half = half_uint_t{ 1 } << (half_digits - 1);
 			static constexpr full_uint_t maximum_half = std::numeric_limits<half_uint_t>::max();
-			static constexpr full_uint_t maximum_half_less_one = maximum_half -1;
+			static constexpr full_uint_t maximum_half_less_one = maximum_half - 1;
 			static constexpr full_uint_t maximum_half_plus_one = maximum_half + 1;
 
-			static constexpr std::array<full_uint_t, 9> all_values = 
+			static constexpr std::array<full_uint_t, 9> all_values =
 			{
 				maximum, max_less_one, zero,
 				one, signed_version_min_bit_pattern_full,
 				signed_version_min_bit_pattern_half, maximum_half,
 				max_less_one, maximum_half_plus_one
 			};
-			
+
 			using half_provider_t = testing_constant_provider<half_uint_t>;
 		};
 	}
@@ -427,28 +467,34 @@ namespace cjm::uint128_tests
 		auto first_res = dec_me--;
 		return std::make_pair(first_res, dec_me);
 	}
-	
-	template<invocable Invocable>
+
+	template<test_invocable Invocable>
 	void execute_test(Invocable test, std::string_view test_name)
 	{
+		auto ptr = get_dedicated();
+
+		auto cout = ptr->cout_proxy();
+		auto cerr = ptr->cerr_proxy();
+
 		cout_saver o_saver{ cout };
-		cout_saver e_saver{ std::cerr };
+		cout_saver e_saver{ cerr };
 
 		cout << "Beginning test: [" << test_name << "]:" << newl;
 		try
 		{
-			test();
+			test(cout, cerr);
 			cout << "Test [" << test_name << "] PASSED" << newl << newl;
 		}
 		catch (const std::exception& ex)
 		{
 			std::stringstream ss;
 			ss << "Test [" << test_name << "] failed with exception message: [" << ex.what() << "]." << newl;
-			std::cerr << ss.str();
+			cerr << ss.str();
 			throw;
 		}
 	}
 
+	
 	[[maybe_unused]] void compile_time_addition_test() noexcept;
 	[[maybe_unused]] void compile_time_shift_test() noexcept;
 	[[maybe_unused]] void compile_time_bw_test() noexcept;
@@ -465,6 +511,81 @@ namespace cjm::uint128_tests
 	[[maybe_unused]] void compile_time_unary_op_bitwise_not_test() noexcept;
 	[[maybe_unused]] void compile_time_unary_op_bool_cast_test() noexcept;
 	[[maybe_unused]] void compile_time_unary_op_logical_negation_test() noexcept;
+
+	constexpr auto all_the_tests = std::array
+	{
+		std::make_pair<test_func_t, std::string_view>(&execute_literal_test, "literal_test"sv),
+		std::make_pair<test_func_t, std::string_view>(&execute_basic_test_one, "basic_test_one"sv),
+		std::make_pair<test_func_t, std::string_view>(&execute_binary_operation_rt_ser_tests, "binary_operation_rt_ser_tests"sv),
+		std::make_pair<test_func_t, std::string_view>(&execute_print_generated_filename_test, "print_generated_filename_test"sv),
+		std::make_pair<test_func_t, std::string_view>(&execute_string_parse_test, "string_parse_text"sv),
+
+		std::make_pair<test_func_t, std::string_view>(&execute_basic_multiplication_test, "basic_multiplication_test"sv),
+		std::make_pair<test_func_t, std::string_view>(&test_fls, "test_fls"sv),
+		std::make_pair<test_func_t, std::string_view>(&execute_builtin_u128fls_test_if_avail, "builtin_u128fls_test_if_avail"sv),
+		std::make_pair<test_func_t, std::string_view>(&execute_first_bin_op_test, "first_bin_op_test"sv),
+		std::make_pair<test_func_t, std::string_view>(&execute_div_mod_by_zero_tests, "div_mod_zero_tests"sv),
+
+		std::make_pair<test_func_t, std::string_view>(&execute_div_mod_zero_dividend_nonzero_divisor_tests, "div_mod_zero_dividend_nonzero_divisor_tests"sv),
+		std::make_pair<test_func_t, std::string_view>(&execute_gen_comp_ops_test, "gen_comp_ops_test"sv),
+		std::make_pair<test_func_t, std::string_view>(&execute_ascii_char_interconversions, "ascii_char_interconversions"sv),
+		std::make_pair<test_func_t, std::string_view>(&execute_trim_tests, "trim_tests"sv),
+		std::make_pair<test_func_t, std::string_view>(&execute_stream_insert_bin_op_test, "stream_insert_bin_op_test"sv),
+
+		std::make_pair<test_func_t, std::string_view>(&execute_addition_tests, "addition_tests"sv),
+		std::make_pair<test_func_t, std::string_view>(&execute_shift_tests, "shift_tests"sv),
+		std::make_pair<test_func_t, std::string_view>(&execute_bw_tests, "bw_tests"sv),
+		std::make_pair<test_func_t, std::string_view>(&execute_subtraction_tests, "subtraction_tests"sv),
+		std::make_pair<test_func_t, std::string_view>(&execute_comparison_tests, "comparison_tests"sv),
+
+		std::make_pair<test_func_t, std::string_view>(&execute_multiplication_tests, "multiplication_tests"sv),
+		std::make_pair<test_func_t, std::string_view>(&execute_failing_division_test_1, "failing_division_test_1"sv),
+		std::make_pair<test_func_t, std::string_view>(&execute_failing_division_test_2, "failing_division_test_2"sv),
+		std::make_pair<test_func_t, std::string_view>(&execute_failing_modulus_test_1, "failing_modulus_test_1"sv),
+		std::make_pair<test_func_t, std::string_view>(&execute_division_modulus_tests, "division_modulus_tests"sv),
+
+		std::make_pair<test_func_t, std::string_view>(&execute_unary_op_code_rt_serialization_tests, "unary_op_code_rt_serialization_tests"sv),
+		std::make_pair<test_func_t, std::string_view>(&execute_unary_op_basic_test, "unary_op_basic_test"sv),
+		std::make_pair<test_func_t, std::string_view>(&execute_unary_op_post_stat_assert_test, "unary_op_post_stat_assert_test"sv),
+		std::make_pair<test_func_t, std::string_view>(&execute_unary_operation_rt_serialization_tests, "unary_operation_rt_serialization_tests"sv),
+		std::make_pair<test_func_t, std::string_view>(&execute_unary_operation_vec_rt_serialization_tests, "unary_operation_vec_rt_serialization_tests"sv),
+
+		std::make_pair<test_func_t, std::string_view>(&execute_unary_op_post_inc_test, "unary_op_post_inc_test"sv),
+		std::make_pair<test_func_t, std::string_view>(&execute_unary_op_pre_inc_test, "unary_op_pre_inc_test"sv),
+		std::make_pair<test_func_t, std::string_view>(&execute_unary_op_pre_dec_test, "unary_op_pre_dec_test"sv),
+		std::make_pair<test_func_t, std::string_view>(&execute_unary_op_post_dec_test, "unary_op_post_dec_test"sv),
+		std::make_pair<test_func_t, std::string_view>(&execute_unary_op_unary_plus_test, "unary_op_unary_plus_test"sv),
+
+		std::make_pair<test_func_t, std::string_view>(&execute_unary_op_unary_minus_test, "unary_op_unary_minus_test"sv),
+		std::make_pair<test_func_t, std::string_view>(&execute_unary_op_bitwise_not_test, "unary_op_bitwise_not_test"sv),
+		std::make_pair<test_func_t, std::string_view>(&execute_unary_op_bool_cast_test, "unary_op_bool_cast_test"sv),
+		std::make_pair<test_func_t, std::string_view>(&execute_unary_op_logical_negation_test, "unary_op_logical_negation_test"sv),
+
+
+		std::make_pair<test_func_t, std::string_view>(&execute_test_convert_to_float, "test_convert_to_float"sv),
+		std::make_pair<test_func_t, std::string_view>(&execute_test_convert_to_double, "test_convert_to_double"sv),
+		std::make_pair<test_func_t, std::string_view>(&execute_test_convert_to_long_double, "test_convert_to_long_double"sv),
+
+
+		std::make_pair<test_func_t, std::string_view>(&execute_throwing_float_conversion_test, "throwing_float_conversion_test"sv),
+		std::make_pair<test_func_t, std::string_view>(&execute_safe_float_conversions_test, "safe_float_conversions_test"sv),
+
+		std::make_pair<test_func_t, std::string_view>(&execute_controlled_from_float_conversion_test, "controlled_from_float_conversion_test"sv),
+		std::make_pair<test_func_t, std::string_view>(&execute_controlled_float_rt_conversion_test, "controlled_float_rt_conversion_test"sv),
+
+		std::make_pair<test_func_t, std::string_view>(&execute_issue_10_strm_insrt_test, "issue_10_strm_insrt_test"sv),
+		std::make_pair<test_func_t, std::string_view>(&execute_issue_10_showbase_test, "issue_10_showbase_test"sv),
+		std::make_pair<test_func_t, std::string_view>(&execute_hash_dx, "hash_dx"sv),
+
+		std::make_pair<test_func_t, std::string_view>(&execute_builtin_add_with_carry_test, "builtin_add_with_carry_test"sv),
+		std::make_pair<test_func_t, std::string_view>(&execute_basic_u128_adc_test, "basic_u128_adc_test"sv),
+		std::make_pair<test_func_t, std::string_view>(&execute_basic_u128_sbb_test, "basic_u128_sbb_test"sv),
+		std::make_pair<test_func_t, std::string_view>(&execute_builtin_sub_with_borrow_test, "builtin_sub_with_borrow_test"sv),
+
+		std::make_pair<test_func_t, std::string_view>(&execute_umult_spec_tests, "umult_spec_tests"sv),
+		std::make_pair<test_func_t, std::string_view>(&execute_uintcontainer_adc_tests, "uintcontainer_adc_tests"sv),
+	};
+	
 }
 
 namespace std

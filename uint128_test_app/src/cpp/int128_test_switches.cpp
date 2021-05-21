@@ -17,7 +17,7 @@
 // For information about copyright and licensing of the original work of others,
 // see Notices file in cjm/ folder.
 #include "int128_test_switches.hpp"
-
+#include <sstream>
 #include <cassert>
 #include <boost/algorithm/string.hpp>
 
@@ -27,11 +27,33 @@ namespace cjm::uint128_tests::switches
 
 	sv_t strip_switch_token(sv_t text);
 
+	using switch_variant_t = std::variant<std::filesystem::path, std::string, std::monostate>;
+	
 	struct test_switch::test_switch_impl final
 	{
 		friend class test_switch;
 
-		[[nodiscard]] const std::optional<std::filesystem::path>& file_path() const noexcept { return m_parameter; }
+		[[nodiscard]] std::optional<std::filesystem::path> file_path() const noexcept
+		{
+			if (m_mode != test_mode::run_specific_test)
+			{
+				if (m_parameter.index() == 0)
+					return std::make_optional(std::get<0>(m_parameter));
+				return std::nullopt;
+			}
+			return std::nullopt;
+		}
+
+		[[nodiscard]] std::string_view test_name() const noexcept
+		{
+			std::string_view ret;
+			if (m_mode == test_mode::run_specific_test && m_parameter.index() == 1)
+			{
+				ret = std::get<1>(m_parameter);
+			}
+			return ret;
+		}
+		
 		[[nodiscard]] test_mode mode() const noexcept { return m_mode; }
 		test_switch_impl(std::string param, test_mode mode);
 		test_switch_impl();
@@ -41,7 +63,7 @@ namespace cjm::uint128_tests::switches
 		test_switch_impl& operator=(test_switch_impl&& other) noexcept = default;
 		~test_switch_impl() = default;
 	private:
-		std::optional<std::filesystem::path> m_parameter;
+		switch_variant_t m_parameter;
 		test_mode m_mode;
 	};
 }
@@ -66,19 +88,24 @@ namespace
 			return std::nullopt;
 		}
 	}
-	std::optional<std::filesystem::path> create_path_if_needed(cjm::uint128_tests::switches::test_mode mode, std::string_view text)
+
+	cjm::uint128_tests::switches::switch_variant_t create_param_member_if_needed(cjm::uint128_tests::switches::test_mode mode, std::string_view text)
 	{
 		if (mode == cjm::uint128_tests::switches::test_mode::execute_binary_from_file 
 			|| mode == cjm::uint128_tests::switches::test_mode::execute_unary_from_file)
 		{
-			return create_path(text);
+			return create_path(text).value_or(std::string{});
 		}
-		return std::nullopt;
+		if (mode == cjm::uint128_tests::switches::test_mode::run_specific_test)
+		{
+			return cjm::uint128_tests::switches::switch_variant_t{ std::string{text} };
+		}
+		return cjm::uint128_tests::switches::switch_variant_t{ std::monostate{} };
 	}
 }
 
 cjm::uint128_tests::switches::test_switch::test_switch_impl::test_switch_impl(std::string param, test_mode mode)
-	: m_parameter{create_path_if_needed(mode, param)}, m_mode{mode}
+	: m_parameter{create_param_member_if_needed(mode, param)}, m_mode{mode}
 {
 	using namespace std::string_view_literals;
 	sv_t view = param;
@@ -89,25 +116,47 @@ cjm::uint128_tests::switches::test_switch::test_switch_impl::test_switch_impl(st
 	else
 	{
 		auto needs_param = needs_parameter(mode).value();
-		if (needs_param && (!m_parameter.has_value() || !exists(m_parameter.value())))
+		if (needs_param)
 		{
-			if (!m_parameter.has_value())
+			if (m_mode == test_mode::run_specific_test)
 			{
-				throw bad_test_switch{ mode, "Mode requires file parameter but none supplied"sv, view };
+				if (auto ptr = std::get_if<std::string>(&m_parameter))
+				{
+					if (ptr->empty())
+					{
+						throw bad_test_switch{mode, "Mode requires specification of a test name, but none was supplied." };
+					}
+				}
+				else
+				{
+					throw bad_test_switch{ mode, "Mode requires specification of a test name, but none was supplied." };
+				}
 			}
-			auto msg = cjm::string::make_throwing_sstream<char>();
-			msg 
-				<< "Mode requires file parameter referring to existing file.  Referenced file [" 
-				<< m_parameter.value() << "] does not exist.";
-			std::string msg_str = msg.str();
-			throw bad_test_switch(mode, msg_str, param);
-		}
-		
-		if (!needs_param && m_parameter.has_value())
-		{
-			throw bad_test_switch{ mode, "The supplied switch does not take a parameter, but one was supplied."sv, view };
-		}
-		
+			else if (m_mode == test_mode::execute_binary_from_file || m_mode == test_mode::execute_unary_from_file)
+			{
+				if (auto ptr = std::get_if<std::filesystem::path>(&m_parameter))
+				{
+					if (ptr->empty())
+					{
+						throw bad_test_switch{ mode, "Mode requires specification of a file, but none was supplied." };
+					}
+					if (!exists(*ptr))
+					{
+						std::basic_stringstream<char> msg = cjm::string::make_throwing_sstream<char>();
+						msg
+							<< "Mode requires file parameter referring to existing file.  Referenced file ["
+							<< *ptr << "] does not exist.";
+						std::string txt = string::move_extract_string<std::stringstream>(std::move(msg));
+						std::string_view str_view = txt;
+						throw bad_test_switch(mode, str_view, param);
+					}
+				}
+				else
+				{
+					throw bad_test_switch{ mode, "Mode requires specification of a test name, but none was supplied." };
+				}
+			}
+		}		
 	}
 }
 
@@ -116,16 +165,16 @@ cjm::uint128_tests::switches::test_switch::test_switch_impl::test_switch_impl()
 
 std::string cjm::uint128_tests::switches::get_text_any_mode(test_mode mode)
 {
-	auto known_text = get_text_for_flag_combo(mode);
-	if (known_text.has_value())
+	if (auto text = get_text_for_indiv_flag(mode); text.has_value())
 	{
-		return std::string{ known_text.value() };
+		return std::string{ *text };
 	}
+	
 	auto str = cjm::string::make_throwing_sstream<char>();
 	constexpr size_t digits = std::numeric_limits<test_mode_underlying_t>::digits;
 	constexpr size_t width = digits / 4;
 	static_assert(width >= 1, "Unexpected width for underlying type of test_mode enum class.");
-	str		<< "Unrecognized test switch has bit pattern: [0x" << std::hex << std::setw(width)
+	str << "Unrecognized test switch has bit pattern: [0x" << std::hex << std::setw(width)
 		<< std::setfill('0') << static_cast<test_mode_underlying_t>(mode) << "].";
 	return str.str();
 }
@@ -146,10 +195,8 @@ std::pair<std::string, std::vector<std::string>> cjm::uint128_tests::switches::n
 		for (auto* it = argv + 1; it != argv + argc; ++it)
 		{
 			std::string temp = *it;
-			temp = cjm::string::trim(std::move(temp));
-			ret.push_back(std::move(temp));
-		}
-		
+			 ret.emplace_back(string::trim(std::move(temp)));
+		}		
 	}
 	return std::make_pair(current_exec, ret);
 }
@@ -171,12 +218,18 @@ size_t cjm::uint128_tests::switches::test_switch::hash_code() const noexcept
 	return seed;	
 }
 
-const std::optional<std::filesystem::path>& cjm::uint128_tests::switches::test_switch::file_path() const noexcept
+std::optional<std::filesystem::path> cjm::uint128_tests::switches::test_switch::file_path() const noexcept
 {
 	return m_impl->file_path();
 }
+
+std::string_view cjm::uint128_tests::switches::test_switch::test_name() const noexcept
+{
+	return m_impl->test_name();
+}
+
 cjm::uint128_tests::switches::test_switch::test_switch(cjm::uint128_tests::switches::test_mode mode,
-	std::optional<std::string> parameter) : m_impl{}
+                                                       std::optional<std::string> parameter) : m_impl{}
 {
 	using namespace std::string_literals;
 	m_impl = std::make_unique<test_switch_impl>(parameter.value_or(""s), mode);
@@ -428,8 +481,56 @@ std::string cjm::uint128_tests::switches::bad_test_switch::create_message(test_m
 	return strm.str();
 }
 
+std::string cjm::uint128_tests::switches::get_usage_examples_all_modes()
+{
+	auto stream = string::make_throwing_sstream<char>();
+	stream << "Usage examples for all switches: " << newl;
+	for (const auto& itm : individual_specified_flags)
+	{
+		append_usage_example(stream, itm);
+	}
+	stream << "DONE with usage examples." << newl << newl;
+	return string::move_extract_string(std::move(stream));
+}
+
+std::stringstream& cjm::uint128_tests::switches::append_usage_example(std::stringstream& ss, test_mode mode)
+{
+	const auto mode_text = get_text_for_indiv_flag(mode).value_or("Unknown Mode"sv);
+
+	switch (mode)
+	{
+	default:
+	case test_mode::unspecified:
+		ss << "switch [" << mode_text << "] is not recognized." << newl;
+		break;
+	case test_mode::execute_unary_from_file:
+		ss << "--" << mode_text << " \t\t\t my_unary_operations_file.txt" << newl;
+		break;
+	case test_mode::execute_binary_from_file:
+		ss << "--" << mode_text << " \t\t\t my_binary_operations_file.txt" << newl;
+		break;
+	case test_mode::run_specific_test:
+		ss << "--" << mode_text << " \t\t\t name_of_test_to_run" << newl;
+		break;
+	case test_mode::print_environ_info:
+	case test_mode::help:
+	case test_mode::list_tests:
+	case test_mode::run_default_tests:
+		ss << "--" << mode_text << " \t\t\t" << newl;
+		break;
+	}
+	return ss;
+}
+
+std::string cjm::uint128_tests::switches::get_usage_example(test_mode mode)
+{
+	auto stream = string::make_throwing_sstream<char>();
+	append_usage_example(stream, mode);
+	return string::move_extract_string(std::move(stream));
+}
+
 std::weak_ordering cjm::uint128_tests::switches::operator<=>(const test_switch& lhs, 
-	const test_switch& rhs) noexcept
+                                                             const test_switch& rhs) noexcept
 {
 	bool l_good = static_cast<bool>(lhs.m_impl);
 	bool r_good = static_cast<bool>(rhs.m_impl);
@@ -456,8 +557,8 @@ std::weak_ordering cjm::uint128_tests::switches::operator<=>(const test_switch& 
 				? std::weak_ordering::greater 
 					: std::weak_ordering::less;
 		}
-		const auto& l_val = *(lhs.m_impl->file_path());
-		const auto& r_val = *(rhs.m_impl->file_path());
+		const auto l_val = *(lhs.m_impl->file_path());
+		const auto r_val = *(rhs.m_impl->file_path());
 		if (l_val == r_val)
 		{
 			return std::weak_ordering::equivalent;
@@ -557,11 +658,7 @@ std::vector<cjm::uint128_tests::switches::test_switch> cjm::uint128_tests::switc
 	process_input(std::span<std::string> args)
 {
 	std::vector<test_switch> ret;
-	if (args.empty())
-	{
-		ret.emplace_back(test_mode::print_environ_info, std::nullopt);
-		ret.emplace_back(test_mode::run_default_tests, std::nullopt);
-	}
+	
 	auto it = args.begin();
 	auto end_it = args.end();
 	while (it != end_it)

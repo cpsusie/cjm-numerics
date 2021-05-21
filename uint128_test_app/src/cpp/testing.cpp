@@ -17,7 +17,11 @@
 // For information about copyright and licensing of the original work of others,
 // see Notices file in cjm/ folder.
 #include "testing.hpp"
+
+#include <cassert>
 #include <sstream>
+
+
 
 void cjm::testing::cjm_deny(bool predicateExpression)
 {
@@ -79,5 +83,5 @@ void cjm::testing::cjm_assert_nothrow(const std::function<void()>& func)
 	{
 		throw testing_failure("The delegate threw a non-standard exception.");
 	}
-	
+
 }

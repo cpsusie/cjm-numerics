@@ -125,6 +125,7 @@ int cjm::base_test_program::execute_test_program(int argc, char* argv[]) noexcep
 		using testing::cjm_assert;
 		using namespace std::string_view_literals;
 
+			
 		static_assert(cjm::numerics::concepts::unsigned_integer<uint128_t>);
 		std::vector<uint128_tests::test_switch> switch_vector;
 		try
@@ -141,14 +142,14 @@ int cjm::base_test_program::execute_test_program(int argc, char* argv[]) noexcep
 		}
 		catch (const std::runtime_error& ex)
 		{
-			std::cerr << "There was a problem, likely when processing command-line arguments." << newl;
-			std::cerr << "Message: \"" << ex.what() << "\"." << newl;
-			return -1;
+			std::cerr << "There was a problem, likely when processing command-line arguments:" << newl;
+			std::cerr << "\t" << ex.what() << newl;
+			uint128_tests::execute_help(std::cerr, std::cerr);
+			return 0;
 		}
 		catch (const std::exception& ex)
 		{
-			std::cerr << "An unexpected exception was thrown while trying"
-				<< " to insert and extract an int with u16 string stream: ["
+			std::cerr << "An unexpected exception was thrown: ["
 				<< ex.what() << "]." << newl;
 			return -1;
 		}
@@ -240,7 +241,7 @@ void cjm::base_test_program::log_arg_processing(int argc, char* argv[])
 			std::cout << "\t\tSwitch value: [" << arg_switch.mode() << "]." << newl;
 			if (arg_switch.file_path() != std::nullopt)
 			{
-				const auto& file = arg_switch.file_path().value();
+				const auto file = arg_switch.file_path().value();
 				std::cout << "\t\tSwitch parameter: [" << file << "]" << newl;
 			}
 			else
