@@ -168,11 +168,11 @@ This project (given its one-person authorship and the author's fulltime employme
 
 ### **Unit Test Application**
 
-The [unit test application][34] is the one application in this repository that has external dependencies.  Those dependencies include:
+The [unit test application][34] has its own markdown documentation file found [here][35]. It is the one application in this repository that has external dependencies. Those dependencies include:
 
-1. [abseil-C++17][35] (vcpkg: abseil[cxx17])
-2. [boost][36] version 1.73+ (vcpkg: boost)
-3. [hinnant/date][37] 3.0.0+ (vcpkg: date)
+1. [abseil-C++17][36] (vcpkg: abseil[cxx17])
+2. [boost][37] version 1.73+ (vcpkg: boost)
+3. [hinnant/date][38] 3.0.0+ (vcpkg: date)
 
 The unit test application must be built and run in Visual Studio 2019 with the dependencies installed as static libraries with a static c-runtime via the following vcpkg triplets: `x86-windows-static` and `x64-windows-static`.
 
@@ -240,7 +240,7 @@ Selected multilib: .;@m64
 > gcc version 10.2.0 (Ubuntu 10.2.0-13ubuntu1) 
 
 
-The CMakeLists.txt file used to build the unit test project (and example project) on linux with both g++ and clang can be found [here][38].
+The CMakeLists.txt file used to build the unit test project (and example project) on linux with both g++ and clang can be found [here][39].
 
 
 If you download the main branch, you can be assured that the unit test project was built successfully and passed in all of the above configurations, summarized:
@@ -252,14 +252,14 @@ If you download the main branch, you can be assured that the unit test project w
 
 ### **Example Code Application**
 
-The [example code application][39] is designed to demonstrate the functionality of the library using code.  Unlike the unit test application, it does not have any external dependencies.  In addition to requiring that the unit test application build and passes under all the configurations listed above, it is also required that the example code application build and execute without errors.  In addition to the configurations used by the unit test application, the following extra compilers/configurations must be verified to build the example code application such that it runs successfully:
+The [example code application][40] is designed to demonstrate the functionality of the library using code.  Unlike the unit test application, it does not have any external dependencies.  In addition to requiring that the unit test application build and passes under all the configurations listed above, it is also required that the example code application build and execute without errors.  In addition to the configurations used by the unit test application, the following extra compilers/configurations must be verified to build the example code application such that it runs successfully:
 
 Microsoft Windows 10 Target, (using Microsoft's standard library):
 
 * Clang v. 11, as supplied by Microsoft with Visual Studio (x86, x64, Debug and Release)
 * Intel's LLVM-based compiler v. 2021.1.2 (x86, x64, Debug and Release)  
 
-Currently, Intel's classic C++ compiler does not support C++ 20 at all.  If it ever supports C++ 20 sufficiently to be compatible with this library, it will be added to the list immediately above.
+Currently, Intel's *classic* (read: not llvm-based) C++ compiler does not support C++ 20 at all.  If it ever supports C++ 20 sufficiently to be compatible with this library, it will be added to the list immediately above.
   
 ### **Note on Big Endian Systems**  
 
@@ -274,7 +274,7 @@ The above copyright notice and this permission notice shall be included in all c
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 CJM Screws, LLC is a Maryland Limited Liability Company.
-No copyright claimed to unmodified original work of others. The original, unmodified work of others, to the extent included in this library, is licensed to you under the same terms under which it was licensed to CJM Screws, LLC. For information about copyright and licensing of the original work of others, see [Notices][40] file in cjm/ folder.
+No copyright claimed to unmodified original work of others. The original, unmodified work of others, to the extent included in this library, is licensed to you under the same terms under which it was licensed to CJM Screws, LLC. For information about copyright and licensing of the original work of others, see [Notices][41] file in cjm/ folder.
 
   [1]: https://github.com/cpsusie/cjm-numerics/blob/main/docs/quick_start_visual_studio/quick_start_install_vs2019.md#cjm-numerics-visual-studio-2019-1928--1693-quick-start-installation-guide
   [2]: https://github.com/cpsusie/cjm-numerics/blob/main/docs/quick_start_linux_clion/quick_start_install_linux_clion.md
@@ -289,7 +289,7 @@ No copyright claimed to unmodified original work of others. The original, unmodi
   [11]: https://github.com/ridiculousfish/libdivide
   [12]: https://github.com/llvm/llvm-project/blob/938d05b814c7fe470201d595afefc02e3371244e/compiler-rt/lib/builtins/udivmodti4.c#L84
   [13]: https://github.com/cpsusie/cjm-numerics/blob/main/src/cjm/numerics/cjm_numeric_concepts.hpp#L321
-  [14]: https://github.com/cpsusie/cjm-numerics/blob/main/src/cjm/numerics/numerics_configuration.hpp
+  [14]: https://github.com/cpsusie/cjm-numerics/blob/main/src/include/cjm/numerics/numerics_configuration.hpp#L35
   [15]: https://en.cppreference.com/w/cpp/compiler_support
   [16]: http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2018/p0482r6.html
   [17]: http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2017/p0734r0.pdf
@@ -310,9 +310,10 @@ No copyright claimed to unmodified original work of others. The original, unmodi
   [32]: https://en.cppreference.com/w/cpp/types/endian
   [33]: https://en.cppreference.com/w/cpp/types/numeric_limits/digits
   [34]: https://github.com/cpsusie/cjm-numerics/tree/main/uint128_test_app/src
-  [35]: https://github.com/abseil/abseil-cpp/tree/master/absl
-  [36]: https://github.com/boostorg/boost
-  [37]: https://github.com/HowardHinnant/date
-  [38]: https://github.com/cpsusie/cjm-numerics/blob/main/CMakeLists.txt
-  [39]: https://github.com/cpsusie/cjm-numerics/blob/main/example_code/src/uint128_example/program.cpp
-  [40]: https://github.com/cpsusie/cjm-numerics/blob/main/src/NOTICES.md
+  [35]: https://github.com/cpsusie/cjm-numerics/blob/main/uint128_test_app/src/WinInt128/unit_test_readme.md#unit-test-application-for-cjm-numerics-a-fixed-precision-a-fixed-precision-numeric-library-for-c20
+  [36]: https://github.com/abseil/abseil-cpp/tree/master/absl
+  [37]: https://github.com/boostorg/boost
+  [38]: https://github.com/HowardHinnant/date
+  [39]: https://github.com/cpsusie/cjm-numerics/blob/main/CMakeLists.txt
+  [40]: https://github.com/cpsusie/cjm-numerics/blob/main/example_code/src/uint128_example/program.cpp
+  [41]: https://github.com/cpsusie/cjm-numerics/blob/main/src/NOTICES.md
