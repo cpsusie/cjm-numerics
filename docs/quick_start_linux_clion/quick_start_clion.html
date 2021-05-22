@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<!-- saved from url=(0085)file:///C:/Users/Christopher%20Susie/AppData/Local/Temp/_MarkdownMonster_Preview.html -->
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <!--<base href="file:///E:\Source\Repos\cjm-numerics\docs\quick_start_linux_clion\">--><base href=".">
+  
+
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <link href="./quick_start_clion_files/font-awesome.min.css" rel="stylesheet">
+
+  <link href="./quick_start_clion_files/Theme.css" rel="stylesheet">
+
+  <script src="./quick_start_clion_files/jquery.min.js.download"></script>
+  <link href="./quick_start_clion_files/twilight.css" rel="stylesheet">
+  <script src="./quick_start_clion_files/highlight.pack.js.download"></script>
+  <script src="./quick_start_clion_files/preview.js.download" id="PreviewScript"></script>
+  
+</head>
+<body>
+<div id="MainContent">
+    <!-- Markdown Monster Content -->
+    <h1 id="cjm-numerics-linuxclion-quick-start-installation-guide">CJM Numerics Linux/Clion Quick Start Installation Guide</h1>
+<p><strong>Copyright © 2020-2021, CJM Screws, LLC</strong></p>
+<p>This guide is a walkthrough describing how to install the CJM Numerics UInt128 <code>C++20</code> Library for usage in an Intel/Amd 64 bit Linux environment.  It uses CLion as the IDE / Code editor.  CLion makes use of CMake so even if you are using a different IDE or text editor, you may be able to make some use of this guide.</p>
+<h2 id="description-of-environment">Description of Environment</h2>
+<h3 id="operating-system">Operating System</h3>
+<p>This guide was made on a Kubuntu 20.10 system with a 64-bit intel processor.  The processor supports AVX2 but not AVX512.</p>
+<h3 id="compilers-and-standard-library">Compilers and Standard Library</h3>
+<ol>
+<li>This project will assume use of GCC 10.2.0+ as the primary compiler</li>
+<li>Clang 11.0.0+ is used as a secondary compiler</li>
+<li>libstdc++ is used as the standard library (by both clang and gcc; note that clang's own libc++ does not yet provide full support for concepts)</li>
+</ol>
+<h3 id="package-manager">Package Manager</h3>
+<p>Vcpkg is used as the C++ package manager for this guide and is highly recommended.  Vcpkg is a cross-platform open-source C++ package manager published by Microsoft under a permissive license.  You can obtain vcpkg from Microsoft here (you will have to download and copy a port folder) or from my vcpkg fork here (comes with port for cjm-numerics-uint128 and some custom triplets but is otherwise idential to Microsoft's version).  Make sure you have vcpkg built and working before proceeding.  For generalized unix instructions look <a href="https://github.com/microsoft/vcpkg#quick-start-unix">here</a>.  Make sure you also follow the linux-specific instructions <a href="https://github.com/microsoft/vcpkg#installing-linux-developer-tools">here</a>.</p>
+<h3 id="ide">IDE</h3>
+<p>This guide assumes you are using CLion version 2020.3.3+.</p>
+<h2 id="downloading-cjm-numerics-uint128-port-folder">Downloading cjm-numerics-uint128 Port folder</h2>
+<h3 id="see-if-the-port-for-cjm-numerics-is-present-already">See if the port for cjm-numerics is present already</h3>
+<p>Open up a command line terminal and navigate to the folder where you have built and installed vcpkg. Enter the following command: <code>./vcpkg search cjm-numerics</code>.  If you downloaded vcpkg from the cjm repository, the result should be:</p>
+<blockquote>
+<p>csusie@ubuntu:~/vcpkg/vcpkg$ ./vcpkg search cjm-numerics<br>
+cjm-numerics-uint128 0.0.0.6-alpha  a header-only library for C++ 20 that provides an unsigned 128-bit integer.<br>
+If your library is not listed, please open an issue at and/or consider making a pull request:<br>
+<a href="https://github.com/Microsoft/vcpkg/issues">https://github.com/Microsoft/vcpkg/issues</a></p>
+</blockquote>
+<p>If you downloaded vcpkg from Microsoft's repo, no library will be found and the result should be:</p>
+<blockquote>
+<p>csusie@ubuntu:~/vcpkg/vcpkg$ ./vcpkg search cjm-numerics<br>
+If your library is not listed, please open an issue at and/or consider making a pull request:<br>
+<a href="https://github.com/Microsoft/vcpkg/issues">https://github.com/Microsoft/vcpkg/issues</a></p>
+</blockquote>
+<h3 id="if-the-port-is-not-already-present-download-it-from-github"><strong>If</strong> the port is <strong>not already present</strong>, download it from github</h3>
+<p>Go to the <a href="https://github.com/cpsusie/cjm-numerics/releases">releases page</a> of the repository and select the most recent release.  From the most recent release, you will need <strong>only</strong> the 7-zip file.  Vcpkg will download everything else from the repo itself.  Consult the following illustration:</p>
+<p><img src="./quick_start_clion_files/download_7zip_file.PNG" alt="Download 7z File"></p>
+<p>Now open the archive and extract contents as shown to your vcpkg's ports folder then confirm it is prenent.</p>
+<p><img src="./quick_start_clion_files/extract_port_folder_to_vcpkg_ports.png" alt="Copy over folder to ports"></p>
+<p>Now when you enter <code>./vcpkg search cjm-numerics</code>, the result should be:</p>
+<blockquote>
+<p>csusie@ubuntu:~/vcpkg/vcpkg$ ./vcpkg search cjm-numerics<br>
+cjm-numerics-uint128 0.0.0.6-alpha    a header-only library for C++ 20 that provides an unsigned 128-bit integer.</p>
+</blockquote>
+<h2 id="installing-the-library">Installing the Library</h2>
+<p>Now it is time to use vcpkg to install the library.  Navigate in the command prompt to your vcpkg folder.  Then enter: <code>./vcpkg install cjm-numerics-uint128</code>.  The result should look like:</p>
+<blockquote>
+<p>csusie@ubuntu:~/vcpkg/vcpkg$ ./vcpkg install cjm-numerics-uint128<br>
+Computing installation plan...<br>
+The following packages will be built and installed:<br>
+cjm-numerics-uint128[core]:x64-linux → 0.0.0.6-alpha<br>
+Detecting compiler hash for triplet x64-linux...<br>
+Using cached binary package:   /home/csusie/.cache/vcpkg/archives/85/853468a55306e5d214c34f0ff1f191b07467df20.zip<br>
+Starting package 1/1: cjm-numerics-uint128:x64-linux<br>
+Building package cjm-numerics-uint128[core]:x64-linux...<br>
+Building package cjm-numerics-uint128[core]:x64-linux... done<br>
+Installing package cjm-numerics-uint128[core]:x64-linux...<br>
+Installing package cjm-numerics-uint128[core]:x64-linux... done<br>
+Elapsed time for package cjm-numerics-uint128:x64-linux: 10.16 ms<br>
+Total elapsed time: 610.7 ms<br>
+The package cjm-numerics-uint128:x64-linux is header only and can be used from CMake via:<br>
+find_path(CJM_NUMERICS_UINT128_INCLUDE_DIRS "cjm/numerics/cjm_configuration.hpp")<br>
+target_include_directories(main PRIVATE ${CJM_NUMERICS_UINT128_INCLUDE_DIRS})</p>
+</blockquote>
+<p>Entering the command <code>./vcpkg list cjm-numerics</code> should confirm installation as follows:</p>
+<blockquote>
+<p>csusie@ubuntu:~/vcpkg/vcpkg$ ./vcpkg list cjm-numerics<br>
+cjm-numerics-uint128:x64-linux                     0.0.0.6-alpha    a header-only library for C++ 20 that provides a...</p>
+</blockquote>
+<h2 id="creating-a-console-application-in-clion-to-test-installation">Creating a Console Application in CLion to Test Installation</h2>
+<p>Open Clion and choose to create a new project.  In the "New Project" popup window,</p>
+<ol>
+<li>select C++ executable,</li>
+<li>choose an appropriate name and location,</li>
+<li>set the language standard to C++20 then</li>
+<li>click the "Create" button as shown:</li>
+</ol>
+<p><img src="./quick_start_clion_files/create_c++20_executable.png" alt="Create C++20 Executable"></p>
+<p>As a result, CLion should autogenerate a "hello world" console application for you.</p>
+<h3 id="setup-build-configuration-referencing-vcpkgs-cmake-file">Setup Build Configuration Referencing Vcpkg's cmake file</h3>
+<p>Once the "hello world" application is generated, click file-&gt;setting as shown:</p>
+<p><img src="./quick_start_clion_files/clion_file_settings.png" alt="Navigate to Settings Under File"></p>
+<p>The "Settings" Window should appear.  First, navigate to "CMake" (#1) under "Build, Execution, Deployment" in the left-side menu-list.  You will see that the project currently has one configuration called "Debug" (#2). Note that the Toolchain for the Debug Configuration is "Use: Default".  On my setup the default toolchain is GCC.  We will be setting up three additional configurations: a Release configuration for Default/GCC, a Debug Configuration for Clang and a Release Configuration for Clang.  On your system, Clang may be default or you might have only Clang or GCC installed.  If you only have one compiler installed, ignore the instructions for the other compiler and skip those configurations.  If you have both GCC and Clang installed, but Clang is your default toolchain, adjust how you follow the instructions accordingly.  Also, please note that this C++20 library requires GCC version 10.2+ and Clang version 11.0+.  If either of your compilers does not meet those requirements, update them before continuing.  Or, just follow the instructions (adjusting accordingly) for the compliant compiler you have installed.</p>
+<p><img src="./quick_start_clion_files/click_add.jpg" alt="Settings Window -- Add Configurations"></p>
+<p>In any case, you must enter the following text in the "CMake options" textbox <strong>in each configuration, including "Debug"</strong> to setup CLion to use vcpkg's CMake settings: <code>-DCMAKE_TOOLCHAIN_FILE=/home/csusie/vcpkg/vcpkg/scripts/buildsystems/vcpkg.cmake</code>.  When you are ready to add configurations, press the plus button (#3) until the desired number of configurations appear (these instructions assume 4 configurations).  After adding the configurations, setup each configuration as shown, ignoring or adjusting to compensate for differences between your setup and mine.</p>
+<ol>
+<li><strong>Debug -- GCC(G++) Configuration</strong></li>
+</ol>
+<p><img src="./quick_start_clion_files/settings_debug_configured.jpg" alt="Debug -- GCC/G++ Config"></p>
+<ol start="2">
+<li><strong>Release -- GCC(G++) Configuration</strong></li>
+</ol>
+<p><img src="./quick_start_clion_files/settings_release_configured.jpg" alt="Release -- GCC/G++ Config"></p>
+<ol start="3">
+<li><strong>Debug -- Clang Configuration</strong></li>
+</ol>
+<p><img src="./quick_start_clion_files/settings_debug_clang_configured.jpg" alt="Debug -- Clang Config"></p>
+<ol start="4">
+<li><strong>Release -- Clang Configuration</strong></li>
+</ol>
+<p><img src="./quick_start_clion_files/settings_release_clang_configured.jpg" alt="Release -- Clang Config"></p>
+<p>After you have setup all your configurations, press the "Apply" then "Ok" buttons in the lower right of the settings Window.</p>
+<h3 id="setting-up-cmakeliststxt">Setting Up CMakeLists.txt</h3>
+<p>Next, we will need to setup CMakeLists.txt to build our example application, use the <code>C++20</code> standard and know where to find the cjm-numerics-uint128 library.  To open up CMakeLists.txt for editing, double click on CMakeLists.txt in the left-hand project pane as shown:</p>
+<p><img src="./quick_start_clion_files/cmake_lists_edit.png" alt="Edit CMakeLists.txt"></p>
+<p>Then delete the current contents of the file and replace it with the following:</p>
+<pre><code class="language-makefile hljs">cmake_minimum_required(VERSION 3.17) <span class="hljs-comment">#Minimum cmake version</span>
+project(linux_cjm_quick_start) <span class="hljs-comment">#Name the test project</span>
+set(CMAKE_CXX_STANDARD 20) <span class="hljs-comment">#Request C++20 Standard</span>
+set(CMAKE_CXX_STANDARD_REQUIRED ON) <span class="hljs-comment">#Refuse to work if compiler does not support C++20</span>
+set(CMAKE_VERBOSE_MAKEFILE ON) <span class="hljs-comment">#Make Verbose log ... help if there are problems.</span>
+
+set(GCC_COVERAGE_COMPILE_FLAGS <span class="hljs-string">"-Wall -Werror -Wextra -Wstrict-aliasing -Wstrict-overflow -Wsequence-point -Wno-unknown-pragmas"</span>)
+<span class="hljs-comment">#Set up healthy errors requiring standards-conforming code, disable unknown pragma warnings (for now).</span>
+
+set(CMAKE_CXX_FLAGS <span class="hljs-string">"${CMAKE_CXX_FLAGS} ${GCC_COVERAGE_COMPILE_FLAGS}"</span> ) <span class="hljs-comment">#set flags appropriately</span>
+
+if(NOT DEFINED CMAKE_INSTALL_INCLUDEDIR)
+    SET(CMAKE_INSTALL_INCLUDEDIR <span class="hljs-keyword">include</span> CACHE
+            PATH <span class="hljs-string">"Output directory for header files"</span>)
+<span class="hljs-keyword">endif</span>() <span class="hljs-comment">#find vcpkg's include directory if it's not already</span>
+
+find_path(CJM_NUMERICS_UINT128_INCLUDE_DIRS <span class="hljs-string">"cjm/numerics/cjm_configuration.hpp"</span> REQUIRED) <span class="hljs-comment">#find cjm numerics include folder</span>
+
+include_directories(${CMAKE_INSTALL_INCLUDEDIR} ${CJM_NUMERICS_UINT128_INCLUDE_DIRS}) <span class="hljs-comment">#include appropriate folders</span>
+
+add_executable(linux_cjm_quick_start main.cpp) <span class="hljs-comment">#compile main.cpp as executable</span>
+
+<span class="hljs-comment">#GET_DIRECTORY_PROPERTY(output INCLUDE_DIRECTORIES) #in case of trouble, print include directories</span>
+<span class="hljs-comment">#MESSAGE(WARNING ${output})</span>
+</code></pre>
+<p>After entering the above code, CLion should let you know that the project needs to be reloaded by showing a blue notice box on top of the CMakeLists.txt file as shown:</p>
+<p><img src="./quick_start_clion_files/reload_cmake_proj_1.jpg" alt="Reload CMake Project V1"></p>
+<p>Click reload as above.  If for some reason this box does not appear after editing the file, you can cause the reload by right-clicking on CMakeLists.txt in the left-hand project panel, then choosing "Reload CMake Project" in the context menu as shown:</p>
+<p><img src="./quick_start_clion_files/reload_cmake_proj_2.jpg" alt="Reload CMake Project V2"></p>
+<p>After reloading the CMake project by one of the options suggested below, something like the following should appear in the CMake log:</p>
+<pre><code class="hljs foxpro">/<span class="hljs-built_in">home</span>/csusie/Clion_Install/clion<span class="hljs-number">-2020.3</span><span class="hljs-number">.2</span>/bin/cmake/linux/bin/cmake -DCMAKE_BUILD_TYPE=<span class="hljs-keyword">Debug</span> -DCMAKE_CXX_COMPILER=/usr/bin/g++ -DCMAKE_TOOLCHAIN_FILE=/<span class="hljs-built_in">home</span>/csusie/vcpkg/vcpkg/scripts/buildsystems/vcpkg.cmake -G <span class="hljs-string">"CodeBlocks - Unix Makefiles"</span> /<span class="hljs-built_in">home</span>/csusie/CLionProjects/linux_cjm_quick_start
+-- Configuring done
+-- Generating done
+-- <span class="hljs-keyword">Build</span> <span class="hljs-keyword">files</span> have been written <span class="hljs-keyword">to</span>: /<span class="hljs-built_in">home</span>/csusie/CLionProjects/linux_cjm_quick_start/cmake-<span class="hljs-keyword">build</span>-<span class="hljs-keyword">debug</span>
+
+<span class="hljs-string">[Finished]</span>
+
+</code></pre>
+<h2 id="entering-the-code">Entering the Code</h2>
+<p>Next, open main.cpp (found in the left-hand project pane).  Replace the default "Hello, world!" with the following:</p>
+<pre><code class="language-cpp hljs"><span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;iostream&gt;</span></span>
+<span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;iomanip&gt;</span></span>
+<span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;cjm/numerics/uint128.hpp&gt;</span></span>
+
+<span class="hljs-function"><span class="hljs-keyword">int</span> <span class="hljs-title">main</span><span class="hljs-params">()</span>  <span class="hljs-comment">// NOLINT(bugprone-exception-escape) (it's a demo)</span>
+</span>{
+	<span class="hljs-keyword">using</span> <span class="hljs-keyword">uint128_t</span> = cjm::numerics::uint128;
+	<span class="hljs-keyword">using</span> <span class="hljs-keyword">namespace</span> cjm::numerics::uint128_literals;
+	<span class="hljs-keyword">constexpr</span> <span class="hljs-keyword">auto</span> newl = <span class="hljs-string">'\n'</span>;
+	<span class="hljs-keyword">constexpr</span> <span class="hljs-keyword">uint128_t</span> lhs = <span class="hljs-number">123'456'789'012'345'678'901'234</span>_u128;
+	<span class="hljs-keyword">constexpr</span> <span class="hljs-keyword">uint128_t</span> rhs = <span class="hljs-number">432'109'876'543'210'987'654'321</span>_u128;
+	<span class="hljs-built_in">std</span>::<span class="hljs-built_in">cout</span> &lt;&lt; <span class="hljs-string">"Hello, uint128_t!"</span> &lt;&lt; newl;
+	<span class="hljs-built_in">std</span>::<span class="hljs-built_in">cout</span> &lt;&lt; <span class="hljs-string">"lhs ["</span> &lt;&lt; lhs &lt;&lt; <span class="hljs-string">"] * rhs ["</span> &lt;&lt; rhs &lt;&lt; <span class="hljs-string">"] == ["</span> &lt;&lt; (lhs * rhs) &lt;&lt; <span class="hljs-string">"]."</span> &lt;&lt; newl;
+
+	<span class="hljs-comment">//check if compiler intrinsics used:</span>
+	<span class="hljs-comment">//should be available if using microsoft compiler targeting x64 Intel or AMD processor</span>
+	<span class="hljs-built_in">std</span>::<span class="hljs-built_in">cout</span>
+		&lt;&lt; <span class="hljs-string">"Using msvc x64 intrinsics?: ["</span> &lt;&lt; <span class="hljs-built_in">std</span>::boolalpha
+		&lt;&lt; (cjm::numerics::calculation_mode == cjm::numerics::uint128_calc_mode::msvc_x64) &lt;&lt; <span class="hljs-string">"]"</span> &lt;&lt; newl;
+
+	<span class="hljs-comment">//Check if using built-in unsigned int 128 for runtime math</span>
+	<span class="hljs-comment">//This type is provided as a language extension by some compilers (NOT msvc)</span>
+	<span class="hljs-comment">//it is usually only available for 64 bit targets on compilers that provide</span>
+	<span class="hljs-comment">//this extension</span>
+	<span class="hljs-built_in">std</span>::<span class="hljs-built_in">cout</span>
+		&lt;&lt; <span class="hljs-string">"Using built-in uint128 for runtime calculations?: ["</span> &lt;&lt; <span class="hljs-built_in">std</span>::boolalpha
+		&lt;&lt; (cjm::numerics::calculation_mode == cjm::numerics::uint128_calc_mode::intrinsic_u128)
+		&lt;&lt; <span class="hljs-string">"]."</span> &lt;&lt; newl;
+	
+	<span class="hljs-comment">//On msvc when targeting x64, enabling AVX2 extension will allow us to use compiler intrinsics</span>
+	<span class="hljs-comment">//supplied by ADX and BMI2 (for add-with-carry and extended precision multiplication)</span>
+	<span class="hljs-comment">//rather than the default compiler intrinsics for those operations.  Make sure your processor</span>
+	<span class="hljs-comment">//target supports those extensions before trying this.</span>
+	<span class="hljs-built_in">std</span>::<span class="hljs-built_in">cout</span>
+		&lt;&lt; <span class="hljs-string">"Has adx enabled: ["</span> &lt;&lt; <span class="hljs-built_in">std</span>::boolalpha &lt;&lt; cjm::numerics::intel_adx_available &lt;&lt; <span class="hljs-string">"]."</span> &lt;&lt; newl;
+	<span class="hljs-built_in">std</span>::<span class="hljs-built_in">cout</span>
+		&lt;&lt; <span class="hljs-string">"Has bmi2 enabled: ["</span> &lt;&lt; <span class="hljs-built_in">std</span>::boolalpha &lt;&lt; cjm::numerics::intel_bmi2_available &lt;&lt; <span class="hljs-string">"]."</span> &lt;&lt; newl;
+	<span class="hljs-built_in">std</span>::<span class="hljs-built_in">cout</span>
+		&lt;&lt; <span class="hljs-string">"Goodbye!"</span> &lt;&lt; <span class="hljs-built_in">std</span>::<span class="hljs-built_in">endl</span>;
+	<span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;
+}
+</code></pre>
+<p>This code can also be found in the GitHub repository <a href="https://github.com/cpsusie/cjm-numerics/blob/main/pre_release_quick_start/pre_release_quick_start/pre_release_quick_start.cpp">here</a>.</p>
+<h2 id="building-the-project">Building the Project</h2>
+<p>It is now time to build the project.  To rebuild for all configurations, click on Build in the menu bar and select "Rebuild Project" in the drop-down as shown:</p>
+<p><img src="./quick_start_clion_files/rebuild_project.jpg" alt="Build Project for All Configurations"></p>
+<p>The project should be built for all your configurations, with the build log at the bottom reflecting success with something similar to the following:</p>
+<pre><code class="language-bash hljs">====================[ Build | all | Debug ]=====================================
+/home/csusie/Clion_Install/clion-2020.3.2/bin/cmake/linux/bin/cmake --build /home/csusie/CLionProjects/linux_cjm_quick_start/cmake-build-debug --target all -- -j 4
+/home/csusie/Clion_Install/clion-2020.3.2/bin/cmake/linux/bin/cmake -S/home/csusie/CLionProjects/linux_cjm_quick_start -B/home/csusie/CLionProjects/linux_cjm_quick_start/cmake-build-debug --check-build-system CMakeFiles/Makefile.cmake 0
+/home/csusie/Clion_Install/clion-2020.3.2/bin/cmake/linux/bin/cmake -E cmake_progress_start /home/csusie/CLionProjects/linux_cjm_quick_start/cmake-build-debug/CMakeFiles /home/csusie/CLionProjects/linux_cjm_quick_start/cmake-build-debug/CMakeFiles/progress.marks
+/usr/bin/gmake  -f CMakeFiles/Makefile2 all
+gmake[1]: Entering directory <span class="hljs-string">'/home/csusie/CLionProjects/linux_cjm_quick_start/cmake-build-debug'</span>
+/usr/bin/gmake  -f CMakeFiles/linux_cjm_quick_start.dir/build.make CMakeFiles/linux_cjm_quick_start.dir/depend
+gmake[2]: Entering directory <span class="hljs-string">'/home/csusie/CLionProjects/linux_cjm_quick_start/cmake-build-debug'</span>
+<span class="hljs-built_in">cd</span> /home/csusie/CLionProjects/linux_cjm_quick_start/cmake-build-debug &amp;&amp; /home/csusie/Clion_Install/clion-2020.3.2/bin/cmake/linux/bin/cmake -E cmake_depends <span class="hljs-string">"Unix Makefiles"</span> /home/csusie/CLionProjects/linux_cjm_quick_start /home/csusie/CLionProjects/linux_cjm_quick_start /home/csusie/CLionProjects/linux_cjm_quick_start/cmake-build-debug /home/csusie/CLionProjects/linux_cjm_quick_start/cmake-build-debug /home/csusie/CLionProjects/linux_cjm_quick_start/cmake-build-debug/CMakeFiles/linux_cjm_quick_start.dir/DependInfo.cmake --color=
+Scanning dependencies of target linux_cjm_quick_start
+gmake[2]: Leaving directory <span class="hljs-string">'/home/csusie/CLionProjects/linux_cjm_quick_start/cmake-build-debug'</span>
+/usr/bin/gmake  -f CMakeFiles/linux_cjm_quick_start.dir/build.make CMakeFiles/linux_cjm_quick_start.dir/build
+gmake[2]: Entering directory <span class="hljs-string">'/home/csusie/CLionProjects/linux_cjm_quick_start/cmake-build-debug'</span>
+[ 50%] Building CXX object CMakeFiles/linux_cjm_quick_start.dir/main.cpp.o
+/usr/bin/g++   -I/home/csusie/CLionProjects/linux_cjm_quick_start/include -I/home/csusie/vcpkg/vcpkg/installed/x64-linux/include  -Wall -Werror -Wextra -Wstrict-aliasing -Wstrict-overflow -Wsequence-point -Wno-unknown-pragmas -g   -std=gnu++2a -o CMakeFiles/linux_cjm_quick_start.dir/main.cpp.o -c /home/csusie/CLionProjects/linux_cjm_quick_start/main.cpp
+[100%] Linking CXX executable linux_cjm_quick_start
+/home/csusie/Clion_Install/clion-2020.3.2/bin/cmake/linux/bin/cmake -E cmake_link_script CMakeFiles/linux_cjm_quick_start.dir/link.txt --verbose=1
+/usr/bin/g++   -Wall -Werror -Wextra -Wstrict-aliasing -Wstrict-overflow -Wsequence-point -Wno-unknown-pragmas -g   CMakeFiles/linux_cjm_quick_start.dir/main.cpp.o  -o linux_cjm_quick_start 
+gmake[2]: Leaving directory <span class="hljs-string">'/home/csusie/CLionProjects/linux_cjm_quick_start/cmake-build-debug'</span>
+[100%] Built target linux_cjm_quick_start
+gmake[1]: Leaving directory <span class="hljs-string">'/home/csusie/CLionProjects/linux_cjm_quick_start/cmake-build-debug'</span>
+/home/csusie/Clion_Install/clion-2020.3.2/bin/cmake/linux/bin/cmake -E cmake_progress_start /home/csusie/CLionProjects/linux_cjm_quick_start/cmake-build-debug/CMakeFiles 0
+
+Build finished
+
+====================[ Build | all | Debug-Clang ]===============================
+/home/csusie/Clion_Install/clion-2020.3.2/bin/cmake/linux/bin/cmake --build /home/csusie/CLionProjects/linux_cjm_quick_start/cmake-build-debug-clang --target all -- -j 4
+/home/csusie/Clion_Install/clion-2020.3.2/bin/cmake/linux/bin/cmake -S/home/csusie/CLionProjects/linux_cjm_quick_start -B/home/csusie/CLionProjects/linux_cjm_quick_start/cmake-build-debug-clang --check-build-system CMakeFiles/Makefile.cmake 0
+/home/csusie/Clion_Install/clion-2020.3.2/bin/cmake/linux/bin/cmake -E cmake_progress_start /home/csusie/CLionProjects/linux_cjm_quick_start/cmake-build-debug-clang/CMakeFiles /home/csusie/CLionProjects/linux_cjm_quick_start/cmake-build-debug-clang/CMakeFiles/progress.marks
+/usr/bin/gmake  -f CMakeFiles/Makefile2 all
+gmake[1]: Entering directory <span class="hljs-string">'/home/csusie/CLionProjects/linux_cjm_quick_start/cmake-build-debug-clang'</span>
+/usr/bin/gmake  -f CMakeFiles/linux_cjm_quick_start.dir/build.make CMakeFiles/linux_cjm_quick_start.dir/depend
+gmake[2]: Entering directory <span class="hljs-string">'/home/csusie/CLionProjects/linux_cjm_quick_start/cmake-build-debug-clang'</span>
+<span class="hljs-built_in">cd</span> /home/csusie/CLionProjects/linux_cjm_quick_start/cmake-build-debug-clang &amp;&amp; /home/csusie/Clion_Install/clion-2020.3.2/bin/cmake/linux/bin/cmake -E cmake_depends <span class="hljs-string">"Unix Makefiles"</span> /home/csusie/CLionProjects/linux_cjm_quick_start /home/csusie/CLionProjects/linux_cjm_quick_start /home/csusie/CLionProjects/linux_cjm_quick_start/cmake-build-debug-clang /home/csusie/CLionProjects/linux_cjm_quick_start/cmake-build-debug-clang /home/csusie/CLionProjects/linux_cjm_quick_start/cmake-build-debug-clang/CMakeFiles/linux_cjm_quick_start.dir/DependInfo.cmake --color=
+Scanning dependencies of target linux_cjm_quick_start
+gmake[2]: Leaving directory <span class="hljs-string">'/home/csusie/CLionProjects/linux_cjm_quick_start/cmake-build-debug-clang'</span>
+/usr/bin/gmake  -f CMakeFiles/linux_cjm_quick_start.dir/build.make CMakeFiles/linux_cjm_quick_start.dir/build
+gmake[2]: Entering directory <span class="hljs-string">'/home/csusie/CLionProjects/linux_cjm_quick_start/cmake-build-debug-clang'</span>
+[ 50%] Building CXX object CMakeFiles/linux_cjm_quick_start.dir/main.cpp.o
+/usr/bin/clang++   -I/home/csusie/CLionProjects/linux_cjm_quick_start/include -I/home/csusie/vcpkg/vcpkg/installed/x64-linux/include  -Wall -Werror -Wextra -Wstrict-aliasing -Wstrict-overflow -Wsequence-point -Wno-unknown-pragmas -g   -std=gnu++2a -o CMakeFiles/linux_cjm_quick_start.dir/main.cpp.o -c /home/csusie/CLionProjects/linux_cjm_quick_start/main.cpp
+[100%] Linking CXX executable linux_cjm_quick_start
+/home/csusie/Clion_Install/clion-2020.3.2/bin/cmake/linux/bin/cmake -E cmake_link_script CMakeFiles/linux_cjm_quick_start.dir/link.txt --verbose=1
+/usr/bin/clang++   -Wall -Werror -Wextra -Wstrict-aliasing -Wstrict-overflow -Wsequence-point -Wno-unknown-pragmas -g   CMakeFiles/linux_cjm_quick_start.dir/main.cpp.o  -o linux_cjm_quick_start 
+gmake[2]: Leaving directory <span class="hljs-string">'/home/csusie/CLionProjects/linux_cjm_quick_start/cmake-build-debug-clang'</span>
+[100%] Built target linux_cjm_quick_start
+gmake[1]: Leaving directory <span class="hljs-string">'/home/csusie/CLionProjects/linux_cjm_quick_start/cmake-build-debug-clang'</span>
+/home/csusie/Clion_Install/clion-2020.3.2/bin/cmake/linux/bin/cmake -E cmake_progress_start /home/csusie/CLionProjects/linux_cjm_quick_start/cmake-build-debug-clang/CMakeFiles 0
+
+Build finished
+
+====================[ Build | all | Release ]===================================
+/home/csusie/Clion_Install/clion-2020.3.2/bin/cmake/linux/bin/cmake --build /home/csusie/CLionProjects/linux_cjm_quick_start/cmake-build-release --target all -- -j 4
+/home/csusie/Clion_Install/clion-2020.3.2/bin/cmake/linux/bin/cmake -S/home/csusie/CLionProjects/linux_cjm_quick_start -B/home/csusie/CLionProjects/linux_cjm_quick_start/cmake-build-release --check-build-system CMakeFiles/Makefile.cmake 0
+/home/csusie/Clion_Install/clion-2020.3.2/bin/cmake/linux/bin/cmake -E cmake_progress_start /home/csusie/CLionProjects/linux_cjm_quick_start/cmake-build-release/CMakeFiles /home/csusie/CLionProjects/linux_cjm_quick_start/cmake-build-release/CMakeFiles/progress.marks
+/usr/bin/gmake  -f CMakeFiles/Makefile2 all
+gmake[1]: Entering directory <span class="hljs-string">'/home/csusie/CLionProjects/linux_cjm_quick_start/cmake-build-release'</span>
+/usr/bin/gmake  -f CMakeFiles/linux_cjm_quick_start.dir/build.make CMakeFiles/linux_cjm_quick_start.dir/depend
+gmake[2]: Entering directory <span class="hljs-string">'/home/csusie/CLionProjects/linux_cjm_quick_start/cmake-build-release'</span>
+<span class="hljs-built_in">cd</span> /home/csusie/CLionProjects/linux_cjm_quick_start/cmake-build-release &amp;&amp; /home/csusie/Clion_Install/clion-2020.3.2/bin/cmake/linux/bin/cmake -E cmake_depends <span class="hljs-string">"Unix Makefiles"</span> /home/csusie/CLionProjects/linux_cjm_quick_start /home/csusie/CLionProjects/linux_cjm_quick_start /home/csusie/CLionProjects/linux_cjm_quick_start/cmake-build-release /home/csusie/CLionProjects/linux_cjm_quick_start/cmake-build-release /home/csusie/CLionProjects/linux_cjm_quick_start/cmake-build-release/CMakeFiles/linux_cjm_quick_start.dir/DependInfo.cmake --color=
+Scanning dependencies of target linux_cjm_quick_start
+gmake[2]: Leaving directory <span class="hljs-string">'/home/csusie/CLionProjects/linux_cjm_quick_start/cmake-build-release'</span>
+/usr/bin/gmake  -f CMakeFiles/linux_cjm_quick_start.dir/build.make CMakeFiles/linux_cjm_quick_start.dir/build
+gmake[2]: Entering directory <span class="hljs-string">'/home/csusie/CLionProjects/linux_cjm_quick_start/cmake-build-release'</span>
+[ 50%] Building CXX object CMakeFiles/linux_cjm_quick_start.dir/main.cpp.o
+/usr/bin/g++   -I/home/csusie/CLionProjects/linux_cjm_quick_start/include -I/home/csusie/vcpkg/vcpkg/installed/x64-linux/include  -Wall -Werror -Wextra -Wstrict-aliasing -Wstrict-overflow -Wsequence-point -Wno-unknown-pragmas -O3 -DNDEBUG   -std=gnu++2a -o CMakeFiles/linux_cjm_quick_start.dir/main.cpp.o -c /home/csusie/CLionProjects/linux_cjm_quick_start/main.cpp
+[100%] Linking CXX executable linux_cjm_quick_start
+/home/csusie/Clion_Install/clion-2020.3.2/bin/cmake/linux/bin/cmake -E cmake_link_script CMakeFiles/linux_cjm_quick_start.dir/link.txt --verbose=1
+/usr/bin/g++   -Wall -Werror -Wextra -Wstrict-aliasing -Wstrict-overflow -Wsequence-point -Wno-unknown-pragmas -O3 -DNDEBUG   CMakeFiles/linux_cjm_quick_start.dir/main.cpp.o  -o linux_cjm_quick_start 
+gmake[2]: Leaving directory <span class="hljs-string">'/home/csusie/CLionProjects/linux_cjm_quick_start/cmake-build-release'</span>
+[100%] Built target linux_cjm_quick_start
+gmake[1]: Leaving directory <span class="hljs-string">'/home/csusie/CLionProjects/linux_cjm_quick_start/cmake-build-release'</span>
+/home/csusie/Clion_Install/clion-2020.3.2/bin/cmake/linux/bin/cmake -E cmake_progress_start /home/csusie/CLionProjects/linux_cjm_quick_start/cmake-build-release/CMakeFiles 0
+
+Build finished
+
+====================[ Build | all | Release-Clang ]=============================
+/home/csusie/Clion_Install/clion-2020.3.2/bin/cmake/linux/bin/cmake --build /home/csusie/CLionProjects/linux_cjm_quick_start/cmake-build-release-clang --target all -- -j 4
+/home/csusie/Clion_Install/clion-2020.3.2/bin/cmake/linux/bin/cmake -S/home/csusie/CLionProjects/linux_cjm_quick_start -B/home/csusie/CLionProjects/linux_cjm_quick_start/cmake-build-release-clang --check-build-system CMakeFiles/Makefile.cmake 0
+/home/csusie/Clion_Install/clion-2020.3.2/bin/cmake/linux/bin/cmake -E cmake_progress_start /home/csusie/CLionProjects/linux_cjm_quick_start/cmake-build-release-clang/CMakeFiles /home/csusie/CLionProjects/linux_cjm_quick_start/cmake-build-release-clang/CMakeFiles/progress.marks
+/usr/bin/gmake  -f CMakeFiles/Makefile2 all
+gmake[1]: Entering directory <span class="hljs-string">'/home/csusie/CLionProjects/linux_cjm_quick_start/cmake-build-release-clang'</span>
+/usr/bin/gmake  -f CMakeFiles/linux_cjm_quick_start.dir/build.make CMakeFiles/linux_cjm_quick_start.dir/depend
+gmake[2]: Entering directory <span class="hljs-string">'/home/csusie/CLionProjects/linux_cjm_quick_start/cmake-build-release-clang'</span>
+<span class="hljs-built_in">cd</span> /home/csusie/CLionProjects/linux_cjm_quick_start/cmake-build-release-clang &amp;&amp; /home/csusie/Clion_Install/clion-2020.3.2/bin/cmake/linux/bin/cmake -E cmake_depends <span class="hljs-string">"Unix Makefiles"</span> /home/csusie/CLionProjects/linux_cjm_quick_start /home/csusie/CLionProjects/linux_cjm_quick_start /home/csusie/CLionProjects/linux_cjm_quick_start/cmake-build-release-clang /home/csusie/CLionProjects/linux_cjm_quick_start/cmake-build-release-clang /home/csusie/CLionProjects/linux_cjm_quick_start/cmake-build-release-clang/CMakeFiles/linux_cjm_quick_start.dir/DependInfo.cmake --color=
+Scanning dependencies of target linux_cjm_quick_start
+gmake[2]: Leaving directory <span class="hljs-string">'/home/csusie/CLionProjects/linux_cjm_quick_start/cmake-build-release-clang'</span>
+/usr/bin/gmake  -f CMakeFiles/linux_cjm_quick_start.dir/build.make CMakeFiles/linux_cjm_quick_start.dir/build
+gmake[2]: Entering directory <span class="hljs-string">'/home/csusie/CLionProjects/linux_cjm_quick_start/cmake-build-release-clang'</span>
+[ 50%] Building CXX object CMakeFiles/linux_cjm_quick_start.dir/main.cpp.o
+/usr/bin/clang++   -I/home/csusie/CLionProjects/linux_cjm_quick_start/include -I/home/csusie/vcpkg/vcpkg/installed/x64-linux/include  -Wall -Werror -Wextra -Wstrict-aliasing -Wstrict-overflow -Wsequence-point -Wno-unknown-pragmas -O3 -DNDEBUG   -std=gnu++2a -o CMakeFiles/linux_cjm_quick_start.dir/main.cpp.o -c /home/csusie/CLionProjects/linux_cjm_quick_start/main.cpp
+[100%] Linking CXX executable linux_cjm_quick_start
+/home/csusie/Clion_Install/clion-2020.3.2/bin/cmake/linux/bin/cmake -E cmake_link_script CMakeFiles/linux_cjm_quick_start.dir/link.txt --verbose=1
+/usr/bin/clang++   -Wall -Werror -Wextra -Wstrict-aliasing -Wstrict-overflow -Wsequence-point -Wno-unknown-pragmas -O3 -DNDEBUG   CMakeFiles/linux_cjm_quick_start.dir/main.cpp.o  -o linux_cjm_quick_start 
+gmake[2]: Leaving directory <span class="hljs-string">'/home/csusie/CLionProjects/linux_cjm_quick_start/cmake-build-release-clang'</span>
+[100%] Built target linux_cjm_quick_start
+gmake[1]: Leaving directory <span class="hljs-string">'/home/csusie/CLionProjects/linux_cjm_quick_start/cmake-build-release-clang'</span>
+/home/csusie/Clion_Install/clion-2020.3.2/bin/cmake/linux/bin/cmake -E cmake_progress_start /home/csusie/CLionProjects/linux_cjm_quick_start/cmake-build-release-clang/CMakeFiles 0
+
+Build finished
+</code></pre>
+<h2 id="run-the-project">Run the Project</h2>
+<p>Set the project to Release or Release-Clang then run it or them.  Your results should be something like what appears below.</p>
+<ol>
+<li>Release -- GCC</li>
+</ol>
+<pre><code class="language-bash hljs">/home/csusie/CLionProjects/linux_cjm_quick_start/cmake-build-release/linux_cjm_quick_start
+Hello, uint128_t!
+lhs [123456789012345678901234] * rhs [432109876543210987654321] == [226810394222294446283585782734362836562].
+Using msvc x64 intrinsics?: [<span class="hljs-literal">false</span>]
+Using built-in uint128 <span class="hljs-keyword">for</span> runtime calculations?: [<span class="hljs-literal">true</span>].
+Has adx enabled: [<span class="hljs-literal">false</span>].
+Has bmi2 enabled: [<span class="hljs-literal">false</span>].
+Goodbye!
+
+Process finished with <span class="hljs-built_in">exit</span> code 0
+</code></pre>
+<ol start="2">
+<li>Release -- Clang</li>
+</ol>
+<pre><code class="language-bash hljs">/home/csusie/CLionProjects/linux_cjm_quick_start/cmake-build-release-clang/linux_cjm_quick_start
+Hello, uint128_t!
+lhs [123456789012345678901234] * rhs [432109876543210987654321] == [226810394222294446283585782734362836562].
+Using msvc x64 intrinsics?: [<span class="hljs-literal">false</span>]
+Using built-in uint128 <span class="hljs-keyword">for</span> runtime calculations?: [<span class="hljs-literal">true</span>].
+Has adx enabled: [<span class="hljs-literal">false</span>].
+Has bmi2 enabled: [<span class="hljs-literal">false</span>].
+Goodbye!
+
+Process finished with <span class="hljs-built_in">exit</span> code 0
+</code></pre>
+<p>Normally, in a 64-bit linux environment, GCC and Clang should have a built-in unsigned int128 available.  If it is available (as in the example output), "Using built-in uint128 for runtime calculations?:" should come out as <em>true</em>.  cjm-numerics-uint128 delegates and uses the arithmetic of that type when possible -- for runtime calculations.  Our uint128_t should be bit-pattern compatible with the built-in version (same size, alignment and endian bit-order).  Thus, the two types are <a href="https://en.cppreference.com/w/cpp/numeric/bit_cast">bit_castable</a> to and from each other.  If your version of the C++ standard library does not support bit-casting yet, we provide <a href="https://github.com/cpsusie/cjm-numerics/blob/78fa5e323ba1d0c6be561e0e84885d98e5f22b13/src/include/cjm/numerics/numerics.hpp#L53">an equivalent that will delegate to the standard library version if available or provide its own equivalent operation if not available.</a>  Note that the non-standard version is not <em>constexpr</em> capable.</p>
+<p>If, you are on a 64-bit system (this library is only tested for x64 on linux but <em>should</em> work in 32-bit linux as well; note however that built-in 128 bit integers are not provided by GCC or Clang for x86), but, for some reason the built-in uint128 is not available, check whether GCC is set to GNU mode.  Outside of GNU mode, the 128 bit integer is limited.  See a discussion of this topic <a href="https://quuxplusone.github.io/blog/2019/02/28/is-int128-integral/">here.</a>  If you would like support for the built-in arithmetic enabled on GCC in non-GNU mode, open an issue.</p>
+<h3 id="note-on-adx-bmi2-and-enhanced-instruction-sets">Note on ADX, BMI2 and Enhanced Instruction Sets</h3>
+<p>Windows does not provide any built-in int128 capabilities.  Thus, for Windows, compiler intrinsics are used for many of the calculations if executed at runtime.  More recent (approximately 2013-2014) Intel and (on a more limited and recent basis) AMD processors provide more efficient <a href="https://www.intel.com/content/dam/www/public/us/en/documents/white-papers/ia-large-integer-arithmetic-paper.pdf">add-with-carry and extended precision multiply operations on 64 bit systems.</a>  If those technologies are explicitly enabled, this library will use intrinsics that call the more efficient versions of the operations.  Thus, what ADX and BMI indicate in the output is whether <em>on Windows</em> those intrinsics are used for runtime computations.</p>
+<p>Outside of Windows, these intrinsics are not (directly) used by this library as we use the compiler built-in 128 bit operations instead.  On Linux, therefore, ADX and BMI2 will always show up as false in the run output, <em>even if those operations are enabled.</em>  If those operations are enabled however GCC and Clang <em>may</em> emit more efficient code (either currently or in the future).  Therefore, if it is possible, you should enable these instructions as long as all your <a href="https://en.wikipedia.org/wiki/Bit_manipulation_instruction_set#BMI2">target architectures support them.</a>  Even if you enable them, the output of the example code will still say false, because that refers to whether they library itself directly uses the more efficient intrinsic operations.</p>
+<h3 id="optional----enabling-adx-bmi2-and-avx2-or-avx512">Optional -- Enabling ADX, BMI2 and AVX2 or AVX512</h3>
+<p>Even though the library relies on the compiler's built-in int128 to emit the most efficient code possible rather than using assembly instructions directly, you may wish to enable these technologies if all your target architectures support it.  Most Intel and some AMD processors (when operating in 64-bit mode) support <a href="https://en.wikipedia.org/wiki/Intel_ADX">ADX</a>, <a href="https://en.wikipedia.org/wiki/Bit_manipulation_instruction_set#BMI2">BMI2</a> and <a href="https://en.wikipedia.org/wiki/Advanced_Vector_Extensions#CPUs_with_AVX2">AVX2</a>.  Fewer processors support <a href="https://en.wikipedia.org/wiki/AVX-512#CPUs_with_AVX-512">AVX512</a>.</p>
+<p>To enable ADX, BMI2 and AVX2, replace the following line from CMakeLists.txt</p>
+<pre><code class="language-makefile hljs">set(GCC_COVERAGE_COMPILE_FLAGS <span class="hljs-string">"-Wall -Werror -Wextra -Wstrict-aliasing -Wstrict-overflow -Wsequence-point -Wno-unknown-pragmas"</span>)
+</code></pre>
+<p>with</p>
+<pre><code class="language-makefile hljs">set(GCC_COVERAGE_COMPILE_FLAGS <span class="hljs-string">"-Wall -Werror -Wextra -Wstrict-aliasing -Wstrict-overflow -Wsequence-point -Wno-unknown-pragmas -madx -mbmi2 -mavx2"</span>)
+</code></pre>
+<p>Again, it will enable the compiler to use the instructions from those sets if it deems it appropriate; it will not, however, force use of those features as it will in Windows.</p>
+<p>AVX512 has many separately enableable instruction sets and since I have no way to test the library with them enabled, I will leave enabling AVX512 as an exercise for the reader.</p>
+<h2 id="conclusion">Conclusion</h2>
+<p>You should now know how to install this library using vcpkg then use it from CLion (with CMake) on a 64-bit Linux environment.</p>
+
+    <!-- End Markdown Monster Content -->
+</div>
+
+
+</body></html>
