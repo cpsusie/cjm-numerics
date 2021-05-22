@@ -1,0 +1,2390 @@
+From: <Saved by Blink>
+Snapshot-Content-Location: file:///C:/Users/Christopher%20Susie/AppData/Local/Temp/_MarkdownMonster_Preview.html
+Subject: 
+Date: Sat, 22 May 2021 01:47:03 -0000
+MIME-Version: 1.0
+Content-Type: multipart/related;
+	type="text/html";
+	boundary="----MultipartBoundary--UrpJjMYV44Fc9akAXoOKXJLMcu0mI7Izu96NbZJoyL----"
+
+
+------MultipartBoundary--UrpJjMYV44Fc9akAXoOKXJLMcu0mI7Izu96NbZJoyL----
+Content-Type: text/html
+Content-ID: <frame-BE8CBC4F2E78811042793B9E92AC712B@mhtml.blink>
+Content-Transfer-Encoding: quoted-printable
+Content-Location: file:///C:/Users/Christopher%20Susie/AppData/Local/Temp/_MarkdownMonster_Preview.html
+
+<!DOCTYPE html><!-- saved from url=3D(0016)http://localhost --><html lang=
+=3D"en" xmlns=3D"http://www.w3.org/1999/xhtml"><head><meta http-equiv=3D"Co=
+ntent-Type" content=3D"text/html; charset=3DUTF-8">
+  <base href=3D"file:///E:/Source/Repos/cjm-numerics/src/">
+ =20
+
+  <meta http-equiv=3D"X-UA-Compatible" content=3D"IE=3Dedge">
+  <link href=3D"file:///C:/Users/Christopher%20Susie/AppData/Local/Markdown=
+%20Monster/PreviewThemes/scripts/fontawesome/css/font-awesome.min.css" rel=
+=3D"stylesheet">
+
+  <link href=3D"file:///C:/Users/Christopher%20Susie/AppData/Local/Markdown=
+%20Monster/PreviewThemes/Dharkan/Theme.css" rel=3D"stylesheet">
+
+ =20
+  <link href=3D"file:///C:/Users/Christopher%20Susie/AppData/Local/Markdown=
+%20Monster/PreviewThemes/scripts/highlightjs/styles/twilight.css" rel=3D"st=
+ylesheet">
+ =20
+ =20
+ =20
+</head>
+<body>
+<div id=3D"MainContent">
+    <!-- Markdown Monster Content -->
+    <h1 id=3D"legal-notices">Legal Notices</h1>
+<p><strong>Copyright =C2=A9 2020-2021 CJM Screws, LLC</strong></p>
+<p>The components of this library to which CJM Screws, LLC holds copyright,=
+ including any modifications made to the original work of others (but exclu=
+ding unmodified original work of others) are licensed to you as follows (<a=
+ href=3D"https://opensource.org/licenses/MIT">MIT License</a>):</p>
+<blockquote>
+<p>Permission is hereby granted, free of charge, to any person obtaining a =
+copy of this software and associated documentation files (the "Software"), =
+to deal in the Software without restriction, including without limitation t=
+he rights to use, copy, modify, merge, publish, distribute, sublicense, and=
+/or sell copies of the Software, and to permit persons to whom the Software=
+ is furnished to do so, subject to the following conditions:</p>
+<p>The above copyright notice and this permission notice shall be included =
+in all copies or substantial portions of the Software.</p>
+<p>THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS =
+OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,=
+ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL TH=
+E AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LI=
+ABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,=
+ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN =
+THE SOFTWARE.</p>
+</blockquote>
+<h2 id=3D"other-licenses">Other Licenses</h2>
+<ul>
+<li><a href=3D"https://github.com/cpsusie/Int128/blob/main/originals_code_h=
+eavily_drawn_from/abseil_int128_h.txt">Abseil</a>.  <a href=3D"https://www.=
+apache.org/licenses/LICENSE-2.0">Apache 2.0</a>. See legal information <a h=
+ref=3D"file:///E:/Source/Repos/cjm-numerics/src/#abseil">here</a>.</li>
+<li><a href=3D"https://www.boost.org/">Boost</a> / <a href=3D"https://githu=
+b.com/boostorg/multiprecision/blob/1c8fcaea68943f86e94070a86c003513794633a7=
+/include/boost/multiprecision/cpp_int.hpp#L2">John Maddock</a>. <a href=3D"=
+https://www.boost.org/LICENSE_1_0.txt">Boost 1.0</a>.  See legal informatio=
+n <a href=3D"file:///E:/Source/Repos/cjm-numerics/src/#boost">here</a>.</li=
+>
+<li><a href=3D"https://llvm.org/">LLVM Project</a>.  <a href=3D"https://fou=
+ndation.llvm.org/relicensing/LICENSE.txt">Apache 2.0 with LLVM exceptions</=
+a>.  See legal information <a href=3D"file:///E:/Source/Repos/cjm-numerics/=
+src/#llvm">here</a>.</li>
+<li><a href=3D"https://github.com/HowardHinnant/date">Hinnant Date Library<=
+/a>. <a href=3D"https://github.com/HowardHinnant/date/blob/master/LICENSE.t=
+xt">MIT License</a>. See legal information <a href=3D"file:///E:/Source/Rep=
+os/cjm-numerics/src/#hinnant-date">here</a>.</li>
+</ul>
+<h3 id=3D"abseil">Abseil</h3>
+<p>This library was originally modeled off of the abseil C++ numerics libra=
+ry.  Significant portions of the abseil library have been modified by this =
+project, but some amount of verbatim or nearly verbatim duplications of abs=
+eil's code may remain in the library.  CJM Screws, LLC claims no copyright =
+to unmodified versions of abseil's intellectual property.  For comparison p=
+urposes, the following text files (available in this project's github repos=
+itory) contain abseil's original unaltered code:</p>
+<ul>
+<li><a href=3D"https://github.com/cpsusie/Int128/blob/main/originals_code_h=
+eavily_drawn_from/abseil_int128_cpp.txt">abseil_int128_h.txt</a></li>
+<li><a href=3D"https://github.com/cpsusie/Int128/blob/main/originals_code_h=
+eavily_drawn_from/int128.cc.orig.txt">abseil_int128_cpp.txt</a></li>
+<li><a href=3D"https://github.com/cpsusie/Int128/blob/main/originals_code_h=
+eavily_drawn_from/Llvm_u128div.txt">int128.cc.orig.txt</a></li>
+</ul>
+<p>Any code owned by abseil contained herein is licensed to you under the t=
+erms of the Apache 2.0 license:</p>
+<blockquote>
+<p>Apache License<br>
+Version 2.0, January 2004<br>
+<a href=3D"https://www.apache.org/licenses/">https://www.apache.org/license=
+s/</a></p>
+<p>TERMS AND CONDITIONS FOR USE, REPRODUCTION, AND DISTRIBUTION</p>
+<ol>
+<li><p>Definitions.</p>
+<p>"License" shall mean the terms and conditions for use, reproduction,
+and distribution as defined by Sections 1 through 9 of this document.</p>
+<p>"Licensor" shall mean the copyright owner or entity authorized by
+the copyright owner that is granting the License.</p>
+<p>"Legal Entity" shall mean the union of the acting entity and all other e=
+ntities that control, are controlled by, or are under common control with t=
+hat entity. For the purposes of this definition, "control" means (i) the po=
+wer, direct or indirect, to cause the direction or management of such entit=
+y, whether by contract or
+otherwise, or (ii) ownership of fifty percent (50%) or more of the outstand=
+ing shares, or (iii) beneficial ownership of such entity.</p>
+<p>"You" (or "Your") shall mean an individual or Legal Entity exercising pe=
+rmissions granted by this License.</p>
+<p>"Source" form shall mean the preferred form for making modifications, in=
+cluding but not limited to software source code, documentation, source, and=
+ configuration files.</p>
+<p>"Object" form shall mean any form resulting from mechanical transformati=
+on or translation of a Source form, including but not limited to compiled o=
+bject code, generated documentation, and conversions to other media types.<=
+/p>
+<p>"Work" shall mean the work of authorship, whether in Source or Object fo=
+rm, made available under the License, as indicated by a copyright notice th=
+at is included in or attached to the work (an example is provided in the Ap=
+pendix below).</p>
+<p>"Derivative Works" shall mean any work, whether in Source or Object form=
+, that is based on (or derived from) the Work and for which the editorial r=
+evisions, annotations, elaborations, or other modifications
+represent, as a whole, an original work of authorship. For the purposes of =
+this License, Derivative Works shall not include works that remain separabl=
+e from, or merely link (or bind by name) to the interfaces of,
+the Work and Derivative Works thereof.</p>
+<p>"Contribution" shall mean any work of authorship, including the original=
+ version of the Work and any modifications or additions to that Work or Der=
+ivative Works thereof, that is intentionally submitted to Licensor for incl=
+usion in the Work by the copyright owner
+or by an individual or Legal Entity authorized to submit on behalf of
+the copyright owner. For the purposes of this definition, "submitted"
+means any form of electronic, verbal, or written communication sent
+to the Licensor or its representatives, including but not limited to
+communication on electronic mailing lists, source code control systems,
+and issue tracking systems that are managed by, or on behalf of, the
+Licensor for the purpose of discussing and improving the Work, but
+excluding communication that is conspicuously marked or otherwise
+designated in writing by the copyright owner as "Not a Contribution."</p>
+<p>"Contributor" shall mean Licensor and any individual or Legal Entity
+on behalf of whom a Contribution has been received by Licensor and
+subsequently incorporated within the Work.</p>
+</li>
+<li><p>Grant of Copyright License. Subject to the terms and conditions of
+this License, each Contributor hereby grants to You a perpetual,
+worldwide, non-exclusive, no-charge, royalty-free, irrevocable
+copyright license to reproduce, prepare Derivative Works of,
+publicly display, publicly perform, sublicense, and distribute the
+Work and such Derivative Works in Source or Object form.</p>
+</li>
+<li><p>Grant of Patent License. Subject to the terms and conditions of
+this License, each Contributor hereby grants to You a perpetual,
+worldwide, non-exclusive, no-charge, royalty-free, irrevocable
+(except as stated in this section) patent license to make, have made,
+use, offer to sell, sell, import, and otherwise transfer the Work,
+where such license applies only to those patent claims licensable
+by such Contributor that are necessarily infringed by their
+Contribution(s) alone or by combination of their Contribution(s)
+with the Work to which such Contribution(s) was submitted. If You
+institute patent litigation against any entity (including a
+cross-claim or counterclaim in a lawsuit) alleging that the Work
+or a Contribution incorporated within the Work constitutes direct
+or contributory patent infringement, then any patent licenses
+granted to You under this License for that Work shall terminate
+as of the date such litigation is filed.</p>
+</li>
+<li><p>Redistribution. You may reproduce and distribute copies of the
+Work or Derivative Works thereof in any medium, with or without
+modifications, and in Source or Object form, provided that You
+meet the following conditions:</p>
+<p>(a) You must give any other recipients of the Work or
+Derivative Works a copy of this License; and</p>
+<p>(b) You must cause any modified files to carry prominent notices
+stating that You changed the files; and</p>
+<p>(c) You must retain, in the Source form of any Derivative Works
+that You distribute, all copyright, patent, trademark, and
+attribution notices from the Source form of the Work,
+excluding those notices that do not pertain to any part of
+the Derivative Works; and</p>
+<p>(d) If the Work includes a "NOTICE" text file as part of its
+distribution, then any Derivative Works that You distribute must
+include a readable copy of the attribution notices contained
+within such NOTICE file, excluding those notices that do not
+pertain to any part of the Derivative Works, in at least one
+of the following places: within a NOTICE text file distributed
+as part of the Derivative Works; within the Source form or
+documentation, if provided along with the Derivative Works; or,
+within a display generated by the Derivative Works, if and
+wherever such third-party notices normally appear. The contents
+of the NOTICE file are for informational purposes only and
+do not modify the License. You may add Your own attribution
+notices within Derivative Works that You distribute, alongside
+or as an addendum to the NOTICE text from the Work, provided
+that such additional attribution notices cannot be construed
+as modifying the License.</p>
+<p>You may add Your own copyright statement to Your modifications and
+may provide additional or different license terms and conditions
+for use, reproduction, or distribution of Your modifications, or
+for any such Derivative Works as a whole, provided Your use,
+reproduction, and distribution of the Work otherwise complies with
+the conditions stated in this License.</p>
+</li>
+<li><p>Submission of Contributions. Unless You explicitly state otherwise,
+any Contribution intentionally submitted for inclusion in the Work
+by You to the Licensor shall be under the terms and conditions of
+this License, without any additional terms or conditions.
+Notwithstanding the above, nothing herein shall supersede or modify
+the terms of any separate license agreement you may have executed
+with Licensor regarding such Contributions.</p>
+</li>
+<li><p>Trademarks. This License does not grant permission to use the trade
+names, trademarks, service marks, or product names of the Licensor,
+except as required for reasonable and customary use in describing the
+origin of the Work and reproducing the content of the NOTICE file.</p>
+</li>
+<li><p>Disclaimer of Warranty. Unless required by applicable law or
+agreed to in writing, Licensor provides the Work (and each
+Contributor provides its Contributions) on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
+implied, including, without limitation, any warranties or conditions
+of TITLE, NON-INFRINGEMENT, MERCHANTABILITY, or FITNESS FOR A
+PARTICULAR PURPOSE. You are solely responsible for determining the
+appropriateness of using or redistributing the Work and assume any
+risks associated with Your exercise of permissions under this License.</p>
+</li>
+<li><p>Limitation of Liability. In no event and under no legal theory,
+whether in tort (including negligence), contract, or otherwise,
+unless required by applicable law (such as deliberate and grossly
+negligent acts) or agreed to in writing, shall any Contributor be
+liable to You for damages, including any direct, indirect, special,
+incidental, or consequential damages of any character arising as a
+result of this License or out of the use or inability to use the
+Work (including but not limited to damages for loss of goodwill,
+work stoppage, computer failure or malfunction, or any and all
+other commercial damages or losses), even if such Contributor
+has been advised of the possibility of such damages.</p>
+</li>
+<li><p>Accepting Warranty or Additional Liability. While redistributing
+the Work or Derivative Works thereof, You may choose to offer,
+and charge a fee for, acceptance of support, warranty, indemnity,
+or other liability obligations and/or rights consistent with this
+License. However, in accepting such obligations, You may act only
+on Your own behalf and on Your sole responsibility, not on behalf
+of any other Contributor, and only if You agree to indemnify,
+defend, and hold each Contributor harmless for any liability
+incurred by, or claims asserted against, such Contributor by reason
+of your accepting any such warranty or additional liability.</p>
+</li>
+</ol>
+<p>END OF TERMS AND CONDITIONS<br>
+APPENDIX: How to apply the Apache License to your work.</p>
+<p>To apply the Apache License to your work, attach the following
+boilerplate notice, with the fields enclosed by brackets "[]"
+replaced with your own identifying information. (Don't include
+the brackets!)  The text should be enclosed in the appropriate
+comment syntax for the file format. We also recommend that a
+file or class name and description of purpose be included on the
+same "printed page" as the copyright notice for easier
+identification within third-party archives.</p>
+<p>Copyright [yyyy] [name of copyright owner]</p>
+<p>Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at</p>
+<p><a href=3D"http://www.apache.org/licenses/LICENSE-2.0">http://www.apache=
+.org/licenses/LICENSE-2.0</a></p>
+<p>Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.</p>
+</blockquote>
+<h3 id=3D"llvm">LLVM</h3>
+<p>This project contains code derived from code owned by the LLVM project. =
+ The two code files that were consulted (used in an optimized special case =
+of 128 bit unsigned integer division) are found verbatim in this project's =
+Github repository for comparison purposes:</p>
+<ul>
+<li><a href=3D"https://github.com/cpsusie/Int128/blob/main/originals_code_h=
+eavily_drawn_from/llvm_int_typedefs.txt">Llvm_u128div.txt</a></li>
+<li><a href=3D"https://github.com/cpsusie/Int128/blob/main/originals_code_h=
+eavily_drawn_from/llvm_int_typedefs.txt">llvm_int_typedefs.txt</a></li>
+</ul>
+<p>CJM Screws, LLC claims no copyright to the LLVM's project's unmodified w=
+ork.  To the extent that this library may contain code to which the LLVM pr=
+oject holds copyright, such code was licensed to CJM Screws, LLC under the =
+terms of the Apache 2.0 License with LLVM Exceptions.  Any such unmodified =
+code (to the extent it may be found within this project) is therefore licen=
+sed to you under the terms of the Apache 2.0 License with LLVM exceptions. =
+ Any derivative work based on their code, however, is licensed to you under=
+ the terms of the MIT license, as set forth at the top of this document.  T=
+o comply with the terms of the Apache 2.0 license with LLVM exceptions is r=
+eproduced here:</p>
+<blockquote>
+<p>=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D<br>
+The LLVM Project is under the Apache License v2.0 with LLVM Exceptions:<br>
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D<br>
+Apache License<br>
+Version 2.0, January 2004<br>
+<a href=3D"http://www.apache.org/licenses/">http://www.apache.org/licenses/=
+</a></p>
+<p>TERMS AND CONDITIONS FOR USE, REPRODUCTION, AND DISTRIBUTION</p>
+<ol>
+<li><p>Definitions.</p>
+<p>"License" shall mean the terms and conditions for use, reproduction,
+and distribution as defined by Sections 1 through 9 of this document.</p>
+<p>"Licensor" shall mean the copyright owner or entity authorized by
+the copyright owner that is granting the License.</p>
+<p>"Legal Entity" shall mean the union of the acting entity and all
+other entities that control, are controlled by, or are under common
+control with that entity. For the purposes of this definition,
+"control" means (i) the power, direct or indirect, to cause the
+direction or management of such entity, whether by contract or
+otherwise, or (ii) ownership of fifty percent (50%) or more of the
+outstanding shares, or (iii) beneficial ownership of such entity.</p>
+<p>"You" (or "Your") shall mean an individual or Legal Entity
+exercising permissions granted by this License.</p>
+<p>"Source" form shall mean the preferred form for making modifications,
+including but not limited to software source code, documentation
+source, and configuration files.</p>
+<p>"Object" form shall mean any form resulting from mechanical
+transformation or translation of a Source form, including but
+not limited to compiled object code, generated documentation,
+and conversions to other media types.</p>
+<p>"Work" shall mean the work of authorship, whether in Source or
+Object form, made available under the License, as indicated by a
+copyright notice that is included in or attached to the work
+(an example is provided in the Appendix below).</p>
+<p>"Derivative Works" shall mean any work, whether in Source or Object
+form, that is based on (or derived from) the Work and for which the
+editorial revisions, annotations, elaborations, or other modifications
+represent, as a whole, an original work of authorship. For the purposes
+of this License, Derivative Works shall not include works that remain
+separable from, or merely link (or bind by name) to the interfaces of,
+the Work and Derivative Works thereof.</p>
+<p>"Contribution" shall mean any work of authorship, including
+the original version of the Work and any modifications or additions
+to that Work or Derivative Works thereof, that is intentionally
+submitted to Licensor for inclusion in the Work by the copyright owner
+or by an individual or Legal Entity authorized to submit on behalf of
+the copyright owner. For the purposes of this definition, "submitted"
+means any form of electronic, verbal, or written communication sent
+to the Licensor or its representatives, including but not limited to
+communication on electronic mailing lists, source code control systems,
+and issue tracking systems that are managed by, or on behalf of, the
+Licensor for the purpose of discussing and improving the Work, but
+excluding communication that is conspicuously marked or otherwise
+designated in writing by the copyright owner as "Not a Contribution."</p>
+<p>"Contributor" shall mean Licensor and any individual or Legal Entity
+on behalf of whom a Contribution has been received by Licensor and
+subsequently incorporated within the Work.</p>
+</li>
+<li><p>Grant of Copyright License. Subject to the terms and conditions of
+this License, each Contributor hereby grants to You a perpetual,
+worldwide, non-exclusive, no-charge, royalty-free, irrevocable
+copyright license to reproduce, prepare Derivative Works of,
+publicly display, publicly perform, sublicense, and distribute the
+Work and such Derivative Works in Source or Object form.</p>
+</li>
+<li><p>Grant of Patent License. Subject to the terms and conditions of
+this License, each Contributor hereby grants to You a perpetual,
+worldwide, non-exclusive, no-charge, royalty-free, irrevocable
+(except as stated in this section) patent license to make, have made,
+use, offer to sell, sell, import, and otherwise transfer the Work,
+where such license applies only to those patent claims licensable
+by such Contributor that are necessarily infringed by their
+Contribution(s) alone or by combination of their Contribution(s)
+with the Work to which such Contribution(s) was submitted. If You
+institute patent litigation against any entity (including a
+cross-claim or counterclaim in a lawsuit) alleging that the Work
+or a Contribution incorporated within the Work constitutes direct
+or contributory patent infringement, then any patent licenses
+granted to You under this License for that Work shall terminate
+as of the date such litigation is filed.</p>
+</li>
+<li><p>Redistribution. You may reproduce and distribute copies of the
+Work or Derivative Works thereof in any medium, with or without
+modifications, and in Source or Object form, provided that You
+meet the following conditions:</p>
+<p>(a) You must give any other recipients of the Work or
+Derivative Works a copy of this License; and</p>
+<p>(b) You must cause any modified files to carry prominent notices
+stating that You changed the files; and</p>
+<p>(c) You must retain, in the Source form of any Derivative Works
+that You distribute, all copyright, patent, trademark, and
+attribution notices from the Source form of the Work,
+excluding those notices that do not pertain to any part of
+the Derivative Works; and</p>
+<p>(d) If the Work includes a "NOTICE" text file as part of its
+distribution, then any Derivative Works that You distribute must
+include a readable copy of the attribution notices contained
+within such NOTICE file, excluding those notices that do not
+pertain to any part of the Derivative Works, in at least one
+of the following places: within a NOTICE text file distributed
+as part of the Derivative Works; within the Source form or
+documentation, if provided along with the Derivative Works; or,
+within a display generated by the Derivative Works, if and
+wherever such third-party notices normally appear. The contents
+of the NOTICE file are for informational purposes only and
+do not modify the License. You may add Your own attribution
+notices within Derivative Works that You distribute, alongside
+or as an addendum to the NOTICE text from the Work, provided
+that such additional attribution notices cannot be construed
+as modifying the License.</p>
+<p>You may add Your own copyright statement to Your modifications and
+may provide additional or different license terms and conditions
+for use, reproduction, or distribution of Your modifications, or
+for any such Derivative Works as a whole, provided Your use,
+reproduction, and distribution of the Work otherwise complies with
+the conditions stated in this License.</p>
+</li>
+<li><p>Submission of Contributions. Unless You explicitly state otherwise,
+any Contribution intentionally submitted for inclusion in the Work
+by You to the Licensor shall be under the terms and conditions of
+this License, without any additional terms or conditions.
+Notwithstanding the above, nothing herein shall supersede or modify
+the terms of any separate license agreement you may have executed
+with Licensor regarding such Contributions.</p>
+</li>
+<li><p>Trademarks. This License does not grant permission to use the trade
+names, trademarks, service marks, or product names of the Licensor,
+except as required for reasonable and customary use in describing the
+origin of the Work and reproducing the content of the NOTICE file.</p>
+</li>
+<li><p>Disclaimer of Warranty. Unless required by applicable law or
+agreed to in writing, Licensor provides the Work (and each
+Contributor provides its Contributions) on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
+implied, including, without limitation, any warranties or conditions
+of TITLE, NON-INFRINGEMENT, MERCHANTABILITY, or FITNESS FOR A
+PARTICULAR PURPOSE. You are solely responsible for determining the
+appropriateness of using or redistributing the Work and assume any
+risks associated with Your exercise of permissions under this License.</p>
+</li>
+<li><p>Limitation of Liability. In no event and under no legal theory,
+whether in tort (including negligence), contract, or otherwise,
+unless required by applicable law (such as deliberate and grossly
+negligent acts) or agreed to in writing, shall any Contributor be
+liable to You for damages, including any direct, indirect, special,
+incidental, or consequential damages of any character arising as a
+result of this License or out of the use or inability to use the
+Work (including but not limited to damages for loss of goodwill,
+work stoppage, computer failure or malfunction, or any and all
+other commercial damages or losses), even if such Contributor
+has been advised of the possibility of such damages.</p>
+</li>
+<li><p>Accepting Warranty or Additional Liability. While redistributing
+the Work or Derivative Works thereof, You may choose to offer,
+and charge a fee for, acceptance of support, warranty, indemnity,
+or other liability obligations and/or rights consistent with this
+License. However, in accepting such obligations, You may act only
+on Your own behalf and on Your sole responsibility, not on behalf
+of any other Contributor, and only if You agree to indemnify,
+defend, and hold each Contributor harmless for any liability
+incurred by, or claims asserted against, such Contributor by reason
+of your accepting any such warranty or additional liability.</p>
+</li>
+</ol>
+<p>END OF TERMS AND CONDITIONS</p>
+<p>APPENDIX: How to apply the Apache License to your work.</p>
+<p>To apply the Apache License to your work, attach the following
+boilerplate notice, with the fields enclosed by brackets "[]"
+replaced with your own identifying information. (Don't include
+the brackets!)  The text should be enclosed in the appropriate
+comment syntax for the file format. We also recommend that a
+file or class name and description of purpose be included on the
+same "printed page" as the copyright notice for easier
+identification within third-party archives.</p>
+<p>Copyright [yyyy] [name of copyright owner]</p>
+<p>Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at</p>
+<p><a href=3D"http://www.apache.org/licenses/LICENSE-2.0">http://www.apache=
+.org/licenses/LICENSE-2.0</a></p>
+<p>Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.</p>
+<p>---- LLVM Exceptions to the Apache 2.0 License ----</p>
+<p>As an exception, if, as a result of your compiling your source code, por=
+tions
+of this Software are embedded into an Object form of such source code, you
+may redistribute such embedded portions in such Object form without complyi=
+ng
+with the conditions of Sections 4(a), 4(b) and 4(d) of the License.</p>
+<p>In addition, if you combine or link compiled forms of this Software with
+software that is licensed under the GPLv2 ("Combined Software") and if a
+court of competent jurisdiction determines that the patent provision (Secti=
+on
+3), the indemnity provision (Section 9) or other Section of the License
+conflicts with the conditions of the GPLv2, you may retroactively and
+prospectively choose to deem waived or otherwise exclude such Section(s) of
+the License, but only in their entirety and only with respect to the Combin=
+ed
+Software.</p>
+<p>=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D<br>
+Software from third parties included in the LLVM Project:
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D<br>
+The LLVM Project contains third party software which is under different lic=
+ense
+terms. All such code will be identified clearly using at least one of two
+mechanisms:</p>
+<ol>
+<li>It will be in a separate directory tree with its own <code>LICENSE.txt<=
+/code> or
+<code>LICENSE</code> file at the top containing the specific license and re=
+strictions
+which apply to that software, or</li>
+<li>It will contain specific license and restriction terms at the top of ev=
+ery
+file.</li>
+</ol>
+<p>=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D<br>
+Legacy LLVM License (<a href=3D"https://llvm.org/docs/DeveloperPolicy.html#=
+legacy">https://llvm.org/docs/DeveloperPolicy.html#legacy</a>):
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D<br>
+University of Illinois/NCSA
+Open Source License</p>
+<p>Copyright (c) 2003-2019 University of Illinois at Urbana-Champaign.
+All rights reserved.</p>
+<p>Developed by:</p>
+<p>LLVM Team</p>
+<p>University of Illinois at Urbana-Champaign</p>
+<p><a href=3D"http://llvm.org/">http://llvm.org</a></p>
+<p>Permission is hereby granted, free of charge, to any person obtaining a =
+copy of
+this software and associated documentation files (the "Software"), to deal =
+with
+the Software without restriction, including without limitation the rights t=
+o
+use, copy, modify, merge, publish, distribute, sublicense, and/or sell copi=
+es
+of the Software, and to permit persons to whom the Software is furnished to=
+ do
+so, subject to the following conditions:</p>
+<ul>
+<li><p>Redistributions of source code must retain the above copyright notic=
+e,
+this list of conditions and the following disclaimers.</p>
+</li>
+<li><p>Redistributions in binary form must reproduce the above copyright no=
+tice,
+this list of conditions and the following disclaimers in the
+documentation and/or other materials provided with the distribution.</p>
+</li>
+<li><p>Neither the names of the LLVM Team, University of Illinois at
+Urbana-Champaign, nor the names of its contributors may be used to
+endorse or promote products derived from this Software without specific
+prior written permission.</p>
+</li>
+</ul>
+<p>THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS =
+OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FI=
+TNESS
+FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL THE
+CONTRIBUTORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FRO=
+M,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH=
+ THE
+SOFTWARE.</p>
+</blockquote>
+<h3 id=3D"boost">Boost</h3>
+<p>Boost's multiprecision library (particularly <a href=3D"https://github.c=
+om/boostorg/multiprecision/blob/develop/include/boost/multiprecision/cpp_in=
+t.hpp">cpp_int.hpp</a>) has been consulted in the creation of this library =
+and some portions of code from that library may appear in this project. To =
+the extent that any unmodified, non-derivate code from boost is included in=
+ this project, it was licensed to CJM Screws, LLC under the terms of the Bo=
+ost 1.0 license.  CJM Screws, LLC therefore licenses such portions of code =
+(to the extent they may exist within the project) under the terms of that l=
+icense.  Any derivate work based on the Boost library is licensed under ter=
+ms of the MIT license as found at the top of this document.  To comply with=
+ the terms of the Boost License, its text is reproduced here:</p>
+<blockquote>
+<p>Boost Software License - Version 1.0 - August 17th, 2003</p>
+<p>Permission is hereby granted, free of charge, to any person or organizat=
+ion
+obtaining a copy of the software and accompanying documentation covered by
+this license (the "Software") to use, reproduce, display, distribute,
+execute, and transmit the Software, and to prepare derivative works of the
+Software, and to permit third-parties to whom the Software is furnished to
+do so, all subject to the following:</p>
+<p>The copyright notices in the Software and this entire statement, includi=
+ng
+the above license grant, this restriction and the following disclaimer,
+must be included in all copies of the Software, in whole or in part, and
+all derivative works of the Software, unless such copies or derivative
+works are solely in the form of machine-executable object code generated by
+a source language processor.</p>
+<p>THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS =
+OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE, TITLE AND NON-INFRINGEMENT. IN NO EVENT
+SHALL THE COPYRIGHT HOLDERS OR ANYONE DISTRIBUTING THE SOFTWARE BE LIABLE
+FOR ANY DAMAGES OR OTHER LIABILITY, WHETHER IN CONTRACT, TORT OR OTHERWISE,
+ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+DEALINGS IN THE SOFTWARE.</p>
+</blockquote>
+<h3 id=3D"hinnant-date">Hinnant-Date</h3>
+<p>Unlike Boost, Abseil and LLVM, this project is in no way a derivative wo=
+rk of the Hinnant Date library.  Its unit-test project, however, includes a=
+nd makes use of the Hinnant Date library.  CJM Screws, LLC, has the right t=
+o use the Hinnant Date library under the terms of the MIT license.  The cod=
+e from the Hinnant library is not included in this project's repository nor=
+ directly in any packaged versions of this project in source-code form.  If=
+ you download from this project's repository a <strong>pre-compiled and pre=
+-linked</strong> version of the unit test application, the Hinnant code wil=
+l be included in it in object-code form.  In this case, CJM Screws, LLC wil=
+l license the code to you under the same terms it was licensed to us: under=
+ the MIT license.  The copyright holders and copyright dates of various par=
+ts of the Hinnant library vary but are all provided under the MIT license. =
+A copy of these terms is reproduced below to ensure license compliance.  Da=
+tes and copyright holders are not included because they vary:</p>
+<blockquote>
+<p>The MIT License (MIT)</p>
+<p>Permission is hereby granted, free of charge, to any person obtaining a =
+copy
+of this software and associated documentation files (the "Software"), to de=
+al
+in the Software without restriction, including without limitation the right=
+s
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:</p>
+<p>The above copyright notice and this permission notice shall be included =
+in all
+copies or substantial portions of the Software.</p>
+<p>THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS =
+OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FRO=
+M,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN T=
+HE
+SOFTWARE.</p>
+</blockquote>
+<p>If you wish to build the unit test project yourself, you will need to do=
+wnload the Hinnant date libary under the terms of whatever license you can =
+acquire it other (again, it is currently offered under the MIT license).  I=
+t can be found via a vcpkg and otherwise as described <a href=3D"https://gi=
+thub.com/HowardHinnant/date#build--test">here</a>.</p>
+
+    <!-- End Markdown Monster Content -->
+</div>
+
+
+</body></html>
+------MultipartBoundary--UrpJjMYV44Fc9akAXoOKXJLMcu0mI7Izu96NbZJoyL----
+Content-Type: text/css
+Content-Transfer-Encoding: quoted-printable
+Content-Location: file:///C:/Users/Christopher%20Susie/AppData/Local/Markdown%20Monster/PreviewThemes/scripts/fontawesome/css/font-awesome.min.css
+
+@charset "utf-8";
+
+@font-face { font-family: FontAwesome; src: url("../fonts/fontawesome-webfo=
+nt.eot?#iefix&v=3D4.7.0") format("embedded-opentype"), url("../fonts/fontaw=
+esome-webfont.woff2?v=3D4.7.0") format("woff2"), url("../fonts/fontawesome-=
+webfont.woff?v=3D4.7.0") format("woff"), url("../fonts/fontawesome-webfont.=
+ttf?v=3D4.7.0") format("truetype"), url("../fonts/fontawesome-webfont.svg?v=
+=3D4.7.0#fontawesomeregular") format("svg"); font-weight: normal; font-styl=
+e: normal; }
+
+.fa { display: inline-block; font-style: normal; font-variant: normal; font=
+-weight: normal; font-stretch: normal; line-height: 1; font-family: FontAwe=
+some; font-size: inherit; text-rendering: auto; -webkit-font-smoothing: ant=
+ialiased; }
+
+.fa-lg { font-size: 1.33333em; line-height: 0.75em; vertical-align: -15%; }
+
+.fa-2x { font-size: 2em; }
+
+.fa-3x { font-size: 3em; }
+
+.fa-4x { font-size: 4em; }
+
+.fa-5x { font-size: 5em; }
+
+.fa-fw { width: 1.28571em; text-align: center; }
+
+.fa-ul { padding-left: 0px; margin-left: 2.14286em; list-style-type: none; =
+}
+
+.fa-ul > li { position: relative; }
+
+.fa-li { position: absolute; left: -2.14286em; width: 2.14286em; top: 0.142=
+857em; text-align: center; }
+
+.fa-li.fa-lg { left: -1.85714em; }
+
+.fa-border { padding: 0.2em 0.25em 0.15em; border: 0.08em solid rgb(238, 23=
+8, 238); border-radius: 0.1em; }
+
+.fa-pull-left { float: left; }
+
+.fa-pull-right { float: right; }
+
+.fa.fa-pull-left { margin-right: 0.3em; }
+
+.fa.fa-pull-right { margin-left: 0.3em; }
+
+.pull-right { float: right; }
+
+.pull-left { float: left; }
+
+.fa.pull-left { margin-right: 0.3em; }
+
+.fa.pull-right { margin-left: 0.3em; }
+
+.fa-spin { animation: 2s linear 0s infinite normal none running fa-spin; }
+
+.fa-pulse { animation: 1s steps(8) 0s infinite normal none running fa-spin;=
+ }
+
+@-webkit-keyframes fa-spin {=20
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(359deg); }
+}
+
+@keyframes fa-spin {=20
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(359deg); }
+}
+
+.fa-rotate-90 { transform: rotate(90deg); }
+
+.fa-rotate-180 { transform: rotate(180deg); }
+
+.fa-rotate-270 { transform: rotate(270deg); }
+
+.fa-flip-horizontal { transform: scale(-1, 1); }
+
+.fa-flip-vertical { transform: scale(1, -1); }
+
+:root .fa-rotate-90, :root .fa-rotate-180, :root .fa-rotate-270, :root .fa-=
+flip-horizontal, :root .fa-flip-vertical { filter: none; }
+
+.fa-stack { position: relative; display: inline-block; width: 2em; height: =
+2em; line-height: 2em; vertical-align: middle; }
+
+.fa-stack-1x, .fa-stack-2x { position: absolute; left: 0px; width: 100%; te=
+xt-align: center; }
+
+.fa-stack-1x { line-height: inherit; }
+
+.fa-stack-2x { font-size: 2em; }
+
+.fa-inverse { color: rgb(255, 255, 255); }
+
+.fa-glass::before { content: "=EF=80=80"; }
+
+.fa-music::before { content: "=EF=80=81"; }
+
+.fa-search::before { content: "=EF=80=82"; }
+
+.fa-envelope-o::before { content: "=EF=80=83"; }
+
+.fa-heart::before { content: "=EF=80=84"; }
+
+.fa-star::before { content: "=EF=80=85"; }
+
+.fa-star-o::before { content: "=EF=80=86"; }
+
+.fa-user::before { content: "=EF=80=87"; }
+
+.fa-film::before { content: "=EF=80=88"; }
+
+.fa-th-large::before { content: "=EF=80=89"; }
+
+.fa-th::before { content: "=EF=80=8A"; }
+
+.fa-th-list::before { content: "=EF=80=8B"; }
+
+.fa-check::before { content: "=EF=80=8C"; }
+
+.fa-remove::before, .fa-close::before, .fa-times::before { content: "=EF=80=
+=8D"; }
+
+.fa-search-plus::before { content: "=EF=80=8E"; }
+
+.fa-search-minus::before { content: "=EF=80=90"; }
+
+.fa-power-off::before { content: "=EF=80=91"; }
+
+.fa-signal::before { content: "=EF=80=92"; }
+
+.fa-gear::before, .fa-cog::before { content: "=EF=80=93"; }
+
+.fa-trash-o::before { content: "=EF=80=94"; }
+
+.fa-home::before { content: "=EF=80=95"; }
+
+.fa-file-o::before { content: "=EF=80=96"; }
+
+.fa-clock-o::before { content: "=EF=80=97"; }
+
+.fa-road::before { content: "=EF=80=98"; }
+
+.fa-download::before { content: "=EF=80=99"; }
+
+.fa-arrow-circle-o-down::before { content: "=EF=80=9A"; }
+
+.fa-arrow-circle-o-up::before { content: "=EF=80=9B"; }
+
+.fa-inbox::before { content: "=EF=80=9C"; }
+
+.fa-play-circle-o::before { content: "=EF=80=9D"; }
+
+.fa-rotate-right::before, .fa-repeat::before { content: "=EF=80=9E"; }
+
+.fa-refresh::before { content: "=EF=80=A1"; }
+
+.fa-list-alt::before { content: "=EF=80=A2"; }
+
+.fa-lock::before { content: "=EF=80=A3"; }
+
+.fa-flag::before { content: "=EF=80=A4"; }
+
+.fa-headphones::before { content: "=EF=80=A5"; }
+
+.fa-volume-off::before { content: "=EF=80=A6"; }
+
+.fa-volume-down::before { content: "=EF=80=A7"; }
+
+.fa-volume-up::before { content: "=EF=80=A8"; }
+
+.fa-qrcode::before { content: "=EF=80=A9"; }
+
+.fa-barcode::before { content: "=EF=80=AA"; }
+
+.fa-tag::before { content: "=EF=80=AB"; }
+
+.fa-tags::before { content: "=EF=80=AC"; }
+
+.fa-book::before { content: "=EF=80=AD"; }
+
+.fa-bookmark::before { content: "=EF=80=AE"; }
+
+.fa-print::before { content: "=EF=80=AF"; }
+
+.fa-camera::before { content: "=EF=80=B0"; }
+
+.fa-font::before { content: "=EF=80=B1"; }
+
+.fa-bold::before { content: "=EF=80=B2"; }
+
+.fa-italic::before { content: "=EF=80=B3"; }
+
+.fa-text-height::before { content: "=EF=80=B4"; }
+
+.fa-text-width::before { content: "=EF=80=B5"; }
+
+.fa-align-left::before { content: "=EF=80=B6"; }
+
+.fa-align-center::before { content: "=EF=80=B7"; }
+
+.fa-align-right::before { content: "=EF=80=B8"; }
+
+.fa-align-justify::before { content: "=EF=80=B9"; }
+
+.fa-list::before { content: "=EF=80=BA"; }
+
+.fa-dedent::before, .fa-outdent::before { content: "=EF=80=BB"; }
+
+.fa-indent::before { content: "=EF=80=BC"; }
+
+.fa-video-camera::before { content: "=EF=80=BD"; }
+
+.fa-photo::before, .fa-image::before, .fa-picture-o::before { content: "=EF=
+=80=BE"; }
+
+.fa-pencil::before { content: "=EF=81=80"; }
+
+.fa-map-marker::before { content: "=EF=81=81"; }
+
+.fa-adjust::before { content: "=EF=81=82"; }
+
+.fa-tint::before { content: "=EF=81=83"; }
+
+.fa-edit::before, .fa-pencil-square-o::before { content: "=EF=81=84"; }
+
+.fa-share-square-o::before { content: "=EF=81=85"; }
+
+.fa-check-square-o::before { content: "=EF=81=86"; }
+
+.fa-arrows::before { content: "=EF=81=87"; }
+
+.fa-step-backward::before { content: "=EF=81=88"; }
+
+.fa-fast-backward::before { content: "=EF=81=89"; }
+
+.fa-backward::before { content: "=EF=81=8A"; }
+
+.fa-play::before { content: "=EF=81=8B"; }
+
+.fa-pause::before { content: "=EF=81=8C"; }
+
+.fa-stop::before { content: "=EF=81=8D"; }
+
+.fa-forward::before { content: "=EF=81=8E"; }
+
+.fa-fast-forward::before { content: "=EF=81=90"; }
+
+.fa-step-forward::before { content: "=EF=81=91"; }
+
+.fa-eject::before { content: "=EF=81=92"; }
+
+.fa-chevron-left::before { content: "=EF=81=93"; }
+
+.fa-chevron-right::before { content: "=EF=81=94"; }
+
+.fa-plus-circle::before { content: "=EF=81=95"; }
+
+.fa-minus-circle::before { content: "=EF=81=96"; }
+
+.fa-times-circle::before { content: "=EF=81=97"; }
+
+.fa-check-circle::before { content: "=EF=81=98"; }
+
+.fa-question-circle::before { content: "=EF=81=99"; }
+
+.fa-info-circle::before { content: "=EF=81=9A"; }
+
+.fa-crosshairs::before { content: "=EF=81=9B"; }
+
+.fa-times-circle-o::before { content: "=EF=81=9C"; }
+
+.fa-check-circle-o::before { content: "=EF=81=9D"; }
+
+.fa-ban::before { content: "=EF=81=9E"; }
+
+.fa-arrow-left::before { content: "=EF=81=A0"; }
+
+.fa-arrow-right::before { content: "=EF=81=A1"; }
+
+.fa-arrow-up::before { content: "=EF=81=A2"; }
+
+.fa-arrow-down::before { content: "=EF=81=A3"; }
+
+.fa-mail-forward::before, .fa-share::before { content: "=EF=81=A4"; }
+
+.fa-expand::before { content: "=EF=81=A5"; }
+
+.fa-compress::before { content: "=EF=81=A6"; }
+
+.fa-plus::before { content: "=EF=81=A7"; }
+
+.fa-minus::before { content: "=EF=81=A8"; }
+
+.fa-asterisk::before { content: "=EF=81=A9"; }
+
+.fa-exclamation-circle::before { content: "=EF=81=AA"; }
+
+.fa-gift::before { content: "=EF=81=AB"; }
+
+.fa-leaf::before { content: "=EF=81=AC"; }
+
+.fa-fire::before { content: "=EF=81=AD"; }
+
+.fa-eye::before { content: "=EF=81=AE"; }
+
+.fa-eye-slash::before { content: "=EF=81=B0"; }
+
+.fa-warning::before, .fa-exclamation-triangle::before { content: "=EF=81=B1=
+"; }
+
+.fa-plane::before { content: "=EF=81=B2"; }
+
+.fa-calendar::before { content: "=EF=81=B3"; }
+
+.fa-random::before { content: "=EF=81=B4"; }
+
+.fa-comment::before { content: "=EF=81=B5"; }
+
+.fa-magnet::before { content: "=EF=81=B6"; }
+
+.fa-chevron-up::before { content: "=EF=81=B7"; }
+
+.fa-chevron-down::before { content: "=EF=81=B8"; }
+
+.fa-retweet::before { content: "=EF=81=B9"; }
+
+.fa-shopping-cart::before { content: "=EF=81=BA"; }
+
+.fa-folder::before { content: "=EF=81=BB"; }
+
+.fa-folder-open::before { content: "=EF=81=BC"; }
+
+.fa-arrows-v::before { content: "=EF=81=BD"; }
+
+.fa-arrows-h::before { content: "=EF=81=BE"; }
+
+.fa-bar-chart-o::before, .fa-bar-chart::before { content: "=EF=82=80"; }
+
+.fa-twitter-square::before { content: "=EF=82=81"; }
+
+.fa-facebook-square::before { content: "=EF=82=82"; }
+
+.fa-camera-retro::before { content: "=EF=82=83"; }
+
+.fa-key::before { content: "=EF=82=84"; }
+
+.fa-gears::before, .fa-cogs::before { content: "=EF=82=85"; }
+
+.fa-comments::before { content: "=EF=82=86"; }
+
+.fa-thumbs-o-up::before { content: "=EF=82=87"; }
+
+.fa-thumbs-o-down::before { content: "=EF=82=88"; }
+
+.fa-star-half::before { content: "=EF=82=89"; }
+
+.fa-heart-o::before { content: "=EF=82=8A"; }
+
+.fa-sign-out::before { content: "=EF=82=8B"; }
+
+.fa-linkedin-square::before { content: "=EF=82=8C"; }
+
+.fa-thumb-tack::before { content: "=EF=82=8D"; }
+
+.fa-external-link::before { content: "=EF=82=8E"; }
+
+.fa-sign-in::before { content: "=EF=82=90"; }
+
+.fa-trophy::before { content: "=EF=82=91"; }
+
+.fa-github-square::before { content: "=EF=82=92"; }
+
+.fa-upload::before { content: "=EF=82=93"; }
+
+.fa-lemon-o::before { content: "=EF=82=94"; }
+
+.fa-phone::before { content: "=EF=82=95"; }
+
+.fa-square-o::before { content: "=EF=82=96"; }
+
+.fa-bookmark-o::before { content: "=EF=82=97"; }
+
+.fa-phone-square::before { content: "=EF=82=98"; }
+
+.fa-twitter::before { content: "=EF=82=99"; }
+
+.fa-facebook-f::before, .fa-facebook::before { content: "=EF=82=9A"; }
+
+.fa-github::before { content: "=EF=82=9B"; }
+
+.fa-unlock::before { content: "=EF=82=9C"; }
+
+.fa-credit-card::before { content: "=EF=82=9D"; }
+
+.fa-feed::before, .fa-rss::before { content: "=EF=82=9E"; }
+
+.fa-hdd-o::before { content: "=EF=82=A0"; }
+
+.fa-bullhorn::before { content: "=EF=82=A1"; }
+
+.fa-bell::before { content: "=EF=83=B3"; }
+
+.fa-certificate::before { content: "=EF=82=A3"; }
+
+.fa-hand-o-right::before { content: "=EF=82=A4"; }
+
+.fa-hand-o-left::before { content: "=EF=82=A5"; }
+
+.fa-hand-o-up::before { content: "=EF=82=A6"; }
+
+.fa-hand-o-down::before { content: "=EF=82=A7"; }
+
+.fa-arrow-circle-left::before { content: "=EF=82=A8"; }
+
+.fa-arrow-circle-right::before { content: "=EF=82=A9"; }
+
+.fa-arrow-circle-up::before { content: "=EF=82=AA"; }
+
+.fa-arrow-circle-down::before { content: "=EF=82=AB"; }
+
+.fa-globe::before { content: "=EF=82=AC"; }
+
+.fa-wrench::before { content: "=EF=82=AD"; }
+
+.fa-tasks::before { content: "=EF=82=AE"; }
+
+.fa-filter::before { content: "=EF=82=B0"; }
+
+.fa-briefcase::before { content: "=EF=82=B1"; }
+
+.fa-arrows-alt::before { content: "=EF=82=B2"; }
+
+.fa-group::before, .fa-users::before { content: "=EF=83=80"; }
+
+.fa-chain::before, .fa-link::before { content: "=EF=83=81"; }
+
+.fa-cloud::before { content: "=EF=83=82"; }
+
+.fa-flask::before { content: "=EF=83=83"; }
+
+.fa-cut::before, .fa-scissors::before { content: "=EF=83=84"; }
+
+.fa-copy::before, .fa-files-o::before { content: "=EF=83=85"; }
+
+.fa-paperclip::before { content: "=EF=83=86"; }
+
+.fa-save::before, .fa-floppy-o::before { content: "=EF=83=87"; }
+
+.fa-square::before { content: "=EF=83=88"; }
+
+.fa-navicon::before, .fa-reorder::before, .fa-bars::before { content: "=EF=
+=83=89"; }
+
+.fa-list-ul::before { content: "=EF=83=8A"; }
+
+.fa-list-ol::before { content: "=EF=83=8B"; }
+
+.fa-strikethrough::before { content: "=EF=83=8C"; }
+
+.fa-underline::before { content: "=EF=83=8D"; }
+
+.fa-table::before { content: "=EF=83=8E"; }
+
+.fa-magic::before { content: "=EF=83=90"; }
+
+.fa-truck::before { content: "=EF=83=91"; }
+
+.fa-pinterest::before { content: "=EF=83=92"; }
+
+.fa-pinterest-square::before { content: "=EF=83=93"; }
+
+.fa-google-plus-square::before { content: "=EF=83=94"; }
+
+.fa-google-plus::before { content: "=EF=83=95"; }
+
+.fa-money::before { content: "=EF=83=96"; }
+
+.fa-caret-down::before { content: "=EF=83=97"; }
+
+.fa-caret-up::before { content: "=EF=83=98"; }
+
+.fa-caret-left::before { content: "=EF=83=99"; }
+
+.fa-caret-right::before { content: "=EF=83=9A"; }
+
+.fa-columns::before { content: "=EF=83=9B"; }
+
+.fa-unsorted::before, .fa-sort::before { content: "=EF=83=9C"; }
+
+.fa-sort-down::before, .fa-sort-desc::before { content: "=EF=83=9D"; }
+
+.fa-sort-up::before, .fa-sort-asc::before { content: "=EF=83=9E"; }
+
+.fa-envelope::before { content: "=EF=83=A0"; }
+
+.fa-linkedin::before { content: "=EF=83=A1"; }
+
+.fa-rotate-left::before, .fa-undo::before { content: "=EF=83=A2"; }
+
+.fa-legal::before, .fa-gavel::before { content: "=EF=83=A3"; }
+
+.fa-dashboard::before, .fa-tachometer::before { content: "=EF=83=A4"; }
+
+.fa-comment-o::before { content: "=EF=83=A5"; }
+
+.fa-comments-o::before { content: "=EF=83=A6"; }
+
+.fa-flash::before, .fa-bolt::before { content: "=EF=83=A7"; }
+
+.fa-sitemap::before { content: "=EF=83=A8"; }
+
+.fa-umbrella::before { content: "=EF=83=A9"; }
+
+.fa-paste::before, .fa-clipboard::before { content: "=EF=83=AA"; }
+
+.fa-lightbulb-o::before { content: "=EF=83=AB"; }
+
+.fa-exchange::before { content: "=EF=83=AC"; }
+
+.fa-cloud-download::before { content: "=EF=83=AD"; }
+
+.fa-cloud-upload::before { content: "=EF=83=AE"; }
+
+.fa-user-md::before { content: "=EF=83=B0"; }
+
+.fa-stethoscope::before { content: "=EF=83=B1"; }
+
+.fa-suitcase::before { content: "=EF=83=B2"; }
+
+.fa-bell-o::before { content: "=EF=82=A2"; }
+
+.fa-coffee::before { content: "=EF=83=B4"; }
+
+.fa-cutlery::before { content: "=EF=83=B5"; }
+
+.fa-file-text-o::before { content: "=EF=83=B6"; }
+
+.fa-building-o::before { content: "=EF=83=B7"; }
+
+.fa-hospital-o::before { content: "=EF=83=B8"; }
+
+.fa-ambulance::before { content: "=EF=83=B9"; }
+
+.fa-medkit::before { content: "=EF=83=BA"; }
+
+.fa-fighter-jet::before { content: "=EF=83=BB"; }
+
+.fa-beer::before { content: "=EF=83=BC"; }
+
+.fa-h-square::before { content: "=EF=83=BD"; }
+
+.fa-plus-square::before { content: "=EF=83=BE"; }
+
+.fa-angle-double-left::before { content: "=EF=84=80"; }
+
+.fa-angle-double-right::before { content: "=EF=84=81"; }
+
+.fa-angle-double-up::before { content: "=EF=84=82"; }
+
+.fa-angle-double-down::before { content: "=EF=84=83"; }
+
+.fa-angle-left::before { content: "=EF=84=84"; }
+
+.fa-angle-right::before { content: "=EF=84=85"; }
+
+.fa-angle-up::before { content: "=EF=84=86"; }
+
+.fa-angle-down::before { content: "=EF=84=87"; }
+
+.fa-desktop::before { content: "=EF=84=88"; }
+
+.fa-laptop::before { content: "=EF=84=89"; }
+
+.fa-tablet::before { content: "=EF=84=8A"; }
+
+.fa-mobile-phone::before, .fa-mobile::before { content: "=EF=84=8B"; }
+
+.fa-circle-o::before { content: "=EF=84=8C"; }
+
+.fa-quote-left::before { content: "=EF=84=8D"; }
+
+.fa-quote-right::before { content: "=EF=84=8E"; }
+
+.fa-spinner::before { content: "=EF=84=90"; }
+
+.fa-circle::before { content: "=EF=84=91"; }
+
+.fa-mail-reply::before, .fa-reply::before { content: "=EF=84=92"; }
+
+.fa-github-alt::before { content: "=EF=84=93"; }
+
+.fa-folder-o::before { content: "=EF=84=94"; }
+
+.fa-folder-open-o::before { content: "=EF=84=95"; }
+
+.fa-smile-o::before { content: "=EF=84=98"; }
+
+.fa-frown-o::before { content: "=EF=84=99"; }
+
+.fa-meh-o::before { content: "=EF=84=9A"; }
+
+.fa-gamepad::before { content: "=EF=84=9B"; }
+
+.fa-keyboard-o::before { content: "=EF=84=9C"; }
+
+.fa-flag-o::before { content: "=EF=84=9D"; }
+
+.fa-flag-checkered::before { content: "=EF=84=9E"; }
+
+.fa-terminal::before { content: "=EF=84=A0"; }
+
+.fa-code::before { content: "=EF=84=A1"; }
+
+.fa-mail-reply-all::before, .fa-reply-all::before { content: "=EF=84=A2"; }
+
+.fa-star-half-empty::before, .fa-star-half-full::before, .fa-star-half-o::b=
+efore { content: "=EF=84=A3"; }
+
+.fa-location-arrow::before { content: "=EF=84=A4"; }
+
+.fa-crop::before { content: "=EF=84=A5"; }
+
+.fa-code-fork::before { content: "=EF=84=A6"; }
+
+.fa-unlink::before, .fa-chain-broken::before { content: "=EF=84=A7"; }
+
+.fa-question::before { content: "=EF=84=A8"; }
+
+.fa-info::before { content: "=EF=84=A9"; }
+
+.fa-exclamation::before { content: "=EF=84=AA"; }
+
+.fa-superscript::before { content: "=EF=84=AB"; }
+
+.fa-subscript::before { content: "=EF=84=AC"; }
+
+.fa-eraser::before { content: "=EF=84=AD"; }
+
+.fa-puzzle-piece::before { content: "=EF=84=AE"; }
+
+.fa-microphone::before { content: "=EF=84=B0"; }
+
+.fa-microphone-slash::before { content: "=EF=84=B1"; }
+
+.fa-shield::before { content: "=EF=84=B2"; }
+
+.fa-calendar-o::before { content: "=EF=84=B3"; }
+
+.fa-fire-extinguisher::before { content: "=EF=84=B4"; }
+
+.fa-rocket::before { content: "=EF=84=B5"; }
+
+.fa-maxcdn::before { content: "=EF=84=B6"; }
+
+.fa-chevron-circle-left::before { content: "=EF=84=B7"; }
+
+.fa-chevron-circle-right::before { content: "=EF=84=B8"; }
+
+.fa-chevron-circle-up::before { content: "=EF=84=B9"; }
+
+.fa-chevron-circle-down::before { content: "=EF=84=BA"; }
+
+.fa-html5::before { content: "=EF=84=BB"; }
+
+.fa-css3::before { content: "=EF=84=BC"; }
+
+.fa-anchor::before { content: "=EF=84=BD"; }
+
+.fa-unlock-alt::before { content: "=EF=84=BE"; }
+
+.fa-bullseye::before { content: "=EF=85=80"; }
+
+.fa-ellipsis-h::before { content: "=EF=85=81"; }
+
+.fa-ellipsis-v::before { content: "=EF=85=82"; }
+
+.fa-rss-square::before { content: "=EF=85=83"; }
+
+.fa-play-circle::before { content: "=EF=85=84"; }
+
+.fa-ticket::before { content: "=EF=85=85"; }
+
+.fa-minus-square::before { content: "=EF=85=86"; }
+
+.fa-minus-square-o::before { content: "=EF=85=87"; }
+
+.fa-level-up::before { content: "=EF=85=88"; }
+
+.fa-level-down::before { content: "=EF=85=89"; }
+
+.fa-check-square::before { content: "=EF=85=8A"; }
+
+.fa-pencil-square::before { content: "=EF=85=8B"; }
+
+.fa-external-link-square::before { content: "=EF=85=8C"; }
+
+.fa-share-square::before { content: "=EF=85=8D"; }
+
+.fa-compass::before { content: "=EF=85=8E"; }
+
+.fa-toggle-down::before, .fa-caret-square-o-down::before { content: "=EF=85=
+=90"; }
+
+.fa-toggle-up::before, .fa-caret-square-o-up::before { content: "=EF=85=91"=
+; }
+
+.fa-toggle-right::before, .fa-caret-square-o-right::before { content: "=EF=
+=85=92"; }
+
+.fa-euro::before, .fa-eur::before { content: "=EF=85=93"; }
+
+.fa-gbp::before { content: "=EF=85=94"; }
+
+.fa-dollar::before, .fa-usd::before { content: "=EF=85=95"; }
+
+.fa-rupee::before, .fa-inr::before { content: "=EF=85=96"; }
+
+.fa-cny::before, .fa-rmb::before, .fa-yen::before, .fa-jpy::before { conten=
+t: "=EF=85=97"; }
+
+.fa-ruble::before, .fa-rouble::before, .fa-rub::before { content: "=EF=85=
+=98"; }
+
+.fa-won::before, .fa-krw::before { content: "=EF=85=99"; }
+
+.fa-bitcoin::before, .fa-btc::before { content: "=EF=85=9A"; }
+
+.fa-file::before { content: "=EF=85=9B"; }
+
+.fa-file-text::before { content: "=EF=85=9C"; }
+
+.fa-sort-alpha-asc::before { content: "=EF=85=9D"; }
+
+.fa-sort-alpha-desc::before { content: "=EF=85=9E"; }
+
+.fa-sort-amount-asc::before { content: "=EF=85=A0"; }
+
+.fa-sort-amount-desc::before { content: "=EF=85=A1"; }
+
+.fa-sort-numeric-asc::before { content: "=EF=85=A2"; }
+
+.fa-sort-numeric-desc::before { content: "=EF=85=A3"; }
+
+.fa-thumbs-up::before { content: "=EF=85=A4"; }
+
+.fa-thumbs-down::before { content: "=EF=85=A5"; }
+
+.fa-youtube-square::before { content: "=EF=85=A6"; }
+
+.fa-youtube::before { content: "=EF=85=A7"; }
+
+.fa-xing::before { content: "=EF=85=A8"; }
+
+.fa-xing-square::before { content: "=EF=85=A9"; }
+
+.fa-youtube-play::before { content: "=EF=85=AA"; }
+
+.fa-dropbox::before { content: "=EF=85=AB"; }
+
+.fa-stack-overflow::before { content: "=EF=85=AC"; }
+
+.fa-instagram::before { content: "=EF=85=AD"; }
+
+.fa-flickr::before { content: "=EF=85=AE"; }
+
+.fa-adn::before { content: "=EF=85=B0"; }
+
+.fa-bitbucket::before { content: "=EF=85=B1"; }
+
+.fa-bitbucket-square::before { content: "=EF=85=B2"; }
+
+.fa-tumblr::before { content: "=EF=85=B3"; }
+
+.fa-tumblr-square::before { content: "=EF=85=B4"; }
+
+.fa-long-arrow-down::before { content: "=EF=85=B5"; }
+
+.fa-long-arrow-up::before { content: "=EF=85=B6"; }
+
+.fa-long-arrow-left::before { content: "=EF=85=B7"; }
+
+.fa-long-arrow-right::before { content: "=EF=85=B8"; }
+
+.fa-apple::before { content: "=EF=85=B9"; }
+
+.fa-windows::before { content: "=EF=85=BA"; }
+
+.fa-android::before { content: "=EF=85=BB"; }
+
+.fa-linux::before { content: "=EF=85=BC"; }
+
+.fa-dribbble::before { content: "=EF=85=BD"; }
+
+.fa-skype::before { content: "=EF=85=BE"; }
+
+.fa-foursquare::before { content: "=EF=86=80"; }
+
+.fa-trello::before { content: "=EF=86=81"; }
+
+.fa-female::before { content: "=EF=86=82"; }
+
+.fa-male::before { content: "=EF=86=83"; }
+
+.fa-gittip::before, .fa-gratipay::before { content: "=EF=86=84"; }
+
+.fa-sun-o::before { content: "=EF=86=85"; }
+
+.fa-moon-o::before { content: "=EF=86=86"; }
+
+.fa-archive::before { content: "=EF=86=87"; }
+
+.fa-bug::before { content: "=EF=86=88"; }
+
+.fa-vk::before { content: "=EF=86=89"; }
+
+.fa-weibo::before { content: "=EF=86=8A"; }
+
+.fa-renren::before { content: "=EF=86=8B"; }
+
+.fa-pagelines::before { content: "=EF=86=8C"; }
+
+.fa-stack-exchange::before { content: "=EF=86=8D"; }
+
+.fa-arrow-circle-o-right::before { content: "=EF=86=8E"; }
+
+.fa-arrow-circle-o-left::before { content: "=EF=86=90"; }
+
+.fa-toggle-left::before, .fa-caret-square-o-left::before { content: "=EF=86=
+=91"; }
+
+.fa-dot-circle-o::before { content: "=EF=86=92"; }
+
+.fa-wheelchair::before { content: "=EF=86=93"; }
+
+.fa-vimeo-square::before { content: "=EF=86=94"; }
+
+.fa-turkish-lira::before, .fa-try::before { content: "=EF=86=95"; }
+
+.fa-plus-square-o::before { content: "=EF=86=96"; }
+
+.fa-space-shuttle::before { content: "=EF=86=97"; }
+
+.fa-slack::before { content: "=EF=86=98"; }
+
+.fa-envelope-square::before { content: "=EF=86=99"; }
+
+.fa-wordpress::before { content: "=EF=86=9A"; }
+
+.fa-openid::before { content: "=EF=86=9B"; }
+
+.fa-institution::before, .fa-bank::before, .fa-university::before { content=
+: "=EF=86=9C"; }
+
+.fa-mortar-board::before, .fa-graduation-cap::before { content: "=EF=86=9D"=
+; }
+
+.fa-yahoo::before { content: "=EF=86=9E"; }
+
+.fa-google::before { content: "=EF=86=A0"; }
+
+.fa-reddit::before { content: "=EF=86=A1"; }
+
+.fa-reddit-square::before { content: "=EF=86=A2"; }
+
+.fa-stumbleupon-circle::before { content: "=EF=86=A3"; }
+
+.fa-stumbleupon::before { content: "=EF=86=A4"; }
+
+.fa-delicious::before { content: "=EF=86=A5"; }
+
+.fa-digg::before { content: "=EF=86=A6"; }
+
+.fa-pied-piper-pp::before { content: "=EF=86=A7"; }
+
+.fa-pied-piper-alt::before { content: "=EF=86=A8"; }
+
+.fa-drupal::before { content: "=EF=86=A9"; }
+
+.fa-joomla::before { content: "=EF=86=AA"; }
+
+.fa-language::before { content: "=EF=86=AB"; }
+
+.fa-fax::before { content: "=EF=86=AC"; }
+
+.fa-building::before { content: "=EF=86=AD"; }
+
+.fa-child::before { content: "=EF=86=AE"; }
+
+.fa-paw::before { content: "=EF=86=B0"; }
+
+.fa-spoon::before { content: "=EF=86=B1"; }
+
+.fa-cube::before { content: "=EF=86=B2"; }
+
+.fa-cubes::before { content: "=EF=86=B3"; }
+
+.fa-behance::before { content: "=EF=86=B4"; }
+
+.fa-behance-square::before { content: "=EF=86=B5"; }
+
+.fa-steam::before { content: "=EF=86=B6"; }
+
+.fa-steam-square::before { content: "=EF=86=B7"; }
+
+.fa-recycle::before { content: "=EF=86=B8"; }
+
+.fa-automobile::before, .fa-car::before { content: "=EF=86=B9"; }
+
+.fa-cab::before, .fa-taxi::before { content: "=EF=86=BA"; }
+
+.fa-tree::before { content: "=EF=86=BB"; }
+
+.fa-spotify::before { content: "=EF=86=BC"; }
+
+.fa-deviantart::before { content: "=EF=86=BD"; }
+
+.fa-soundcloud::before { content: "=EF=86=BE"; }
+
+.fa-database::before { content: "=EF=87=80"; }
+
+.fa-file-pdf-o::before { content: "=EF=87=81"; }
+
+.fa-file-word-o::before { content: "=EF=87=82"; }
+
+.fa-file-excel-o::before { content: "=EF=87=83"; }
+
+.fa-file-powerpoint-o::before { content: "=EF=87=84"; }
+
+.fa-file-photo-o::before, .fa-file-picture-o::before, .fa-file-image-o::bef=
+ore { content: "=EF=87=85"; }
+
+.fa-file-zip-o::before, .fa-file-archive-o::before { content: "=EF=87=86"; =
+}
+
+.fa-file-sound-o::before, .fa-file-audio-o::before { content: "=EF=87=87"; =
+}
+
+.fa-file-movie-o::before, .fa-file-video-o::before { content: "=EF=87=88"; =
+}
+
+.fa-file-code-o::before { content: "=EF=87=89"; }
+
+.fa-vine::before { content: "=EF=87=8A"; }
+
+.fa-codepen::before { content: "=EF=87=8B"; }
+
+.fa-jsfiddle::before { content: "=EF=87=8C"; }
+
+.fa-life-bouy::before, .fa-life-buoy::before, .fa-life-saver::before, .fa-s=
+upport::before, .fa-life-ring::before { content: "=EF=87=8D"; }
+
+.fa-circle-o-notch::before { content: "=EF=87=8E"; }
+
+.fa-ra::before, .fa-resistance::before, .fa-rebel::before { content: "=EF=
+=87=90"; }
+
+.fa-ge::before, .fa-empire::before { content: "=EF=87=91"; }
+
+.fa-git-square::before { content: "=EF=87=92"; }
+
+.fa-git::before { content: "=EF=87=93"; }
+
+.fa-y-combinator-square::before, .fa-yc-square::before, .fa-hacker-news::be=
+fore { content: "=EF=87=94"; }
+
+.fa-tencent-weibo::before { content: "=EF=87=95"; }
+
+.fa-qq::before { content: "=EF=87=96"; }
+
+.fa-wechat::before, .fa-weixin::before { content: "=EF=87=97"; }
+
+.fa-send::before, .fa-paper-plane::before { content: "=EF=87=98"; }
+
+.fa-send-o::before, .fa-paper-plane-o::before { content: "=EF=87=99"; }
+
+.fa-history::before { content: "=EF=87=9A"; }
+
+.fa-circle-thin::before { content: "=EF=87=9B"; }
+
+.fa-header::before { content: "=EF=87=9C"; }
+
+.fa-paragraph::before { content: "=EF=87=9D"; }
+
+.fa-sliders::before { content: "=EF=87=9E"; }
+
+.fa-share-alt::before { content: "=EF=87=A0"; }
+
+.fa-share-alt-square::before { content: "=EF=87=A1"; }
+
+.fa-bomb::before { content: "=EF=87=A2"; }
+
+.fa-soccer-ball-o::before, .fa-futbol-o::before { content: "=EF=87=A3"; }
+
+.fa-tty::before { content: "=EF=87=A4"; }
+
+.fa-binoculars::before { content: "=EF=87=A5"; }
+
+.fa-plug::before { content: "=EF=87=A6"; }
+
+.fa-slideshare::before { content: "=EF=87=A7"; }
+
+.fa-twitch::before { content: "=EF=87=A8"; }
+
+.fa-yelp::before { content: "=EF=87=A9"; }
+
+.fa-newspaper-o::before { content: "=EF=87=AA"; }
+
+.fa-wifi::before { content: "=EF=87=AB"; }
+
+.fa-calculator::before { content: "=EF=87=AC"; }
+
+.fa-paypal::before { content: "=EF=87=AD"; }
+
+.fa-google-wallet::before { content: "=EF=87=AE"; }
+
+.fa-cc-visa::before { content: "=EF=87=B0"; }
+
+.fa-cc-mastercard::before { content: "=EF=87=B1"; }
+
+.fa-cc-discover::before { content: "=EF=87=B2"; }
+
+.fa-cc-amex::before { content: "=EF=87=B3"; }
+
+.fa-cc-paypal::before { content: "=EF=87=B4"; }
+
+.fa-cc-stripe::before { content: "=EF=87=B5"; }
+
+.fa-bell-slash::before { content: "=EF=87=B6"; }
+
+.fa-bell-slash-o::before { content: "=EF=87=B7"; }
+
+.fa-trash::before { content: "=EF=87=B8"; }
+
+.fa-copyright::before { content: "=EF=87=B9"; }
+
+.fa-at::before { content: "=EF=87=BA"; }
+
+.fa-eyedropper::before { content: "=EF=87=BB"; }
+
+.fa-paint-brush::before { content: "=EF=87=BC"; }
+
+.fa-birthday-cake::before { content: "=EF=87=BD"; }
+
+.fa-area-chart::before { content: "=EF=87=BE"; }
+
+.fa-pie-chart::before { content: "=EF=88=80"; }
+
+.fa-line-chart::before { content: "=EF=88=81"; }
+
+.fa-lastfm::before { content: "=EF=88=82"; }
+
+.fa-lastfm-square::before { content: "=EF=88=83"; }
+
+.fa-toggle-off::before { content: "=EF=88=84"; }
+
+.fa-toggle-on::before { content: "=EF=88=85"; }
+
+.fa-bicycle::before { content: "=EF=88=86"; }
+
+.fa-bus::before { content: "=EF=88=87"; }
+
+.fa-ioxhost::before { content: "=EF=88=88"; }
+
+.fa-angellist::before { content: "=EF=88=89"; }
+
+.fa-cc::before { content: "=EF=88=8A"; }
+
+.fa-shekel::before, .fa-sheqel::before, .fa-ils::before { content: "=EF=88=
+=8B"; }
+
+.fa-meanpath::before { content: "=EF=88=8C"; }
+
+.fa-buysellads::before { content: "=EF=88=8D"; }
+
+.fa-connectdevelop::before { content: "=EF=88=8E"; }
+
+.fa-dashcube::before { content: "=EF=88=90"; }
+
+.fa-forumbee::before { content: "=EF=88=91"; }
+
+.fa-leanpub::before { content: "=EF=88=92"; }
+
+.fa-sellsy::before { content: "=EF=88=93"; }
+
+.fa-shirtsinbulk::before { content: "=EF=88=94"; }
+
+.fa-simplybuilt::before { content: "=EF=88=95"; }
+
+.fa-skyatlas::before { content: "=EF=88=96"; }
+
+.fa-cart-plus::before { content: "=EF=88=97"; }
+
+.fa-cart-arrow-down::before { content: "=EF=88=98"; }
+
+.fa-diamond::before { content: "=EF=88=99"; }
+
+.fa-ship::before { content: "=EF=88=9A"; }
+
+.fa-user-secret::before { content: "=EF=88=9B"; }
+
+.fa-motorcycle::before { content: "=EF=88=9C"; }
+
+.fa-street-view::before { content: "=EF=88=9D"; }
+
+.fa-heartbeat::before { content: "=EF=88=9E"; }
+
+.fa-venus::before { content: "=EF=88=A1"; }
+
+.fa-mars::before { content: "=EF=88=A2"; }
+
+.fa-mercury::before { content: "=EF=88=A3"; }
+
+.fa-intersex::before, .fa-transgender::before { content: "=EF=88=A4"; }
+
+.fa-transgender-alt::before { content: "=EF=88=A5"; }
+
+.fa-venus-double::before { content: "=EF=88=A6"; }
+
+.fa-mars-double::before { content: "=EF=88=A7"; }
+
+.fa-venus-mars::before { content: "=EF=88=A8"; }
+
+.fa-mars-stroke::before { content: "=EF=88=A9"; }
+
+.fa-mars-stroke-v::before { content: "=EF=88=AA"; }
+
+.fa-mars-stroke-h::before { content: "=EF=88=AB"; }
+
+.fa-neuter::before { content: "=EF=88=AC"; }
+
+.fa-genderless::before { content: "=EF=88=AD"; }
+
+.fa-facebook-official::before { content: "=EF=88=B0"; }
+
+.fa-pinterest-p::before { content: "=EF=88=B1"; }
+
+.fa-whatsapp::before { content: "=EF=88=B2"; }
+
+.fa-server::before { content: "=EF=88=B3"; }
+
+.fa-user-plus::before { content: "=EF=88=B4"; }
+
+.fa-user-times::before { content: "=EF=88=B5"; }
+
+.fa-hotel::before, .fa-bed::before { content: "=EF=88=B6"; }
+
+.fa-viacoin::before { content: "=EF=88=B7"; }
+
+.fa-train::before { content: "=EF=88=B8"; }
+
+.fa-subway::before { content: "=EF=88=B9"; }
+
+.fa-medium::before { content: "=EF=88=BA"; }
+
+.fa-yc::before, .fa-y-combinator::before { content: "=EF=88=BB"; }
+
+.fa-optin-monster::before { content: "=EF=88=BC"; }
+
+.fa-opencart::before { content: "=EF=88=BD"; }
+
+.fa-expeditedssl::before { content: "=EF=88=BE"; }
+
+.fa-battery-4::before, .fa-battery::before, .fa-battery-full::before { cont=
+ent: "=EF=89=80"; }
+
+.fa-battery-3::before, .fa-battery-three-quarters::before { content: "=EF=
+=89=81"; }
+
+.fa-battery-2::before, .fa-battery-half::before { content: "=EF=89=82"; }
+
+.fa-battery-1::before, .fa-battery-quarter::before { content: "=EF=89=83"; =
+}
+
+.fa-battery-0::before, .fa-battery-empty::before { content: "=EF=89=84"; }
+
+.fa-mouse-pointer::before { content: "=EF=89=85"; }
+
+.fa-i-cursor::before { content: "=EF=89=86"; }
+
+.fa-object-group::before { content: "=EF=89=87"; }
+
+.fa-object-ungroup::before { content: "=EF=89=88"; }
+
+.fa-sticky-note::before { content: "=EF=89=89"; }
+
+.fa-sticky-note-o::before { content: "=EF=89=8A"; }
+
+.fa-cc-jcb::before { content: "=EF=89=8B"; }
+
+.fa-cc-diners-club::before { content: "=EF=89=8C"; }
+
+.fa-clone::before { content: "=EF=89=8D"; }
+
+.fa-balance-scale::before { content: "=EF=89=8E"; }
+
+.fa-hourglass-o::before { content: "=EF=89=90"; }
+
+.fa-hourglass-1::before, .fa-hourglass-start::before { content: "=EF=89=91"=
+; }
+
+.fa-hourglass-2::before, .fa-hourglass-half::before { content: "=EF=89=92";=
+ }
+
+.fa-hourglass-3::before, .fa-hourglass-end::before { content: "=EF=89=93"; =
+}
+
+.fa-hourglass::before { content: "=EF=89=94"; }
+
+.fa-hand-grab-o::before, .fa-hand-rock-o::before { content: "=EF=89=95"; }
+
+.fa-hand-stop-o::before, .fa-hand-paper-o::before { content: "=EF=89=96"; }
+
+.fa-hand-scissors-o::before { content: "=EF=89=97"; }
+
+.fa-hand-lizard-o::before { content: "=EF=89=98"; }
+
+.fa-hand-spock-o::before { content: "=EF=89=99"; }
+
+.fa-hand-pointer-o::before { content: "=EF=89=9A"; }
+
+.fa-hand-peace-o::before { content: "=EF=89=9B"; }
+
+.fa-trademark::before { content: "=EF=89=9C"; }
+
+.fa-registered::before { content: "=EF=89=9D"; }
+
+.fa-creative-commons::before { content: "=EF=89=9E"; }
+
+.fa-gg::before { content: "=EF=89=A0"; }
+
+.fa-gg-circle::before { content: "=EF=89=A1"; }
+
+.fa-tripadvisor::before { content: "=EF=89=A2"; }
+
+.fa-odnoklassniki::before { content: "=EF=89=A3"; }
+
+.fa-odnoklassniki-square::before { content: "=EF=89=A4"; }
+
+.fa-get-pocket::before { content: "=EF=89=A5"; }
+
+.fa-wikipedia-w::before { content: "=EF=89=A6"; }
+
+.fa-safari::before { content: "=EF=89=A7"; }
+
+.fa-chrome::before { content: "=EF=89=A8"; }
+
+.fa-firefox::before { content: "=EF=89=A9"; }
+
+.fa-opera::before { content: "=EF=89=AA"; }
+
+.fa-internet-explorer::before { content: "=EF=89=AB"; }
+
+.fa-tv::before, .fa-television::before { content: "=EF=89=AC"; }
+
+.fa-contao::before { content: "=EF=89=AD"; }
+
+.fa-500px::before { content: "=EF=89=AE"; }
+
+.fa-amazon::before { content: "=EF=89=B0"; }
+
+.fa-calendar-plus-o::before { content: "=EF=89=B1"; }
+
+.fa-calendar-minus-o::before { content: "=EF=89=B2"; }
+
+.fa-calendar-times-o::before { content: "=EF=89=B3"; }
+
+.fa-calendar-check-o::before { content: "=EF=89=B4"; }
+
+.fa-industry::before { content: "=EF=89=B5"; }
+
+.fa-map-pin::before { content: "=EF=89=B6"; }
+
+.fa-map-signs::before { content: "=EF=89=B7"; }
+
+.fa-map-o::before { content: "=EF=89=B8"; }
+
+.fa-map::before { content: "=EF=89=B9"; }
+
+.fa-commenting::before { content: "=EF=89=BA"; }
+
+.fa-commenting-o::before { content: "=EF=89=BB"; }
+
+.fa-houzz::before { content: "=EF=89=BC"; }
+
+.fa-vimeo::before { content: "=EF=89=BD"; }
+
+.fa-black-tie::before { content: "=EF=89=BE"; }
+
+.fa-fonticons::before { content: "=EF=8A=80"; }
+
+.fa-reddit-alien::before { content: "=EF=8A=81"; }
+
+.fa-edge::before { content: "=EF=8A=82"; }
+
+.fa-credit-card-alt::before { content: "=EF=8A=83"; }
+
+.fa-codiepie::before { content: "=EF=8A=84"; }
+
+.fa-modx::before { content: "=EF=8A=85"; }
+
+.fa-fort-awesome::before { content: "=EF=8A=86"; }
+
+.fa-usb::before { content: "=EF=8A=87"; }
+
+.fa-product-hunt::before { content: "=EF=8A=88"; }
+
+.fa-mixcloud::before { content: "=EF=8A=89"; }
+
+.fa-scribd::before { content: "=EF=8A=8A"; }
+
+.fa-pause-circle::before { content: "=EF=8A=8B"; }
+
+.fa-pause-circle-o::before { content: "=EF=8A=8C"; }
+
+.fa-stop-circle::before { content: "=EF=8A=8D"; }
+
+.fa-stop-circle-o::before { content: "=EF=8A=8E"; }
+
+.fa-shopping-bag::before { content: "=EF=8A=90"; }
+
+.fa-shopping-basket::before { content: "=EF=8A=91"; }
+
+.fa-hashtag::before { content: "=EF=8A=92"; }
+
+.fa-bluetooth::before { content: "=EF=8A=93"; }
+
+.fa-bluetooth-b::before { content: "=EF=8A=94"; }
+
+.fa-percent::before { content: "=EF=8A=95"; }
+
+.fa-gitlab::before { content: "=EF=8A=96"; }
+
+.fa-wpbeginner::before { content: "=EF=8A=97"; }
+
+.fa-wpforms::before { content: "=EF=8A=98"; }
+
+.fa-envira::before { content: "=EF=8A=99"; }
+
+.fa-universal-access::before { content: "=EF=8A=9A"; }
+
+.fa-wheelchair-alt::before { content: "=EF=8A=9B"; }
+
+.fa-question-circle-o::before { content: "=EF=8A=9C"; }
+
+.fa-blind::before { content: "=EF=8A=9D"; }
+
+.fa-audio-description::before { content: "=EF=8A=9E"; }
+
+.fa-volume-control-phone::before { content: "=EF=8A=A0"; }
+
+.fa-braille::before { content: "=EF=8A=A1"; }
+
+.fa-assistive-listening-systems::before { content: "=EF=8A=A2"; }
+
+.fa-asl-interpreting::before, .fa-american-sign-language-interpreting::befo=
+re { content: "=EF=8A=A3"; }
+
+.fa-deafness::before, .fa-hard-of-hearing::before, .fa-deaf::before { conte=
+nt: "=EF=8A=A4"; }
+
+.fa-glide::before { content: "=EF=8A=A5"; }
+
+.fa-glide-g::before { content: "=EF=8A=A6"; }
+
+.fa-signing::before, .fa-sign-language::before { content: "=EF=8A=A7"; }
+
+.fa-low-vision::before { content: "=EF=8A=A8"; }
+
+.fa-viadeo::before { content: "=EF=8A=A9"; }
+
+.fa-viadeo-square::before { content: "=EF=8A=AA"; }
+
+.fa-snapchat::before { content: "=EF=8A=AB"; }
+
+.fa-snapchat-ghost::before { content: "=EF=8A=AC"; }
+
+.fa-snapchat-square::before { content: "=EF=8A=AD"; }
+
+.fa-pied-piper::before { content: "=EF=8A=AE"; }
+
+.fa-first-order::before { content: "=EF=8A=B0"; }
+
+.fa-yoast::before { content: "=EF=8A=B1"; }
+
+.fa-themeisle::before { content: "=EF=8A=B2"; }
+
+.fa-google-plus-circle::before, .fa-google-plus-official::before { content:=
+ "=EF=8A=B3"; }
+
+.fa-fa::before, .fa-font-awesome::before { content: "=EF=8A=B4"; }
+
+.fa-handshake-o::before { content: "=EF=8A=B5"; }
+
+.fa-envelope-open::before { content: "=EF=8A=B6"; }
+
+.fa-envelope-open-o::before { content: "=EF=8A=B7"; }
+
+.fa-linode::before { content: "=EF=8A=B8"; }
+
+.fa-address-book::before { content: "=EF=8A=B9"; }
+
+.fa-address-book-o::before { content: "=EF=8A=BA"; }
+
+.fa-vcard::before, .fa-address-card::before { content: "=EF=8A=BB"; }
+
+.fa-vcard-o::before, .fa-address-card-o::before { content: "=EF=8A=BC"; }
+
+.fa-user-circle::before { content: "=EF=8A=BD"; }
+
+.fa-user-circle-o::before { content: "=EF=8A=BE"; }
+
+.fa-user-o::before { content: "=EF=8B=80"; }
+
+.fa-id-badge::before { content: "=EF=8B=81"; }
+
+.fa-drivers-license::before, .fa-id-card::before { content: "=EF=8B=82"; }
+
+.fa-drivers-license-o::before, .fa-id-card-o::before { content: "=EF=8B=83"=
+; }
+
+.fa-quora::before { content: "=EF=8B=84"; }
+
+.fa-free-code-camp::before { content: "=EF=8B=85"; }
+
+.fa-telegram::before { content: "=EF=8B=86"; }
+
+.fa-thermometer-4::before, .fa-thermometer::before, .fa-thermometer-full::b=
+efore { content: "=EF=8B=87"; }
+
+.fa-thermometer-3::before, .fa-thermometer-three-quarters::before { content=
+: "=EF=8B=88"; }
+
+.fa-thermometer-2::before, .fa-thermometer-half::before { content: "=EF=8B=
+=89"; }
+
+.fa-thermometer-1::before, .fa-thermometer-quarter::before { content: "=EF=
+=8B=8A"; }
+
+.fa-thermometer-0::before, .fa-thermometer-empty::before { content: "=EF=8B=
+=8B"; }
+
+.fa-shower::before { content: "=EF=8B=8C"; }
+
+.fa-bathtub::before, .fa-s15::before, .fa-bath::before { content: "=EF=8B=
+=8D"; }
+
+.fa-podcast::before { content: "=EF=8B=8E"; }
+
+.fa-window-maximize::before { content: "=EF=8B=90"; }
+
+.fa-window-minimize::before { content: "=EF=8B=91"; }
+
+.fa-window-restore::before { content: "=EF=8B=92"; }
+
+.fa-times-rectangle::before, .fa-window-close::before { content: "=EF=8B=93=
+"; }
+
+.fa-times-rectangle-o::before, .fa-window-close-o::before { content: "=EF=
+=8B=94"; }
+
+.fa-bandcamp::before { content: "=EF=8B=95"; }
+
+.fa-grav::before { content: "=EF=8B=96"; }
+
+.fa-etsy::before { content: "=EF=8B=97"; }
+
+.fa-imdb::before { content: "=EF=8B=98"; }
+
+.fa-ravelry::before { content: "=EF=8B=99"; }
+
+.fa-eercast::before { content: "=EF=8B=9A"; }
+
+.fa-microchip::before { content: "=EF=8B=9B"; }
+
+.fa-snowflake-o::before { content: "=EF=8B=9C"; }
+
+.fa-superpowers::before { content: "=EF=8B=9D"; }
+
+.fa-wpexplorer::before { content: "=EF=8B=9E"; }
+
+.fa-meetup::before { content: "=EF=8B=A0"; }
+
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0px; margi=
+n: -1px; overflow: hidden; clip: rect(0px, 0px, 0px, 0px); border: 0px; }
+
+.sr-only-focusable:active, .sr-only-focusable:focus { position: static; wid=
+th: auto; height: auto; margin: 0px; overflow: visible; clip: auto; }
+------MultipartBoundary--UrpJjMYV44Fc9akAXoOKXJLMcu0mI7Izu96NbZJoyL----
+Content-Type: text/css
+Content-Transfer-Encoding: quoted-printable
+Content-Location: file:///C:/Users/Christopher%20Susie/AppData/Local/Markdown%20Monster/PreviewThemes/Dharkan/Theme.css
+
+@charset "utf-8";
+
+html, body { color: rgb(51, 51, 51); font-family: -apple-system, BlinkMacSy=
+stemFont, "Segoe UI", Helvetica, Helvetica, Arial, sans-serif, "Segoe UI Sy=
+mbol", "Apple Color Emoji"; font-size: 17px; -webkit-font-smoothing: antial=
+iased; height: 100%; line-height: 1.55; margin: 0px; }
+
+#MainContent { margin: 20px 20px 20px 30px; }
+
+h1, h2, h3, h4, h5, h6, .byline, .content-title { color: rgb(85, 85, 85); f=
+ont-weight: bold; font-family: "Trebuchet MS", "Lucida Sans Unicode", "Luci=
+da Grande", "Lucida Sans"; margin-top: 1.2em; margin-bottom: 0.4em; }
+
+h1 { font-size: 1.9em; padding-bottom: 10px; border-bottom: 1px solid rgb(2=
+38, 238, 238); }
+
+h2 { font-size: 1.55em; }
+
+h3 { font-size: 1.35em; }
+
+h4 { font-size: 1.18em; }
+
+h5, h6 { color: rgb(101, 101, 101); font-size: 1.09em; }
+
+h6 { color: rgb(119, 119, 119); font-size: 1.03em; }
+
+p { margin: 0.5rem 0px 1rem; }
+
+a { font-weight: 600; color: rgb(51, 122, 183); text-decoration: none; }
+
+a:hover { text-decoration: underline; }
+
+img { max-width: 100%; }
+
+ul, ol { margin: 1.1em 0px; }
+
+li { margin: 0.6em 0.2em 0.6em 1em; }
+
+ul > li > ul > li > ul > li { list-style: disc; }
+
+ul > li > ul > li { list-style: square; }
+
+.task-list-item { list-style: none; margin-left: -2em; }
+
+dt { font-size: 1.08em; font-weight: bold; text-decoration: underline; padd=
+ing-top: 0.5em; cursor: pointer; }
+
+dd { margin: 0px; padding: 0px 0px 0.2em 1em; display: none; }
+
+b, strong { font-weight: 600; }
+
+dt { font-size: 1.08em; font-weight: bold; text-decoration: underline; padd=
+ing-top: 0.5em; }
+
+dd { margin: 0px; padding: 0px 0px 0.2em 1em; }
+
+.hidden { display: none; }
+
+.hidden-nowidth { width: 0px; }
+
+.visually-hidden { border: 0px; clip: rect(0px, 0px, 0px, 0px); height: 1px=
+; margin: -1px; overflow: hidden; padding: 0px; position: absolute; width: =
+1px; }
+
+@media (min-width: 1080px) {
+  html, body { font-size: 1.06em; }
+}
+
+blockquote { background: rgb(245, 245, 245); color: rgb(101, 101, 101); bor=
+der-left: 8px solid rgb(170, 170, 170); border-radius: 4px; padding: 10px 2=
+0px; margin: 30px 20px; font-size: 1.03em; }
+
+blockquote :first-child { margin-top: 0px; }
+
+blockquote :last-child { margin-bottom: 0px; }
+
+hr { margin: 12px 0px; }
+
+.figure .caption, figure figcaption { font-size: 0.8em; font-style: italic;=
+ margin-top: 0px; }
+
+code { padding: 2px 5px; font-family: SFMono-Regular, Consolas, "Liberation=
+ Mono", Menlo, Courier, monospace; border-radius: 3px; font-weight: 600; ba=
+ckground: rgb(238, 238, 238); color: rgb(85, 85, 85); }
+
+pre { font-family: menlo, consolas, monospace; font-weight: normal; font-si=
+ze: 87%; line-height: 1.4; margin: 7px 0px; padding: 0px; border: 1px solid=
+ silver; border-radius: 5px; overflow-x: auto; max-width: 98%; white-space:=
+ pre; word-break: normal; overflow-wrap: normal; }
+
+pre > code { white-space: pre; display: block; font-weight: normal; padding=
+: 0.8em !important; }
+
+pre > code::-webkit-scrollbar { width: 8px; height: 8px; background: rgb(68=
+, 68, 68); }
+
+pre > code::-webkit-scrollbar-thumb { background: rgb(153, 153, 153); }
+
+table { width: 100%; overflow: auto; border-spacing: 0px; border-collapse: =
+collapse; margin: 15px 0px; border-color: gray; }
+
+td, th { border: 1px solid rgb(221, 221, 221); padding: 6px 13px; display: =
+table-cell; vertical-align: top; }
+
+th { font-weight: bold; color: white; background: rgb(85, 85, 85); }
+
+tbody > tr:nth-child(2n) { background: rgb(238, 238, 238); }
+
+.line-highlight { background: rgb(233, 245, 255) !important; }
+
+p.line-highlight, h1.line-highlight, h2.line-highlight, h3.line-highlight, =
+h4.line-highlight { border-radius: 4px; margin-left: -10px; margin-right: -=
+10px; padding-left: 10px; padding-right: 10px; }
+
+code.line-highlight { background: rgb(85, 85, 85) !important; }
+
+.hidden { display: none; }
+
+.hidden-nowidth { width: 0px; }
+
+.visually-hidden { border: 0px; clip: rect(0px, 0px, 0px, 0px); height: 1px=
+; margin: -1px; overflow: hidden; padding: 0px; position: absolute; width: =
+1px; }
+
+.line-highlight { background: rgb(245, 245, 245); border-radius: 3px; }
+
+.CAUTION, .IMPORTANT, .INFO, .TIP, .NOTE, .WARNING { padding: 0.1px 20px; m=
+argin: 15px 0px; border-radius: 4px; }
+
+.CAUTION > h5, .IMPORTANT > h5, .INFO > h5, .TIP > h5, .NOTE > h5, .WARNING=
+ > h5 { color: inherit; }
+
+.CAUTION, .IMPORTANT { color: rgb(169, 68, 66); background-color: rgb(242, =
+222, 222); border-color: rgb(235, 204, 209); }
+
+.WARNING { color: rgb(138, 109, 59); background-color: rgb(252, 248, 227); =
+border-color: rgb(250, 235, 204); }
+
+.INFO, .TIP, .NOTE { color: rgb(49, 112, 143); background-color: rgb(217, 2=
+37, 247); border-color: rgb(188, 232, 241); }
+
+.NOTE h5::before, .TIP h5::before { content: "=EF=81=9A"; font-family: Font=
+Awesome; padding-right: 6px; }
+
+.WARNING h5::before, .CAUTION h5::before { content: "=EF=81=B1"; font-famil=
+y: FontAwesome; padding-right: 6px; }
+
+.IMPORTANT h5::before { content: "=EF=81=AA"; font-family: FontAwesome; pad=
+ding-right: 6px; }
+
+xref { display: block; }
+
+.hljs { font-size: 1em; }
+
+@media (min-width: 1080px) {
+  html, body { font-size: 1.06em; }
+}
+
+@media print {
+  pre { white-space: pre-wrap; word-break: normal; overflow-wrap: normal; }
+  pre > code { white-space: pre-wrap; padding: 1em !important; }
+}
+------MultipartBoundary--UrpJjMYV44Fc9akAXoOKXJLMcu0mI7Izu96NbZJoyL----
+Content-Type: text/css
+Content-Transfer-Encoding: quoted-printable
+Content-Location: file:///C:/Users/Christopher%20Susie/AppData/Local/Markdown%20Monster/PreviewThemes/scripts/highlightjs/styles/twilight.css
+
+@charset "utf-8";
+
+.hljs { display: block; overflow-x: auto; padding: 0.5em; background: rgb(3=
+7, 37, 37); color: rgb(226, 226, 226); font-weight: normal; font-size: 1.15=
+em !important; }
+
+.hljs-keyword, .hljs-selector-tag, .hljs-built_in, .hljs-tag { color: rgb(2=
+05, 168, 105); }
+
+.hljs-template-tag { color: rgb(220, 220, 220); }
+
+.hljs-number { color: rgb(207, 106, 76); }
+
+.hljs-attr { color: cornsilk; }
+
+.hljs-variable, .hljs-template-variable { color: rgb(239, 220, 188); }
+
+.hljs-literal { color: rgb(207, 106, 76); }
+
+.hljs-subst { color: rgb(143, 143, 143); }
+
+.hljs-title { color: rgb(199, 140, 59); }
+
+.hljs-name, .hljs-selector-id, .hljs-selector-class, .hljs-section, .hljs-t=
+ype { color: rgb(213, 173, 105); }
+
+.hljs-symbol, .hljs-bullet, .hljs-link { color: rgb(220, 163, 163); }
+
+.hljs-string { color: rgb(143, 157, 106); }
+
+.hljs-deletion, .hljs-builtin-name { color: rgb(204, 147, 147); }
+
+.hljs-comment { font-style: italic; color: rgb(136, 136, 136); }
+
+.hljs-addition, .hljs-quote, .hljs-meta { color: rgb(127, 159, 127); }
+
+.hljs-emphasis { font-style: italic; }
+
+.hljs-strong { font-weight: bold; }
+------MultipartBoundary--UrpJjMYV44Fc9akAXoOKXJLMcu0mI7Izu96NbZJoyL------

@@ -1,0 +1,1971 @@
+From: <Saved by Blink>
+Snapshot-Content-Location: file:///C:/Users/Christopher%20Susie/AppData/Local/Temp/_MarkdownMonster_Preview.html
+Subject: 
+Date: Sat, 22 May 2021 01:50:46 -0000
+MIME-Version: 1.0
+Content-Type: multipart/related;
+	type="text/html";
+	boundary="----MultipartBoundary--hdBEeKVdovcPJXOOMQOHjcR2fuYpoCrvpyWoR6OIe6----"
+
+
+------MultipartBoundary--hdBEeKVdovcPJXOOMQOHjcR2fuYpoCrvpyWoR6OIe6----
+Content-Type: text/html
+Content-ID: <frame-78B675F837D5616BE3C1C902967E4C2C@mhtml.blink>
+Content-Transfer-Encoding: quoted-printable
+Content-Location: file:///C:/Users/Christopher%20Susie/AppData/Local/Temp/_MarkdownMonster_Preview.html
+
+<!DOCTYPE html><!-- saved from url=3D(0016)http://localhost --><html lang=
+=3D"en" xmlns=3D"http://www.w3.org/1999/xhtml"><head><meta http-equiv=3D"Co=
+ntent-Type" content=3D"text/html; charset=3DUTF-8">
+  <base href=3D"file:///E:/Source/Repos/cjm-numerics/uint128_test_app/src/h=
+eaders/">
+ =20
+
+  <meta http-equiv=3D"X-UA-Compatible" content=3D"IE=3Dedge">
+  <link href=3D"file:///C:/Users/Christopher%20Susie/AppData/Local/Markdown=
+%20Monster/PreviewThemes/scripts/fontawesome/css/font-awesome.min.css" rel=
+=3D"stylesheet">
+
+  <link href=3D"file:///C:/Users/Christopher%20Susie/AppData/Local/Markdown=
+%20Monster/PreviewThemes/Dharkan/Theme.css" rel=3D"stylesheet">
+
+ =20
+  <link href=3D"file:///C:/Users/Christopher%20Susie/AppData/Local/Markdown=
+%20Monster/PreviewThemes/scripts/highlightjs/styles/twilight.css" rel=3D"st=
+ylesheet">
+ =20
+ =20
+ =20
+</head>
+<body>
+<div id=3D"MainContent">
+    <!-- Markdown Monster Content -->
+    <h1 id=3D"explanation-of-future-feature-extended-precision-multiplicati=
+on-algorithm">Explanation of Future Feature: Extended Precision Multiplicat=
+ion Algorithm</h1>
+<p>Copyright =C2=A9 2020-2021 CJM Screws, LLC</p>
+<p>Future versions of this library will have further extended precision uns=
+igned integer types that will build on uint128.  It is therefore desirable =
+to put forth the algorithm for extended precision multiplication so that it=
+ can be expressed generically and effectively and have the best possible pe=
+rformance characteristics.</p>
+<p>This algorithm, when generalized, explains how to pull off a multiplicat=
+ion for values of size X by splitting X into 4 multiplications of values of=
+ size X/2 (though using variables of size X to perform multiplications) fol=
+lowed by a series of left shifts then add_with_carries of a type with size =
+x*2.</p>
+<p>For this example we will be multipling two 16 bit unsigned integers by s=
+plitting each of them up into two 8 bit integers, which are then zero-exten=
+ded back to 16 bit integers.  Thus, for multiplication of 0xfea2 * 0xf00f: =
+fea2 will be split into 0x00fe and 0x00a2; f00f will be split up into 0x00f=
+0 and 0x000f.</p>
+<h2 id=3D"splitting-up-two-variables-of-size-16">Splitting up two variables=
+ of size 16</h2>
+<h2 id=3D"declarations">Declarations</h2>
+<ul>
+<li>let factor_1 :=3D 0xfe'a2 (std::uint16_t)</li>
+<li>let factor_2 :=3D 0xf0'0f (std::uint16_t)</li>
+<li>let const mult_size :=3D 16 (<code>std::numeric_limits&lt;std::uint16_t=
+&gt;::digits</code>)</li>
+<li>let const add_c_size :=3D 32 (mult_size * 2)</li>
+<li>let const base_shift :=3D 8 (mult_size / 2)</li>
+<li>let const full_shift :=3D 16 (mult_size)</li>
+<li>using add_c_size_t =3D std::uint32_t (unsigned int of size add_c_size)<=
+/li>
+<li>using split_size_t =3D std::uint8_t (unsigned int of size base_shift)</=
+li>
+<li>using multiplicand_t =3D std::uint16_t (unsigned int of size full_shift=
+)</li>
+<li>let const low_bit_mask =3D max value of usigned integer of same size as=
+ base_shift, zero extended to size multiplicand_t</li>
+</ul>
+<h2 id=3D"split-up-factors">Split up factors</h2>
+<ul>
+<li>let factor_1_low :=3D factor_1 &amp; low_bit_mask (0x00a2 : multiplican=
+d_t)</li>
+<li>let factor_1_high :=3D factor_1 &gt;&gt; base_shift (0x00fe : multiplic=
+and_t)</li>
+<li>let factor_2_low :=3D factor_2 &amp; low_bit_mask (0x000f : multiplican=
+d_t)</li>
+<li>let factor_2_high :=3D factor_2 &gt;&gt; base_shift (0x00f0 : multiplic=
+and_t)</li>
+</ul>
+<h2 id=3D"peform-4-split-up-multiplications">Peform 4 split-up multiplicati=
+ons</h2>
+<ul>
+<li>let product_f1_low_f2_low :=3D add_c_size_t(factor_1_low * factor_2_low=
+)      ( ((0x00a2 * 0x000f) =E2=86=92 add_c_size_t) =3D=3D 0x0000_097e)</li=
+>
+<li>let product_f1_high_f2_low :=3D add_c_size_t(factor_1_high * factor_2_l=
+ow)    ( ((0x00fe * 0x000f) =E2=86=92 add_c_size_t) =3D=3D 0x0000_0ee2)</li=
+>
+<li>let product_f1_low_f2_high :=3D add_c_size_t(factor_1_low * factor_2_hi=
+gh)    ( ((0x00a2 * 0x00f0) =E2=86=92 add_c_size_t) =3D=3D 0x0000_97e0)</li=
+>
+<li>let product_f1_high_f2_high :=3D add_c_size_t(factor_1_high * factor_2_=
+high)  ( ((0x00fe * 0x00f0) =E2=86=92 add_c_size_t) =3D=3D 0x0000_ee20)</li=
+>
+</ul>
+<h2 id=3D"adjust-products">Adjust products</h2>
+<ul>
+<li>product_f1_high_f2_low &lt;&lt;=3D base_shift (0x000e_e200)</li>
+<li>product_f1_low_f2_high &lt;&lt;=3D base_shift (0x0097_e000)</li>
+<li>product_f1_high_f2_high &lt;&lt;=3D full_shift (0xee20_0000)</li>
+</ul>
+<h2 id=3D"perform-32-bit-addition--or-16-bit-add-with-carry-">Perform 32-bi=
+t addition ( <em>or 16 bit add with carry</em> )</h2>
+<ul>
+<li>let <em><strong>sum</strong></em> :=3D product_f1_low_f2_low + product_=
+f1_high_f2_low + product_f1_low_f2_high + product_f1_high_f2_high (0xeec6_c=
+b7e)</li>
+<li><strong>return <em>sum</em></strong></li>
+</ul>
+<h2 id=3D"second-example-0xffff--0xffff">Second Example: 0xffff * 0xffff</h=
+2>
+<h2 id=3D"declarations-1">Declarations</h2>
+<ul>
+<li>let factor_1 :=3D 0xff'ff (std::uint16_t)</li>
+<li>let factor_2 :=3D 0xff'ff (std::uint16_t)</li>
+<li>let const mult_size :=3D 16 (std::numeric_limits<a href=3D"std::uint16_=
+t">std::uint16_t</a>::digits)</li>
+<li>let const add_c_size :=3D 32 (mult_size * 2)</li>
+<li>let const base_shift :=3D 8 (mult_size / 2)</li>
+<li>let const full_shift :=3D 16 (mult_size)</li>
+<li>using add_c_size_t =3D std::uint32_t (unsigned int of size add_c_size)<=
+/li>
+<li>using split_size_t =3D std::uint8_t (unsigned int of size base_shift)</=
+li>
+<li>using multiplicand_t =3D std::uint16_t (unsigned int of size full_shift=
+)</li>
+<li>let const low_bit_mask =3D max value of usigned integer of same size as=
+ base_shift, zero extended to size multiplicand_t</li>
+</ul>
+<h2 id=3D"split-up-factors-1">Split up factors</h2>
+<ul>
+<li>let factor_1_low :=3D factor_1 &amp; low_bit_mask (0x00ff : multiplican=
+d_t)</li>
+<li>let factor_1_high :=3D factor_1 &gt;&gt; base_shift (0x00ff : multiplic=
+and_t)</li>
+<li>let factor_2_low :=3D factor_2 &amp; low_bit_mask (0x00ff : multiplican=
+d_t)</li>
+<li>let factor_2_high :=3D factor_2 &gt;&gt; base_shift (0x00ff : multiplic=
+and_t)</li>
+</ul>
+<h2 id=3D"peform-4-split-up-multiplications-1">Peform 4 split-up multiplica=
+tions</h2>
+<ul>
+<li>let product_f1_low_f2_low :=3D add_c_size_t(factor_1_low * factor_2_low=
+)      ( ((0x00ff * 0x00ff) =E2=86=92 add_c_size_t) =3D=3D 0x0000_fe01)</li=
+>
+<li>let product_f1_high_f2_low :=3D add_c_size_t(factor_1_high * factor_2_l=
+ow)    ( ((0x00ff * 0x00ff) =E2=86=92 add_c_size_t) =3D=3D 0x0000_fe01)</li=
+>
+<li>let product_f1_low_f2_high :=3D add_c_size_t(factor_1_low * factor_2_hi=
+gh)    ( ((0x00ff * 0x00ff) =E2=86=92 add_c_size_t) =3D=3D 0x0000_fe01)</li=
+>
+<li>let product_f1_high_f2_high :=3D add_c_size_t(factor_1_high * factor_2_=
+high)  ( ((0x00ff * 0x00ff) =E2=86=92 add_c_size_t) =3D=3D 0x0000_fe01)</li=
+>
+</ul>
+<h2 id=3D"adjust-products-1">Adjust products</h2>
+<ul>
+<li>product_f1_high_f2_low &lt;&lt;=3D base_shift (0x00fe_0100)</li>
+<li>product_f1_low_f2_high &lt;&lt;=3D base_shift (0x00fe_0100)</li>
+<li>product_f1_high_f2_high &lt;&lt;=3D full_shift (0xfe01_0000)</li>
+</ul>
+<h2 id=3D"perform-32-bit-addition-or-16-bit-add-with-carry">Perform 32-bit =
+addition (or 16 bit add with carry)</h2>
+<ul>
+<li>let <em><strong>sum</strong></em> :=3D product_f1_low_f2_low + product_=
+f1_high_f2_low + product_f1_low_f2_high + product_f1_high_f2_high (0xfffe_0=
+001)</li>
+<li><strong>return <em>sum</em></strong></li>
+</ul>
+<h1 id=3D"elaboration-of-16-bit-add-with-carry-alternative-to-32-bit-additi=
+on">Elaboration of 16-bit add with carry alternative to 32 bit addition</h1=
+>
+<h2 id=3D"consider-the-additions-from-the-0xffff--0xffff-example-above">Con=
+sider the additions from the 0xffff * 0xffff example above</h2>
+<h2 id=3D"peform-4-split-up-multiplications-each-variable-is-16-bit">Peform=
+ 4 split-up multiplications (each variable is 16 bit)</h2>
+<ul>
+<li>let low_product_f1_low_f2_low :=3D factor_1_low * factor_2_low      ((0=
+x00ff * 0x00ff) =3D=3D 0xfe01)</li>
+<li>let high_product_f1_low_f2_high :=3D 0</li>
+<li>let low_product_f1_high_f2_low :=3D factor_1_high * factor_2_low    ((0=
+x00ff * 0x00ff) =3D=3D 0xfe01)</li>
+<li>let high_product_f1_low_f2_high :=3D 0</li>
+<li>let low_product_f1_low_f2_high :=3D factor_1_low * factor_2_high    ((0=
+x00ff * 0x00ff) =3D=3D 0xfe01)</li>
+<li>let high_product_f1_low_f2_high :=3D 0</li>
+<li>let product_f1_high_f2_high :=3D factor_1_high * factor_2_high      ((0=
+x00ff * 0x00ff) =3D=3D 0xfe01)</li>
+<li>let high_product_f1_high_f2_high :=3D 0</li>
+</ul>
+<h2 id=3D"adjust-products-with-left-shift-to-have-same-results-as-would-if-=
+each-high_low-pair-were-one-32-bit-variable">Adjust products with left shif=
+t to have same results as would if each high_low pair were one 32-bit varia=
+ble</h2>
+<ul>
+<li>(high_product_f1_low_f2_low    :   low_product_f1_low_f2_low)     NOSHI=
+FT           =E2=86=92 (0x0000, 0xfe01)</li>
+<li>(high_product_f1_high_f2_low   :   low_product_f1_high_f2_low)    LBASE=
+ SHIFT 8     =E2=86=92 (0x00fe, 0x0100)</li>
+<li>(high_product_f1_low_f2_high   :   low_product_f1_low_f2_high)    LBASE=
+ SHIFT 8     =E2=86=92 (0x00fe, 0x0100)</li>
+<li>(high_product_f1_high_f2_high  :   low_product_f1_high_f2_high)   LBASE=
+ SHIFT 16    =E2=86=92 (0xfe01, 0x0000)</li>
+</ul>
+<h2 id=3D"now-its-time-for-the-additions">Now it's time for the additions</=
+h2>
+<ul>
+<li>let carry_out :=3D false</li>
+<li>let carry_in :=3D false</li>
+<li>let low_sum :=3D add_with_carry_u16(low_product_f1_low_f2_low, low_prod=
+uct_f1_high_f2_low, carry_in, out carry_out) (low_sum =3D=3D 0xff01, carry_=
+out =3D=3D false )</li>
+<li>carry_in =E2=86=90 carry_out</li>
+<li>let high_sum :=3D add_with_carry_u16(high_product_f1_low_f2_low, high_p=
+roduct_f1_high_f2_low, carry_in, out carry_out ) (high_sum =3D=3D 0x00fe, c=
+arry_out =3D=3D false)</li>
+<li>carry_in =E2=86=90 false</li>
+<li>low_sum =E2=86=90 add_with_carry_u16(low_sum, low_product_f1_low_f2_hig=
+h, carry_in, out carry_out) (low_sum =3D=3D 0xff01 + 0x0100 =3D=3D 0x0001, =
+carry_out =3D=3D true)</li>
+<li>carry_in =E2=86=90 carry_out (true)</li>
+<li>high_sum =E2=86=90 add_with_carry_u16(high_sum, high_product_f1_low_f2_=
+high, carry_in, out carry_out) (high_sum =3D=3D (0x00fe + 0x00fe + 1)
+=3D=3D 0x01fd, carry_out =3D=3D false)</li>
+<li>carry_in =E2=86=90 false</li>
+<li>low_sum =E2=86=90 add_with_carry_u16(low_sum, low_product_f1_high_f2_hi=
+gh, carry_in, out carry_out) (low_sum =3D=3D 0x0001 + 0x0000 =3D=3D 0x0001,=
+ carry_out =3D=3D false)</li>
+<li>carry_in =E2=86=90 carry_out (false)</li>
+<li>high_sum =E2=86=90 add_with_carry_u16(high_sum, high_product_f1_high_f2=
+_high, carry_in, out carry_out) (high_sum =3D=3D 0x01fd + 0xfe01 =3D=3D 0xf=
+ffe, carry_out =3D=3D false)</li>
+</ul>
+<h2 id=3D"now-bring-high-sum-and-low-some-together-into-a-32-bit-value-bitc=
+asting-would-work-or-something-like-this">Now bring high sum and low some t=
+ogether into a 32 bit value (bitcasting would work or something like this)<=
+/h2>
+<ul>
+<li>let <em><strong>sum</strong></em> :=3D add_c_size_t(high_sum)</li>
+<li>sum =E2=86=90 sum &lt;&lt; full_shift</li>
+<li>sum =E2=86=90 (sum | add_c_size_t(low_sum))</li>
+<li>debug_assert(carry_out =3D=3D false)</li>
+<li><strong>return <em>sum</em></strong></li>
+</ul>
+
+    <!-- End Markdown Monster Content -->
+</div>
+
+
+</body></html>
+------MultipartBoundary--hdBEeKVdovcPJXOOMQOHjcR2fuYpoCrvpyWoR6OIe6----
+Content-Type: text/css
+Content-Transfer-Encoding: quoted-printable
+Content-Location: file:///C:/Users/Christopher%20Susie/AppData/Local/Markdown%20Monster/PreviewThemes/scripts/fontawesome/css/font-awesome.min.css
+
+@charset "utf-8";
+
+@font-face { font-family: FontAwesome; src: url("../fonts/fontawesome-webfo=
+nt.eot?#iefix&v=3D4.7.0") format("embedded-opentype"), url("../fonts/fontaw=
+esome-webfont.woff2?v=3D4.7.0") format("woff2"), url("../fonts/fontawesome-=
+webfont.woff?v=3D4.7.0") format("woff"), url("../fonts/fontawesome-webfont.=
+ttf?v=3D4.7.0") format("truetype"), url("../fonts/fontawesome-webfont.svg?v=
+=3D4.7.0#fontawesomeregular") format("svg"); font-weight: normal; font-styl=
+e: normal; }
+
+.fa { display: inline-block; font-style: normal; font-variant: normal; font=
+-weight: normal; font-stretch: normal; line-height: 1; font-family: FontAwe=
+some; font-size: inherit; text-rendering: auto; -webkit-font-smoothing: ant=
+ialiased; }
+
+.fa-lg { font-size: 1.33333em; line-height: 0.75em; vertical-align: -15%; }
+
+.fa-2x { font-size: 2em; }
+
+.fa-3x { font-size: 3em; }
+
+.fa-4x { font-size: 4em; }
+
+.fa-5x { font-size: 5em; }
+
+.fa-fw { width: 1.28571em; text-align: center; }
+
+.fa-ul { padding-left: 0px; margin-left: 2.14286em; list-style-type: none; =
+}
+
+.fa-ul > li { position: relative; }
+
+.fa-li { position: absolute; left: -2.14286em; width: 2.14286em; top: 0.142=
+857em; text-align: center; }
+
+.fa-li.fa-lg { left: -1.85714em; }
+
+.fa-border { padding: 0.2em 0.25em 0.15em; border: 0.08em solid rgb(238, 23=
+8, 238); border-radius: 0.1em; }
+
+.fa-pull-left { float: left; }
+
+.fa-pull-right { float: right; }
+
+.fa.fa-pull-left { margin-right: 0.3em; }
+
+.fa.fa-pull-right { margin-left: 0.3em; }
+
+.pull-right { float: right; }
+
+.pull-left { float: left; }
+
+.fa.pull-left { margin-right: 0.3em; }
+
+.fa.pull-right { margin-left: 0.3em; }
+
+.fa-spin { animation: 2s linear 0s infinite normal none running fa-spin; }
+
+.fa-pulse { animation: 1s steps(8) 0s infinite normal none running fa-spin;=
+ }
+
+@-webkit-keyframes fa-spin {=20
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(359deg); }
+}
+
+@keyframes fa-spin {=20
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(359deg); }
+}
+
+.fa-rotate-90 { transform: rotate(90deg); }
+
+.fa-rotate-180 { transform: rotate(180deg); }
+
+.fa-rotate-270 { transform: rotate(270deg); }
+
+.fa-flip-horizontal { transform: scale(-1, 1); }
+
+.fa-flip-vertical { transform: scale(1, -1); }
+
+:root .fa-rotate-90, :root .fa-rotate-180, :root .fa-rotate-270, :root .fa-=
+flip-horizontal, :root .fa-flip-vertical { filter: none; }
+
+.fa-stack { position: relative; display: inline-block; width: 2em; height: =
+2em; line-height: 2em; vertical-align: middle; }
+
+.fa-stack-1x, .fa-stack-2x { position: absolute; left: 0px; width: 100%; te=
+xt-align: center; }
+
+.fa-stack-1x { line-height: inherit; }
+
+.fa-stack-2x { font-size: 2em; }
+
+.fa-inverse { color: rgb(255, 255, 255); }
+
+.fa-glass::before { content: "=EF=80=80"; }
+
+.fa-music::before { content: "=EF=80=81"; }
+
+.fa-search::before { content: "=EF=80=82"; }
+
+.fa-envelope-o::before { content: "=EF=80=83"; }
+
+.fa-heart::before { content: "=EF=80=84"; }
+
+.fa-star::before { content: "=EF=80=85"; }
+
+.fa-star-o::before { content: "=EF=80=86"; }
+
+.fa-user::before { content: "=EF=80=87"; }
+
+.fa-film::before { content: "=EF=80=88"; }
+
+.fa-th-large::before { content: "=EF=80=89"; }
+
+.fa-th::before { content: "=EF=80=8A"; }
+
+.fa-th-list::before { content: "=EF=80=8B"; }
+
+.fa-check::before { content: "=EF=80=8C"; }
+
+.fa-remove::before, .fa-close::before, .fa-times::before { content: "=EF=80=
+=8D"; }
+
+.fa-search-plus::before { content: "=EF=80=8E"; }
+
+.fa-search-minus::before { content: "=EF=80=90"; }
+
+.fa-power-off::before { content: "=EF=80=91"; }
+
+.fa-signal::before { content: "=EF=80=92"; }
+
+.fa-gear::before, .fa-cog::before { content: "=EF=80=93"; }
+
+.fa-trash-o::before { content: "=EF=80=94"; }
+
+.fa-home::before { content: "=EF=80=95"; }
+
+.fa-file-o::before { content: "=EF=80=96"; }
+
+.fa-clock-o::before { content: "=EF=80=97"; }
+
+.fa-road::before { content: "=EF=80=98"; }
+
+.fa-download::before { content: "=EF=80=99"; }
+
+.fa-arrow-circle-o-down::before { content: "=EF=80=9A"; }
+
+.fa-arrow-circle-o-up::before { content: "=EF=80=9B"; }
+
+.fa-inbox::before { content: "=EF=80=9C"; }
+
+.fa-play-circle-o::before { content: "=EF=80=9D"; }
+
+.fa-rotate-right::before, .fa-repeat::before { content: "=EF=80=9E"; }
+
+.fa-refresh::before { content: "=EF=80=A1"; }
+
+.fa-list-alt::before { content: "=EF=80=A2"; }
+
+.fa-lock::before { content: "=EF=80=A3"; }
+
+.fa-flag::before { content: "=EF=80=A4"; }
+
+.fa-headphones::before { content: "=EF=80=A5"; }
+
+.fa-volume-off::before { content: "=EF=80=A6"; }
+
+.fa-volume-down::before { content: "=EF=80=A7"; }
+
+.fa-volume-up::before { content: "=EF=80=A8"; }
+
+.fa-qrcode::before { content: "=EF=80=A9"; }
+
+.fa-barcode::before { content: "=EF=80=AA"; }
+
+.fa-tag::before { content: "=EF=80=AB"; }
+
+.fa-tags::before { content: "=EF=80=AC"; }
+
+.fa-book::before { content: "=EF=80=AD"; }
+
+.fa-bookmark::before { content: "=EF=80=AE"; }
+
+.fa-print::before { content: "=EF=80=AF"; }
+
+.fa-camera::before { content: "=EF=80=B0"; }
+
+.fa-font::before { content: "=EF=80=B1"; }
+
+.fa-bold::before { content: "=EF=80=B2"; }
+
+.fa-italic::before { content: "=EF=80=B3"; }
+
+.fa-text-height::before { content: "=EF=80=B4"; }
+
+.fa-text-width::before { content: "=EF=80=B5"; }
+
+.fa-align-left::before { content: "=EF=80=B6"; }
+
+.fa-align-center::before { content: "=EF=80=B7"; }
+
+.fa-align-right::before { content: "=EF=80=B8"; }
+
+.fa-align-justify::before { content: "=EF=80=B9"; }
+
+.fa-list::before { content: "=EF=80=BA"; }
+
+.fa-dedent::before, .fa-outdent::before { content: "=EF=80=BB"; }
+
+.fa-indent::before { content: "=EF=80=BC"; }
+
+.fa-video-camera::before { content: "=EF=80=BD"; }
+
+.fa-photo::before, .fa-image::before, .fa-picture-o::before { content: "=EF=
+=80=BE"; }
+
+.fa-pencil::before { content: "=EF=81=80"; }
+
+.fa-map-marker::before { content: "=EF=81=81"; }
+
+.fa-adjust::before { content: "=EF=81=82"; }
+
+.fa-tint::before { content: "=EF=81=83"; }
+
+.fa-edit::before, .fa-pencil-square-o::before { content: "=EF=81=84"; }
+
+.fa-share-square-o::before { content: "=EF=81=85"; }
+
+.fa-check-square-o::before { content: "=EF=81=86"; }
+
+.fa-arrows::before { content: "=EF=81=87"; }
+
+.fa-step-backward::before { content: "=EF=81=88"; }
+
+.fa-fast-backward::before { content: "=EF=81=89"; }
+
+.fa-backward::before { content: "=EF=81=8A"; }
+
+.fa-play::before { content: "=EF=81=8B"; }
+
+.fa-pause::before { content: "=EF=81=8C"; }
+
+.fa-stop::before { content: "=EF=81=8D"; }
+
+.fa-forward::before { content: "=EF=81=8E"; }
+
+.fa-fast-forward::before { content: "=EF=81=90"; }
+
+.fa-step-forward::before { content: "=EF=81=91"; }
+
+.fa-eject::before { content: "=EF=81=92"; }
+
+.fa-chevron-left::before { content: "=EF=81=93"; }
+
+.fa-chevron-right::before { content: "=EF=81=94"; }
+
+.fa-plus-circle::before { content: "=EF=81=95"; }
+
+.fa-minus-circle::before { content: "=EF=81=96"; }
+
+.fa-times-circle::before { content: "=EF=81=97"; }
+
+.fa-check-circle::before { content: "=EF=81=98"; }
+
+.fa-question-circle::before { content: "=EF=81=99"; }
+
+.fa-info-circle::before { content: "=EF=81=9A"; }
+
+.fa-crosshairs::before { content: "=EF=81=9B"; }
+
+.fa-times-circle-o::before { content: "=EF=81=9C"; }
+
+.fa-check-circle-o::before { content: "=EF=81=9D"; }
+
+.fa-ban::before { content: "=EF=81=9E"; }
+
+.fa-arrow-left::before { content: "=EF=81=A0"; }
+
+.fa-arrow-right::before { content: "=EF=81=A1"; }
+
+.fa-arrow-up::before { content: "=EF=81=A2"; }
+
+.fa-arrow-down::before { content: "=EF=81=A3"; }
+
+.fa-mail-forward::before, .fa-share::before { content: "=EF=81=A4"; }
+
+.fa-expand::before { content: "=EF=81=A5"; }
+
+.fa-compress::before { content: "=EF=81=A6"; }
+
+.fa-plus::before { content: "=EF=81=A7"; }
+
+.fa-minus::before { content: "=EF=81=A8"; }
+
+.fa-asterisk::before { content: "=EF=81=A9"; }
+
+.fa-exclamation-circle::before { content: "=EF=81=AA"; }
+
+.fa-gift::before { content: "=EF=81=AB"; }
+
+.fa-leaf::before { content: "=EF=81=AC"; }
+
+.fa-fire::before { content: "=EF=81=AD"; }
+
+.fa-eye::before { content: "=EF=81=AE"; }
+
+.fa-eye-slash::before { content: "=EF=81=B0"; }
+
+.fa-warning::before, .fa-exclamation-triangle::before { content: "=EF=81=B1=
+"; }
+
+.fa-plane::before { content: "=EF=81=B2"; }
+
+.fa-calendar::before { content: "=EF=81=B3"; }
+
+.fa-random::before { content: "=EF=81=B4"; }
+
+.fa-comment::before { content: "=EF=81=B5"; }
+
+.fa-magnet::before { content: "=EF=81=B6"; }
+
+.fa-chevron-up::before { content: "=EF=81=B7"; }
+
+.fa-chevron-down::before { content: "=EF=81=B8"; }
+
+.fa-retweet::before { content: "=EF=81=B9"; }
+
+.fa-shopping-cart::before { content: "=EF=81=BA"; }
+
+.fa-folder::before { content: "=EF=81=BB"; }
+
+.fa-folder-open::before { content: "=EF=81=BC"; }
+
+.fa-arrows-v::before { content: "=EF=81=BD"; }
+
+.fa-arrows-h::before { content: "=EF=81=BE"; }
+
+.fa-bar-chart-o::before, .fa-bar-chart::before { content: "=EF=82=80"; }
+
+.fa-twitter-square::before { content: "=EF=82=81"; }
+
+.fa-facebook-square::before { content: "=EF=82=82"; }
+
+.fa-camera-retro::before { content: "=EF=82=83"; }
+
+.fa-key::before { content: "=EF=82=84"; }
+
+.fa-gears::before, .fa-cogs::before { content: "=EF=82=85"; }
+
+.fa-comments::before { content: "=EF=82=86"; }
+
+.fa-thumbs-o-up::before { content: "=EF=82=87"; }
+
+.fa-thumbs-o-down::before { content: "=EF=82=88"; }
+
+.fa-star-half::before { content: "=EF=82=89"; }
+
+.fa-heart-o::before { content: "=EF=82=8A"; }
+
+.fa-sign-out::before { content: "=EF=82=8B"; }
+
+.fa-linkedin-square::before { content: "=EF=82=8C"; }
+
+.fa-thumb-tack::before { content: "=EF=82=8D"; }
+
+.fa-external-link::before { content: "=EF=82=8E"; }
+
+.fa-sign-in::before { content: "=EF=82=90"; }
+
+.fa-trophy::before { content: "=EF=82=91"; }
+
+.fa-github-square::before { content: "=EF=82=92"; }
+
+.fa-upload::before { content: "=EF=82=93"; }
+
+.fa-lemon-o::before { content: "=EF=82=94"; }
+
+.fa-phone::before { content: "=EF=82=95"; }
+
+.fa-square-o::before { content: "=EF=82=96"; }
+
+.fa-bookmark-o::before { content: "=EF=82=97"; }
+
+.fa-phone-square::before { content: "=EF=82=98"; }
+
+.fa-twitter::before { content: "=EF=82=99"; }
+
+.fa-facebook-f::before, .fa-facebook::before { content: "=EF=82=9A"; }
+
+.fa-github::before { content: "=EF=82=9B"; }
+
+.fa-unlock::before { content: "=EF=82=9C"; }
+
+.fa-credit-card::before { content: "=EF=82=9D"; }
+
+.fa-feed::before, .fa-rss::before { content: "=EF=82=9E"; }
+
+.fa-hdd-o::before { content: "=EF=82=A0"; }
+
+.fa-bullhorn::before { content: "=EF=82=A1"; }
+
+.fa-bell::before { content: "=EF=83=B3"; }
+
+.fa-certificate::before { content: "=EF=82=A3"; }
+
+.fa-hand-o-right::before { content: "=EF=82=A4"; }
+
+.fa-hand-o-left::before { content: "=EF=82=A5"; }
+
+.fa-hand-o-up::before { content: "=EF=82=A6"; }
+
+.fa-hand-o-down::before { content: "=EF=82=A7"; }
+
+.fa-arrow-circle-left::before { content: "=EF=82=A8"; }
+
+.fa-arrow-circle-right::before { content: "=EF=82=A9"; }
+
+.fa-arrow-circle-up::before { content: "=EF=82=AA"; }
+
+.fa-arrow-circle-down::before { content: "=EF=82=AB"; }
+
+.fa-globe::before { content: "=EF=82=AC"; }
+
+.fa-wrench::before { content: "=EF=82=AD"; }
+
+.fa-tasks::before { content: "=EF=82=AE"; }
+
+.fa-filter::before { content: "=EF=82=B0"; }
+
+.fa-briefcase::before { content: "=EF=82=B1"; }
+
+.fa-arrows-alt::before { content: "=EF=82=B2"; }
+
+.fa-group::before, .fa-users::before { content: "=EF=83=80"; }
+
+.fa-chain::before, .fa-link::before { content: "=EF=83=81"; }
+
+.fa-cloud::before { content: "=EF=83=82"; }
+
+.fa-flask::before { content: "=EF=83=83"; }
+
+.fa-cut::before, .fa-scissors::before { content: "=EF=83=84"; }
+
+.fa-copy::before, .fa-files-o::before { content: "=EF=83=85"; }
+
+.fa-paperclip::before { content: "=EF=83=86"; }
+
+.fa-save::before, .fa-floppy-o::before { content: "=EF=83=87"; }
+
+.fa-square::before { content: "=EF=83=88"; }
+
+.fa-navicon::before, .fa-reorder::before, .fa-bars::before { content: "=EF=
+=83=89"; }
+
+.fa-list-ul::before { content: "=EF=83=8A"; }
+
+.fa-list-ol::before { content: "=EF=83=8B"; }
+
+.fa-strikethrough::before { content: "=EF=83=8C"; }
+
+.fa-underline::before { content: "=EF=83=8D"; }
+
+.fa-table::before { content: "=EF=83=8E"; }
+
+.fa-magic::before { content: "=EF=83=90"; }
+
+.fa-truck::before { content: "=EF=83=91"; }
+
+.fa-pinterest::before { content: "=EF=83=92"; }
+
+.fa-pinterest-square::before { content: "=EF=83=93"; }
+
+.fa-google-plus-square::before { content: "=EF=83=94"; }
+
+.fa-google-plus::before { content: "=EF=83=95"; }
+
+.fa-money::before { content: "=EF=83=96"; }
+
+.fa-caret-down::before { content: "=EF=83=97"; }
+
+.fa-caret-up::before { content: "=EF=83=98"; }
+
+.fa-caret-left::before { content: "=EF=83=99"; }
+
+.fa-caret-right::before { content: "=EF=83=9A"; }
+
+.fa-columns::before { content: "=EF=83=9B"; }
+
+.fa-unsorted::before, .fa-sort::before { content: "=EF=83=9C"; }
+
+.fa-sort-down::before, .fa-sort-desc::before { content: "=EF=83=9D"; }
+
+.fa-sort-up::before, .fa-sort-asc::before { content: "=EF=83=9E"; }
+
+.fa-envelope::before { content: "=EF=83=A0"; }
+
+.fa-linkedin::before { content: "=EF=83=A1"; }
+
+.fa-rotate-left::before, .fa-undo::before { content: "=EF=83=A2"; }
+
+.fa-legal::before, .fa-gavel::before { content: "=EF=83=A3"; }
+
+.fa-dashboard::before, .fa-tachometer::before { content: "=EF=83=A4"; }
+
+.fa-comment-o::before { content: "=EF=83=A5"; }
+
+.fa-comments-o::before { content: "=EF=83=A6"; }
+
+.fa-flash::before, .fa-bolt::before { content: "=EF=83=A7"; }
+
+.fa-sitemap::before { content: "=EF=83=A8"; }
+
+.fa-umbrella::before { content: "=EF=83=A9"; }
+
+.fa-paste::before, .fa-clipboard::before { content: "=EF=83=AA"; }
+
+.fa-lightbulb-o::before { content: "=EF=83=AB"; }
+
+.fa-exchange::before { content: "=EF=83=AC"; }
+
+.fa-cloud-download::before { content: "=EF=83=AD"; }
+
+.fa-cloud-upload::before { content: "=EF=83=AE"; }
+
+.fa-user-md::before { content: "=EF=83=B0"; }
+
+.fa-stethoscope::before { content: "=EF=83=B1"; }
+
+.fa-suitcase::before { content: "=EF=83=B2"; }
+
+.fa-bell-o::before { content: "=EF=82=A2"; }
+
+.fa-coffee::before { content: "=EF=83=B4"; }
+
+.fa-cutlery::before { content: "=EF=83=B5"; }
+
+.fa-file-text-o::before { content: "=EF=83=B6"; }
+
+.fa-building-o::before { content: "=EF=83=B7"; }
+
+.fa-hospital-o::before { content: "=EF=83=B8"; }
+
+.fa-ambulance::before { content: "=EF=83=B9"; }
+
+.fa-medkit::before { content: "=EF=83=BA"; }
+
+.fa-fighter-jet::before { content: "=EF=83=BB"; }
+
+.fa-beer::before { content: "=EF=83=BC"; }
+
+.fa-h-square::before { content: "=EF=83=BD"; }
+
+.fa-plus-square::before { content: "=EF=83=BE"; }
+
+.fa-angle-double-left::before { content: "=EF=84=80"; }
+
+.fa-angle-double-right::before { content: "=EF=84=81"; }
+
+.fa-angle-double-up::before { content: "=EF=84=82"; }
+
+.fa-angle-double-down::before { content: "=EF=84=83"; }
+
+.fa-angle-left::before { content: "=EF=84=84"; }
+
+.fa-angle-right::before { content: "=EF=84=85"; }
+
+.fa-angle-up::before { content: "=EF=84=86"; }
+
+.fa-angle-down::before { content: "=EF=84=87"; }
+
+.fa-desktop::before { content: "=EF=84=88"; }
+
+.fa-laptop::before { content: "=EF=84=89"; }
+
+.fa-tablet::before { content: "=EF=84=8A"; }
+
+.fa-mobile-phone::before, .fa-mobile::before { content: "=EF=84=8B"; }
+
+.fa-circle-o::before { content: "=EF=84=8C"; }
+
+.fa-quote-left::before { content: "=EF=84=8D"; }
+
+.fa-quote-right::before { content: "=EF=84=8E"; }
+
+.fa-spinner::before { content: "=EF=84=90"; }
+
+.fa-circle::before { content: "=EF=84=91"; }
+
+.fa-mail-reply::before, .fa-reply::before { content: "=EF=84=92"; }
+
+.fa-github-alt::before { content: "=EF=84=93"; }
+
+.fa-folder-o::before { content: "=EF=84=94"; }
+
+.fa-folder-open-o::before { content: "=EF=84=95"; }
+
+.fa-smile-o::before { content: "=EF=84=98"; }
+
+.fa-frown-o::before { content: "=EF=84=99"; }
+
+.fa-meh-o::before { content: "=EF=84=9A"; }
+
+.fa-gamepad::before { content: "=EF=84=9B"; }
+
+.fa-keyboard-o::before { content: "=EF=84=9C"; }
+
+.fa-flag-o::before { content: "=EF=84=9D"; }
+
+.fa-flag-checkered::before { content: "=EF=84=9E"; }
+
+.fa-terminal::before { content: "=EF=84=A0"; }
+
+.fa-code::before { content: "=EF=84=A1"; }
+
+.fa-mail-reply-all::before, .fa-reply-all::before { content: "=EF=84=A2"; }
+
+.fa-star-half-empty::before, .fa-star-half-full::before, .fa-star-half-o::b=
+efore { content: "=EF=84=A3"; }
+
+.fa-location-arrow::before { content: "=EF=84=A4"; }
+
+.fa-crop::before { content: "=EF=84=A5"; }
+
+.fa-code-fork::before { content: "=EF=84=A6"; }
+
+.fa-unlink::before, .fa-chain-broken::before { content: "=EF=84=A7"; }
+
+.fa-question::before { content: "=EF=84=A8"; }
+
+.fa-info::before { content: "=EF=84=A9"; }
+
+.fa-exclamation::before { content: "=EF=84=AA"; }
+
+.fa-superscript::before { content: "=EF=84=AB"; }
+
+.fa-subscript::before { content: "=EF=84=AC"; }
+
+.fa-eraser::before { content: "=EF=84=AD"; }
+
+.fa-puzzle-piece::before { content: "=EF=84=AE"; }
+
+.fa-microphone::before { content: "=EF=84=B0"; }
+
+.fa-microphone-slash::before { content: "=EF=84=B1"; }
+
+.fa-shield::before { content: "=EF=84=B2"; }
+
+.fa-calendar-o::before { content: "=EF=84=B3"; }
+
+.fa-fire-extinguisher::before { content: "=EF=84=B4"; }
+
+.fa-rocket::before { content: "=EF=84=B5"; }
+
+.fa-maxcdn::before { content: "=EF=84=B6"; }
+
+.fa-chevron-circle-left::before { content: "=EF=84=B7"; }
+
+.fa-chevron-circle-right::before { content: "=EF=84=B8"; }
+
+.fa-chevron-circle-up::before { content: "=EF=84=B9"; }
+
+.fa-chevron-circle-down::before { content: "=EF=84=BA"; }
+
+.fa-html5::before { content: "=EF=84=BB"; }
+
+.fa-css3::before { content: "=EF=84=BC"; }
+
+.fa-anchor::before { content: "=EF=84=BD"; }
+
+.fa-unlock-alt::before { content: "=EF=84=BE"; }
+
+.fa-bullseye::before { content: "=EF=85=80"; }
+
+.fa-ellipsis-h::before { content: "=EF=85=81"; }
+
+.fa-ellipsis-v::before { content: "=EF=85=82"; }
+
+.fa-rss-square::before { content: "=EF=85=83"; }
+
+.fa-play-circle::before { content: "=EF=85=84"; }
+
+.fa-ticket::before { content: "=EF=85=85"; }
+
+.fa-minus-square::before { content: "=EF=85=86"; }
+
+.fa-minus-square-o::before { content: "=EF=85=87"; }
+
+.fa-level-up::before { content: "=EF=85=88"; }
+
+.fa-level-down::before { content: "=EF=85=89"; }
+
+.fa-check-square::before { content: "=EF=85=8A"; }
+
+.fa-pencil-square::before { content: "=EF=85=8B"; }
+
+.fa-external-link-square::before { content: "=EF=85=8C"; }
+
+.fa-share-square::before { content: "=EF=85=8D"; }
+
+.fa-compass::before { content: "=EF=85=8E"; }
+
+.fa-toggle-down::before, .fa-caret-square-o-down::before { content: "=EF=85=
+=90"; }
+
+.fa-toggle-up::before, .fa-caret-square-o-up::before { content: "=EF=85=91"=
+; }
+
+.fa-toggle-right::before, .fa-caret-square-o-right::before { content: "=EF=
+=85=92"; }
+
+.fa-euro::before, .fa-eur::before { content: "=EF=85=93"; }
+
+.fa-gbp::before { content: "=EF=85=94"; }
+
+.fa-dollar::before, .fa-usd::before { content: "=EF=85=95"; }
+
+.fa-rupee::before, .fa-inr::before { content: "=EF=85=96"; }
+
+.fa-cny::before, .fa-rmb::before, .fa-yen::before, .fa-jpy::before { conten=
+t: "=EF=85=97"; }
+
+.fa-ruble::before, .fa-rouble::before, .fa-rub::before { content: "=EF=85=
+=98"; }
+
+.fa-won::before, .fa-krw::before { content: "=EF=85=99"; }
+
+.fa-bitcoin::before, .fa-btc::before { content: "=EF=85=9A"; }
+
+.fa-file::before { content: "=EF=85=9B"; }
+
+.fa-file-text::before { content: "=EF=85=9C"; }
+
+.fa-sort-alpha-asc::before { content: "=EF=85=9D"; }
+
+.fa-sort-alpha-desc::before { content: "=EF=85=9E"; }
+
+.fa-sort-amount-asc::before { content: "=EF=85=A0"; }
+
+.fa-sort-amount-desc::before { content: "=EF=85=A1"; }
+
+.fa-sort-numeric-asc::before { content: "=EF=85=A2"; }
+
+.fa-sort-numeric-desc::before { content: "=EF=85=A3"; }
+
+.fa-thumbs-up::before { content: "=EF=85=A4"; }
+
+.fa-thumbs-down::before { content: "=EF=85=A5"; }
+
+.fa-youtube-square::before { content: "=EF=85=A6"; }
+
+.fa-youtube::before { content: "=EF=85=A7"; }
+
+.fa-xing::before { content: "=EF=85=A8"; }
+
+.fa-xing-square::before { content: "=EF=85=A9"; }
+
+.fa-youtube-play::before { content: "=EF=85=AA"; }
+
+.fa-dropbox::before { content: "=EF=85=AB"; }
+
+.fa-stack-overflow::before { content: "=EF=85=AC"; }
+
+.fa-instagram::before { content: "=EF=85=AD"; }
+
+.fa-flickr::before { content: "=EF=85=AE"; }
+
+.fa-adn::before { content: "=EF=85=B0"; }
+
+.fa-bitbucket::before { content: "=EF=85=B1"; }
+
+.fa-bitbucket-square::before { content: "=EF=85=B2"; }
+
+.fa-tumblr::before { content: "=EF=85=B3"; }
+
+.fa-tumblr-square::before { content: "=EF=85=B4"; }
+
+.fa-long-arrow-down::before { content: "=EF=85=B5"; }
+
+.fa-long-arrow-up::before { content: "=EF=85=B6"; }
+
+.fa-long-arrow-left::before { content: "=EF=85=B7"; }
+
+.fa-long-arrow-right::before { content: "=EF=85=B8"; }
+
+.fa-apple::before { content: "=EF=85=B9"; }
+
+.fa-windows::before { content: "=EF=85=BA"; }
+
+.fa-android::before { content: "=EF=85=BB"; }
+
+.fa-linux::before { content: "=EF=85=BC"; }
+
+.fa-dribbble::before { content: "=EF=85=BD"; }
+
+.fa-skype::before { content: "=EF=85=BE"; }
+
+.fa-foursquare::before { content: "=EF=86=80"; }
+
+.fa-trello::before { content: "=EF=86=81"; }
+
+.fa-female::before { content: "=EF=86=82"; }
+
+.fa-male::before { content: "=EF=86=83"; }
+
+.fa-gittip::before, .fa-gratipay::before { content: "=EF=86=84"; }
+
+.fa-sun-o::before { content: "=EF=86=85"; }
+
+.fa-moon-o::before { content: "=EF=86=86"; }
+
+.fa-archive::before { content: "=EF=86=87"; }
+
+.fa-bug::before { content: "=EF=86=88"; }
+
+.fa-vk::before { content: "=EF=86=89"; }
+
+.fa-weibo::before { content: "=EF=86=8A"; }
+
+.fa-renren::before { content: "=EF=86=8B"; }
+
+.fa-pagelines::before { content: "=EF=86=8C"; }
+
+.fa-stack-exchange::before { content: "=EF=86=8D"; }
+
+.fa-arrow-circle-o-right::before { content: "=EF=86=8E"; }
+
+.fa-arrow-circle-o-left::before { content: "=EF=86=90"; }
+
+.fa-toggle-left::before, .fa-caret-square-o-left::before { content: "=EF=86=
+=91"; }
+
+.fa-dot-circle-o::before { content: "=EF=86=92"; }
+
+.fa-wheelchair::before { content: "=EF=86=93"; }
+
+.fa-vimeo-square::before { content: "=EF=86=94"; }
+
+.fa-turkish-lira::before, .fa-try::before { content: "=EF=86=95"; }
+
+.fa-plus-square-o::before { content: "=EF=86=96"; }
+
+.fa-space-shuttle::before { content: "=EF=86=97"; }
+
+.fa-slack::before { content: "=EF=86=98"; }
+
+.fa-envelope-square::before { content: "=EF=86=99"; }
+
+.fa-wordpress::before { content: "=EF=86=9A"; }
+
+.fa-openid::before { content: "=EF=86=9B"; }
+
+.fa-institution::before, .fa-bank::before, .fa-university::before { content=
+: "=EF=86=9C"; }
+
+.fa-mortar-board::before, .fa-graduation-cap::before { content: "=EF=86=9D"=
+; }
+
+.fa-yahoo::before { content: "=EF=86=9E"; }
+
+.fa-google::before { content: "=EF=86=A0"; }
+
+.fa-reddit::before { content: "=EF=86=A1"; }
+
+.fa-reddit-square::before { content: "=EF=86=A2"; }
+
+.fa-stumbleupon-circle::before { content: "=EF=86=A3"; }
+
+.fa-stumbleupon::before { content: "=EF=86=A4"; }
+
+.fa-delicious::before { content: "=EF=86=A5"; }
+
+.fa-digg::before { content: "=EF=86=A6"; }
+
+.fa-pied-piper-pp::before { content: "=EF=86=A7"; }
+
+.fa-pied-piper-alt::before { content: "=EF=86=A8"; }
+
+.fa-drupal::before { content: "=EF=86=A9"; }
+
+.fa-joomla::before { content: "=EF=86=AA"; }
+
+.fa-language::before { content: "=EF=86=AB"; }
+
+.fa-fax::before { content: "=EF=86=AC"; }
+
+.fa-building::before { content: "=EF=86=AD"; }
+
+.fa-child::before { content: "=EF=86=AE"; }
+
+.fa-paw::before { content: "=EF=86=B0"; }
+
+.fa-spoon::before { content: "=EF=86=B1"; }
+
+.fa-cube::before { content: "=EF=86=B2"; }
+
+.fa-cubes::before { content: "=EF=86=B3"; }
+
+.fa-behance::before { content: "=EF=86=B4"; }
+
+.fa-behance-square::before { content: "=EF=86=B5"; }
+
+.fa-steam::before { content: "=EF=86=B6"; }
+
+.fa-steam-square::before { content: "=EF=86=B7"; }
+
+.fa-recycle::before { content: "=EF=86=B8"; }
+
+.fa-automobile::before, .fa-car::before { content: "=EF=86=B9"; }
+
+.fa-cab::before, .fa-taxi::before { content: "=EF=86=BA"; }
+
+.fa-tree::before { content: "=EF=86=BB"; }
+
+.fa-spotify::before { content: "=EF=86=BC"; }
+
+.fa-deviantart::before { content: "=EF=86=BD"; }
+
+.fa-soundcloud::before { content: "=EF=86=BE"; }
+
+.fa-database::before { content: "=EF=87=80"; }
+
+.fa-file-pdf-o::before { content: "=EF=87=81"; }
+
+.fa-file-word-o::before { content: "=EF=87=82"; }
+
+.fa-file-excel-o::before { content: "=EF=87=83"; }
+
+.fa-file-powerpoint-o::before { content: "=EF=87=84"; }
+
+.fa-file-photo-o::before, .fa-file-picture-o::before, .fa-file-image-o::bef=
+ore { content: "=EF=87=85"; }
+
+.fa-file-zip-o::before, .fa-file-archive-o::before { content: "=EF=87=86"; =
+}
+
+.fa-file-sound-o::before, .fa-file-audio-o::before { content: "=EF=87=87"; =
+}
+
+.fa-file-movie-o::before, .fa-file-video-o::before { content: "=EF=87=88"; =
+}
+
+.fa-file-code-o::before { content: "=EF=87=89"; }
+
+.fa-vine::before { content: "=EF=87=8A"; }
+
+.fa-codepen::before { content: "=EF=87=8B"; }
+
+.fa-jsfiddle::before { content: "=EF=87=8C"; }
+
+.fa-life-bouy::before, .fa-life-buoy::before, .fa-life-saver::before, .fa-s=
+upport::before, .fa-life-ring::before { content: "=EF=87=8D"; }
+
+.fa-circle-o-notch::before { content: "=EF=87=8E"; }
+
+.fa-ra::before, .fa-resistance::before, .fa-rebel::before { content: "=EF=
+=87=90"; }
+
+.fa-ge::before, .fa-empire::before { content: "=EF=87=91"; }
+
+.fa-git-square::before { content: "=EF=87=92"; }
+
+.fa-git::before { content: "=EF=87=93"; }
+
+.fa-y-combinator-square::before, .fa-yc-square::before, .fa-hacker-news::be=
+fore { content: "=EF=87=94"; }
+
+.fa-tencent-weibo::before { content: "=EF=87=95"; }
+
+.fa-qq::before { content: "=EF=87=96"; }
+
+.fa-wechat::before, .fa-weixin::before { content: "=EF=87=97"; }
+
+.fa-send::before, .fa-paper-plane::before { content: "=EF=87=98"; }
+
+.fa-send-o::before, .fa-paper-plane-o::before { content: "=EF=87=99"; }
+
+.fa-history::before { content: "=EF=87=9A"; }
+
+.fa-circle-thin::before { content: "=EF=87=9B"; }
+
+.fa-header::before { content: "=EF=87=9C"; }
+
+.fa-paragraph::before { content: "=EF=87=9D"; }
+
+.fa-sliders::before { content: "=EF=87=9E"; }
+
+.fa-share-alt::before { content: "=EF=87=A0"; }
+
+.fa-share-alt-square::before { content: "=EF=87=A1"; }
+
+.fa-bomb::before { content: "=EF=87=A2"; }
+
+.fa-soccer-ball-o::before, .fa-futbol-o::before { content: "=EF=87=A3"; }
+
+.fa-tty::before { content: "=EF=87=A4"; }
+
+.fa-binoculars::before { content: "=EF=87=A5"; }
+
+.fa-plug::before { content: "=EF=87=A6"; }
+
+.fa-slideshare::before { content: "=EF=87=A7"; }
+
+.fa-twitch::before { content: "=EF=87=A8"; }
+
+.fa-yelp::before { content: "=EF=87=A9"; }
+
+.fa-newspaper-o::before { content: "=EF=87=AA"; }
+
+.fa-wifi::before { content: "=EF=87=AB"; }
+
+.fa-calculator::before { content: "=EF=87=AC"; }
+
+.fa-paypal::before { content: "=EF=87=AD"; }
+
+.fa-google-wallet::before { content: "=EF=87=AE"; }
+
+.fa-cc-visa::before { content: "=EF=87=B0"; }
+
+.fa-cc-mastercard::before { content: "=EF=87=B1"; }
+
+.fa-cc-discover::before { content: "=EF=87=B2"; }
+
+.fa-cc-amex::before { content: "=EF=87=B3"; }
+
+.fa-cc-paypal::before { content: "=EF=87=B4"; }
+
+.fa-cc-stripe::before { content: "=EF=87=B5"; }
+
+.fa-bell-slash::before { content: "=EF=87=B6"; }
+
+.fa-bell-slash-o::before { content: "=EF=87=B7"; }
+
+.fa-trash::before { content: "=EF=87=B8"; }
+
+.fa-copyright::before { content: "=EF=87=B9"; }
+
+.fa-at::before { content: "=EF=87=BA"; }
+
+.fa-eyedropper::before { content: "=EF=87=BB"; }
+
+.fa-paint-brush::before { content: "=EF=87=BC"; }
+
+.fa-birthday-cake::before { content: "=EF=87=BD"; }
+
+.fa-area-chart::before { content: "=EF=87=BE"; }
+
+.fa-pie-chart::before { content: "=EF=88=80"; }
+
+.fa-line-chart::before { content: "=EF=88=81"; }
+
+.fa-lastfm::before { content: "=EF=88=82"; }
+
+.fa-lastfm-square::before { content: "=EF=88=83"; }
+
+.fa-toggle-off::before { content: "=EF=88=84"; }
+
+.fa-toggle-on::before { content: "=EF=88=85"; }
+
+.fa-bicycle::before { content: "=EF=88=86"; }
+
+.fa-bus::before { content: "=EF=88=87"; }
+
+.fa-ioxhost::before { content: "=EF=88=88"; }
+
+.fa-angellist::before { content: "=EF=88=89"; }
+
+.fa-cc::before { content: "=EF=88=8A"; }
+
+.fa-shekel::before, .fa-sheqel::before, .fa-ils::before { content: "=EF=88=
+=8B"; }
+
+.fa-meanpath::before { content: "=EF=88=8C"; }
+
+.fa-buysellads::before { content: "=EF=88=8D"; }
+
+.fa-connectdevelop::before { content: "=EF=88=8E"; }
+
+.fa-dashcube::before { content: "=EF=88=90"; }
+
+.fa-forumbee::before { content: "=EF=88=91"; }
+
+.fa-leanpub::before { content: "=EF=88=92"; }
+
+.fa-sellsy::before { content: "=EF=88=93"; }
+
+.fa-shirtsinbulk::before { content: "=EF=88=94"; }
+
+.fa-simplybuilt::before { content: "=EF=88=95"; }
+
+.fa-skyatlas::before { content: "=EF=88=96"; }
+
+.fa-cart-plus::before { content: "=EF=88=97"; }
+
+.fa-cart-arrow-down::before { content: "=EF=88=98"; }
+
+.fa-diamond::before { content: "=EF=88=99"; }
+
+.fa-ship::before { content: "=EF=88=9A"; }
+
+.fa-user-secret::before { content: "=EF=88=9B"; }
+
+.fa-motorcycle::before { content: "=EF=88=9C"; }
+
+.fa-street-view::before { content: "=EF=88=9D"; }
+
+.fa-heartbeat::before { content: "=EF=88=9E"; }
+
+.fa-venus::before { content: "=EF=88=A1"; }
+
+.fa-mars::before { content: "=EF=88=A2"; }
+
+.fa-mercury::before { content: "=EF=88=A3"; }
+
+.fa-intersex::before, .fa-transgender::before { content: "=EF=88=A4"; }
+
+.fa-transgender-alt::before { content: "=EF=88=A5"; }
+
+.fa-venus-double::before { content: "=EF=88=A6"; }
+
+.fa-mars-double::before { content: "=EF=88=A7"; }
+
+.fa-venus-mars::before { content: "=EF=88=A8"; }
+
+.fa-mars-stroke::before { content: "=EF=88=A9"; }
+
+.fa-mars-stroke-v::before { content: "=EF=88=AA"; }
+
+.fa-mars-stroke-h::before { content: "=EF=88=AB"; }
+
+.fa-neuter::before { content: "=EF=88=AC"; }
+
+.fa-genderless::before { content: "=EF=88=AD"; }
+
+.fa-facebook-official::before { content: "=EF=88=B0"; }
+
+.fa-pinterest-p::before { content: "=EF=88=B1"; }
+
+.fa-whatsapp::before { content: "=EF=88=B2"; }
+
+.fa-server::before { content: "=EF=88=B3"; }
+
+.fa-user-plus::before { content: "=EF=88=B4"; }
+
+.fa-user-times::before { content: "=EF=88=B5"; }
+
+.fa-hotel::before, .fa-bed::before { content: "=EF=88=B6"; }
+
+.fa-viacoin::before { content: "=EF=88=B7"; }
+
+.fa-train::before { content: "=EF=88=B8"; }
+
+.fa-subway::before { content: "=EF=88=B9"; }
+
+.fa-medium::before { content: "=EF=88=BA"; }
+
+.fa-yc::before, .fa-y-combinator::before { content: "=EF=88=BB"; }
+
+.fa-optin-monster::before { content: "=EF=88=BC"; }
+
+.fa-opencart::before { content: "=EF=88=BD"; }
+
+.fa-expeditedssl::before { content: "=EF=88=BE"; }
+
+.fa-battery-4::before, .fa-battery::before, .fa-battery-full::before { cont=
+ent: "=EF=89=80"; }
+
+.fa-battery-3::before, .fa-battery-three-quarters::before { content: "=EF=
+=89=81"; }
+
+.fa-battery-2::before, .fa-battery-half::before { content: "=EF=89=82"; }
+
+.fa-battery-1::before, .fa-battery-quarter::before { content: "=EF=89=83"; =
+}
+
+.fa-battery-0::before, .fa-battery-empty::before { content: "=EF=89=84"; }
+
+.fa-mouse-pointer::before { content: "=EF=89=85"; }
+
+.fa-i-cursor::before { content: "=EF=89=86"; }
+
+.fa-object-group::before { content: "=EF=89=87"; }
+
+.fa-object-ungroup::before { content: "=EF=89=88"; }
+
+.fa-sticky-note::before { content: "=EF=89=89"; }
+
+.fa-sticky-note-o::before { content: "=EF=89=8A"; }
+
+.fa-cc-jcb::before { content: "=EF=89=8B"; }
+
+.fa-cc-diners-club::before { content: "=EF=89=8C"; }
+
+.fa-clone::before { content: "=EF=89=8D"; }
+
+.fa-balance-scale::before { content: "=EF=89=8E"; }
+
+.fa-hourglass-o::before { content: "=EF=89=90"; }
+
+.fa-hourglass-1::before, .fa-hourglass-start::before { content: "=EF=89=91"=
+; }
+
+.fa-hourglass-2::before, .fa-hourglass-half::before { content: "=EF=89=92";=
+ }
+
+.fa-hourglass-3::before, .fa-hourglass-end::before { content: "=EF=89=93"; =
+}
+
+.fa-hourglass::before { content: "=EF=89=94"; }
+
+.fa-hand-grab-o::before, .fa-hand-rock-o::before { content: "=EF=89=95"; }
+
+.fa-hand-stop-o::before, .fa-hand-paper-o::before { content: "=EF=89=96"; }
+
+.fa-hand-scissors-o::before { content: "=EF=89=97"; }
+
+.fa-hand-lizard-o::before { content: "=EF=89=98"; }
+
+.fa-hand-spock-o::before { content: "=EF=89=99"; }
+
+.fa-hand-pointer-o::before { content: "=EF=89=9A"; }
+
+.fa-hand-peace-o::before { content: "=EF=89=9B"; }
+
+.fa-trademark::before { content: "=EF=89=9C"; }
+
+.fa-registered::before { content: "=EF=89=9D"; }
+
+.fa-creative-commons::before { content: "=EF=89=9E"; }
+
+.fa-gg::before { content: "=EF=89=A0"; }
+
+.fa-gg-circle::before { content: "=EF=89=A1"; }
+
+.fa-tripadvisor::before { content: "=EF=89=A2"; }
+
+.fa-odnoklassniki::before { content: "=EF=89=A3"; }
+
+.fa-odnoklassniki-square::before { content: "=EF=89=A4"; }
+
+.fa-get-pocket::before { content: "=EF=89=A5"; }
+
+.fa-wikipedia-w::before { content: "=EF=89=A6"; }
+
+.fa-safari::before { content: "=EF=89=A7"; }
+
+.fa-chrome::before { content: "=EF=89=A8"; }
+
+.fa-firefox::before { content: "=EF=89=A9"; }
+
+.fa-opera::before { content: "=EF=89=AA"; }
+
+.fa-internet-explorer::before { content: "=EF=89=AB"; }
+
+.fa-tv::before, .fa-television::before { content: "=EF=89=AC"; }
+
+.fa-contao::before { content: "=EF=89=AD"; }
+
+.fa-500px::before { content: "=EF=89=AE"; }
+
+.fa-amazon::before { content: "=EF=89=B0"; }
+
+.fa-calendar-plus-o::before { content: "=EF=89=B1"; }
+
+.fa-calendar-minus-o::before { content: "=EF=89=B2"; }
+
+.fa-calendar-times-o::before { content: "=EF=89=B3"; }
+
+.fa-calendar-check-o::before { content: "=EF=89=B4"; }
+
+.fa-industry::before { content: "=EF=89=B5"; }
+
+.fa-map-pin::before { content: "=EF=89=B6"; }
+
+.fa-map-signs::before { content: "=EF=89=B7"; }
+
+.fa-map-o::before { content: "=EF=89=B8"; }
+
+.fa-map::before { content: "=EF=89=B9"; }
+
+.fa-commenting::before { content: "=EF=89=BA"; }
+
+.fa-commenting-o::before { content: "=EF=89=BB"; }
+
+.fa-houzz::before { content: "=EF=89=BC"; }
+
+.fa-vimeo::before { content: "=EF=89=BD"; }
+
+.fa-black-tie::before { content: "=EF=89=BE"; }
+
+.fa-fonticons::before { content: "=EF=8A=80"; }
+
+.fa-reddit-alien::before { content: "=EF=8A=81"; }
+
+.fa-edge::before { content: "=EF=8A=82"; }
+
+.fa-credit-card-alt::before { content: "=EF=8A=83"; }
+
+.fa-codiepie::before { content: "=EF=8A=84"; }
+
+.fa-modx::before { content: "=EF=8A=85"; }
+
+.fa-fort-awesome::before { content: "=EF=8A=86"; }
+
+.fa-usb::before { content: "=EF=8A=87"; }
+
+.fa-product-hunt::before { content: "=EF=8A=88"; }
+
+.fa-mixcloud::before { content: "=EF=8A=89"; }
+
+.fa-scribd::before { content: "=EF=8A=8A"; }
+
+.fa-pause-circle::before { content: "=EF=8A=8B"; }
+
+.fa-pause-circle-o::before { content: "=EF=8A=8C"; }
+
+.fa-stop-circle::before { content: "=EF=8A=8D"; }
+
+.fa-stop-circle-o::before { content: "=EF=8A=8E"; }
+
+.fa-shopping-bag::before { content: "=EF=8A=90"; }
+
+.fa-shopping-basket::before { content: "=EF=8A=91"; }
+
+.fa-hashtag::before { content: "=EF=8A=92"; }
+
+.fa-bluetooth::before { content: "=EF=8A=93"; }
+
+.fa-bluetooth-b::before { content: "=EF=8A=94"; }
+
+.fa-percent::before { content: "=EF=8A=95"; }
+
+.fa-gitlab::before { content: "=EF=8A=96"; }
+
+.fa-wpbeginner::before { content: "=EF=8A=97"; }
+
+.fa-wpforms::before { content: "=EF=8A=98"; }
+
+.fa-envira::before { content: "=EF=8A=99"; }
+
+.fa-universal-access::before { content: "=EF=8A=9A"; }
+
+.fa-wheelchair-alt::before { content: "=EF=8A=9B"; }
+
+.fa-question-circle-o::before { content: "=EF=8A=9C"; }
+
+.fa-blind::before { content: "=EF=8A=9D"; }
+
+.fa-audio-description::before { content: "=EF=8A=9E"; }
+
+.fa-volume-control-phone::before { content: "=EF=8A=A0"; }
+
+.fa-braille::before { content: "=EF=8A=A1"; }
+
+.fa-assistive-listening-systems::before { content: "=EF=8A=A2"; }
+
+.fa-asl-interpreting::before, .fa-american-sign-language-interpreting::befo=
+re { content: "=EF=8A=A3"; }
+
+.fa-deafness::before, .fa-hard-of-hearing::before, .fa-deaf::before { conte=
+nt: "=EF=8A=A4"; }
+
+.fa-glide::before { content: "=EF=8A=A5"; }
+
+.fa-glide-g::before { content: "=EF=8A=A6"; }
+
+.fa-signing::before, .fa-sign-language::before { content: "=EF=8A=A7"; }
+
+.fa-low-vision::before { content: "=EF=8A=A8"; }
+
+.fa-viadeo::before { content: "=EF=8A=A9"; }
+
+.fa-viadeo-square::before { content: "=EF=8A=AA"; }
+
+.fa-snapchat::before { content: "=EF=8A=AB"; }
+
+.fa-snapchat-ghost::before { content: "=EF=8A=AC"; }
+
+.fa-snapchat-square::before { content: "=EF=8A=AD"; }
+
+.fa-pied-piper::before { content: "=EF=8A=AE"; }
+
+.fa-first-order::before { content: "=EF=8A=B0"; }
+
+.fa-yoast::before { content: "=EF=8A=B1"; }
+
+.fa-themeisle::before { content: "=EF=8A=B2"; }
+
+.fa-google-plus-circle::before, .fa-google-plus-official::before { content:=
+ "=EF=8A=B3"; }
+
+.fa-fa::before, .fa-font-awesome::before { content: "=EF=8A=B4"; }
+
+.fa-handshake-o::before { content: "=EF=8A=B5"; }
+
+.fa-envelope-open::before { content: "=EF=8A=B6"; }
+
+.fa-envelope-open-o::before { content: "=EF=8A=B7"; }
+
+.fa-linode::before { content: "=EF=8A=B8"; }
+
+.fa-address-book::before { content: "=EF=8A=B9"; }
+
+.fa-address-book-o::before { content: "=EF=8A=BA"; }
+
+.fa-vcard::before, .fa-address-card::before { content: "=EF=8A=BB"; }
+
+.fa-vcard-o::before, .fa-address-card-o::before { content: "=EF=8A=BC"; }
+
+.fa-user-circle::before { content: "=EF=8A=BD"; }
+
+.fa-user-circle-o::before { content: "=EF=8A=BE"; }
+
+.fa-user-o::before { content: "=EF=8B=80"; }
+
+.fa-id-badge::before { content: "=EF=8B=81"; }
+
+.fa-drivers-license::before, .fa-id-card::before { content: "=EF=8B=82"; }
+
+.fa-drivers-license-o::before, .fa-id-card-o::before { content: "=EF=8B=83"=
+; }
+
+.fa-quora::before { content: "=EF=8B=84"; }
+
+.fa-free-code-camp::before { content: "=EF=8B=85"; }
+
+.fa-telegram::before { content: "=EF=8B=86"; }
+
+.fa-thermometer-4::before, .fa-thermometer::before, .fa-thermometer-full::b=
+efore { content: "=EF=8B=87"; }
+
+.fa-thermometer-3::before, .fa-thermometer-three-quarters::before { content=
+: "=EF=8B=88"; }
+
+.fa-thermometer-2::before, .fa-thermometer-half::before { content: "=EF=8B=
+=89"; }
+
+.fa-thermometer-1::before, .fa-thermometer-quarter::before { content: "=EF=
+=8B=8A"; }
+
+.fa-thermometer-0::before, .fa-thermometer-empty::before { content: "=EF=8B=
+=8B"; }
+
+.fa-shower::before { content: "=EF=8B=8C"; }
+
+.fa-bathtub::before, .fa-s15::before, .fa-bath::before { content: "=EF=8B=
+=8D"; }
+
+.fa-podcast::before { content: "=EF=8B=8E"; }
+
+.fa-window-maximize::before { content: "=EF=8B=90"; }
+
+.fa-window-minimize::before { content: "=EF=8B=91"; }
+
+.fa-window-restore::before { content: "=EF=8B=92"; }
+
+.fa-times-rectangle::before, .fa-window-close::before { content: "=EF=8B=93=
+"; }
+
+.fa-times-rectangle-o::before, .fa-window-close-o::before { content: "=EF=
+=8B=94"; }
+
+.fa-bandcamp::before { content: "=EF=8B=95"; }
+
+.fa-grav::before { content: "=EF=8B=96"; }
+
+.fa-etsy::before { content: "=EF=8B=97"; }
+
+.fa-imdb::before { content: "=EF=8B=98"; }
+
+.fa-ravelry::before { content: "=EF=8B=99"; }
+
+.fa-eercast::before { content: "=EF=8B=9A"; }
+
+.fa-microchip::before { content: "=EF=8B=9B"; }
+
+.fa-snowflake-o::before { content: "=EF=8B=9C"; }
+
+.fa-superpowers::before { content: "=EF=8B=9D"; }
+
+.fa-wpexplorer::before { content: "=EF=8B=9E"; }
+
+.fa-meetup::before { content: "=EF=8B=A0"; }
+
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0px; margi=
+n: -1px; overflow: hidden; clip: rect(0px, 0px, 0px, 0px); border: 0px; }
+
+.sr-only-focusable:active, .sr-only-focusable:focus { position: static; wid=
+th: auto; height: auto; margin: 0px; overflow: visible; clip: auto; }
+------MultipartBoundary--hdBEeKVdovcPJXOOMQOHjcR2fuYpoCrvpyWoR6OIe6----
+Content-Type: text/css
+Content-Transfer-Encoding: quoted-printable
+Content-Location: file:///C:/Users/Christopher%20Susie/AppData/Local/Markdown%20Monster/PreviewThemes/Dharkan/Theme.css
+
+@charset "utf-8";
+
+html, body { color: rgb(51, 51, 51); font-family: -apple-system, BlinkMacSy=
+stemFont, "Segoe UI", Helvetica, Helvetica, Arial, sans-serif, "Segoe UI Sy=
+mbol", "Apple Color Emoji"; font-size: 17px; -webkit-font-smoothing: antial=
+iased; height: 100%; line-height: 1.55; margin: 0px; }
+
+#MainContent { margin: 20px 20px 20px 30px; }
+
+h1, h2, h3, h4, h5, h6, .byline, .content-title { color: rgb(85, 85, 85); f=
+ont-weight: bold; font-family: "Trebuchet MS", "Lucida Sans Unicode", "Luci=
+da Grande", "Lucida Sans"; margin-top: 1.2em; margin-bottom: 0.4em; }
+
+h1 { font-size: 1.9em; padding-bottom: 10px; border-bottom: 1px solid rgb(2=
+38, 238, 238); }
+
+h2 { font-size: 1.55em; }
+
+h3 { font-size: 1.35em; }
+
+h4 { font-size: 1.18em; }
+
+h5, h6 { color: rgb(101, 101, 101); font-size: 1.09em; }
+
+h6 { color: rgb(119, 119, 119); font-size: 1.03em; }
+
+p { margin: 0.5rem 0px 1rem; }
+
+a { font-weight: 600; color: rgb(51, 122, 183); text-decoration: none; }
+
+a:hover { text-decoration: underline; }
+
+img { max-width: 100%; }
+
+ul, ol { margin: 1.1em 0px; }
+
+li { margin: 0.6em 0.2em 0.6em 1em; }
+
+ul > li > ul > li > ul > li { list-style: disc; }
+
+ul > li > ul > li { list-style: square; }
+
+.task-list-item { list-style: none; margin-left: -2em; }
+
+dt { font-size: 1.08em; font-weight: bold; text-decoration: underline; padd=
+ing-top: 0.5em; cursor: pointer; }
+
+dd { margin: 0px; padding: 0px 0px 0.2em 1em; display: none; }
+
+b, strong { font-weight: 600; }
+
+dt { font-size: 1.08em; font-weight: bold; text-decoration: underline; padd=
+ing-top: 0.5em; }
+
+dd { margin: 0px; padding: 0px 0px 0.2em 1em; }
+
+.hidden { display: none; }
+
+.hidden-nowidth { width: 0px; }
+
+.visually-hidden { border: 0px; clip: rect(0px, 0px, 0px, 0px); height: 1px=
+; margin: -1px; overflow: hidden; padding: 0px; position: absolute; width: =
+1px; }
+
+@media (min-width: 1080px) {
+  html, body { font-size: 1.06em; }
+}
+
+blockquote { background: rgb(245, 245, 245); color: rgb(101, 101, 101); bor=
+der-left: 8px solid rgb(170, 170, 170); border-radius: 4px; padding: 10px 2=
+0px; margin: 30px 20px; font-size: 1.03em; }
+
+blockquote :first-child { margin-top: 0px; }
+
+blockquote :last-child { margin-bottom: 0px; }
+
+hr { margin: 12px 0px; }
+
+.figure .caption, figure figcaption { font-size: 0.8em; font-style: italic;=
+ margin-top: 0px; }
+
+code { padding: 2px 5px; font-family: SFMono-Regular, Consolas, "Liberation=
+ Mono", Menlo, Courier, monospace; border-radius: 3px; font-weight: 600; ba=
+ckground: rgb(238, 238, 238); color: rgb(85, 85, 85); }
+
+pre { font-family: menlo, consolas, monospace; font-weight: normal; font-si=
+ze: 87%; line-height: 1.4; margin: 7px 0px; padding: 0px; border: 1px solid=
+ silver; border-radius: 5px; overflow-x: auto; max-width: 98%; white-space:=
+ pre; word-break: normal; overflow-wrap: normal; }
+
+pre > code { white-space: pre; display: block; font-weight: normal; padding=
+: 0.8em !important; }
+
+pre > code::-webkit-scrollbar { width: 8px; height: 8px; background: rgb(68=
+, 68, 68); }
+
+pre > code::-webkit-scrollbar-thumb { background: rgb(153, 153, 153); }
+
+table { width: 100%; overflow: auto; border-spacing: 0px; border-collapse: =
+collapse; margin: 15px 0px; border-color: gray; }
+
+td, th { border: 1px solid rgb(221, 221, 221); padding: 6px 13px; display: =
+table-cell; vertical-align: top; }
+
+th { font-weight: bold; color: white; background: rgb(85, 85, 85); }
+
+tbody > tr:nth-child(2n) { background: rgb(238, 238, 238); }
+
+.line-highlight { background: rgb(233, 245, 255) !important; }
+
+p.line-highlight, h1.line-highlight, h2.line-highlight, h3.line-highlight, =
+h4.line-highlight { border-radius: 4px; margin-left: -10px; margin-right: -=
+10px; padding-left: 10px; padding-right: 10px; }
+
+code.line-highlight { background: rgb(85, 85, 85) !important; }
+
+.hidden { display: none; }
+
+.hidden-nowidth { width: 0px; }
+
+.visually-hidden { border: 0px; clip: rect(0px, 0px, 0px, 0px); height: 1px=
+; margin: -1px; overflow: hidden; padding: 0px; position: absolute; width: =
+1px; }
+
+.line-highlight { background: rgb(245, 245, 245); border-radius: 3px; }
+
+.CAUTION, .IMPORTANT, .INFO, .TIP, .NOTE, .WARNING { padding: 0.1px 20px; m=
+argin: 15px 0px; border-radius: 4px; }
+
+.CAUTION > h5, .IMPORTANT > h5, .INFO > h5, .TIP > h5, .NOTE > h5, .WARNING=
+ > h5 { color: inherit; }
+
+.CAUTION, .IMPORTANT { color: rgb(169, 68, 66); background-color: rgb(242, =
+222, 222); border-color: rgb(235, 204, 209); }
+
+.WARNING { color: rgb(138, 109, 59); background-color: rgb(252, 248, 227); =
+border-color: rgb(250, 235, 204); }
+
+.INFO, .TIP, .NOTE { color: rgb(49, 112, 143); background-color: rgb(217, 2=
+37, 247); border-color: rgb(188, 232, 241); }
+
+.NOTE h5::before, .TIP h5::before { content: "=EF=81=9A"; font-family: Font=
+Awesome; padding-right: 6px; }
+
+.WARNING h5::before, .CAUTION h5::before { content: "=EF=81=B1"; font-famil=
+y: FontAwesome; padding-right: 6px; }
+
+.IMPORTANT h5::before { content: "=EF=81=AA"; font-family: FontAwesome; pad=
+ding-right: 6px; }
+
+xref { display: block; }
+
+.hljs { font-size: 1em; }
+
+@media (min-width: 1080px) {
+  html, body { font-size: 1.06em; }
+}
+
+@media print {
+  pre { white-space: pre-wrap; word-break: normal; overflow-wrap: normal; }
+  pre > code { white-space: pre-wrap; padding: 1em !important; }
+}
+------MultipartBoundary--hdBEeKVdovcPJXOOMQOHjcR2fuYpoCrvpyWoR6OIe6----
+Content-Type: text/css
+Content-Transfer-Encoding: quoted-printable
+Content-Location: file:///C:/Users/Christopher%20Susie/AppData/Local/Markdown%20Monster/PreviewThemes/scripts/highlightjs/styles/twilight.css
+
+@charset "utf-8";
+
+.hljs { display: block; overflow-x: auto; padding: 0.5em; background: rgb(3=
+7, 37, 37); color: rgb(226, 226, 226); font-weight: normal; font-size: 1.15=
+em !important; }
+
+.hljs-keyword, .hljs-selector-tag, .hljs-built_in, .hljs-tag { color: rgb(2=
+05, 168, 105); }
+
+.hljs-template-tag { color: rgb(220, 220, 220); }
+
+.hljs-number { color: rgb(207, 106, 76); }
+
+.hljs-attr { color: cornsilk; }
+
+.hljs-variable, .hljs-template-variable { color: rgb(239, 220, 188); }
+
+.hljs-literal { color: rgb(207, 106, 76); }
+
+.hljs-subst { color: rgb(143, 143, 143); }
+
+.hljs-title { color: rgb(199, 140, 59); }
+
+.hljs-name, .hljs-selector-id, .hljs-selector-class, .hljs-section, .hljs-t=
+ype { color: rgb(213, 173, 105); }
+
+.hljs-symbol, .hljs-bullet, .hljs-link { color: rgb(220, 163, 163); }
+
+.hljs-string { color: rgb(143, 157, 106); }
+
+.hljs-deletion, .hljs-builtin-name { color: rgb(204, 147, 147); }
+
+.hljs-comment { font-style: italic; color: rgb(136, 136, 136); }
+
+.hljs-addition, .hljs-quote, .hljs-meta { color: rgb(127, 159, 127); }
+
+.hljs-emphasis { font-style: italic; }
+
+.hljs-strong { font-weight: bold; }
+------MultipartBoundary--hdBEeKVdovcPJXOOMQOHjcR2fuYpoCrvpyWoR6OIe6------

@@ -1,0 +1,3465 @@
+From: <Saved by Blink>
+Snapshot-Content-Location: file:///C:/Users/Christopher%20Susie/AppData/Local/Temp/_MarkdownMonster_Preview.html
+Subject: 
+Date: Sat, 22 May 2021 01:36:49 -0000
+MIME-Version: 1.0
+Content-Type: multipart/related;
+	type="text/html";
+	boundary="----MultipartBoundary--zBVcE6wDR8GWJQwTuzeBRVUs3lvNmxnehhbUhJO4dX----"
+
+
+------MultipartBoundary--zBVcE6wDR8GWJQwTuzeBRVUs3lvNmxnehhbUhJO4dX----
+Content-Type: text/html
+Content-ID: <frame-D2D18989291356A13E8DF7867B2C17A2@mhtml.blink>
+Content-Transfer-Encoding: quoted-printable
+Content-Location: file:///C:/Users/Christopher%20Susie/AppData/Local/Temp/_MarkdownMonster_Preview.html
+
+<!DOCTYPE html><!-- saved from url=3D(0016)http://localhost --><html lang=
+=3D"en" xmlns=3D"http://www.w3.org/1999/xhtml"><head><meta http-equiv=3D"Co=
+ntent-Type" content=3D"text/html; charset=3DUTF-8">
+  <base href=3D"file:///E:/Source/Repos/cjm-numerics/uint128_test_app/src/W=
+inInt128/">
+ =20
+
+  <meta http-equiv=3D"X-UA-Compatible" content=3D"IE=3Dedge">
+  <link href=3D"file:///C:/Users/Christopher%20Susie/AppData/Local/Markdown=
+%20Monster/PreviewThemes/scripts/fontawesome/css/font-awesome.min.css" rel=
+=3D"stylesheet">
+
+  <link href=3D"file:///C:/Users/Christopher%20Susie/AppData/Local/Markdown=
+%20Monster/PreviewThemes/Dharkan/Theme.css" rel=3D"stylesheet">
+
+ =20
+  <link href=3D"file:///C:/Users/Christopher%20Susie/AppData/Local/Markdown=
+%20Monster/PreviewThemes/scripts/highlightjs/styles/twilight.css" rel=3D"st=
+ylesheet">
+ =20
+ =20
+ =20
+</head>
+<body>
+<div id=3D"MainContent">
+    <!-- Markdown Monster Content -->
+    <h1 id=3D"unit-test-application-for-cjm-numerics-a-fixed-precision-a-fi=
+xed-precision-numeric-library-for-c20">Unit Test Application for CJM Numeri=
+cs (a fixed precision a fixed precision numeric library for C++20)</h1>
+<p><strong>Copyright =C2=A9 2021, CJM Screws, LLC</strong></p>
+<h2 id=3D"summary">Summary</h2>
+<p>The unit test application is a command line application that runs a suit=
+e of unit tests to demonstrate the correctness of operations on the uint128=
+ type defined in the CJM Numerics library.  The primary focus and goal of t=
+he tests is to ensure the correctness of the numerical computations provide=
+d by the library at both compile and runtime.  Compile-time correctness is =
+checked during the compilation of the unit test application.  The applicati=
+on needs to be run to apply runtime testing.</p>
+<p>A Secondary goal of the unit test application include testing the correc=
+tness of to-string conversion and from-string parsing, particularly for std=
+<span>string and std</span>wstring (and their matching streams and string_v=
+iews).  Some experimental support is included for using strings (and stream=
+s/string_views) based on char8_t, char16_t and char32_t: these seem to work=
+ on Windows, but are iffy on linux setups.  Supporting the newer string typ=
+es is a tertiary goal of the test application, at best.</p>
+<p>Another secondary goal of the unit test application is to provide a way =
+to print out information about the target environment including compiler us=
+ed, 64 or 32 bit, whether adx and bmi2 are enabled, sizes and alignments of=
+ standard numeric types, etc.</p>
+<h2 id=3D"functionality">Functionality</h2>
+<h3 id=3D"running-entire-battery-of-tests"><strong>RUNNING ENTIRE BATTERY O=
+F TESTS.</strong></h3>
+<p>To run the entire battery of tests, simply run the application from the =
+command line without using any options:</p>
+<pre><code class=3D"language-dos hljs"><span class=3D"hljs-function">E:\<sp=
+an class=3D"hljs-title">Source</span>\<span class=3D"hljs-title">Repos</spa=
+n>\<span class=3D"hljs-title">cjm</span>-<span class=3D"hljs-title">numeric=
+s</span>\<span class=3D"hljs-title">uint128_test_app</span>\<span class=3D"=
+hljs-title">src</span>\<span class=3D"hljs-title">x64</span>\<span class=3D=
+"hljs-title">Release</span>&gt;<span class=3D"hljs-title">WinInt128.exe</sp=
+an>
+<span class=3D"hljs-title">Using</span> <span class=3D"hljs-title">num</spa=
+n> <span class=3D"hljs-title">threads</span>: [12].
+<span class=3D"hljs-title">Beginning</span> <span class=3D"hljs-title">exec=
+ution</span> <span class=3D"hljs-title">of</span> <span class=3D"hljs-title=
+">test</span> [<span class=3D"hljs-title">unary_op_basic_test</span>].
+<span class=3D"hljs-title">Test</span> [<span class=3D"hljs-title">unary_op=
+_basic_test</span>], <span class=3D"hljs-title">PASSED</span>!
+
+<span class=3D"hljs-title">Beginning</span> <span class=3D"hljs-title">exec=
+ution</span> <span class=3D"hljs-title">of</span> <span class=3D"hljs-title=
+">test</span> [<span class=3D"hljs-title">test_convert_to_double</span>].
+<span class=3D"hljs-title">Test</span> [<span class=3D"hljs-title">test_con=
+vert_to_double</span>], <span class=3D"hljs-title">PASSED</span>!
+
+<span class=3D"hljs-title">Beginning</span> <span class=3D"hljs-title">exec=
+ution</span> <span class=3D"hljs-title">of</span> <span class=3D"hljs-title=
+">test</span> [<span class=3D"hljs-title">failing_division_test_1</span>].
+<span class=3D"hljs-title">Test</span> [<span class=3D"hljs-title">failing_=
+division_test_1</span>], <span class=3D"hljs-title">PASSED</span>!
+
+<span class=3D"hljs-title">Beginning</span> <span class=3D"hljs-title">exec=
+ution</span> <span class=3D"hljs-title">of</span> <span class=3D"hljs-title=
+">test</span> [<span class=3D"hljs-title">div_mod_zero_dividend_nonzero_div=
+isor_tests</span>].
+<span class=3D"hljs-title">Test</span> [<span class=3D"hljs-title">div_mod_=
+zero_dividend_nonzero_divisor_tests</span>], <span class=3D"hljs-title">PAS=
+SED</span>!
+
+<span class=3D"hljs-title">Beginning</span> <span class=3D"hljs-title">exec=
+ution</span> <span class=3D"hljs-title">of</span> <span class=3D"hljs-title=
+">test</span> [<span class=3D"hljs-title">literal_test</span>].
+<span class=3D"hljs-title">Test</span> [<span class=3D"hljs-title">literal_=
+test</span>], <span class=3D"hljs-title">PASSED</span>!
+
+<span class=3D"hljs-title">Beginning</span> <span class=3D"hljs-title">exec=
+ution</span> <span class=3D"hljs-title">of</span> <span class=3D"hljs-title=
+">test</span> [<span class=3D"hljs-title">failing_division_test_2</span>].
+<span class=3D"hljs-title">Test</span> [<span class=3D"hljs-title">failing_=
+division_test_2</span>], <span class=3D"hljs-title">PASSED</span>!
+
+<span class=3D"hljs-title">Beginning</span> <span class=3D"hljs-title">exec=
+ution</span> <span class=3D"hljs-title">of</span> <span class=3D"hljs-title=
+">test</span> [<span class=3D"hljs-title">umult_spec_tests</span>].
+<span class=3D"hljs-title">Test</span> [<span class=3D"hljs-title">umult_sp=
+ec_tests</span>], <span class=3D"hljs-title">PASSED</span>!
+
+<span class=3D"hljs-title">Beginning</span> <span class=3D"hljs-title">exec=
+ution</span> <span class=3D"hljs-title">of</span> <span class=3D"hljs-title=
+">test</span> [<span class=3D"hljs-title">print_generated_filename_test</sp=
+an>].
+<span class=3D"hljs-title">Test</span> [<span class=3D"hljs-title">print_ge=
+nerated_filename_test</span>], <span class=3D"hljs-title">PASSED</span>!
+
+<span class=3D"hljs-title">Beginning</span> <span class=3D"hljs-title">exec=
+ution</span> <span class=3D"hljs-title">of</span> <span class=3D"hljs-title=
+">test</span> [<span class=3D"hljs-title">controlled_float_rt_conversion_te=
+st</span>].
+<span class=3D"hljs-title">Test</span> [<span class=3D"hljs-title">controll=
+ed_float_rt_conversion_test</span>], <span class=3D"hljs-title">PASSED</spa=
+n>!
+
+<span class=3D"hljs-title">Beginning</span> <span class=3D"hljs-title">exec=
+ution</span> <span class=3D"hljs-title">of</span> <span class=3D"hljs-title=
+">test</span> [<span class=3D"hljs-title">unary_op_bool_cast_test</span>].
+<span class=3D"hljs-title">Test</span> [<span class=3D"hljs-title">unary_op=
+_bool_cast_test</span>], <span class=3D"hljs-title">PASSED</span>!
+
+<span class=3D"hljs-title">Beginning</span> <span class=3D"hljs-title">exec=
+ution</span> <span class=3D"hljs-title">of</span> <span class=3D"hljs-title=
+">test</span> [<span class=3D"hljs-title">unary_op_bitwise_not_test</span>]=
+.
+<span class=3D"hljs-title">Test</span> [<span class=3D"hljs-title">unary_op=
+_bitwise_not_test</span>], <span class=3D"hljs-title">PASSED</span>!
+
+<span class=3D"hljs-title">Beginning</span> <span class=3D"hljs-title">exec=
+ution</span> <span class=3D"hljs-title">of</span> <span class=3D"hljs-title=
+">test</span> [<span class=3D"hljs-title">unary_op_logical_negation_test</s=
+pan>].
+<span class=3D"hljs-title">Test</span> [<span class=3D"hljs-title">unary_op=
+_logical_negation_test</span>], <span class=3D"hljs-title">PASSED</span>!
+
+<span class=3D"hljs-title">Beginning</span> <span class=3D"hljs-title">exec=
+ution</span> <span class=3D"hljs-title">of</span> <span class=3D"hljs-title=
+">test</span> [<span class=3D"hljs-title">unary_op_unary_minus_test</span>]=
+.
+<span class=3D"hljs-title">Test</span> [<span class=3D"hljs-title">unary_op=
+_unary_minus_test</span>], <span class=3D"hljs-title">PASSED</span>!
+
+<span class=3D"hljs-title">Beginning</span> <span class=3D"hljs-title">exec=
+ution</span> <span class=3D"hljs-title">of</span> <span class=3D"hljs-title=
+">test</span> [<span class=3D"hljs-title">unary_op_post_dec_test</span>].
+<span class=3D"hljs-title">Test</span> [<span class=3D"hljs-title">unary_op=
+_post_dec_test</span>], <span class=3D"hljs-title">PASSED</span>!
+
+<span class=3D"hljs-title">Beginning</span> <span class=3D"hljs-title">exec=
+ution</span> <span class=3D"hljs-title">of</span> <span class=3D"hljs-title=
+">test</span> [<span class=3D"hljs-title">unary_op_unary_plus_test</span>].
+<span class=3D"hljs-title">Test</span> [<span class=3D"hljs-title">unary_op=
+_unary_plus_test</span>], <span class=3D"hljs-title">PASSED</span>!
+
+<span class=3D"hljs-title">Beginning</span> <span class=3D"hljs-title">exec=
+ution</span> <span class=3D"hljs-title">of</span> <span class=3D"hljs-title=
+">test</span> [<span class=3D"hljs-title">multiplication_tests</span>].
+<span class=3D"hljs-title">Test</span> [<span class=3D"hljs-title">multipli=
+cation_tests</span>], <span class=3D"hljs-title">PASSED</span>!
+
+<span class=3D"hljs-title">Beginning</span> <span class=3D"hljs-title">exec=
+ution</span> <span class=3D"hljs-title">of</span> <span class=3D"hljs-title=
+">test</span> [<span class=3D"hljs-title">builtin_u128fls_test_if_avail</sp=
+an>].
+<span class=3D"hljs-title">Test</span> [<span class=3D"hljs-title">builtin_=
+u128fls_test_if_avail</span>], <span class=3D"hljs-title">PASSED</span>!
+
+<span class=3D"hljs-title">Beginning</span> <span class=3D"hljs-title">exec=
+ution</span> <span class=3D"hljs-title">of</span> <span class=3D"hljs-title=
+">test</span> [<span class=3D"hljs-title">throwing_float_conversion_test</s=
+pan>].
+<span class=3D"hljs-title">Test</span> [<span class=3D"hljs-title">throwing=
+_float_conversion_test</span>], <span class=3D"hljs-title">PASSED</span>!
+
+<span class=3D"hljs-title">Beginning</span> <span class=3D"hljs-title">exec=
+ution</span> <span class=3D"hljs-title">of</span> <span class=3D"hljs-title=
+">test</span> [<span class=3D"hljs-title">division_modulus_tests</span>].
+<span class=3D"hljs-title">Test</span> [<span class=3D"hljs-title">division=
+_modulus_tests</span>], <span class=3D"hljs-title">PASSED</span>!
+
+<span class=3D"hljs-title">Beginning</span> <span class=3D"hljs-title">exec=
+ution</span> <span class=3D"hljs-title">of</span> <span class=3D"hljs-title=
+">test</span> [<span class=3D"hljs-title">unary_op_post_inc_test</span>].
+<span class=3D"hljs-title">Test</span> [<span class=3D"hljs-title">unary_op=
+_post_inc_test</span>], <span class=3D"hljs-title">PASSED</span>!
+
+<span class=3D"hljs-title">Beginning</span> <span class=3D"hljs-title">exec=
+ution</span> <span class=3D"hljs-title">of</span> <span class=3D"hljs-title=
+">test</span> [<span class=3D"hljs-title">subtraction_tests</span>].
+<span class=3D"hljs-title">Test</span> [<span class=3D"hljs-title">subtract=
+ion_tests</span>], <span class=3D"hljs-title">PASSED</span>!
+
+<span class=3D"hljs-title">Beginning</span> <span class=3D"hljs-title">exec=
+ution</span> <span class=3D"hljs-title">of</span> <span class=3D"hljs-title=
+">test</span> [<span class=3D"hljs-title">gen_comp_ops_test</span>].
+<span class=3D"hljs-title">Test</span> [<span class=3D"hljs-title">gen_comp=
+_ops_test</span>], <span class=3D"hljs-title">PASSED</span>!
+
+<span class=3D"hljs-title">Beginning</span> <span class=3D"hljs-title">exec=
+ution</span> <span class=3D"hljs-title">of</span> <span class=3D"hljs-title=
+">test</span> [<span class=3D"hljs-title">safe_float_conversions_test</span=
+>].
+<span class=3D"hljs-title">Test</span> [<span class=3D"hljs-title">safe_flo=
+at_conversions_test</span>], <span class=3D"hljs-title">PASSED</span>!
+
+<span class=3D"hljs-title">Beginning</span> <span class=3D"hljs-title">exec=
+ution</span> <span class=3D"hljs-title">of</span> <span class=3D"hljs-title=
+">test</span> [<span class=3D"hljs-title">unary_op_pre_inc_test</span>].
+<span class=3D"hljs-title">Test</span> [<span class=3D"hljs-title">unary_op=
+_pre_inc_test</span>], <span class=3D"hljs-title">PASSED</span>!
+
+<span class=3D"hljs-title">Beginning</span> <span class=3D"hljs-title">exec=
+ution</span> <span class=3D"hljs-title">of</span> <span class=3D"hljs-title=
+">test</span> [<span class=3D"hljs-title">uintcontainer_adc_tests</span>].
+<span class=3D"hljs-title">Test</span> [<span class=3D"hljs-title">uintcont=
+ainer_adc_tests</span>], <span class=3D"hljs-title">PASSED</span>!
+
+<span class=3D"hljs-title">Beginning</span> <span class=3D"hljs-title">exec=
+ution</span> <span class=3D"hljs-title">of</span> <span class=3D"hljs-title=
+">test</span> [<span class=3D"hljs-title">comparison_tests</span>].
+<span class=3D"hljs-title">Test</span> [<span class=3D"hljs-title">comparis=
+on_tests</span>], <span class=3D"hljs-title">PASSED</span>!
+
+<span class=3D"hljs-title">Beginning</span> <span class=3D"hljs-title">exec=
+ution</span> <span class=3D"hljs-title">of</span> <span class=3D"hljs-title=
+">test</span> [<span class=3D"hljs-title">builtin_sub_with_borrow_test</spa=
+n>].
+<span class=3D"hljs-title">Test</span> [<span class=3D"hljs-title">builtin_=
+sub_with_borrow_test</span>], <span class=3D"hljs-title">PASSED</span>!
+
+<span class=3D"hljs-title">Beginning</span> <span class=3D"hljs-title">exec=
+ution</span> <span class=3D"hljs-title">of</span> <span class=3D"hljs-title=
+">test</span> [<span class=3D"hljs-title">basic_u128_adc_test</span>].
+<span class=3D"hljs-title">Test</span> [<span class=3D"hljs-title">basic_u1=
+28_adc_test</span>], <span class=3D"hljs-title">PASSED</span>!
+
+<span class=3D"hljs-title">Beginning</span> <span class=3D"hljs-title">exec=
+ution</span> <span class=3D"hljs-title">of</span> <span class=3D"hljs-title=
+">test</span> [<span class=3D"hljs-title">div_mod_zero_tests</span>].
+<span class=3D"hljs-title">Test</span> [<span class=3D"hljs-title">div_mod_=
+zero_tests</span>], <span class=3D"hljs-title">PASSED</span>!
+
+<span class=3D"hljs-title">Beginning</span> <span class=3D"hljs-title">exec=
+ution</span> <span class=3D"hljs-title">of</span> <span class=3D"hljs-title=
+">test</span> [<span class=3D"hljs-title">first_bin_op_test</span>].
+<span class=3D"hljs-title">Test</span> [<span class=3D"hljs-title">first_bi=
+n_op_test</span>], <span class=3D"hljs-title">PASSED</span>!
+
+<span class=3D"hljs-title">Beginning</span> <span class=3D"hljs-title">exec=
+ution</span> <span class=3D"hljs-title">of</span> <span class=3D"hljs-title=
+">test</span> [<span class=3D"hljs-title">builtin_add_with_carry_test</span=
+>].
+<span class=3D"hljs-title">Test</span> [<span class=3D"hljs-title">builtin_=
+add_with_carry_test</span>], <span class=3D"hljs-title">PASSED</span>!
+
+<span class=3D"hljs-title">Beginning</span> <span class=3D"hljs-title">exec=
+ution</span> <span class=3D"hljs-title">of</span> <span class=3D"hljs-title=
+">test</span> [<span class=3D"hljs-title">unary_op_pre_dec_test</span>].
+<span class=3D"hljs-title">Test</span> [<span class=3D"hljs-title">unary_op=
+_pre_dec_test</span>], <span class=3D"hljs-title">PASSED</span>!
+
+<span class=3D"hljs-title">Beginning</span> <span class=3D"hljs-title">exec=
+ution</span> <span class=3D"hljs-title">of</span> <span class=3D"hljs-title=
+">test</span> [<span class=3D"hljs-title">basic_u128_sbb_test</span>].
+<span class=3D"hljs-title">Test</span> [<span class=3D"hljs-title">basic_u1=
+28_sbb_test</span>], <span class=3D"hljs-title">PASSED</span>!
+
+<span class=3D"hljs-title">Beginning</span> <span class=3D"hljs-title">exec=
+ution</span> <span class=3D"hljs-title">of</span> <span class=3D"hljs-title=
+">test</span> [<span class=3D"hljs-title">addition_tests</span>].
+<span class=3D"hljs-title">Test</span> [<span class=3D"hljs-title">addition=
+_tests</span>], <span class=3D"hljs-title">PASSED</span>!
+
+<span class=3D"hljs-title">Beginning</span> <span class=3D"hljs-title">exec=
+ution</span> <span class=3D"hljs-title">of</span> <span class=3D"hljs-title=
+">test</span> [<span class=3D"hljs-title">shift_tests</span>].
+<span class=3D"hljs-title">Test</span> [<span class=3D"hljs-title">shift_te=
+sts</span>], <span class=3D"hljs-title">PASSED</span>!
+
+<span class=3D"hljs-title">Beginning</span> <span class=3D"hljs-title">exec=
+ution</span> <span class=3D"hljs-title">of</span> <span class=3D"hljs-title=
+">test</span> [<span class=3D"hljs-title">bw_tests</span>].
+<span class=3D"hljs-title">Test</span> [<span class=3D"hljs-title">bw_tests=
+</span>], <span class=3D"hljs-title">PASSED</span>!
+
+<span class=3D"hljs-title">Beginning</span> <span class=3D"hljs-title">exec=
+ution</span> <span class=3D"hljs-title">of</span> <span class=3D"hljs-title=
+">test</span> [<span class=3D"hljs-title">ascii_char_interconversions</span=
+>].
+<span class=3D"hljs-title">Test</span> [<span class=3D"hljs-title">ascii_ch=
+ar_interconversions</span>], <span class=3D"hljs-title">PASSED</span>!
+
+<span class=3D"hljs-title">Beginning</span> <span class=3D"hljs-title">exec=
+ution</span> <span class=3D"hljs-title">of</span> <span class=3D"hljs-title=
+">test</span> [<span class=3D"hljs-title">unary_operation_rt_serialization_=
+tests</span>].
+<span class=3D"hljs-title">Test</span> [<span class=3D"hljs-title">unary_op=
+eration_rt_serialization_tests</span>], <span class=3D"hljs-title">PASSED</=
+span>!
+
+<span class=3D"hljs-title">Beginning</span> <span class=3D"hljs-title">exec=
+ution</span> <span class=3D"hljs-title">of</span> <span class=3D"hljs-title=
+">test</span> [<span class=3D"hljs-title">failing_modulus_test_1</span>].
+<span class=3D"hljs-title">Test</span> [<span class=3D"hljs-title">failing_=
+modulus_test_1</span>], <span class=3D"hljs-title">PASSED</span>!
+
+<span class=3D"hljs-title">Beginning</span> <span class=3D"hljs-title">exec=
+ution</span> <span class=3D"hljs-title">of</span> <span class=3D"hljs-title=
+">test</span> [<span class=3D"hljs-title">trim_tests</span>].
+<span class=3D"hljs-title">Test</span> [<span class=3D"hljs-title">trim_tes=
+ts</span>], <span class=3D"hljs-title">PASSED</span>!
+
+<span class=3D"hljs-title">Beginning</span> <span class=3D"hljs-title">exec=
+ution</span> <span class=3D"hljs-title">of</span> <span class=3D"hljs-title=
+">test</span> [<span class=3D"hljs-title">basic_test_one</span>].
+<span class=3D"hljs-title">Test</span> [<span class=3D"hljs-title">basic_te=
+st_one</span>], <span class=3D"hljs-title">PASSED</span>!
+
+<span class=3D"hljs-title">Beginning</span> <span class=3D"hljs-title">exec=
+ution</span> <span class=3D"hljs-title">of</span> <span class=3D"hljs-title=
+">test</span> [<span class=3D"hljs-title">test_convert_to_long_double</span=
+>].
+<span class=3D"hljs-title">Test</span> [<span class=3D"hljs-title">test_con=
+vert_to_long_double</span>], <span class=3D"hljs-title">PASSED</span>!
+
+<span class=3D"hljs-title">Beginning</span> <span class=3D"hljs-title">exec=
+ution</span> <span class=3D"hljs-title">of</span> <span class=3D"hljs-title=
+">test</span> [<span class=3D"hljs-title">binary_operation_rt_ser_tests</sp=
+an>].
+<span class=3D"hljs-title">Test</span> [<span class=3D"hljs-title">binary_o=
+peration_rt_ser_tests</span>], <span class=3D"hljs-title">PASSED</span>!
+
+<span class=3D"hljs-title">Beginning</span> <span class=3D"hljs-title">exec=
+ution</span> <span class=3D"hljs-title">of</span> <span class=3D"hljs-title=
+">test</span> [<span class=3D"hljs-title">unary_op_post_stat_assert_test</s=
+pan>].
+<span class=3D"hljs-title">Test</span> [<span class=3D"hljs-title">unary_op=
+_post_stat_assert_test</span>], <span class=3D"hljs-title">PASSED</span>!
+
+<span class=3D"hljs-title">Beginning</span> <span class=3D"hljs-title">exec=
+ution</span> <span class=3D"hljs-title">of</span> <span class=3D"hljs-title=
+">test</span> [<span class=3D"hljs-title">issue_10_showbase_test</span>].
+<span class=3D"hljs-title">Test</span> [<span class=3D"hljs-title">issue_10=
+_showbase_test</span>], <span class=3D"hljs-title">PASSED</span>!
+
+<span class=3D"hljs-title">Beginning</span> <span class=3D"hljs-title">exec=
+ution</span> <span class=3D"hljs-title">of</span> <span class=3D"hljs-title=
+">test</span> [<span class=3D"hljs-title">basic_multiplication_test</span>]=
+.
+<span class=3D"hljs-title">Test</span> [<span class=3D"hljs-title">basic_mu=
+ltiplication_test</span>], <span class=3D"hljs-title">PASSED</span>!
+
+<span class=3D"hljs-title">Beginning</span> <span class=3D"hljs-title">exec=
+ution</span> <span class=3D"hljs-title">of</span> <span class=3D"hljs-title=
+">test</span> [<span class=3D"hljs-title">test_fls</span>].
+<span class=3D"hljs-title">Test</span> [<span class=3D"hljs-title">test_fls=
+</span>], <span class=3D"hljs-title">PASSED</span>!
+
+<span class=3D"hljs-title">Beginning</span> <span class=3D"hljs-title">exec=
+ution</span> <span class=3D"hljs-title">of</span> <span class=3D"hljs-title=
+">test</span> [<span class=3D"hljs-title">unary_op_code_rt_serialization_te=
+sts</span>].
+<span class=3D"hljs-title">Test</span> [<span class=3D"hljs-title">unary_op=
+_code_rt_serialization_tests</span>], <span class=3D"hljs-title">PASSED</sp=
+an>!
+
+<span class=3D"hljs-title">Beginning</span> <span class=3D"hljs-title">exec=
+ution</span> <span class=3D"hljs-title">of</span> <span class=3D"hljs-title=
+">test</span> [<span class=3D"hljs-title">issue_10_strm_insrt_test</span>].
+<span class=3D"hljs-title">Test</span> [<span class=3D"hljs-title">issue_10=
+_strm_insrt_test</span>], <span class=3D"hljs-title">PASSED</span>!
+
+<span class=3D"hljs-title">Beginning</span> <span class=3D"hljs-title">exec=
+ution</span> <span class=3D"hljs-title">of</span> <span class=3D"hljs-title=
+">test</span> [<span class=3D"hljs-title">stream_insert_bin_op_test</span>]=
+.
+<span class=3D"hljs-title">Test</span> [<span class=3D"hljs-title">stream_i=
+nsert_bin_op_test</span>], <span class=3D"hljs-title">PASSED</span>!
+
+<span class=3D"hljs-title">Beginning</span> <span class=3D"hljs-title">exec=
+ution</span> <span class=3D"hljs-title">of</span> <span class=3D"hljs-title=
+">test</span> [<span class=3D"hljs-title">test_convert_to_float</span>].
+<span class=3D"hljs-title">Test</span> [<span class=3D"hljs-title">test_con=
+vert_to_float</span>], <span class=3D"hljs-title">PASSED</span>!
+
+<span class=3D"hljs-title">Beginning</span> <span class=3D"hljs-title">exec=
+ution</span> <span class=3D"hljs-title">of</span> <span class=3D"hljs-title=
+">test</span> [<span class=3D"hljs-title">controlled_from_float_conversion_=
+test</span>].
+<span class=3D"hljs-title">Test</span> [<span class=3D"hljs-title">controll=
+ed_from_float_conversion_test</span>], <span class=3D"hljs-title">PASSED</s=
+pan>!
+
+<span class=3D"hljs-title">Beginning</span> <span class=3D"hljs-title">exec=
+ution</span> <span class=3D"hljs-title">of</span> <span class=3D"hljs-title=
+">test</span> [<span class=3D"hljs-title">string_parse_text</span>].
+<span class=3D"hljs-title">Test</span> [<span class=3D"hljs-title">string_p=
+arse_text</span>], <span class=3D"hljs-title">PASSED</span>!
+
+<span class=3D"hljs-title">Beginning</span> <span class=3D"hljs-title">exec=
+ution</span> <span class=3D"hljs-title">of</span> <span class=3D"hljs-title=
+">test</span> [<span class=3D"hljs-title">unary_operation_vec_rt_serializat=
+ion_tests</span>].
+<span class=3D"hljs-title">Test</span> [<span class=3D"hljs-title">unary_op=
+eration_vec_rt_serialization_tests</span>], <span class=3D"hljs-title">PASS=
+ED</span>!
+
+<span class=3D"hljs-title">Beginning</span> <span class=3D"hljs-title">exec=
+ution</span> <span class=3D"hljs-title">of</span> <span class=3D"hljs-title=
+">test</span> [<span class=3D"hljs-title">hash_dx</span>].
+<span class=3D"hljs-title">Test</span> [<span class=3D"hljs-title">hash_dx<=
+/span>], <span class=3D"hljs-title">PASSED</span>!
+
+<span class=3D"hljs-title">All</span> [55] <span class=3D"hljs-title">tests=
+</span> <span class=3D"hljs-title">PASSED</span>.
+
+<span class=3D"hljs-title">Successfully</span> <span class=3D"hljs-title">w=
+rote</span> <span class=3D"hljs-title">test</span> <span class=3D"hljs-titl=
+e">result</span> <span class=3D"hljs-title">detail</span> <span class=3D"hl=
+js-title">to</span>: ["<span class=3D"hljs-title">base_test_battery_results=
+_2021_May_20_23_54_06Z.txt</span>"].
+
+<span class=3D"hljs-title">E</span>:\<span class=3D"hljs-title">Source</spa=
+n>\<span class=3D"hljs-title">Repos</span>\<span class=3D"hljs-title">cjm</=
+span>-<span class=3D"hljs-title">numerics</span>\<span class=3D"hljs-title"=
+>uint128_test_app</span>\<span class=3D"hljs-title">src</span>\<span class=
+=3D"hljs-title">x64</span>\<span class=3D"hljs-title">Release</span>&gt;
+</span></code></pre>
+<pre><code class=3D"language-bash hljs">csusie@ubuntu:~/CLionProjects/Int12=
+8/cmake-build-release-clang$ ./Int128
+Using num threads: [6].
+Beginning execution of <span class=3D"hljs-built_in">test</span> [unary_op_=
+unary_minus_test].
+Test [unary_op_unary_minus_test], PASSED!
+.... (INTERMEDIATE TESTS OMMITED BECAUSE SAME AS WITH WINDOWS) ....
+Beginning execution of <span class=3D"hljs-built_in">test</span> [hash_dx].
+Test [hash_dx], PASSED!
+
+All [55] tests PASSED.
+
+Successfully wrote <span class=3D"hljs-built_in">test</span> result detail =
+to: [<span class=3D"hljs-string">"base_test_battery_results_2021_May_21_00_=
+09_04Z.txt"</span>].
+</code></pre>
+<p>As seen, the name and test result of each run test will be logged to the=
+ standard output.  More detailed results will be written to a text file who=
+se name based on a root of "base_test_batter_results", a timestamp and the =
+.txt extension.  Certain classes of failures (none shown) may be written to=
+ the standard error and/or the output file depending on their nature.</p>
+<p>NOTE: the test "hash_dx" takes a very long time (maybe 30 secondsish) on=
+ a <em>debug</em> build built with Microsoft's compiler.  For release build=
+s, this test takes less than a second on my machine.  Using GCC or Clang in=
+ Linux, while a performance difference between <em>debug</em> and <em>relea=
+se</em> exists, it is no where near as profound as the difference using Mic=
+rosoft's compiler.  So, if testing with a debug buld made with Microsoft's =
+compiler, expect it to take a while.</p>
+<h3 id=3D"using-switches"><strong>USING SWITCHES</strong></h3>
+<p>Besides its default behavior of running the entire battery of tests, the=
+ application supports switches to get help, print environmental information=
+, list available tests, run a specific individual test from the list or to =
+execute a unary or binary operation text file.  (Many tests, upon failure, =
+will output a text file with the operation and values that resulted in fail=
+ure.  You can also make your own fairly easily.)  To enter a switch, prefix=
+ its name with -- or - (all operating systems) or (Windows only) /.  For ex=
+ample, to get help, entering the switch --help (or any command line argumen=
+ts not understood by the application) lists the switches as shown:</p>
+<p><em>WINDOWS:</em></p>
+<pre><code class=3D"language-dos hljs"><span class=3D"hljs-function">E:\<sp=
+an class=3D"hljs-title">Source</span>\<span class=3D"hljs-title">Repos</spa=
+n>\<span class=3D"hljs-title">cjm</span>-<span class=3D"hljs-title">numeric=
+s</span>\<span class=3D"hljs-title">uint128_test_app</span>\<span class=3D"=
+hljs-title">src</span>\<span class=3D"hljs-title">x64</span>\<span class=3D=
+"hljs-title">Release</span>&gt;<span class=3D"hljs-title">WinInt128.exe</sp=
+an> <span class=3D"hljs-title">brofklor</span>
+<span class=3D"hljs-title">There</span> <span class=3D"hljs-title">was</spa=
+n> <span class=3D"hljs-title">a</span> <span class=3D"hljs-title">problem</=
+span>, <span class=3D"hljs-title">likely</span> <span class=3D"hljs-title">=
+when</span> <span class=3D"hljs-title">processing</span> <span class=3D"hlj=
+s-title">command</span>-<span class=3D"hljs-title">line</span> <span class=
+=3D"hljs-title">arguments</span>:
+        <span class=3D"hljs-title">Argument</span>: [<span class=3D"hljs-ti=
+tle">brofklor</span>] <span class=3D"hljs-title">is</span> <span class=3D"h=
+ljs-title">not</span> <span class=3D"hljs-title">a</span> <span class=3D"hl=
+js-title">switch</span>:
+        <span class=3D"hljs-title">Switches</span> <span class=3D"hljs-titl=
+e">begin</span> <span class=3D"hljs-title">with</span>: "-", "--", <span cl=
+ass=3D"hljs-title">or</span> (<span class=3D"hljs-title">on</span> <span cl=
+ass=3D"hljs-title">windows</span>): "/"
+
+<span class=3D"hljs-title">Switches</span> <span class=3D"hljs-title">inclu=
+de</span>:
+        <span class=3D"hljs-title">unary_from_file</span>         <span cla=
+ss=3D"hljs-title">Execute</span> <span class=3D"hljs-title">unary</span> <s=
+pan class=3D"hljs-title">operations</span> <span class=3D"hljs-title">tests=
+</span> <span class=3D"hljs-title">as</span> <span class=3D"hljs-title">spe=
+cified</span> <span class=3D"hljs-title">in</span> <span class=3D"hljs-titl=
+e">unary</span> <span class=3D"hljs-title">operations</span> <span class=3D=
+"hljs-title">text</span> <span class=3D"hljs-title">file</span>.
+        <span class=3D"hljs-title">binary_from_file</span>        <span cla=
+ss=3D"hljs-title">Execute</span> <span class=3D"hljs-title">binary</span> <=
+span class=3D"hljs-title">operations</span> <span class=3D"hljs-title">test=
+s</span> <span class=3D"hljs-title">as</span> <span class=3D"hljs-title">bi=
+nary</span> <span class=3D"hljs-title">in</span> <span class=3D"hljs-title"=
+>unary</span> <span class=3D"hljs-title">operations</span> <span class=3D"h=
+ljs-title">text</span> <span class=3D"hljs-title">file</span>.
+        <span class=3D"hljs-title">environ</span>                 <span cla=
+ss=3D"hljs-title">Print</span> <span class=3D"hljs-title">environmental</sp=
+an> <span class=3D"hljs-title">information</span>.
+        <span class=3D"hljs-title">default_tests</span>           <span cla=
+ss=3D"hljs-title">Run</span> <span class=3D"hljs-title">all</span> <span cl=
+ass=3D"hljs-title">tests</span> <span class=3D"hljs-title">in</span> <span =
+class=3D"hljs-title">default</span> <span class=3D"hljs-title">battery</spa=
+n>, <span class=3D"hljs-title">logging</span> <span class=3D"hljs-title">su=
+mmary</span> <span class=3D"hljs-title">of</span> <span class=3D"hljs-title=
+">result</span> <span class=3D"hljs-title">to</span> <span class=3D"hljs-ti=
+tle">standard</span> <span class=3D"hljs-title">output</span> <span class=
+=3D"hljs-title">and</span> <span class=3D"hljs-title">detail</span> <span c=
+lass=3D"hljs-title">to</span> <span class=3D"hljs-title">a</span> <span cla=
+ss=3D"hljs-title">log</span> <span class=3D"hljs-title">file</span>.
+        <span class=3D"hljs-title">list</span>                    <span cla=
+ss=3D"hljs-title">List</span> <span class=3D"hljs-title">all</span> <span c=
+lass=3D"hljs-title">tests</span> <span class=3D"hljs-title">in</span> <span=
+ class=3D"hljs-title">the</span> <span class=3D"hljs-title">default</span> =
+<span class=3D"hljs-title">battery</span>.
+        <span class=3D"hljs-title">specific_test</span>           <span cla=
+ss=3D"hljs-title">Run</span> <span class=3D"hljs-title">the</span> <span cl=
+ass=3D"hljs-title">specified</span> <span class=3D"hljs-title">test</span> =
+<span class=3D"hljs-title">from</span> <span class=3D"hljs-title">the</span=
+> <span class=3D"hljs-title">default</span> <span class=3D"hljs-title">batt=
+ery</span>.
+        <span class=3D"hljs-title">help</span>                    <span cla=
+ss=3D"hljs-title">Print</span> <span class=3D"hljs-title">this</span> <span=
+ class=3D"hljs-title">information</span>.
+<span class=3D"hljs-title">Usage</span> <span class=3D"hljs-title">examples=
+</span> <span class=3D"hljs-title">for</span> <span class=3D"hljs-title">al=
+l</span> <span class=3D"hljs-title">switches</span>:
+--<span class=3D"hljs-title">unary_from_file</span>                        =
+<span class=3D"hljs-title">my_unary_operations_file.txt</span>
+--<span class=3D"hljs-title">binary_from_file</span>                       =
+<span class=3D"hljs-title">my_binary_operations_file.txt</span>
+--<span class=3D"hljs-title">environ</span>
+--<span class=3D"hljs-title">default_tests</span>
+--<span class=3D"hljs-title">list</span>
+--<span class=3D"hljs-title">specific_test</span>                          =
+<span class=3D"hljs-title">name_of_test_to_run</span>
+--<span class=3D"hljs-title">help</span>
+<span class=3D"hljs-title">DONE</span> <span class=3D"hljs-title">with</spa=
+n> <span class=3D"hljs-title">usage</span> <span class=3D"hljs-title">examp=
+les</span>.
+
+
+
+<span class=3D"hljs-title">E</span>:\<span class=3D"hljs-title">Source</spa=
+n>\<span class=3D"hljs-title">Repos</span>\<span class=3D"hljs-title">cjm</=
+span>-<span class=3D"hljs-title">numerics</span>\<span class=3D"hljs-title"=
+>uint128_test_app</span>\<span class=3D"hljs-title">src</span>\<span class=
+=3D"hljs-title">x64</span>\<span class=3D"hljs-title">Release</span>&gt;
+</span></code></pre>
+<p><em>LINUX:</em></p>
+<pre><code class=3D"language-bash hljs">csusie@ubuntu:~/CLionProjects/Int12=
+8/cmake-build-release-clang$ ./Int128 brofklor
+There was a problem, likely when processing <span class=3D"hljs-built_in">c=
+ommand</span>-line arguments:
+        Argument: [brofklor] is not a switch:
+        Switches begin with: <span class=3D"hljs-string">"-"</span>, <span =
+class=3D"hljs-string">"--"</span>, or (on windows): <span class=3D"hljs-str=
+ing">"/"</span>=20
+
+Switches include:=20
+        unary_from_file         Execute unary operations tests as specified=
+ <span class=3D"hljs-keyword">in</span> unary operations text file.
+        binary_from_file        Execute binary operations tests as binary <=
+span class=3D"hljs-keyword">in</span> unary operations text file.
+        environ                 Print environmental information.
+        default_tests           Run all tests <span class=3D"hljs-keyword">=
+in</span> default battery, logging summary of result to standard output and=
+ detail to a <span class=3D"hljs-built_in">log</span> file.
+        list                    List all tests <span class=3D"hljs-keyword"=
+>in</span> the default battery.
+        specific_test           Run the specified <span class=3D"hljs-built=
+_in">test</span> from the default battery.
+        <span class=3D"hljs-built_in">help</span>                    Print =
+this information.
+Usage examples <span class=3D"hljs-keyword">for</span> all switches:=20
+--unary_from_file                        my_unary_operations_file.txt
+--binary_from_file                       my_binary_operations_file.txt
+--environ=20
+--default_tests=20
+--list=20
+--specific_test                          name_of_test_to_run
+--<span class=3D"hljs-built_in">help</span>=20
+DONE with usage examples.
+
+
+csusie@ubuntu:~/CLionProjects/Int128/cmake-build-release-clang$
+</code></pre>
+<h4 id=3D"unary_from_file-switch"><strong>unary_from_file switch</strong></=
+h4>
+<p>The "unary_from_file_switch" requires as an argument the path of an ASCI=
+I text file containing unary operations.  It will then execute the unary op=
+erations in the file and report on success or failure.</p>
+<p>An example of such a file can be found <a href=3D"https://github.com/cps=
+usie/cjm-numerics/blob/48796e42103faf0fe5b7b60d09418abf86f1a216/uint128_tes=
+t_app/src/WinInt128/random_unary_ops.txt">here</a> and is shown below:</p>
+<blockquote>
+<p>!x;340282366920938463463374607431768211455;<br>
+!x;340282366920938463463374607431768211454;<br>
+~x;0;<br>
+-x;1;<br>
+static_cast<bool>(x);170141183460469231731687303715884105728;<br>
+!x;9223372036854775808;<br>
++x;18446744073709551615;<br>
+--x;340282366920938463463374607431768211454;<br>
+++x;18446744073709551616;</bool></p>
+</blockquote>
+<p>The symbols for each supported operation can be found in the <a href=3D"=
+https://github.com/cpsusie/cjm-numerics/blob/f93d362577367b90e23a6979151ded=
+d5b843bbe3/uint128_test_app/src/headers/int128_tests.hpp">int128_tests.hpp<=
+/a> header in the array called <a href=3D"https://github.com/cpsusie/cjm-nu=
+merics/blob/f93d362577367b90e23a6979151dedd5b843bbe3/uint128_test_app/src/h=
+eaders/int128_tests.hpp#L590">un_op_symbol_lookup</a>.  A test is deemed to=
+ pass if, when a unary operation of the specified type is applied to a valu=
+e of type uint128 and an equivalent value of type <a href=3D"https://www.bo=
+ost.org/doc/libs/1_76_0/libs/multiprecision/doc/html/boost_multiprecision/t=
+ut/ints/cpp_int.html"><code>boost::multiprecision::uint128_t</code></a> (fr=
+om the Boost library), the resulting values are equivalent.  If the resulti=
+ng values differ, the test is deemed to have failed.</p>
+<p><strong>Usage Example</strong>:</p>
+<p><em>WINDOWS:</em></p>
+<pre><code class=3D"language-dos hljs"><span class=3D"hljs-function">E:\<sp=
+an class=3D"hljs-title">Source</span>\<span class=3D"hljs-title">Repos</spa=
+n>\<span class=3D"hljs-title">cjm</span>-<span class=3D"hljs-title">numeric=
+s</span>\<span class=3D"hljs-title">uint128_test_app</span>\<span class=3D"=
+hljs-title">src</span>\<span class=3D"hljs-title">x64</span>\<span class=3D=
+"hljs-title">Release</span>&gt;<span class=3D"hljs-title">dir</span>
+ <span class=3D"hljs-title">Volume</span> <span class=3D"hljs-title">in</sp=
+an> <span class=3D"hljs-title">drive</span> <span class=3D"hljs-title">E</s=
+pan> <span class=3D"hljs-title">is</span> <span class=3D"hljs-title">R4pt0r=
+</span>
+ <span class=3D"hljs-title">Volume</span> <span class=3D"hljs-title">Serial=
+</span> <span class=3D"hljs-title">Number</span> <span class=3D"hljs-title"=
+>is</span> 92<span class=3D"hljs-title">C7</span>-4424
+
+ <span class=3D"hljs-title">Directory</span> <span class=3D"hljs-title">of<=
+/span> <span class=3D"hljs-title">E</span>:\<span class=3D"hljs-title">Sour=
+ce</span>\<span class=3D"hljs-title">Repos</span>\<span class=3D"hljs-title=
+">cjm</span>-<span class=3D"hljs-title">numerics</span>\<span class=3D"hljs=
+-title">uint128_test_app</span>\<span class=3D"hljs-title">src</span>\<span=
+ class=3D"hljs-title">x64</span>\<span class=3D"hljs-title">Release</span>
+
+05/20/2021  07:54 <span class=3D"hljs-title">PM</span>    &lt;<span class=
+=3D"hljs-title">DIR</span>&gt;          .
+05/20/2021  07:54 <span class=3D"hljs-title">PM</span>    &lt;<span class=
+=3D"hljs-title">DIR</span>&gt;          ..
+05/12/2021  04:48 <span class=3D"hljs-title">PM</span>            34,120 <s=
+pan class=3D"hljs-title">base_test_battery_results_2021_May_12_20_48_37Z.tx=
+t</span>
+05/12/2021  04:48 <span class=3D"hljs-title">PM</span>            34,246 <s=
+pan class=3D"hljs-title">base_test_battery_results_2021_May_12_20_48_50Z.tx=
+t</span>
+05/20/2021  07:47 <span class=3D"hljs-title">PM</span>            34,244 <s=
+pan class=3D"hljs-title">base_test_battery_results_2021_May_20_23_47_16Z.tx=
+t</span>
+05/20/2021  07:54 <span class=3D"hljs-title">PM</span>            34,240 <s=
+pan class=3D"hljs-title">base_test_battery_results_2021_May_20_23_54_06Z.tx=
+t</span>
+04/23/2021  03:49 <span class=3D"hljs-title">PM</span>             8,702 <s=
+pan class=3D"hljs-title">random_binary_ops.txt</span>
+04/23/2021  03:49 <span class=3D"hljs-title">PM</span>               291 <s=
+pan class=3D"hljs-title">random_unary_ops.txt</span>
+05/20/2021  07:53 <span class=3D"hljs-title">PM</span>         1,128,448 <s=
+pan class=3D"hljs-title">WinInt128.exe</span>
+05/20/2021  07:53 <span class=3D"hljs-title">PM</span>        12,316,672 <s=
+pan class=3D"hljs-title">WinInt128.pdb</span>
+               8 <span class=3D"hljs-title">File</span>(<span class=3D"hljs=
+-title">s</span>)     13,590,963 <span class=3D"hljs-title">bytes</span>
+               2 <span class=3D"hljs-title">Dir</span>(<span class=3D"hljs-=
+title">s</span>)  97,314,496,512 <span class=3D"hljs-title">bytes</span> <s=
+pan class=3D"hljs-title">free</span>
+
+<span class=3D"hljs-title">E</span>:\<span class=3D"hljs-title">Source</spa=
+n>\<span class=3D"hljs-title">Repos</span>\<span class=3D"hljs-title">cjm</=
+span>-<span class=3D"hljs-title">numerics</span>\<span class=3D"hljs-title"=
+>uint128_test_app</span>\<span class=3D"hljs-title">src</span>\<span class=
+=3D"hljs-title">x64</span>\<span class=3D"hljs-title">Release</span>&gt;<sp=
+an class=3D"hljs-title">WinInt128.exe</span> /<span class=3D"hljs-title">un=
+ary_from_file</span> <span class=3D"hljs-title">random_unary_ops.txt</span>
+<span class=3D"hljs-title">Successfully</span> <span class=3D"hljs-title">r=
+ead</span> 9 <span class=3D"hljs-title">unary</span> <span class=3D"hljs-ti=
+tle">operations</span> <span class=3D"hljs-title">from</span> <span class=
+=3D"hljs-title">file</span> ["<span class=3D"hljs-title">random_unary_ops.t=
+xt</span>"].
+<span class=3D"hljs-title">All</span> 9 <span class=3D"hljs-title">tests</s=
+pan> <span class=3D"hljs-title">from</span> <span class=3D"hljs-title">file=
+</span> ["<span class=3D"hljs-title">random_unary_ops.txt</span>"] <span cl=
+ass=3D"hljs-title">PASSED</span>.
+
+<span class=3D"hljs-title">E</span>:\<span class=3D"hljs-title">Source</spa=
+n>\<span class=3D"hljs-title">Repos</span>\<span class=3D"hljs-title">cjm</=
+span>-<span class=3D"hljs-title">numerics</span>\<span class=3D"hljs-title"=
+>uint128_test_app</span>\<span class=3D"hljs-title">src</span>\<span class=
+=3D"hljs-title">x64</span>\<span class=3D"hljs-title">Release</span>&gt;
+</span></code></pre>
+<p><em>LINUX:</em></p>
+<pre><code class=3D"language-bash hljs">csusie@ubuntu:~/CLionProjects/Int12=
+8/cmake-build-release-clang$ ls
+base_test_battery_results_2021_May_09_14_15_46Z.txt  base_test_battery_resu=
+lts_2021_May_09_14_31_22Z.txt  binary_ops_add_generated_2021_Jan_10_14_42_5=
+5Z.txt  CMakeFiles           ExampleCode  Makefile               test_file_=
+1.txt
+base_test_battery_results_2021_May_09_14_15_52Z.txt  base_test_battery_resu=
+lts_2021_May_09_15_33_01Z.txt  cjm-numerics-uint128.cbp                    =
+        cmake_install.cmake  Int128       random_binary_ops.txt  test_file_=
+2.txt
+base_test_battery_results_2021_May_09_14_21_01Z.txt  base_test_battery_resu=
+lts_2021_May_21_00_09_04Z.txt  CMakeCache.txt                              =
+        EnvironTest          Int128.cbp   random_unary_ops.txt   Testing
+csusie@ubuntu:~/CLionProjects/Int128/cmake-build-release-clang$ ./Int128 --=
+unary_from_file random_unary_ops.txt=20
+Successfully <span class=3D"hljs-built_in">read</span> 9 unary operations f=
+rom file [<span class=3D"hljs-string">"random_unary_ops.txt"</span>].
+All 9 tests from file [<span class=3D"hljs-string">"random_unary_ops.txt"</=
+span>] PASSED.
+</code></pre>
+<h4 id=3D"binary_from_file-switch"><strong>binary_from_file switch</strong>=
+</h4>
+<p>The "binary_from_file_switch" requires as an argument the path of an ASC=
+II text file containing binary operations.  It will then execute the binary=
+ operations in the file and report on success or failure.</p>
+<p>An example of such a file can be found here and is shown (greatly shorte=
+ned) below:</p>
+<blockquote>
+<p>/;0;1;<br>
+%;0;1;<br>
+%;14627333968688430831;1611526157;<br>
+/;3235827725;239;</p>
+</blockquote>
+<p>The symbols for each supported operation can be found in the <a href=3D"=
+https://github.com/cpsusie/cjm-numerics/blob/f93d362577367b90e23a6979151ded=
+d5b843bbe3/uint128_test_app/src/headers/int128_tests.hpp">int128_tests.hpp<=
+/a> header in the array called <a href=3D"https://github.com/cpsusie/cjm-nu=
+merics/blob/f93d362577367b90e23a6979151dedd5b843bbe3/uint128_test_app/src/h=
+eaders/int128_tests.hpp#L619">op_symbol_lookup</a>.  A test is deemed to pa=
+ss if, when a binary operation of the specified type is applied to two valu=
+es of type uint128 and two equivalent values of type <a href=3D"https://www=
+.boost.org/doc/libs/1_76_0/libs/multiprecision/doc/html/boost_multiprecisio=
+n/tut/ints/cpp_int.html"><code>boost::multiprecision::uint128_t</code></a> =
+(from the Boost library), the resulting values are equivalent.  If the resu=
+lting values differ, the test is deemed to have failed.</p>
+<p><strong>Usage Example</strong>:</p>
+<p><em>WINDOWS:</em></p>
+<pre><code class=3D"language-dos hljs"><span class=3D"hljs-function">E:\<sp=
+an class=3D"hljs-title">Source</span>\<span class=3D"hljs-title">Repos</spa=
+n>\<span class=3D"hljs-title">cjm</span>-<span class=3D"hljs-title">numeric=
+s</span>\<span class=3D"hljs-title">uint128_test_app</span>\<span class=3D"=
+hljs-title">src</span>\<span class=3D"hljs-title">x64</span>\<span class=3D=
+"hljs-title">Release</span>&gt;<span class=3D"hljs-title">dir</span>
+ <span class=3D"hljs-title">Volume</span> <span class=3D"hljs-title">in</sp=
+an> <span class=3D"hljs-title">drive</span> <span class=3D"hljs-title">E</s=
+pan> <span class=3D"hljs-title">is</span> <span class=3D"hljs-title">R4pt0r=
+</span>
+ <span class=3D"hljs-title">Volume</span> <span class=3D"hljs-title">Serial=
+</span> <span class=3D"hljs-title">Number</span> <span class=3D"hljs-title"=
+>is</span> 92<span class=3D"hljs-title">C7</span>-4424
+
+ <span class=3D"hljs-title">Directory</span> <span class=3D"hljs-title">of<=
+/span> <span class=3D"hljs-title">E</span>:\<span class=3D"hljs-title">Sour=
+ce</span>\<span class=3D"hljs-title">Repos</span>\<span class=3D"hljs-title=
+">cjm</span>-<span class=3D"hljs-title">numerics</span>\<span class=3D"hljs=
+-title">uint128_test_app</span>\<span class=3D"hljs-title">src</span>\<span=
+ class=3D"hljs-title">x64</span>\<span class=3D"hljs-title">Release</span>
+
+05/20/2021  07:54 <span class=3D"hljs-title">PM</span>    &lt;<span class=
+=3D"hljs-title">DIR</span>&gt;          .
+05/20/2021  07:54 <span class=3D"hljs-title">PM</span>    &lt;<span class=
+=3D"hljs-title">DIR</span>&gt;          ..
+05/12/2021  04:48 <span class=3D"hljs-title">PM</span>            34,120 <s=
+pan class=3D"hljs-title">base_test_battery_results_2021_May_12_20_48_37Z.tx=
+t</span>
+05/12/2021  04:48 <span class=3D"hljs-title">PM</span>            34,246 <s=
+pan class=3D"hljs-title">base_test_battery_results_2021_May_12_20_48_50Z.tx=
+t</span>
+05/20/2021  07:47 <span class=3D"hljs-title">PM</span>            34,244 <s=
+pan class=3D"hljs-title">base_test_battery_results_2021_May_20_23_47_16Z.tx=
+t</span>
+05/20/2021  07:54 <span class=3D"hljs-title">PM</span>            34,240 <s=
+pan class=3D"hljs-title">base_test_battery_results_2021_May_20_23_54_06Z.tx=
+t</span>
+04/23/2021  03:49 <span class=3D"hljs-title">PM</span>             8,702 <s=
+pan class=3D"hljs-title">random_binary_ops.txt</span>
+04/23/2021  03:49 <span class=3D"hljs-title">PM</span>               291 <s=
+pan class=3D"hljs-title">random_unary_ops.txt</span>
+05/20/2021  07:53 <span class=3D"hljs-title">PM</span>         1,128,448 <s=
+pan class=3D"hljs-title">WinInt128.exe</span>
+05/20/2021  07:53 <span class=3D"hljs-title">PM</span>        12,316,672 <s=
+pan class=3D"hljs-title">WinInt128.pdb</span>
+               8 <span class=3D"hljs-title">File</span>(<span class=3D"hljs=
+-title">s</span>)     13,590,963 <span class=3D"hljs-title">bytes</span>
+               2 <span class=3D"hljs-title">Dir</span>(<span class=3D"hljs-=
+title">s</span>)  97,314,492,416 <span class=3D"hljs-title">bytes</span> <s=
+pan class=3D"hljs-title">free</span>
+
+<span class=3D"hljs-title">E</span>:\<span class=3D"hljs-title">Source</spa=
+n>\<span class=3D"hljs-title">Repos</span>\<span class=3D"hljs-title">cjm</=
+span>-<span class=3D"hljs-title">numerics</span>\<span class=3D"hljs-title"=
+>uint128_test_app</span>\<span class=3D"hljs-title">src</span>\<span class=
+=3D"hljs-title">x64</span>\<span class=3D"hljs-title">Release</span>&gt;<sp=
+an class=3D"hljs-title">WinInt128.exe</span> /<span class=3D"hljs-title">bi=
+nary_from_file</span> <span class=3D"hljs-title">random_binary_ops.txt</spa=
+n>
+<span class=3D"hljs-title">Successfully</span> <span class=3D"hljs-title">r=
+ead</span> 212 <span class=3D"hljs-title">binary</span> <span class=3D"hljs=
+-title">operations</span> <span class=3D"hljs-title">from</span> <span clas=
+s=3D"hljs-title">file</span> ["<span class=3D"hljs-title">random_binary_ops=
+.txt</span>"].
+<span class=3D"hljs-title">All</span> 212 <span class=3D"hljs-title">tests<=
+/span> <span class=3D"hljs-title">from</span> <span class=3D"hljs-title">fi=
+le</span> ["<span class=3D"hljs-title">random_binary_ops.txt</span>"] <span=
+ class=3D"hljs-title">PASSED</span>.
+
+<span class=3D"hljs-title">E</span>:\<span class=3D"hljs-title">Source</spa=
+n>\<span class=3D"hljs-title">Repos</span>\<span class=3D"hljs-title">cjm</=
+span>-<span class=3D"hljs-title">numerics</span>\<span class=3D"hljs-title"=
+>uint128_test_app</span>\<span class=3D"hljs-title">src</span>\<span class=
+=3D"hljs-title">x64</span>\<span class=3D"hljs-title">Release</span>&gt;
+</span></code></pre>
+<p><em>LINUX:</em></p>
+<pre><code class=3D"language-bash hljs">csusie@ubuntu:~/CLionProjects/Int12=
+8/cmake-build-release-clang$ ls
+base_test_battery_results_2021_May_09_14_15_46Z.txt  base_test_battery_resu=
+lts_2021_May_09_14_31_22Z.txt  binary_ops_add_generated_2021_Jan_10_14_42_5=
+5Z.txt  CMakeFiles           ExampleCode  Makefile               test_file_=
+1.txt
+base_test_battery_results_2021_May_09_14_15_52Z.txt  base_test_battery_resu=
+lts_2021_May_09_15_33_01Z.txt  cjm-numerics-uint128.cbp                    =
+        cmake_install.cmake  Int128       random_binary_ops.txt  test_file_=
+2.txt
+base_test_battery_results_2021_May_09_14_21_01Z.txt  base_test_battery_resu=
+lts_2021_May_21_00_09_04Z.txt  CMakeCache.txt                              =
+        EnvironTest          Int128.cbp   random_unary_ops.txt   Testing
+csusie@ubuntu:~/CLionProjects/Int128/cmake-build-release-clang$ ./Int128 --=
+binary_from_file random_binary_ops.txt=20
+Successfully <span class=3D"hljs-built_in">read</span> 212 binary operation=
+s from file [<span class=3D"hljs-string">"random_binary_ops.txt"</span>].
+All 212 tests from file [<span class=3D"hljs-string">"random_binary_ops.txt=
+"</span>] PASSED.
+csusie@ubuntu:~/CLionProjects/Int128/cmake-build-release-clang$=20
+</code></pre>
+<h4 id=3D"environ-switch"><strong>environ switch</strong></h4>
+<p>Using the environ switch prints out environmental / platform information=
+ that may affect performance.  See below from:</p>
+<p>*WINDOWS (compiled targeting x64, with Advanced Vector Extensions 2 (/ar=
+ch:AVX2): *</p>
+<pre><code class=3D"language-dos hljs"><span class=3D"hljs-function">E:\<sp=
+an class=3D"hljs-title">Source</span>\<span class=3D"hljs-title">Repos</spa=
+n>\<span class=3D"hljs-title">cjm</span>-<span class=3D"hljs-title">numeric=
+s</span>\<span class=3D"hljs-title">uint128_test_app</span>\<span class=3D"=
+hljs-title">src</span>\<span class=3D"hljs-title">x64</span>\<span class=3D=
+"hljs-title">Release</span>&gt;<span class=3D"hljs-title">WinInt128.exe</sp=
+an> --<span class=3D"hljs-title">environ</span>
+<span class=3D"hljs-title">Executing</span> <span class=3D"hljs-title">swit=
+ch</span> [<span class=3D"hljs-title">environ</span>]:
+<span class=3D"hljs-title">ENVIRONMENT</span> <span class=3D"hljs-title">DA=
+TA</span>:
+<span class=3D"hljs-title">Detected</span> <span class=3D"hljs-title">compi=
+ler</span>: [<span class=3D"hljs-title">Microsoft</span>].
+<span class=3D"hljs-title">SSE3</span>: [<span class=3D"hljs-title">NOT</sp=
+an> <span class=3D"hljs-title">AVAILABLE</span>].
+<span class=3D"hljs-title">Intel</span> <span class=3D"hljs-title">ADX</spa=
+n>: [<span class=3D"hljs-title">AVAILABLE</span>].
+<span class=3D"hljs-title">Intel</span> <span class=3D"hljs-title">BMI2</sp=
+an>: [<span class=3D"hljs-title">AVAILABLE</span>].
+<span class=3D"hljs-title">Execution</span> <span class=3D"hljs-title">Core=
+s</span> <span class=3D"hljs-title">for</span> <span class=3D"hljs-title">c=
+oncurrency</span>: [12].
+
+<span class=3D"hljs-title">PRINTING</span> <span class=3D"hljs-title">SIZES=
+</span>:
+        <span class=3D"hljs-title">CHAR_BIT</span>: 8 <span class=3D"hljs-t=
+itle">bits</span> <span class=3D"hljs-title">per</span> <span class=3D"hljs=
+-title">byte</span> <span class=3D"hljs-title">on</span> <span class=3D"hlj=
+s-title">this</span> <span class=3D"hljs-title">system</span>.
+        <span class=3D"hljs-title">Sizeof</span> <span class=3D"hljs-title"=
+>unsigned</span> <span class=3D"hljs-title">short</span>: [2].
+        <span class=3D"hljs-title">Sizeof</span> <span class=3D"hljs-title"=
+>unsigned</span> <span class=3D"hljs-title">int</span>: [4].
+        <span class=3D"hljs-title">Sizeof</span> <span class=3D"hljs-title"=
+>unsigned</span> <span class=3D"hljs-title">long</span>: [4].
+        <span class=3D"hljs-title">Sizeof</span> <span class=3D"hljs-title"=
+>unsigned</span> <span class=3D"hljs-title">long</span> <span class=3D"hljs=
+-title">long</span>: [8].
+        <span class=3D"hljs-title">Sizeof</span> <span class=3D"hljs-title"=
+>size_t</span>: [8].
+        <span class=3D"hljs-title">Sizeof</span> <span class=3D"hljs-title"=
+>uintmax_t</span>: [8].
+        <span class=3D"hljs-title">unsigned</span> 128 <span class=3D"hljs-=
+title">bit</span> <span class=3D"hljs-title">integer</span> <span class=3D"=
+hljs-title">unavailable</span> <span class=3D"hljs-title">in</span> <span c=
+lass=3D"hljs-title">this</span> <span class=3D"hljs-title">environment</spa=
+n>.
+        <span class=3D"hljs-title">char</span> <span class=3D"hljs-title">i=
+s</span> <span class=3D"hljs-title">signed</span> <span class=3D"hljs-title=
+">in</span> <span class=3D"hljs-title">this</span> <span class=3D"hljs-titl=
+e">implementation</span>.
+        <span class=3D"hljs-title">Sizeof</span> <span class=3D"hljs-title"=
+>wide</span> <span class=3D"hljs-title">character</span>: [2].
+        <span class=3D"hljs-title">Wide</span> <span class=3D"hljs-title">c=
+haracter</span> <span class=3D"hljs-title">is</span> <span class=3D"hljs-ti=
+tle">unsigned</span> <span class=3D"hljs-title">in</span> <span class=3D"hl=
+js-title">this</span> <span class=3D"hljs-title">implementation</span>.
+        <span class=3D"hljs-title">Sizeof</span> <span class=3D"hljs-title"=
+>cjm</span>::<span class=3D"hljs-title">numerics</span>::<span class=3D"hlj=
+s-title">uint128</span>: [16].
+        <span class=3D"hljs-title">Sizeof</span> <span class=3D"hljs-title"=
+>float</span>: [4].
+        <span class=3D"hljs-title">Sizeof</span> <span class=3D"hljs-title"=
+>double</span>: [8].
+        <span class=3D"hljs-title">Sizeof</span> <span class=3D"hljs-title"=
+>long</span> <span class=3D"hljs-title">double</span>: [8].
+        <span class=3D"hljs-title">Sizeof</span> <span class=3D"hljs-title"=
+>pointer</span> <span class=3D"hljs-title">to</span> <span class=3D"hljs-ti=
+tle">object</span>: [8].
+        <span class=3D"hljs-title">Sizeof</span> <span class=3D"hljs-title"=
+>most</span> <span class=3D"hljs-title">aligned</span> <span class=3D"hljs-=
+title">built</span>-<span class=3D"hljs-title">in</span>: [8].
+<span class=3D"hljs-title">DONE</span> <span class=3D"hljs-title">PRINTING<=
+/span> <span class=3D"hljs-title">SIZES</span>
+
+<span class=3D"hljs-title">PRINTING</span> <span class=3D"hljs-title">ALIGN=
+MENTS</span>:
+        <span class=3D"hljs-title">Alignof</span> <span class=3D"hljs-title=
+">unsigned</span> <span class=3D"hljs-title">short</span>: [2].
+        <span class=3D"hljs-title">Alignof</span> <span class=3D"hljs-title=
+">unsigned</span> <span class=3D"hljs-title">int</span>: [4].
+        <span class=3D"hljs-title">Alignof</span> <span class=3D"hljs-title=
+">unsigned</span> <span class=3D"hljs-title">long</span>: [4].
+        <span class=3D"hljs-title">Alignof</span> <span class=3D"hljs-title=
+">unsigned</span> <span class=3D"hljs-title">long</span> <span class=3D"hlj=
+s-title">long</span>: [8].
+        <span class=3D"hljs-title">Alignof</span> <span class=3D"hljs-title=
+">size_t</span>: [8].
+        <span class=3D"hljs-title">Alignof</span> <span class=3D"hljs-title=
+">uintmax_t</span>: [8].
+        <span class=3D"hljs-title">unsigned</span> 128 <span class=3D"hljs-=
+title">bit</span> <span class=3D"hljs-title">integer</span> <span class=3D"=
+hljs-title">unavailable</span> <span class=3D"hljs-title">in</span> <span c=
+lass=3D"hljs-title">this</span> <span class=3D"hljs-title">environment</spa=
+n>.
+        <span class=3D"hljs-title">Alignof</span> <span class=3D"hljs-title=
+">char</span>: [1].
+        <span class=3D"hljs-title">Alignof</span> <span class=3D"hljs-title=
+">wide</span> <span class=3D"hljs-title">character</span>: [2].
+        <span class=3D"hljs-title">Alignof</span> <span class=3D"hljs-title=
+">cjm</span>::<span class=3D"hljs-title">numerics</span>::<span class=3D"hl=
+js-title">uint128</span>: [16].
+        <span class=3D"hljs-title">Alignof</span> <span class=3D"hljs-title=
+">float</span>: [4].
+        <span class=3D"hljs-title">Alignof</span> <span class=3D"hljs-title=
+">double</span>: [8].
+        <span class=3D"hljs-title">Alignof</span> <span class=3D"hljs-title=
+">long</span> <span class=3D"hljs-title">double</span>: [8].
+        <span class=3D"hljs-title">Alignof</span> <span class=3D"hljs-title=
+">pointer</span> <span class=3D"hljs-title">to</span> <span class=3D"hljs-t=
+itle">object</span>: [8].
+        <span class=3D"hljs-title">Alignof</span> <span class=3D"hljs-title=
+">most</span> <span class=3D"hljs-title">aligned</span> <span class=3D"hljs=
+-title">built</span>-<span class=3D"hljs-title">in</span>: [8].
+<span class=3D"hljs-title">DONE</span> <span class=3D"hljs-title">PRINTING<=
+/span> <span class=3D"hljs-title">ALIGNMENTS</span>
+
+<span class=3D"hljs-title">Printing</span> <span class=3D"hljs-title">data<=
+/span> <span class=3D"hljs-title">for</span> <span class=3D"hljs-title">typ=
+e</span> <span class=3D"hljs-title">float</span>:
+        <span class=3D"hljs-title">float</span> (<span class=3D"hljs-title"=
+>size</span>: 4, <span class=3D"hljs-title">align</span>: 4) <span class=3D=
+"hljs-title">is</span> <span class=3D"hljs-title">an</span> <span class=3D"=
+hljs-title">iec559</span> <span class=3D"hljs-title">type</span>.
+        <span class=3D"hljs-title">float</span> <span class=3D"hljs-title">=
+uses</span> 23 <span class=3D"hljs-title">of</span> <span class=3D"hljs-tit=
+le">its</span> 32 <span class=3D"hljs-title">bits</span> <span class=3D"hlj=
+s-title">for</span> <span class=3D"hljs-title">mantissa</span>.
+        <span class=3D"hljs-title">float</span>'<span class=3D"hljs-title">=
+s</span> <span class=3D"hljs-title">min</span> <span class=3D"hljs-title">e=
+xponent</span>: -125; <span class=3D"hljs-title">max</span> <span class=3D"=
+hljs-title">exponent</span>: 128.
+        <span class=3D"hljs-title">float</span>'<span class=3D"hljs-title">=
+s</span> <span class=3D"hljs-title">max</span> <span class=3D"hljs-title">v=
+alue</span>: 3.40282<span class=3D"hljs-title">e</span>+38.
+<span class=3D"hljs-title">Done</span> <span class=3D"hljs-title">printing<=
+/span> <span class=3D"hljs-title">data</span> <span class=3D"hljs-title">fo=
+r</span> <span class=3D"hljs-title">type</span> <span class=3D"hljs-title">=
+float</span>.
+
+<span class=3D"hljs-title">Printing</span> <span class=3D"hljs-title">data<=
+/span> <span class=3D"hljs-title">for</span> <span class=3D"hljs-title">typ=
+e</span> <span class=3D"hljs-title">double</span>:
+        <span class=3D"hljs-title">double</span> (<span class=3D"hljs-title=
+">size</span>: 8, <span class=3D"hljs-title">align</span>: 8) <span class=
+=3D"hljs-title">is</span> <span class=3D"hljs-title">an</span> <span class=
+=3D"hljs-title">iec559</span> <span class=3D"hljs-title">type</span>.
+        <span class=3D"hljs-title">double</span> <span class=3D"hljs-title"=
+>uses</span> 52 <span class=3D"hljs-title">of</span> <span class=3D"hljs-ti=
+tle">its</span> 64 <span class=3D"hljs-title">bits</span> <span class=3D"hl=
+js-title">for</span> <span class=3D"hljs-title">mantissa</span>.
+        <span class=3D"hljs-title">double</span>'<span class=3D"hljs-title"=
+>s</span> <span class=3D"hljs-title">min</span> <span class=3D"hljs-title">=
+exponent</span>: -1021; <span class=3D"hljs-title">max</span> <span class=
+=3D"hljs-title">exponent</span>: 1024.
+        <span class=3D"hljs-title">double</span>'<span class=3D"hljs-title"=
+>s</span> <span class=3D"hljs-title">max</span> <span class=3D"hljs-title">=
+value</span>: 1.79769<span class=3D"hljs-title">e</span>+308.
+<span class=3D"hljs-title">Done</span> <span class=3D"hljs-title">printing<=
+/span> <span class=3D"hljs-title">data</span> <span class=3D"hljs-title">fo=
+r</span> <span class=3D"hljs-title">type</span> <span class=3D"hljs-title">=
+double</span>.
+
+<span class=3D"hljs-title">Printing</span> <span class=3D"hljs-title">data<=
+/span> <span class=3D"hljs-title">for</span> <span class=3D"hljs-title">typ=
+e</span> <span class=3D"hljs-title">long</span> <span class=3D"hljs-title">=
+double</span>:
+        <span class=3D"hljs-title">long</span> <span class=3D"hljs-title">d=
+ouble</span> (<span class=3D"hljs-title">size</span>: 8, <span class=3D"hlj=
+s-title">align</span>: 8) <span class=3D"hljs-title">is</span> <span class=
+=3D"hljs-title">an</span> <span class=3D"hljs-title">iec559</span> <span cl=
+ass=3D"hljs-title">type</span>.
+        <span class=3D"hljs-title">long</span> <span class=3D"hljs-title">d=
+ouble</span> <span class=3D"hljs-title">uses</span> 52 <span class=3D"hljs-=
+title">of</span> <span class=3D"hljs-title">its</span> 64 <span class=3D"hl=
+js-title">bits</span> <span class=3D"hljs-title">for</span> <span class=3D"=
+hljs-title">mantissa</span>.
+        <span class=3D"hljs-title">long</span> <span class=3D"hljs-title">d=
+ouble</span>'<span class=3D"hljs-title">s</span> <span class=3D"hljs-title"=
+>min</span> <span class=3D"hljs-title">exponent</span>: -1021; <span class=
+=3D"hljs-title">max</span> <span class=3D"hljs-title">exponent</span>: 1024=
+.
+        <span class=3D"hljs-title">long</span> <span class=3D"hljs-title">d=
+ouble</span>'<span class=3D"hljs-title">s</span> <span class=3D"hljs-title"=
+>max</span> <span class=3D"hljs-title">value</span>: 1.79769<span class=3D"=
+hljs-title">e</span>+308.
+<span class=3D"hljs-title">Done</span> <span class=3D"hljs-title">printing<=
+/span> <span class=3D"hljs-title">data</span> <span class=3D"hljs-title">fo=
+r</span> <span class=3D"hljs-title">type</span> <span class=3D"hljs-title">=
+long</span> <span class=3D"hljs-title">double</span>.
+
+<span class=3D"hljs-title">Done</span> <span class=3D"hljs-title">printing<=
+/span> <span class=3D"hljs-title">floating</span> <span class=3D"hljs-title=
+">point</span> <span class=3D"hljs-title">information</span>.
+
+<span class=3D"hljs-title">Is</span> <span class=3D"hljs-title">constexpr</=
+span> <span class=3D"hljs-title">bitcasting</span> <span class=3D"hljs-titl=
+e">available</span>?: [<span class=3D"hljs-title">YES</span>].
+<span class=3D"hljs-title">Arithmetic</span> <span class=3D"hljs-title">mod=
+e</span>: [<span class=3D"hljs-title">Microsoft</span> <span class=3D"hljs-=
+title">x64</span> <span class=3D"hljs-title">Compiler</span>-<span class=3D=
+"hljs-title">Intrinsic</span> <span class=3D"hljs-title">Optimized</span> <=
+span class=3D"hljs-title">Arithmetic</span>].
+<span class=3D"hljs-title">Are</span> <span class=3D"hljs-title">C</span>++=
+20 <span class=3D"hljs-title">bit</span> <span class=3D"hljs-title">operati=
+ons</span> <span class=3D"hljs-title">available</span>?: [<span class=3D"hl=
+js-title">YES</span>].
+<span class=3D"hljs-title">No</span> <span class=3D"hljs-title">built</span=
+>-<span class=3D"hljs-title">in</span>  <span class=3D"hljs-title">uint128<=
+/span> <span class=3D"hljs-title">data</span> <span class=3D"hljs-title">av=
+ailable</span>.
+<span class=3D"hljs-title">Is</span> <span class=3D"hljs-title">consteval</=
+span> (<span class=3D"hljs-title">immediate</span> <span class=3D"hljs-titl=
+e">function</span>) <span class=3D"hljs-title">available</span>?: [<span cl=
+ass=3D"hljs-title">false</span>].
+<span class=3D"hljs-title">END</span> <span class=3D"hljs-title">ENVIRONMEN=
+T</span> <span class=3D"hljs-title">DATA</span>
+
+<span class=3D"hljs-title">Done</span> <span class=3D"hljs-title">executing=
+</span> <span class=3D"hljs-title">switch</span> [<span class=3D"hljs-title=
+">environ</span>]
+</span></code></pre>
+<p>Enabling AVX2 both allows the compiler to use AVX2 vector extensions on =
+its own and, in certain circumstances, to use compiler intrinsics from ADX =
+and BMI2, which are more efficient than the default intrinsics for those op=
+erations.  You are encouraged to enable AVX2 on a Linux platform as well, b=
+ut the <strong>initial note about ADX and BMI2 in the output will always re=
+ad false in Linux</strong>: Linux takes advantage of built-in uint128 arith=
+metic and the library does not use compiler intrinsics on Linux.  You shoul=
+d not take their showing up as false in Linux to mean that GCC or Clang is =
+not using those architectural features ... it merely means that the library=
+ is not directly using those intrinsic function to perform calculations.  O=
+n Linux, it is left up to the compiler.  The initial notice about ADX and B=
+MI2 is relevant for 64-bit Windows targets only (whether using Microsoft's =
+compiler, the Clang compiler included in Visual Studio by Microsoft, or Int=
+el's LLVM based compiler for Windows).</p>
+<p>The following are the results of executing the application with the envi=
+ron switch on Linux (Clang 11.0.0-2):</p>
+<p><em>LINUX:</em></p>
+<pre><code class=3D"language-bash hljs">csusie@ubuntu:~/CLionProjects/Int12=
+8/cmake-build-release-clang$ ./Int128 -environ
+Executing switch [environ]:=20
+ENVIRONMENT DATA:=20
+Detected compiler: [Clang-GCC].
+SSE3: [AVAILABLE].
+Intel ADX: [NOT AVAILABLE].
+Intel BMI2: [NOT AVAILABLE].
+Execution Cores <span class=3D"hljs-keyword">for</span> concurrency: [6].
+
+PRINTING SIZES:
+        CHAR_BIT: 8 bits per byte on this system.
+        Sizeof unsigned short: [2].
+        Sizeof unsigned int: [4].
+        Sizeof unsigned long: [8].
+        Sizeof unsigned long long: [8].
+        Sizeof size_t: [8].
+        Sizeof uintmax_t: [8].
+        Sizeof built-in unsigned 128 bit <span class=3D"hljs-built_in">inte=
+ger</span>: [16].
+        char is signed <span class=3D"hljs-keyword">in</span> this implemen=
+tation.
+        Sizeof wide character: [4].
+        Wide character is signed <span class=3D"hljs-keyword">in</span> thi=
+s implementation.
+        Sizeof cjm::numerics::uint128: [16].
+        Sizeof <span class=3D"hljs-built_in">float</span>: [4].
+        Sizeof double: [8].
+        Sizeof long double: [16].
+        Sizeof pointer to object: [8].
+        Sizeof most aligned built-in: [32].
+DONE PRINTING SIZES
+
+PRINTING ALIGNMENTS:
+        Alignof unsigned short: [2].
+        Alignof unsigned int: [4].
+        Alignof unsigned long: [8].
+        Alignof unsigned long long: [8].
+        Alignof size_t: [8].
+        Alignof uintmax_t: [8].
+        Alignof built-in unsigned 128 bit <span class=3D"hljs-built_in">int=
+eger</span>: [16].
+        Alignof char: [1].
+        Alignof wide character: [4].
+        Alignof cjm::numerics::uint128: [16].
+        Alignof <span class=3D"hljs-built_in">float</span>: [4].
+        Alignof double: [8].
+        Alignof long double: [16].
+        Alignof pointer to object: [8].
+        Alignof most aligned built-in: [16].
+DONE PRINTING ALIGNMENTS
+
+Printing data <span class=3D"hljs-keyword">for</span> <span class=3D"hljs-b=
+uilt_in">type</span> <span class=3D"hljs-built_in">float</span>:=20
+        <span class=3D"hljs-built_in">float</span> (size: 4, align: 4) is a=
+n iec559 <span class=3D"hljs-built_in">type</span>.
+        <span class=3D"hljs-built_in">float</span> uses 23 of its 32 bits <=
+span class=3D"hljs-keyword">for</span> mantissa.
+        <span class=3D"hljs-built_in">float</span><span class=3D"hljs-strin=
+g">'s min exponent: -125; max exponent: 128.
+        float'</span>s max value: 3.40282e+38.
+Done printing data <span class=3D"hljs-keyword">for</span> <span class=3D"h=
+ljs-built_in">type</span> <span class=3D"hljs-built_in">float</span>.
+
+Printing data <span class=3D"hljs-keyword">for</span> <span class=3D"hljs-b=
+uilt_in">type</span> double:=20
+        double (size: 8, align: 8) is an iec559 <span class=3D"hljs-built_i=
+n">type</span>.
+        double uses 52 of its 64 bits <span class=3D"hljs-keyword">for</spa=
+n> mantissa.
+        double<span class=3D"hljs-string">'s min exponent: -1021; max expon=
+ent: 1024.
+        double'</span>s max value: 1.79769e+308.
+Done printing data <span class=3D"hljs-keyword">for</span> <span class=3D"h=
+ljs-built_in">type</span> double.
+
+Printing data <span class=3D"hljs-keyword">for</span> <span class=3D"hljs-b=
+uilt_in">type</span> long double:=20
+        long double (size: 16, align: 16) is an iec559 <span class=3D"hljs-=
+built_in">type</span>.
+        long double uses 63 of its 128 bits <span class=3D"hljs-keyword">fo=
+r</span> mantissa.
+        long double<span class=3D"hljs-string">'s min exponent: -16381; max=
+ exponent: 16384.
+        long double'</span>s max value: 1.18973e+4932.
+Done printing data <span class=3D"hljs-keyword">for</span> <span class=3D"h=
+ljs-built_in">type</span> long double.
+
+Done printing floating point information.
+
+Is constexpr bitcasting available?: [NO].
+Arithmetic mode: [Built-in unsigned __int128 Arithmetic].
+Are C++20 bit operations available?: [YES].
+Is unsigned __int128 an arithmetic <span class=3D"hljs-built_in">type</span=
+>?: [YES].
+Is unsigned __int128 an integral <span class=3D"hljs-built_in">type</span>?=
+: [YES].
+Is unsigned __int128 an unsigned <span class=3D"hljs-built_in">type</span>?=
+: [YES].
+sizeof(std::uintmax_t): [8].
+Is consteval (immediate <span class=3D"hljs-keyword">function</span>) avail=
+able?: [<span class=3D"hljs-literal">false</span>].
+END ENVIRONMENT DATA
+
+Done executing switch [environ]=20
+
+csusie@ubuntu:~/CLionProjects/Int128/cmake-build-release-clang$=20
+</code></pre>
+<h4 id=3D"default_tests-switch">default_tests switch</h4>
+<p>Executing the application with the "default_tests" switch is the same as=
+ executing it without specifying any switches: the entire battery of tests =
+is executed.  See above for examples.</p>
+<h4 id=3D"list-switch">list switch</h4>
+<p>Executing the application with the list switch provides a list of the in=
+dividual tests from the battery of tests.  These can be used with the "spec=
+ific_test" switch (see below) to run individual tests from the battery.</p>
+<p><strong>Usage Example</strong>:</p>
+<p><em>WINDOWS:</em></p>
+<pre><code class=3D"language-dos hljs"><span class=3D"hljs-function">E:\<sp=
+an class=3D"hljs-title">Source</span>\<span class=3D"hljs-title">Repos</spa=
+n>\<span class=3D"hljs-title">cjm</span>-<span class=3D"hljs-title">numeric=
+s</span>\<span class=3D"hljs-title">uint128_test_app</span>\<span class=3D"=
+hljs-title">src</span>\<span class=3D"hljs-title">x64</span>\<span class=3D=
+"hljs-title">Release</span>&gt;<span class=3D"hljs-title">WinInt128.exe</sp=
+an> /<span class=3D"hljs-title">list</span>
+<span class=3D"hljs-title">Going</span> <span class=3D"hljs-title">to</span=
+> <span class=3D"hljs-title">print</span> <span class=3D"hljs-title">all</s=
+pan> [55] <span class=3D"hljs-title">tests</span>:
+<span class=3D"hljs-title">Test</span>#:  [1]:     "<span class=3D"hljs-tit=
+le">addition_tests</span>"
+<span class=3D"hljs-title">Test</span>#:  [2]:     "<span class=3D"hljs-tit=
+le">ascii_char_interconversions</span>"
+<span class=3D"hljs-title">Test</span>#:  [3]:     "<span class=3D"hljs-tit=
+le">basic_multiplication_test</span>"
+<span class=3D"hljs-title">Test</span>#:  [4]:     "<span class=3D"hljs-tit=
+le">basic_test_one</span>"
+<span class=3D"hljs-title">Test</span>#:  [5]:     "<span class=3D"hljs-tit=
+le">basic_u128_adc_test</span>"
+<span class=3D"hljs-title">Test</span>#:  [6]:     "<span class=3D"hljs-tit=
+le">basic_u128_sbb_test</span>"
+<span class=3D"hljs-title">Test</span>#:  [7]:     "<span class=3D"hljs-tit=
+le">binary_operation_rt_ser_tests</span>"
+<span class=3D"hljs-title">Test</span>#:  [8]:     "<span class=3D"hljs-tit=
+le">builtin_add_with_carry_test</span>"
+<span class=3D"hljs-title">Test</span>#:  [9]:     "<span class=3D"hljs-tit=
+le">builtin_sub_with_borrow_test</span>"
+<span class=3D"hljs-title">Test</span>#:  [10]:    "<span class=3D"hljs-tit=
+le">builtin_u128fls_test_if_avail</span>"
+<span class=3D"hljs-title">Test</span>#:  [11]:    "<span class=3D"hljs-tit=
+le">bw_tests</span>"
+<span class=3D"hljs-title">Test</span>#:  [12]:    "<span class=3D"hljs-tit=
+le">comparison_tests</span>"
+<span class=3D"hljs-title">Test</span>#:  [13]:    "<span class=3D"hljs-tit=
+le">controlled_float_rt_conversion_test</span>"
+<span class=3D"hljs-title">Test</span>#:  [14]:    "<span class=3D"hljs-tit=
+le">controlled_from_float_conversion_test</span>"
+<span class=3D"hljs-title">Test</span>#:  [15]:    "<span class=3D"hljs-tit=
+le">div_mod_zero_dividend_nonzero_divisor_tests</span>"
+<span class=3D"hljs-title">Test</span>#:  [16]:    "<span class=3D"hljs-tit=
+le">div_mod_zero_tests</span>"
+<span class=3D"hljs-title">Test</span>#:  [17]:    "<span class=3D"hljs-tit=
+le">division_modulus_tests</span>"
+<span class=3D"hljs-title">Test</span>#:  [18]:    "<span class=3D"hljs-tit=
+le">failing_division_test_1</span>"
+<span class=3D"hljs-title">Test</span>#:  [19]:    "<span class=3D"hljs-tit=
+le">failing_division_test_2</span>"
+<span class=3D"hljs-title">Test</span>#:  [20]:    "<span class=3D"hljs-tit=
+le">failing_modulus_test_1</span>"
+<span class=3D"hljs-title">Test</span>#:  [21]:    "<span class=3D"hljs-tit=
+le">first_bin_op_test</span>"
+<span class=3D"hljs-title">Test</span>#:  [22]:    "<span class=3D"hljs-tit=
+le">gen_comp_ops_test</span>"
+<span class=3D"hljs-title">Test</span>#:  [23]:    "<span class=3D"hljs-tit=
+le">hash_dx</span>"
+<span class=3D"hljs-title">Test</span>#:  [24]:    "<span class=3D"hljs-tit=
+le">issue_10_showbase_test</span>"
+<span class=3D"hljs-title">Test</span>#:  [25]:    "<span class=3D"hljs-tit=
+le">issue_10_strm_insrt_test</span>"
+<span class=3D"hljs-title">Test</span>#:  [26]:    "<span class=3D"hljs-tit=
+le">literal_test</span>"
+<span class=3D"hljs-title">Test</span>#:  [27]:    "<span class=3D"hljs-tit=
+le">multiplication_tests</span>"
+<span class=3D"hljs-title">Test</span>#:  [28]:    "<span class=3D"hljs-tit=
+le">print_generated_filename_test</span>"
+<span class=3D"hljs-title">Test</span>#:  [29]:    "<span class=3D"hljs-tit=
+le">safe_float_conversions_test</span>"
+<span class=3D"hljs-title">Test</span>#:  [30]:    "<span class=3D"hljs-tit=
+le">shift_tests</span>"
+<span class=3D"hljs-title">Test</span>#:  [31]:    "<span class=3D"hljs-tit=
+le">stream_insert_bin_op_test</span>"
+<span class=3D"hljs-title">Test</span>#:  [32]:    "<span class=3D"hljs-tit=
+le">string_parse_text</span>"
+<span class=3D"hljs-title">Test</span>#:  [33]:    "<span class=3D"hljs-tit=
+le">subtraction_tests</span>"
+<span class=3D"hljs-title">Test</span>#:  [34]:    "<span class=3D"hljs-tit=
+le">test_convert_to_double</span>"
+<span class=3D"hljs-title">Test</span>#:  [35]:    "<span class=3D"hljs-tit=
+le">test_convert_to_float</span>"
+<span class=3D"hljs-title">Test</span>#:  [36]:    "<span class=3D"hljs-tit=
+le">test_convert_to_long_double</span>"
+<span class=3D"hljs-title">Test</span>#:  [37]:    "<span class=3D"hljs-tit=
+le">test_fls</span>"
+<span class=3D"hljs-title">Test</span>#:  [38]:    "<span class=3D"hljs-tit=
+le">throwing_float_conversion_test</span>"
+<span class=3D"hljs-title">Test</span>#:  [39]:    "<span class=3D"hljs-tit=
+le">trim_tests</span>"
+<span class=3D"hljs-title">Test</span>#:  [40]:    "<span class=3D"hljs-tit=
+le">uintcontainer_adc_tests</span>"
+<span class=3D"hljs-title">Test</span>#:  [41]:    "<span class=3D"hljs-tit=
+le">umult_spec_tests</span>"
+<span class=3D"hljs-title">Test</span>#:  [42]:    "<span class=3D"hljs-tit=
+le">unary_op_basic_test</span>"
+<span class=3D"hljs-title">Test</span>#:  [43]:    "<span class=3D"hljs-tit=
+le">unary_op_bitwise_not_test</span>"
+<span class=3D"hljs-title">Test</span>#:  [44]:    "<span class=3D"hljs-tit=
+le">unary_op_bool_cast_test</span>"
+<span class=3D"hljs-title">Test</span>#:  [45]:    "<span class=3D"hljs-tit=
+le">unary_op_code_rt_serialization_tests</span>"
+<span class=3D"hljs-title">Test</span>#:  [46]:    "<span class=3D"hljs-tit=
+le">unary_op_logical_negation_test</span>"
+<span class=3D"hljs-title">Test</span>#:  [47]:    "<span class=3D"hljs-tit=
+le">unary_op_post_dec_test</span>"
+<span class=3D"hljs-title">Test</span>#:  [48]:    "<span class=3D"hljs-tit=
+le">unary_op_post_inc_test</span>"
+<span class=3D"hljs-title">Test</span>#:  [49]:    "<span class=3D"hljs-tit=
+le">unary_op_post_stat_assert_test</span>"
+<span class=3D"hljs-title">Test</span>#:  [50]:    "<span class=3D"hljs-tit=
+le">unary_op_pre_dec_test</span>"
+<span class=3D"hljs-title">Test</span>#:  [51]:    "<span class=3D"hljs-tit=
+le">unary_op_pre_inc_test</span>"
+<span class=3D"hljs-title">Test</span>#:  [52]:    "<span class=3D"hljs-tit=
+le">unary_op_unary_minus_test</span>"
+<span class=3D"hljs-title">Test</span>#:  [53]:    "<span class=3D"hljs-tit=
+le">unary_op_unary_plus_test</span>"
+<span class=3D"hljs-title">Test</span>#:  [54]:    "<span class=3D"hljs-tit=
+le">unary_operation_rt_serialization_tests</span>"
+<span class=3D"hljs-title">Test</span>#:  [55]:    "<span class=3D"hljs-tit=
+le">unary_operation_vec_rt_serialization_tests</span>"
+<span class=3D"hljs-title">Done</span> <span class=3D"hljs-title">printing<=
+/span> <span class=3D"hljs-title">available</span> <span class=3D"hljs-titl=
+e">tests</span>.
+</span></code></pre>
+<p><em>LINUX:</em></p>
+<pre><code class=3D"language-bash hljs">csusie@ubuntu:~/CLionProjects/Int12=
+8/cmake-build-release-clang$ ./Int128 --list
+Going to <span class=3D"hljs-built_in">print</span> all [55] tests:=20
+Test<span class=3D"hljs-comment">#:  [1]:     "addition_tests"</span>
+Test<span class=3D"hljs-comment">#:  [2]:     "ascii_char_interconversions"=
+</span>
+Test<span class=3D"hljs-comment">#:  [3]:     "basic_multiplication_test"</=
+span>
+Test<span class=3D"hljs-comment">#:  [4]:     "basic_test_one"</span>
+Test<span class=3D"hljs-comment">#:  [5]:     "basic_u128_adc_test"</span>
+Test<span class=3D"hljs-comment">#:  [6]:     "basic_u128_sbb_test"</span>
+Test<span class=3D"hljs-comment">#:  [7]:     "binary_operation_rt_ser_test=
+s"</span>
+Test<span class=3D"hljs-comment">#:  [8]:     "builtin_add_with_carry_test"=
+</span>
+Test<span class=3D"hljs-comment">#:  [9]:     "builtin_sub_with_borrow_test=
+"</span>
+Test<span class=3D"hljs-comment">#:  [10]:    "builtin_u128fls_test_if_avai=
+l"</span>
+Test<span class=3D"hljs-comment">#:  [11]:    "bw_tests"</span>
+Test<span class=3D"hljs-comment">#:  [12]:    "comparison_tests"</span>
+Test<span class=3D"hljs-comment">#:  [13]:    "controlled_float_rt_conversi=
+on_test"</span>
+Test<span class=3D"hljs-comment">#:  [14]:    "controlled_from_float_conver=
+sion_test"</span>
+Test<span class=3D"hljs-comment">#:  [15]:    "div_mod_zero_dividend_nonzer=
+o_divisor_tests"</span>
+Test<span class=3D"hljs-comment">#:  [16]:    "div_mod_zero_tests"</span>
+Test<span class=3D"hljs-comment">#:  [17]:    "division_modulus_tests"</spa=
+n>
+Test<span class=3D"hljs-comment">#:  [18]:    "failing_division_test_1"</sp=
+an>
+Test<span class=3D"hljs-comment">#:  [19]:    "failing_division_test_2"</sp=
+an>
+Test<span class=3D"hljs-comment">#:  [20]:    "failing_modulus_test_1"</spa=
+n>
+Test<span class=3D"hljs-comment">#:  [21]:    "first_bin_op_test"</span>
+Test<span class=3D"hljs-comment">#:  [22]:    "gen_comp_ops_test"</span>
+Test<span class=3D"hljs-comment">#:  [23]:    "hash_dx"</span>
+Test<span class=3D"hljs-comment">#:  [24]:    "issue_10_showbase_test"</spa=
+n>
+Test<span class=3D"hljs-comment">#:  [25]:    "issue_10_strm_insrt_test"</s=
+pan>
+Test<span class=3D"hljs-comment">#:  [26]:    "literal_test"</span>
+Test<span class=3D"hljs-comment">#:  [27]:    "multiplication_tests"</span>
+Test<span class=3D"hljs-comment">#:  [28]:    "print_generated_filename_tes=
+t"</span>
+Test<span class=3D"hljs-comment">#:  [29]:    "safe_float_conversions_test"=
+</span>
+Test<span class=3D"hljs-comment">#:  [30]:    "shift_tests"</span>
+Test<span class=3D"hljs-comment">#:  [31]:    "stream_insert_bin_op_test"</=
+span>
+Test<span class=3D"hljs-comment">#:  [32]:    "string_parse_text"</span>
+Test<span class=3D"hljs-comment">#:  [33]:    "subtraction_tests"</span>
+Test<span class=3D"hljs-comment">#:  [34]:    "test_convert_to_double"</spa=
+n>
+Test<span class=3D"hljs-comment">#:  [35]:    "test_convert_to_float"</span=
+>
+Test<span class=3D"hljs-comment">#:  [36]:    "test_convert_to_long_double"=
+</span>
+Test<span class=3D"hljs-comment">#:  [37]:    "test_fls"</span>
+Test<span class=3D"hljs-comment">#:  [38]:    "throwing_float_conversion_te=
+st"</span>
+Test<span class=3D"hljs-comment">#:  [39]:    "trim_tests"</span>
+Test<span class=3D"hljs-comment">#:  [40]:    "uintcontainer_adc_tests"</sp=
+an>
+Test<span class=3D"hljs-comment">#:  [41]:    "umult_spec_tests"</span>
+Test<span class=3D"hljs-comment">#:  [42]:    "unary_op_basic_test"</span>
+Test<span class=3D"hljs-comment">#:  [43]:    "unary_op_bitwise_not_test"</=
+span>
+Test<span class=3D"hljs-comment">#:  [44]:    "unary_op_bool_cast_test"</sp=
+an>
+Test<span class=3D"hljs-comment">#:  [45]:    "unary_op_code_rt_serializati=
+on_tests"</span>
+Test<span class=3D"hljs-comment">#:  [46]:    "unary_op_logical_negation_te=
+st"</span>
+Test<span class=3D"hljs-comment">#:  [47]:    "unary_op_post_dec_test"</spa=
+n>
+Test<span class=3D"hljs-comment">#:  [48]:    "unary_op_post_inc_test"</spa=
+n>
+Test<span class=3D"hljs-comment">#:  [49]:    "unary_op_post_stat_assert_te=
+st"</span>
+Test<span class=3D"hljs-comment">#:  [50]:    "unary_op_pre_dec_test"</span=
+>
+Test<span class=3D"hljs-comment">#:  [51]:    "unary_op_pre_inc_test"</span=
+>
+Test<span class=3D"hljs-comment">#:  [52]:    "unary_op_unary_minus_test"</=
+span>
+Test<span class=3D"hljs-comment">#:  [53]:    "unary_op_unary_plus_test"</s=
+pan>
+Test<span class=3D"hljs-comment">#:  [54]:    "unary_operation_rt_serializa=
+tion_tests"</span>
+Test<span class=3D"hljs-comment">#:  [55]:    "unary_operation_vec_rt_seria=
+lization_tests"</span>
+Done printing available tests.
+</code></pre>
+<h4 id=3D"specific_test-switch"><strong>specific_test switch</strong></h4>
+<p>Using the specific_test switch with the name of a test (as obtained by t=
+he list switch, see above) executes the specified test.  When executing an =
+individual test rather than the entire battery, all information is sent to =
+the standard ouput (hopefully) or the standard error (in the sad case).  Th=
+e following examples demonstrate the hash_dx test.  The hash_dx test genera=
+tes hashes, and prints out usage information.  In 64-bit environments it is=
+ highly unlikely that there will be any equal uint128 values produced and a=
+lso highly unlikely that any of the hash values obtained from uint128 will =
+collide.  In a 32-bit environment, however, you can expect around 150 hash =
+collisions.</p>
+<p><strong>WINDOWS (x64)</strong>:</p>
+<pre><code class=3D"language-dos hljs"><span class=3D"hljs-function">E:\<sp=
+an class=3D"hljs-title">Source</span>\<span class=3D"hljs-title">Repos</spa=
+n>\<span class=3D"hljs-title">cjm</span>-<span class=3D"hljs-title">numeric=
+s</span>\<span class=3D"hljs-title">uint128_test_app</span>\<span class=3D"=
+hljs-title">src</span>\<span class=3D"hljs-title">x64</span>\<span class=3D=
+"hljs-title">Release</span>&gt;<span class=3D"hljs-title">WinInt128.exe</sp=
+an> /<span class=3D"hljs-title">specific_test</span> <span class=3D"hljs-ti=
+tle">hash_dx</span>
+<span class=3D"hljs-title">Beginning</span> <span class=3D"hljs-title">exec=
+ution</span> <span class=3D"hljs-title">of</span> <span class=3D"hljs-title=
+">test</span> [<span class=3D"hljs-title">hash_dx</span>].
+<span class=3D"hljs-title">Of</span> 1000000 <span class=3D"hljs-title">uin=
+t128_t</span>'<span class=3D"hljs-title">s</span>, 1000000 <span class=3D"h=
+ljs-title">unique</span> <span class=3D"hljs-title">values</span> <span cla=
+ss=3D"hljs-title">were</span> <span class=3D"hljs-title">generated</span>. =
+ <span class=3D"hljs-title">Those</span> <span class=3D"hljs-title">values<=
+/span> <span class=3D"hljs-title">were</span> <span class=3D"hljs-title">re=
+duced</span> <span class=3D"hljs-title">to</span> 1000000 <span class=3D"hl=
+js-title">unique</span> <span class=3D"hljs-title">hashes</span>. <span cla=
+ss=3D"hljs-title">There</span> <span class=3D"hljs-title">were</span> 0 <sp=
+an class=3D"hljs-title">colliding</span> <span class=3D"hljs-title">hash</s=
+pan> <span class=3D"hljs-title">values</span>.
+<span class=3D"hljs-title">Test</span> [<span class=3D"hljs-title">hash_dx<=
+/span>], <span class=3D"hljs-title">PASSED</span>!
+
+<span class=3D"hljs-title">Will</span> <span class=3D"hljs-title">execute</=
+span> <span class=3D"hljs-title">test</span>: [<span class=3D"hljs-title">h=
+ash_dx</span>].
+        <span class=3D"hljs-title">Result</span> <span class=3D"hljs-title"=
+>of</span> <span class=3D"hljs-title">test</span>:
+                <span class=3D"hljs-title">TEST</span>:   [<span class=3D"h=
+ljs-title">hash_dx</span>]       <span class=3D"hljs-title">Status</span>: =
+        [<span class=3D"hljs-title">complete</span>]
+        <span class=3D"hljs-title">Started</span> <span class=3D"hljs-title=
+">at</span>:     [1.38258<span class=3D"hljs-title">e</span>+10 <span class=
+=3D"hljs-title">microseconds</span>]
+        <span class=3D"hljs-title">Ended</span> <span class=3D"hljs-title">=
+at</span>:       [1.38267<span class=3D"hljs-title">e</span>+10 <span class=
+=3D"hljs-title">microseconds</span>]
+        <span class=3D"hljs-title">Elapsed</span> <span class=3D"hljs-title=
+">time</span>:   [829466 <span class=3D"hljs-title">microseconds</span>]
+        <span class=3D"hljs-title">Test</span> <span class=3D"hljs-title">P=
+ASSED</span>.
+
+<span class=3D"hljs-title">END</span> <span class=3D"hljs-title">TEST</span=
+>:       [<span class=3D"hljs-title">hash_dx</span>].
+
+<span class=3D"hljs-title">Done</span> <span class=3D"hljs-title">with</spa=
+n> <span class=3D"hljs-title">test</span>: [<span class=3D"hljs-title">hash=
+_dx</span>].
+</span></code></pre>
+<p><strong>WINDOWS (x86)</strong>:</p>
+<pre><code class=3D"language-dos hljs"><span class=3D"hljs-function">E:\<sp=
+an class=3D"hljs-title">Source</span>\<span class=3D"hljs-title">Repos</spa=
+n>\<span class=3D"hljs-title">cjm</span>-<span class=3D"hljs-title">numeric=
+s</span>\<span class=3D"hljs-title">uint128_test_app</span>\<span class=3D"=
+hljs-title">src</span>\<span class=3D"hljs-title">Release</span>&gt;<span c=
+lass=3D"hljs-title">WinInt128.exe</span> -<span class=3D"hljs-title">specif=
+ic_test</span> <span class=3D"hljs-title">hash_dx</span>
+<span class=3D"hljs-title">Beginning</span> <span class=3D"hljs-title">exec=
+ution</span> <span class=3D"hljs-title">of</span> <span class=3D"hljs-title=
+">test</span> [<span class=3D"hljs-title">hash_dx</span>].
+<span class=3D"hljs-title">Of</span> 1000000 <span class=3D"hljs-title">uin=
+t128_t</span>'<span class=3D"hljs-title">s</span>, 1000000 <span class=3D"h=
+ljs-title">unique</span> <span class=3D"hljs-title">values</span> <span cla=
+ss=3D"hljs-title">were</span> <span class=3D"hljs-title">generated</span>. =
+ <span class=3D"hljs-title">Those</span> <span class=3D"hljs-title">values<=
+/span> <span class=3D"hljs-title">were</span> <span class=3D"hljs-title">re=
+duced</span> <span class=3D"hljs-title">to</span> 999890 <span class=3D"hlj=
+s-title">unique</span> <span class=3D"hljs-title">hashes</span>. <span clas=
+s=3D"hljs-title">There</span> <span class=3D"hljs-title">were</span> 110 <s=
+pan class=3D"hljs-title">colliding</span> <span class=3D"hljs-title">hash</=
+span> <span class=3D"hljs-title">values</span>.
+<span class=3D"hljs-title">Test</span> [<span class=3D"hljs-title">hash_dx<=
+/span>], <span class=3D"hljs-title">PASSED</span>!
+
+<span class=3D"hljs-title">Will</span> <span class=3D"hljs-title">execute</=
+span> <span class=3D"hljs-title">test</span>: [<span class=3D"hljs-title">h=
+ash_dx</span>].
+        <span class=3D"hljs-title">Result</span> <span class=3D"hljs-title"=
+>of</span> <span class=3D"hljs-title">test</span>:
+                <span class=3D"hljs-title">TEST</span>:   [<span class=3D"h=
+ljs-title">hash_dx</span>]       <span class=3D"hljs-title">Status</span>: =
+        [<span class=3D"hljs-title">complete</span>]
+        <span class=3D"hljs-title">Started</span> <span class=3D"hljs-title=
+">at</span>:     [1.40086<span class=3D"hljs-title">e</span>+10 <span class=
+=3D"hljs-title">microseconds</span>]
+        <span class=3D"hljs-title">Ended</span> <span class=3D"hljs-title">=
+at</span>:       [1.40094<span class=3D"hljs-title">e</span>+10 <span class=
+=3D"hljs-title">microseconds</span>]
+        <span class=3D"hljs-title">Elapsed</span> <span class=3D"hljs-title=
+">time</span>:   [825852 <span class=3D"hljs-title">microseconds</span>]
+        <span class=3D"hljs-title">Test</span> <span class=3D"hljs-title">P=
+ASSED</span>.
+
+<span class=3D"hljs-title">END</span> <span class=3D"hljs-title">TEST</span=
+>:       [<span class=3D"hljs-title">hash_dx</span>].
+
+<span class=3D"hljs-title">Done</span> <span class=3D"hljs-title">with</spa=
+n> <span class=3D"hljs-title">test</span>: [<span class=3D"hljs-title">hash=
+_dx</span>].
+
+
+<span class=3D"hljs-title">E</span>:\<span class=3D"hljs-title">Source</spa=
+n>\<span class=3D"hljs-title">Repos</span>\<span class=3D"hljs-title">cjm</=
+span>-<span class=3D"hljs-title">numerics</span>\<span class=3D"hljs-title"=
+>uint128_test_app</span>\<span class=3D"hljs-title">src</span>\<span class=
+=3D"hljs-title">Release</span>&gt;
+</span></code></pre>
+<p><strong>LINUX (x64)</strong>:</p>
+<pre><code class=3D"language-bash hljs">csusie@ubuntu:~/CLionProjects/Int12=
+8/cmake-build-release-clang$ ./Int128 --specific_test hash_dx
+Beginning execution of <span class=3D"hljs-built_in">test</span> [hash_dx].
+Of 1000000 uint128_t<span class=3D"hljs-string">'s, 1000000 unique values w=
+ere generated.  Those values were reduced to 1000000 unique hashes. There w=
+ere 0 colliding hash values.
+Test [hash_dx], PASSED!
+
+Will execute test: [hash_dx].
+        Result of test:=20
+                TEST:   [hash_dx]       Status:         [complete]
+        Started at:     [6.90054e+09 microseconds]
+        Ended at:       [6.90118e+09 microseconds]
+        Elapsed time:   [641226 microseconds]
+        Test PASSED.
+
+END TEST:       [hash_dx].
+
+Done with test: [hash_dx].
+
+csusie@ubuntu:~/CLionProjects/Int128/cmake-build-release-clang$
+</span></code></pre>
+<p>Note that x86 Linux <em>may</em> work and (the library itself, not the u=
+nit test application) <em>probably would</em> work (at least after a few bu=
+g fixes) but <strong>x86 Linux has NEVER been tested</strong> and is not, p=
+resently, part of the test process applied to this library.</p>
+<h4 id=3D"help-switch"><strong>help switch</strong></h4>
+<p>Using the help switch (or, as above, command line arguments the applicat=
+ion does not understand) will result in the valid switches (with brief desc=
+ription) and usage examples being printed.  Usage examples below:</p>
+<p><em>WINDOWS:</em></p>
+<pre><code class=3D"language-dos hljs"><span class=3D"hljs-function">E:\<sp=
+an class=3D"hljs-title">Source</span>\<span class=3D"hljs-title">Repos</spa=
+n>\<span class=3D"hljs-title">cjm</span>-<span class=3D"hljs-title">numeric=
+s</span>\<span class=3D"hljs-title">uint128_test_app</span>\<span class=3D"=
+hljs-title">src</span>\<span class=3D"hljs-title">Release</span>&gt;<span c=
+lass=3D"hljs-title">WinInt128.exe</span> /<span class=3D"hljs-title">help</=
+span>
+<span class=3D"hljs-title">Switches</span> <span class=3D"hljs-title">inclu=
+de</span>:
+        <span class=3D"hljs-title">unary_from_file</span>         <span cla=
+ss=3D"hljs-title">Execute</span> <span class=3D"hljs-title">unary</span> <s=
+pan class=3D"hljs-title">operations</span> <span class=3D"hljs-title">tests=
+</span> <span class=3D"hljs-title">as</span> <span class=3D"hljs-title">spe=
+cified</span> <span class=3D"hljs-title">in</span> <span class=3D"hljs-titl=
+e">unary</span> <span class=3D"hljs-title">operations</span> <span class=3D=
+"hljs-title">text</span> <span class=3D"hljs-title">file</span>.
+        <span class=3D"hljs-title">binary_from_file</span>        <span cla=
+ss=3D"hljs-title">Execute</span> <span class=3D"hljs-title">binary</span> <=
+span class=3D"hljs-title">operations</span> <span class=3D"hljs-title">test=
+s</span> <span class=3D"hljs-title">as</span> <span class=3D"hljs-title">bi=
+nary</span> <span class=3D"hljs-title">in</span> <span class=3D"hljs-title"=
+>unary</span> <span class=3D"hljs-title">operations</span> <span class=3D"h=
+ljs-title">text</span> <span class=3D"hljs-title">file</span>.
+        <span class=3D"hljs-title">environ</span>                 <span cla=
+ss=3D"hljs-title">Print</span> <span class=3D"hljs-title">environmental</sp=
+an> <span class=3D"hljs-title">information</span>.
+        <span class=3D"hljs-title">default_tests</span>           <span cla=
+ss=3D"hljs-title">Run</span> <span class=3D"hljs-title">all</span> <span cl=
+ass=3D"hljs-title">tests</span> <span class=3D"hljs-title">in</span> <span =
+class=3D"hljs-title">default</span> <span class=3D"hljs-title">battery</spa=
+n>, <span class=3D"hljs-title">logging</span> <span class=3D"hljs-title">su=
+mmary</span> <span class=3D"hljs-title">of</span> <span class=3D"hljs-title=
+">result</span> <span class=3D"hljs-title">to</span> <span class=3D"hljs-ti=
+tle">standard</span> <span class=3D"hljs-title">output</span> <span class=
+=3D"hljs-title">and</span> <span class=3D"hljs-title">detail</span> <span c=
+lass=3D"hljs-title">to</span> <span class=3D"hljs-title">a</span> <span cla=
+ss=3D"hljs-title">log</span> <span class=3D"hljs-title">file</span>.
+        <span class=3D"hljs-title">list</span>                    <span cla=
+ss=3D"hljs-title">List</span> <span class=3D"hljs-title">all</span> <span c=
+lass=3D"hljs-title">tests</span> <span class=3D"hljs-title">in</span> <span=
+ class=3D"hljs-title">the</span> <span class=3D"hljs-title">default</span> =
+<span class=3D"hljs-title">battery</span>.
+        <span class=3D"hljs-title">specific_test</span>           <span cla=
+ss=3D"hljs-title">Run</span> <span class=3D"hljs-title">the</span> <span cl=
+ass=3D"hljs-title">specified</span> <span class=3D"hljs-title">test</span> =
+<span class=3D"hljs-title">from</span> <span class=3D"hljs-title">the</span=
+> <span class=3D"hljs-title">default</span> <span class=3D"hljs-title">batt=
+ery</span>.
+        <span class=3D"hljs-title">help</span>                    <span cla=
+ss=3D"hljs-title">Print</span> <span class=3D"hljs-title">this</span> <span=
+ class=3D"hljs-title">information</span>.
+<span class=3D"hljs-title">Usage</span> <span class=3D"hljs-title">examples=
+</span> <span class=3D"hljs-title">for</span> <span class=3D"hljs-title">al=
+l</span> <span class=3D"hljs-title">switches</span>:
+--<span class=3D"hljs-title">unary_from_file</span>                        =
+<span class=3D"hljs-title">my_unary_operations_file.txt</span>
+--<span class=3D"hljs-title">binary_from_file</span>                       =
+<span class=3D"hljs-title">my_binary_operations_file.txt</span>
+--<span class=3D"hljs-title">environ</span>
+--<span class=3D"hljs-title">default_tests</span>
+--<span class=3D"hljs-title">list</span>
+--<span class=3D"hljs-title">specific_test</span>                          =
+<span class=3D"hljs-title">name_of_test_to_run</span>
+--<span class=3D"hljs-title">help</span>
+<span class=3D"hljs-title">DONE</span> <span class=3D"hljs-title">with</spa=
+n> <span class=3D"hljs-title">usage</span> <span class=3D"hljs-title">examp=
+les</span>.
+
+
+
+<span class=3D"hljs-title">E</span>:\<span class=3D"hljs-title">Source</spa=
+n>\<span class=3D"hljs-title">Repos</span>\<span class=3D"hljs-title">cjm</=
+span>-<span class=3D"hljs-title">numerics</span>\<span class=3D"hljs-title"=
+>uint128_test_app</span>\<span class=3D"hljs-title">src</span>\<span class=
+=3D"hljs-title">Release</span>&gt;
+</span></code></pre>
+<p><em>LINUX:</em></p>
+<pre><code class=3D"language-bash hljs">csusie@ubuntu:~/CLionProjects/Int12=
+8/cmake-build-release-clang$ ./Int128 --<span class=3D"hljs-built_in">help<=
+/span>
+Switches include:=20
+        unary_from_file         Execute unary operations tests as specified=
+ <span class=3D"hljs-keyword">in</span> unary operations text file.
+        binary_from_file        Execute binary operations tests as binary <=
+span class=3D"hljs-keyword">in</span> unary operations text file.
+        environ                 Print environmental information.
+        default_tests           Run all tests <span class=3D"hljs-keyword">=
+in</span> default battery, logging summary of result to standard output and=
+ detail to a <span class=3D"hljs-built_in">log</span> file.
+        list                    List all tests <span class=3D"hljs-keyword"=
+>in</span> the default battery.
+        specific_test           Run the specified <span class=3D"hljs-built=
+_in">test</span> from the default battery.
+        <span class=3D"hljs-built_in">help</span>                    Print =
+this information.
+Usage examples <span class=3D"hljs-keyword">for</span> all switches:=20
+--unary_from_file                        my_unary_operations_file.txt
+--binary_from_file                       my_binary_operations_file.txt
+--environ=20
+--default_tests=20
+--list=20
+--specific_test                          name_of_test_to_run
+--<span class=3D"hljs-built_in">help</span>=20
+DONE with usage examples.
+
+
+csusie@ubuntu:~/CLionProjects/Int128/cmake-build-release-clang$
+</code></pre>
+<h2 id=3D"test-application-dependencies">Test Application Dependencies</h2>
+<p>Unlike the library itself and the example code project, which are depend=
+ency free, the unit test project relies on several external dependencies.  =
+Those dependencies include:</p>
+<ol>
+<li><a href=3D"https://github.com/abseil/abseil-cpp/tree/master/absl">absei=
+l-C++17</a> (vcpkg: abseil[cxx17])</li>
+<li><a href=3D"https://github.com/boostorg/boost">boost</a> version 1.73+ (=
+vcpkg: boost)</li>
+<li><a href=3D"https://github.com/HowardHinnant/date">hinnant/date</a> 3.0.=
+0+ (vcpkg: date)</li>
+</ol>
+<p>The visual studio project file for the test application and the CMAKE / =
+CLion project files assume that you are using vcpkg to manage your dependen=
+cies.  In Visual Studio, these libraries are built linking against a static=
+ CRT (C runtime) for both x64 and x86 Windows and are linked statically int=
+o the unit test application (which also links against a static CRT).  On Li=
+nux/CLion/CMake, vcpkg default Linux linkage settings (I assume dynamic run=
+time and dynamic library linkage) are used.</p>
+<p>Abseil and Boost are used to provide control for the applications test c=
+ases.  Many take equivalent values of uint128 from this library and boosts =
+uint128_t or abseil's uint128 type and perform identical operations on them=
+.  Tests are deemed passing if the test result matches the boost or abseil =
+control result.  Howard Hinnant's date library (which has been adopted into=
+ C++20's standard library but presently not fully supported by GCC, Clang a=
+nd Microsoft) is used to help generate date-based suffixes for file output.=
+ Also, several of Boost's other convenience features are used (such as its =
+output format saver).</p>
+<h2 id=3D"binaries-for-windows">Binaries For Windows</h2>
+<p>For Windows, I plan to release the unit test application in binary form =
+with future beta and official releases.  It will be available in Debug and =
+Release builds for both x86 and x64 targets.  The x64 targets will assume A=
+VX2 is available.  If requested, I will create a x64 Windows binary that do=
+es not enable AVX2 though most fairly recent processors from AMD and Intel =
+(last 5-7 years or so) support it.  For now, do not attempt to run unit tes=
+t application binaries built for x64 Windows on a processor too old to supp=
+ort AVX2.</p>
+
+    <!-- End Markdown Monster Content -->
+</div>
+
+
+</body></html>
+------MultipartBoundary--zBVcE6wDR8GWJQwTuzeBRVUs3lvNmxnehhbUhJO4dX----
+Content-Type: text/css
+Content-Transfer-Encoding: quoted-printable
+Content-Location: file:///C:/Users/Christopher%20Susie/AppData/Local/Markdown%20Monster/PreviewThemes/scripts/fontawesome/css/font-awesome.min.css
+
+@charset "utf-8";
+
+@font-face { font-family: FontAwesome; src: url("../fonts/fontawesome-webfo=
+nt.eot?#iefix&v=3D4.7.0") format("embedded-opentype"), url("../fonts/fontaw=
+esome-webfont.woff2?v=3D4.7.0") format("woff2"), url("../fonts/fontawesome-=
+webfont.woff?v=3D4.7.0") format("woff"), url("../fonts/fontawesome-webfont.=
+ttf?v=3D4.7.0") format("truetype"), url("../fonts/fontawesome-webfont.svg?v=
+=3D4.7.0#fontawesomeregular") format("svg"); font-weight: normal; font-styl=
+e: normal; }
+
+.fa { display: inline-block; font-style: normal; font-variant: normal; font=
+-weight: normal; font-stretch: normal; line-height: 1; font-family: FontAwe=
+some; font-size: inherit; text-rendering: auto; -webkit-font-smoothing: ant=
+ialiased; }
+
+.fa-lg { font-size: 1.33333em; line-height: 0.75em; vertical-align: -15%; }
+
+.fa-2x { font-size: 2em; }
+
+.fa-3x { font-size: 3em; }
+
+.fa-4x { font-size: 4em; }
+
+.fa-5x { font-size: 5em; }
+
+.fa-fw { width: 1.28571em; text-align: center; }
+
+.fa-ul { padding-left: 0px; margin-left: 2.14286em; list-style-type: none; =
+}
+
+.fa-ul > li { position: relative; }
+
+.fa-li { position: absolute; left: -2.14286em; width: 2.14286em; top: 0.142=
+857em; text-align: center; }
+
+.fa-li.fa-lg { left: -1.85714em; }
+
+.fa-border { padding: 0.2em 0.25em 0.15em; border: 0.08em solid rgb(238, 23=
+8, 238); border-radius: 0.1em; }
+
+.fa-pull-left { float: left; }
+
+.fa-pull-right { float: right; }
+
+.fa.fa-pull-left { margin-right: 0.3em; }
+
+.fa.fa-pull-right { margin-left: 0.3em; }
+
+.pull-right { float: right; }
+
+.pull-left { float: left; }
+
+.fa.pull-left { margin-right: 0.3em; }
+
+.fa.pull-right { margin-left: 0.3em; }
+
+.fa-spin { animation: 2s linear 0s infinite normal none running fa-spin; }
+
+.fa-pulse { animation: 1s steps(8) 0s infinite normal none running fa-spin;=
+ }
+
+@-webkit-keyframes fa-spin {=20
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(359deg); }
+}
+
+@keyframes fa-spin {=20
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(359deg); }
+}
+
+.fa-rotate-90 { transform: rotate(90deg); }
+
+.fa-rotate-180 { transform: rotate(180deg); }
+
+.fa-rotate-270 { transform: rotate(270deg); }
+
+.fa-flip-horizontal { transform: scale(-1, 1); }
+
+.fa-flip-vertical { transform: scale(1, -1); }
+
+:root .fa-rotate-90, :root .fa-rotate-180, :root .fa-rotate-270, :root .fa-=
+flip-horizontal, :root .fa-flip-vertical { filter: none; }
+
+.fa-stack { position: relative; display: inline-block; width: 2em; height: =
+2em; line-height: 2em; vertical-align: middle; }
+
+.fa-stack-1x, .fa-stack-2x { position: absolute; left: 0px; width: 100%; te=
+xt-align: center; }
+
+.fa-stack-1x { line-height: inherit; }
+
+.fa-stack-2x { font-size: 2em; }
+
+.fa-inverse { color: rgb(255, 255, 255); }
+
+.fa-glass::before { content: "=EF=80=80"; }
+
+.fa-music::before { content: "=EF=80=81"; }
+
+.fa-search::before { content: "=EF=80=82"; }
+
+.fa-envelope-o::before { content: "=EF=80=83"; }
+
+.fa-heart::before { content: "=EF=80=84"; }
+
+.fa-star::before { content: "=EF=80=85"; }
+
+.fa-star-o::before { content: "=EF=80=86"; }
+
+.fa-user::before { content: "=EF=80=87"; }
+
+.fa-film::before { content: "=EF=80=88"; }
+
+.fa-th-large::before { content: "=EF=80=89"; }
+
+.fa-th::before { content: "=EF=80=8A"; }
+
+.fa-th-list::before { content: "=EF=80=8B"; }
+
+.fa-check::before { content: "=EF=80=8C"; }
+
+.fa-remove::before, .fa-close::before, .fa-times::before { content: "=EF=80=
+=8D"; }
+
+.fa-search-plus::before { content: "=EF=80=8E"; }
+
+.fa-search-minus::before { content: "=EF=80=90"; }
+
+.fa-power-off::before { content: "=EF=80=91"; }
+
+.fa-signal::before { content: "=EF=80=92"; }
+
+.fa-gear::before, .fa-cog::before { content: "=EF=80=93"; }
+
+.fa-trash-o::before { content: "=EF=80=94"; }
+
+.fa-home::before { content: "=EF=80=95"; }
+
+.fa-file-o::before { content: "=EF=80=96"; }
+
+.fa-clock-o::before { content: "=EF=80=97"; }
+
+.fa-road::before { content: "=EF=80=98"; }
+
+.fa-download::before { content: "=EF=80=99"; }
+
+.fa-arrow-circle-o-down::before { content: "=EF=80=9A"; }
+
+.fa-arrow-circle-o-up::before { content: "=EF=80=9B"; }
+
+.fa-inbox::before { content: "=EF=80=9C"; }
+
+.fa-play-circle-o::before { content: "=EF=80=9D"; }
+
+.fa-rotate-right::before, .fa-repeat::before { content: "=EF=80=9E"; }
+
+.fa-refresh::before { content: "=EF=80=A1"; }
+
+.fa-list-alt::before { content: "=EF=80=A2"; }
+
+.fa-lock::before { content: "=EF=80=A3"; }
+
+.fa-flag::before { content: "=EF=80=A4"; }
+
+.fa-headphones::before { content: "=EF=80=A5"; }
+
+.fa-volume-off::before { content: "=EF=80=A6"; }
+
+.fa-volume-down::before { content: "=EF=80=A7"; }
+
+.fa-volume-up::before { content: "=EF=80=A8"; }
+
+.fa-qrcode::before { content: "=EF=80=A9"; }
+
+.fa-barcode::before { content: "=EF=80=AA"; }
+
+.fa-tag::before { content: "=EF=80=AB"; }
+
+.fa-tags::before { content: "=EF=80=AC"; }
+
+.fa-book::before { content: "=EF=80=AD"; }
+
+.fa-bookmark::before { content: "=EF=80=AE"; }
+
+.fa-print::before { content: "=EF=80=AF"; }
+
+.fa-camera::before { content: "=EF=80=B0"; }
+
+.fa-font::before { content: "=EF=80=B1"; }
+
+.fa-bold::before { content: "=EF=80=B2"; }
+
+.fa-italic::before { content: "=EF=80=B3"; }
+
+.fa-text-height::before { content: "=EF=80=B4"; }
+
+.fa-text-width::before { content: "=EF=80=B5"; }
+
+.fa-align-left::before { content: "=EF=80=B6"; }
+
+.fa-align-center::before { content: "=EF=80=B7"; }
+
+.fa-align-right::before { content: "=EF=80=B8"; }
+
+.fa-align-justify::before { content: "=EF=80=B9"; }
+
+.fa-list::before { content: "=EF=80=BA"; }
+
+.fa-dedent::before, .fa-outdent::before { content: "=EF=80=BB"; }
+
+.fa-indent::before { content: "=EF=80=BC"; }
+
+.fa-video-camera::before { content: "=EF=80=BD"; }
+
+.fa-photo::before, .fa-image::before, .fa-picture-o::before { content: "=EF=
+=80=BE"; }
+
+.fa-pencil::before { content: "=EF=81=80"; }
+
+.fa-map-marker::before { content: "=EF=81=81"; }
+
+.fa-adjust::before { content: "=EF=81=82"; }
+
+.fa-tint::before { content: "=EF=81=83"; }
+
+.fa-edit::before, .fa-pencil-square-o::before { content: "=EF=81=84"; }
+
+.fa-share-square-o::before { content: "=EF=81=85"; }
+
+.fa-check-square-o::before { content: "=EF=81=86"; }
+
+.fa-arrows::before { content: "=EF=81=87"; }
+
+.fa-step-backward::before { content: "=EF=81=88"; }
+
+.fa-fast-backward::before { content: "=EF=81=89"; }
+
+.fa-backward::before { content: "=EF=81=8A"; }
+
+.fa-play::before { content: "=EF=81=8B"; }
+
+.fa-pause::before { content: "=EF=81=8C"; }
+
+.fa-stop::before { content: "=EF=81=8D"; }
+
+.fa-forward::before { content: "=EF=81=8E"; }
+
+.fa-fast-forward::before { content: "=EF=81=90"; }
+
+.fa-step-forward::before { content: "=EF=81=91"; }
+
+.fa-eject::before { content: "=EF=81=92"; }
+
+.fa-chevron-left::before { content: "=EF=81=93"; }
+
+.fa-chevron-right::before { content: "=EF=81=94"; }
+
+.fa-plus-circle::before { content: "=EF=81=95"; }
+
+.fa-minus-circle::before { content: "=EF=81=96"; }
+
+.fa-times-circle::before { content: "=EF=81=97"; }
+
+.fa-check-circle::before { content: "=EF=81=98"; }
+
+.fa-question-circle::before { content: "=EF=81=99"; }
+
+.fa-info-circle::before { content: "=EF=81=9A"; }
+
+.fa-crosshairs::before { content: "=EF=81=9B"; }
+
+.fa-times-circle-o::before { content: "=EF=81=9C"; }
+
+.fa-check-circle-o::before { content: "=EF=81=9D"; }
+
+.fa-ban::before { content: "=EF=81=9E"; }
+
+.fa-arrow-left::before { content: "=EF=81=A0"; }
+
+.fa-arrow-right::before { content: "=EF=81=A1"; }
+
+.fa-arrow-up::before { content: "=EF=81=A2"; }
+
+.fa-arrow-down::before { content: "=EF=81=A3"; }
+
+.fa-mail-forward::before, .fa-share::before { content: "=EF=81=A4"; }
+
+.fa-expand::before { content: "=EF=81=A5"; }
+
+.fa-compress::before { content: "=EF=81=A6"; }
+
+.fa-plus::before { content: "=EF=81=A7"; }
+
+.fa-minus::before { content: "=EF=81=A8"; }
+
+.fa-asterisk::before { content: "=EF=81=A9"; }
+
+.fa-exclamation-circle::before { content: "=EF=81=AA"; }
+
+.fa-gift::before { content: "=EF=81=AB"; }
+
+.fa-leaf::before { content: "=EF=81=AC"; }
+
+.fa-fire::before { content: "=EF=81=AD"; }
+
+.fa-eye::before { content: "=EF=81=AE"; }
+
+.fa-eye-slash::before { content: "=EF=81=B0"; }
+
+.fa-warning::before, .fa-exclamation-triangle::before { content: "=EF=81=B1=
+"; }
+
+.fa-plane::before { content: "=EF=81=B2"; }
+
+.fa-calendar::before { content: "=EF=81=B3"; }
+
+.fa-random::before { content: "=EF=81=B4"; }
+
+.fa-comment::before { content: "=EF=81=B5"; }
+
+.fa-magnet::before { content: "=EF=81=B6"; }
+
+.fa-chevron-up::before { content: "=EF=81=B7"; }
+
+.fa-chevron-down::before { content: "=EF=81=B8"; }
+
+.fa-retweet::before { content: "=EF=81=B9"; }
+
+.fa-shopping-cart::before { content: "=EF=81=BA"; }
+
+.fa-folder::before { content: "=EF=81=BB"; }
+
+.fa-folder-open::before { content: "=EF=81=BC"; }
+
+.fa-arrows-v::before { content: "=EF=81=BD"; }
+
+.fa-arrows-h::before { content: "=EF=81=BE"; }
+
+.fa-bar-chart-o::before, .fa-bar-chart::before { content: "=EF=82=80"; }
+
+.fa-twitter-square::before { content: "=EF=82=81"; }
+
+.fa-facebook-square::before { content: "=EF=82=82"; }
+
+.fa-camera-retro::before { content: "=EF=82=83"; }
+
+.fa-key::before { content: "=EF=82=84"; }
+
+.fa-gears::before, .fa-cogs::before { content: "=EF=82=85"; }
+
+.fa-comments::before { content: "=EF=82=86"; }
+
+.fa-thumbs-o-up::before { content: "=EF=82=87"; }
+
+.fa-thumbs-o-down::before { content: "=EF=82=88"; }
+
+.fa-star-half::before { content: "=EF=82=89"; }
+
+.fa-heart-o::before { content: "=EF=82=8A"; }
+
+.fa-sign-out::before { content: "=EF=82=8B"; }
+
+.fa-linkedin-square::before { content: "=EF=82=8C"; }
+
+.fa-thumb-tack::before { content: "=EF=82=8D"; }
+
+.fa-external-link::before { content: "=EF=82=8E"; }
+
+.fa-sign-in::before { content: "=EF=82=90"; }
+
+.fa-trophy::before { content: "=EF=82=91"; }
+
+.fa-github-square::before { content: "=EF=82=92"; }
+
+.fa-upload::before { content: "=EF=82=93"; }
+
+.fa-lemon-o::before { content: "=EF=82=94"; }
+
+.fa-phone::before { content: "=EF=82=95"; }
+
+.fa-square-o::before { content: "=EF=82=96"; }
+
+.fa-bookmark-o::before { content: "=EF=82=97"; }
+
+.fa-phone-square::before { content: "=EF=82=98"; }
+
+.fa-twitter::before { content: "=EF=82=99"; }
+
+.fa-facebook-f::before, .fa-facebook::before { content: "=EF=82=9A"; }
+
+.fa-github::before { content: "=EF=82=9B"; }
+
+.fa-unlock::before { content: "=EF=82=9C"; }
+
+.fa-credit-card::before { content: "=EF=82=9D"; }
+
+.fa-feed::before, .fa-rss::before { content: "=EF=82=9E"; }
+
+.fa-hdd-o::before { content: "=EF=82=A0"; }
+
+.fa-bullhorn::before { content: "=EF=82=A1"; }
+
+.fa-bell::before { content: "=EF=83=B3"; }
+
+.fa-certificate::before { content: "=EF=82=A3"; }
+
+.fa-hand-o-right::before { content: "=EF=82=A4"; }
+
+.fa-hand-o-left::before { content: "=EF=82=A5"; }
+
+.fa-hand-o-up::before { content: "=EF=82=A6"; }
+
+.fa-hand-o-down::before { content: "=EF=82=A7"; }
+
+.fa-arrow-circle-left::before { content: "=EF=82=A8"; }
+
+.fa-arrow-circle-right::before { content: "=EF=82=A9"; }
+
+.fa-arrow-circle-up::before { content: "=EF=82=AA"; }
+
+.fa-arrow-circle-down::before { content: "=EF=82=AB"; }
+
+.fa-globe::before { content: "=EF=82=AC"; }
+
+.fa-wrench::before { content: "=EF=82=AD"; }
+
+.fa-tasks::before { content: "=EF=82=AE"; }
+
+.fa-filter::before { content: "=EF=82=B0"; }
+
+.fa-briefcase::before { content: "=EF=82=B1"; }
+
+.fa-arrows-alt::before { content: "=EF=82=B2"; }
+
+.fa-group::before, .fa-users::before { content: "=EF=83=80"; }
+
+.fa-chain::before, .fa-link::before { content: "=EF=83=81"; }
+
+.fa-cloud::before { content: "=EF=83=82"; }
+
+.fa-flask::before { content: "=EF=83=83"; }
+
+.fa-cut::before, .fa-scissors::before { content: "=EF=83=84"; }
+
+.fa-copy::before, .fa-files-o::before { content: "=EF=83=85"; }
+
+.fa-paperclip::before { content: "=EF=83=86"; }
+
+.fa-save::before, .fa-floppy-o::before { content: "=EF=83=87"; }
+
+.fa-square::before { content: "=EF=83=88"; }
+
+.fa-navicon::before, .fa-reorder::before, .fa-bars::before { content: "=EF=
+=83=89"; }
+
+.fa-list-ul::before { content: "=EF=83=8A"; }
+
+.fa-list-ol::before { content: "=EF=83=8B"; }
+
+.fa-strikethrough::before { content: "=EF=83=8C"; }
+
+.fa-underline::before { content: "=EF=83=8D"; }
+
+.fa-table::before { content: "=EF=83=8E"; }
+
+.fa-magic::before { content: "=EF=83=90"; }
+
+.fa-truck::before { content: "=EF=83=91"; }
+
+.fa-pinterest::before { content: "=EF=83=92"; }
+
+.fa-pinterest-square::before { content: "=EF=83=93"; }
+
+.fa-google-plus-square::before { content: "=EF=83=94"; }
+
+.fa-google-plus::before { content: "=EF=83=95"; }
+
+.fa-money::before { content: "=EF=83=96"; }
+
+.fa-caret-down::before { content: "=EF=83=97"; }
+
+.fa-caret-up::before { content: "=EF=83=98"; }
+
+.fa-caret-left::before { content: "=EF=83=99"; }
+
+.fa-caret-right::before { content: "=EF=83=9A"; }
+
+.fa-columns::before { content: "=EF=83=9B"; }
+
+.fa-unsorted::before, .fa-sort::before { content: "=EF=83=9C"; }
+
+.fa-sort-down::before, .fa-sort-desc::before { content: "=EF=83=9D"; }
+
+.fa-sort-up::before, .fa-sort-asc::before { content: "=EF=83=9E"; }
+
+.fa-envelope::before { content: "=EF=83=A0"; }
+
+.fa-linkedin::before { content: "=EF=83=A1"; }
+
+.fa-rotate-left::before, .fa-undo::before { content: "=EF=83=A2"; }
+
+.fa-legal::before, .fa-gavel::before { content: "=EF=83=A3"; }
+
+.fa-dashboard::before, .fa-tachometer::before { content: "=EF=83=A4"; }
+
+.fa-comment-o::before { content: "=EF=83=A5"; }
+
+.fa-comments-o::before { content: "=EF=83=A6"; }
+
+.fa-flash::before, .fa-bolt::before { content: "=EF=83=A7"; }
+
+.fa-sitemap::before { content: "=EF=83=A8"; }
+
+.fa-umbrella::before { content: "=EF=83=A9"; }
+
+.fa-paste::before, .fa-clipboard::before { content: "=EF=83=AA"; }
+
+.fa-lightbulb-o::before { content: "=EF=83=AB"; }
+
+.fa-exchange::before { content: "=EF=83=AC"; }
+
+.fa-cloud-download::before { content: "=EF=83=AD"; }
+
+.fa-cloud-upload::before { content: "=EF=83=AE"; }
+
+.fa-user-md::before { content: "=EF=83=B0"; }
+
+.fa-stethoscope::before { content: "=EF=83=B1"; }
+
+.fa-suitcase::before { content: "=EF=83=B2"; }
+
+.fa-bell-o::before { content: "=EF=82=A2"; }
+
+.fa-coffee::before { content: "=EF=83=B4"; }
+
+.fa-cutlery::before { content: "=EF=83=B5"; }
+
+.fa-file-text-o::before { content: "=EF=83=B6"; }
+
+.fa-building-o::before { content: "=EF=83=B7"; }
+
+.fa-hospital-o::before { content: "=EF=83=B8"; }
+
+.fa-ambulance::before { content: "=EF=83=B9"; }
+
+.fa-medkit::before { content: "=EF=83=BA"; }
+
+.fa-fighter-jet::before { content: "=EF=83=BB"; }
+
+.fa-beer::before { content: "=EF=83=BC"; }
+
+.fa-h-square::before { content: "=EF=83=BD"; }
+
+.fa-plus-square::before { content: "=EF=83=BE"; }
+
+.fa-angle-double-left::before { content: "=EF=84=80"; }
+
+.fa-angle-double-right::before { content: "=EF=84=81"; }
+
+.fa-angle-double-up::before { content: "=EF=84=82"; }
+
+.fa-angle-double-down::before { content: "=EF=84=83"; }
+
+.fa-angle-left::before { content: "=EF=84=84"; }
+
+.fa-angle-right::before { content: "=EF=84=85"; }
+
+.fa-angle-up::before { content: "=EF=84=86"; }
+
+.fa-angle-down::before { content: "=EF=84=87"; }
+
+.fa-desktop::before { content: "=EF=84=88"; }
+
+.fa-laptop::before { content: "=EF=84=89"; }
+
+.fa-tablet::before { content: "=EF=84=8A"; }
+
+.fa-mobile-phone::before, .fa-mobile::before { content: "=EF=84=8B"; }
+
+.fa-circle-o::before { content: "=EF=84=8C"; }
+
+.fa-quote-left::before { content: "=EF=84=8D"; }
+
+.fa-quote-right::before { content: "=EF=84=8E"; }
+
+.fa-spinner::before { content: "=EF=84=90"; }
+
+.fa-circle::before { content: "=EF=84=91"; }
+
+.fa-mail-reply::before, .fa-reply::before { content: "=EF=84=92"; }
+
+.fa-github-alt::before { content: "=EF=84=93"; }
+
+.fa-folder-o::before { content: "=EF=84=94"; }
+
+.fa-folder-open-o::before { content: "=EF=84=95"; }
+
+.fa-smile-o::before { content: "=EF=84=98"; }
+
+.fa-frown-o::before { content: "=EF=84=99"; }
+
+.fa-meh-o::before { content: "=EF=84=9A"; }
+
+.fa-gamepad::before { content: "=EF=84=9B"; }
+
+.fa-keyboard-o::before { content: "=EF=84=9C"; }
+
+.fa-flag-o::before { content: "=EF=84=9D"; }
+
+.fa-flag-checkered::before { content: "=EF=84=9E"; }
+
+.fa-terminal::before { content: "=EF=84=A0"; }
+
+.fa-code::before { content: "=EF=84=A1"; }
+
+.fa-mail-reply-all::before, .fa-reply-all::before { content: "=EF=84=A2"; }
+
+.fa-star-half-empty::before, .fa-star-half-full::before, .fa-star-half-o::b=
+efore { content: "=EF=84=A3"; }
+
+.fa-location-arrow::before { content: "=EF=84=A4"; }
+
+.fa-crop::before { content: "=EF=84=A5"; }
+
+.fa-code-fork::before { content: "=EF=84=A6"; }
+
+.fa-unlink::before, .fa-chain-broken::before { content: "=EF=84=A7"; }
+
+.fa-question::before { content: "=EF=84=A8"; }
+
+.fa-info::before { content: "=EF=84=A9"; }
+
+.fa-exclamation::before { content: "=EF=84=AA"; }
+
+.fa-superscript::before { content: "=EF=84=AB"; }
+
+.fa-subscript::before { content: "=EF=84=AC"; }
+
+.fa-eraser::before { content: "=EF=84=AD"; }
+
+.fa-puzzle-piece::before { content: "=EF=84=AE"; }
+
+.fa-microphone::before { content: "=EF=84=B0"; }
+
+.fa-microphone-slash::before { content: "=EF=84=B1"; }
+
+.fa-shield::before { content: "=EF=84=B2"; }
+
+.fa-calendar-o::before { content: "=EF=84=B3"; }
+
+.fa-fire-extinguisher::before { content: "=EF=84=B4"; }
+
+.fa-rocket::before { content: "=EF=84=B5"; }
+
+.fa-maxcdn::before { content: "=EF=84=B6"; }
+
+.fa-chevron-circle-left::before { content: "=EF=84=B7"; }
+
+.fa-chevron-circle-right::before { content: "=EF=84=B8"; }
+
+.fa-chevron-circle-up::before { content: "=EF=84=B9"; }
+
+.fa-chevron-circle-down::before { content: "=EF=84=BA"; }
+
+.fa-html5::before { content: "=EF=84=BB"; }
+
+.fa-css3::before { content: "=EF=84=BC"; }
+
+.fa-anchor::before { content: "=EF=84=BD"; }
+
+.fa-unlock-alt::before { content: "=EF=84=BE"; }
+
+.fa-bullseye::before { content: "=EF=85=80"; }
+
+.fa-ellipsis-h::before { content: "=EF=85=81"; }
+
+.fa-ellipsis-v::before { content: "=EF=85=82"; }
+
+.fa-rss-square::before { content: "=EF=85=83"; }
+
+.fa-play-circle::before { content: "=EF=85=84"; }
+
+.fa-ticket::before { content: "=EF=85=85"; }
+
+.fa-minus-square::before { content: "=EF=85=86"; }
+
+.fa-minus-square-o::before { content: "=EF=85=87"; }
+
+.fa-level-up::before { content: "=EF=85=88"; }
+
+.fa-level-down::before { content: "=EF=85=89"; }
+
+.fa-check-square::before { content: "=EF=85=8A"; }
+
+.fa-pencil-square::before { content: "=EF=85=8B"; }
+
+.fa-external-link-square::before { content: "=EF=85=8C"; }
+
+.fa-share-square::before { content: "=EF=85=8D"; }
+
+.fa-compass::before { content: "=EF=85=8E"; }
+
+.fa-toggle-down::before, .fa-caret-square-o-down::before { content: "=EF=85=
+=90"; }
+
+.fa-toggle-up::before, .fa-caret-square-o-up::before { content: "=EF=85=91"=
+; }
+
+.fa-toggle-right::before, .fa-caret-square-o-right::before { content: "=EF=
+=85=92"; }
+
+.fa-euro::before, .fa-eur::before { content: "=EF=85=93"; }
+
+.fa-gbp::before { content: "=EF=85=94"; }
+
+.fa-dollar::before, .fa-usd::before { content: "=EF=85=95"; }
+
+.fa-rupee::before, .fa-inr::before { content: "=EF=85=96"; }
+
+.fa-cny::before, .fa-rmb::before, .fa-yen::before, .fa-jpy::before { conten=
+t: "=EF=85=97"; }
+
+.fa-ruble::before, .fa-rouble::before, .fa-rub::before { content: "=EF=85=
+=98"; }
+
+.fa-won::before, .fa-krw::before { content: "=EF=85=99"; }
+
+.fa-bitcoin::before, .fa-btc::before { content: "=EF=85=9A"; }
+
+.fa-file::before { content: "=EF=85=9B"; }
+
+.fa-file-text::before { content: "=EF=85=9C"; }
+
+.fa-sort-alpha-asc::before { content: "=EF=85=9D"; }
+
+.fa-sort-alpha-desc::before { content: "=EF=85=9E"; }
+
+.fa-sort-amount-asc::before { content: "=EF=85=A0"; }
+
+.fa-sort-amount-desc::before { content: "=EF=85=A1"; }
+
+.fa-sort-numeric-asc::before { content: "=EF=85=A2"; }
+
+.fa-sort-numeric-desc::before { content: "=EF=85=A3"; }
+
+.fa-thumbs-up::before { content: "=EF=85=A4"; }
+
+.fa-thumbs-down::before { content: "=EF=85=A5"; }
+
+.fa-youtube-square::before { content: "=EF=85=A6"; }
+
+.fa-youtube::before { content: "=EF=85=A7"; }
+
+.fa-xing::before { content: "=EF=85=A8"; }
+
+.fa-xing-square::before { content: "=EF=85=A9"; }
+
+.fa-youtube-play::before { content: "=EF=85=AA"; }
+
+.fa-dropbox::before { content: "=EF=85=AB"; }
+
+.fa-stack-overflow::before { content: "=EF=85=AC"; }
+
+.fa-instagram::before { content: "=EF=85=AD"; }
+
+.fa-flickr::before { content: "=EF=85=AE"; }
+
+.fa-adn::before { content: "=EF=85=B0"; }
+
+.fa-bitbucket::before { content: "=EF=85=B1"; }
+
+.fa-bitbucket-square::before { content: "=EF=85=B2"; }
+
+.fa-tumblr::before { content: "=EF=85=B3"; }
+
+.fa-tumblr-square::before { content: "=EF=85=B4"; }
+
+.fa-long-arrow-down::before { content: "=EF=85=B5"; }
+
+.fa-long-arrow-up::before { content: "=EF=85=B6"; }
+
+.fa-long-arrow-left::before { content: "=EF=85=B7"; }
+
+.fa-long-arrow-right::before { content: "=EF=85=B8"; }
+
+.fa-apple::before { content: "=EF=85=B9"; }
+
+.fa-windows::before { content: "=EF=85=BA"; }
+
+.fa-android::before { content: "=EF=85=BB"; }
+
+.fa-linux::before { content: "=EF=85=BC"; }
+
+.fa-dribbble::before { content: "=EF=85=BD"; }
+
+.fa-skype::before { content: "=EF=85=BE"; }
+
+.fa-foursquare::before { content: "=EF=86=80"; }
+
+.fa-trello::before { content: "=EF=86=81"; }
+
+.fa-female::before { content: "=EF=86=82"; }
+
+.fa-male::before { content: "=EF=86=83"; }
+
+.fa-gittip::before, .fa-gratipay::before { content: "=EF=86=84"; }
+
+.fa-sun-o::before { content: "=EF=86=85"; }
+
+.fa-moon-o::before { content: "=EF=86=86"; }
+
+.fa-archive::before { content: "=EF=86=87"; }
+
+.fa-bug::before { content: "=EF=86=88"; }
+
+.fa-vk::before { content: "=EF=86=89"; }
+
+.fa-weibo::before { content: "=EF=86=8A"; }
+
+.fa-renren::before { content: "=EF=86=8B"; }
+
+.fa-pagelines::before { content: "=EF=86=8C"; }
+
+.fa-stack-exchange::before { content: "=EF=86=8D"; }
+
+.fa-arrow-circle-o-right::before { content: "=EF=86=8E"; }
+
+.fa-arrow-circle-o-left::before { content: "=EF=86=90"; }
+
+.fa-toggle-left::before, .fa-caret-square-o-left::before { content: "=EF=86=
+=91"; }
+
+.fa-dot-circle-o::before { content: "=EF=86=92"; }
+
+.fa-wheelchair::before { content: "=EF=86=93"; }
+
+.fa-vimeo-square::before { content: "=EF=86=94"; }
+
+.fa-turkish-lira::before, .fa-try::before { content: "=EF=86=95"; }
+
+.fa-plus-square-o::before { content: "=EF=86=96"; }
+
+.fa-space-shuttle::before { content: "=EF=86=97"; }
+
+.fa-slack::before { content: "=EF=86=98"; }
+
+.fa-envelope-square::before { content: "=EF=86=99"; }
+
+.fa-wordpress::before { content: "=EF=86=9A"; }
+
+.fa-openid::before { content: "=EF=86=9B"; }
+
+.fa-institution::before, .fa-bank::before, .fa-university::before { content=
+: "=EF=86=9C"; }
+
+.fa-mortar-board::before, .fa-graduation-cap::before { content: "=EF=86=9D"=
+; }
+
+.fa-yahoo::before { content: "=EF=86=9E"; }
+
+.fa-google::before { content: "=EF=86=A0"; }
+
+.fa-reddit::before { content: "=EF=86=A1"; }
+
+.fa-reddit-square::before { content: "=EF=86=A2"; }
+
+.fa-stumbleupon-circle::before { content: "=EF=86=A3"; }
+
+.fa-stumbleupon::before { content: "=EF=86=A4"; }
+
+.fa-delicious::before { content: "=EF=86=A5"; }
+
+.fa-digg::before { content: "=EF=86=A6"; }
+
+.fa-pied-piper-pp::before { content: "=EF=86=A7"; }
+
+.fa-pied-piper-alt::before { content: "=EF=86=A8"; }
+
+.fa-drupal::before { content: "=EF=86=A9"; }
+
+.fa-joomla::before { content: "=EF=86=AA"; }
+
+.fa-language::before { content: "=EF=86=AB"; }
+
+.fa-fax::before { content: "=EF=86=AC"; }
+
+.fa-building::before { content: "=EF=86=AD"; }
+
+.fa-child::before { content: "=EF=86=AE"; }
+
+.fa-paw::before { content: "=EF=86=B0"; }
+
+.fa-spoon::before { content: "=EF=86=B1"; }
+
+.fa-cube::before { content: "=EF=86=B2"; }
+
+.fa-cubes::before { content: "=EF=86=B3"; }
+
+.fa-behance::before { content: "=EF=86=B4"; }
+
+.fa-behance-square::before { content: "=EF=86=B5"; }
+
+.fa-steam::before { content: "=EF=86=B6"; }
+
+.fa-steam-square::before { content: "=EF=86=B7"; }
+
+.fa-recycle::before { content: "=EF=86=B8"; }
+
+.fa-automobile::before, .fa-car::before { content: "=EF=86=B9"; }
+
+.fa-cab::before, .fa-taxi::before { content: "=EF=86=BA"; }
+
+.fa-tree::before { content: "=EF=86=BB"; }
+
+.fa-spotify::before { content: "=EF=86=BC"; }
+
+.fa-deviantart::before { content: "=EF=86=BD"; }
+
+.fa-soundcloud::before { content: "=EF=86=BE"; }
+
+.fa-database::before { content: "=EF=87=80"; }
+
+.fa-file-pdf-o::before { content: "=EF=87=81"; }
+
+.fa-file-word-o::before { content: "=EF=87=82"; }
+
+.fa-file-excel-o::before { content: "=EF=87=83"; }
+
+.fa-file-powerpoint-o::before { content: "=EF=87=84"; }
+
+.fa-file-photo-o::before, .fa-file-picture-o::before, .fa-file-image-o::bef=
+ore { content: "=EF=87=85"; }
+
+.fa-file-zip-o::before, .fa-file-archive-o::before { content: "=EF=87=86"; =
+}
+
+.fa-file-sound-o::before, .fa-file-audio-o::before { content: "=EF=87=87"; =
+}
+
+.fa-file-movie-o::before, .fa-file-video-o::before { content: "=EF=87=88"; =
+}
+
+.fa-file-code-o::before { content: "=EF=87=89"; }
+
+.fa-vine::before { content: "=EF=87=8A"; }
+
+.fa-codepen::before { content: "=EF=87=8B"; }
+
+.fa-jsfiddle::before { content: "=EF=87=8C"; }
+
+.fa-life-bouy::before, .fa-life-buoy::before, .fa-life-saver::before, .fa-s=
+upport::before, .fa-life-ring::before { content: "=EF=87=8D"; }
+
+.fa-circle-o-notch::before { content: "=EF=87=8E"; }
+
+.fa-ra::before, .fa-resistance::before, .fa-rebel::before { content: "=EF=
+=87=90"; }
+
+.fa-ge::before, .fa-empire::before { content: "=EF=87=91"; }
+
+.fa-git-square::before { content: "=EF=87=92"; }
+
+.fa-git::before { content: "=EF=87=93"; }
+
+.fa-y-combinator-square::before, .fa-yc-square::before, .fa-hacker-news::be=
+fore { content: "=EF=87=94"; }
+
+.fa-tencent-weibo::before { content: "=EF=87=95"; }
+
+.fa-qq::before { content: "=EF=87=96"; }
+
+.fa-wechat::before, .fa-weixin::before { content: "=EF=87=97"; }
+
+.fa-send::before, .fa-paper-plane::before { content: "=EF=87=98"; }
+
+.fa-send-o::before, .fa-paper-plane-o::before { content: "=EF=87=99"; }
+
+.fa-history::before { content: "=EF=87=9A"; }
+
+.fa-circle-thin::before { content: "=EF=87=9B"; }
+
+.fa-header::before { content: "=EF=87=9C"; }
+
+.fa-paragraph::before { content: "=EF=87=9D"; }
+
+.fa-sliders::before { content: "=EF=87=9E"; }
+
+.fa-share-alt::before { content: "=EF=87=A0"; }
+
+.fa-share-alt-square::before { content: "=EF=87=A1"; }
+
+.fa-bomb::before { content: "=EF=87=A2"; }
+
+.fa-soccer-ball-o::before, .fa-futbol-o::before { content: "=EF=87=A3"; }
+
+.fa-tty::before { content: "=EF=87=A4"; }
+
+.fa-binoculars::before { content: "=EF=87=A5"; }
+
+.fa-plug::before { content: "=EF=87=A6"; }
+
+.fa-slideshare::before { content: "=EF=87=A7"; }
+
+.fa-twitch::before { content: "=EF=87=A8"; }
+
+.fa-yelp::before { content: "=EF=87=A9"; }
+
+.fa-newspaper-o::before { content: "=EF=87=AA"; }
+
+.fa-wifi::before { content: "=EF=87=AB"; }
+
+.fa-calculator::before { content: "=EF=87=AC"; }
+
+.fa-paypal::before { content: "=EF=87=AD"; }
+
+.fa-google-wallet::before { content: "=EF=87=AE"; }
+
+.fa-cc-visa::before { content: "=EF=87=B0"; }
+
+.fa-cc-mastercard::before { content: "=EF=87=B1"; }
+
+.fa-cc-discover::before { content: "=EF=87=B2"; }
+
+.fa-cc-amex::before { content: "=EF=87=B3"; }
+
+.fa-cc-paypal::before { content: "=EF=87=B4"; }
+
+.fa-cc-stripe::before { content: "=EF=87=B5"; }
+
+.fa-bell-slash::before { content: "=EF=87=B6"; }
+
+.fa-bell-slash-o::before { content: "=EF=87=B7"; }
+
+.fa-trash::before { content: "=EF=87=B8"; }
+
+.fa-copyright::before { content: "=EF=87=B9"; }
+
+.fa-at::before { content: "=EF=87=BA"; }
+
+.fa-eyedropper::before { content: "=EF=87=BB"; }
+
+.fa-paint-brush::before { content: "=EF=87=BC"; }
+
+.fa-birthday-cake::before { content: "=EF=87=BD"; }
+
+.fa-area-chart::before { content: "=EF=87=BE"; }
+
+.fa-pie-chart::before { content: "=EF=88=80"; }
+
+.fa-line-chart::before { content: "=EF=88=81"; }
+
+.fa-lastfm::before { content: "=EF=88=82"; }
+
+.fa-lastfm-square::before { content: "=EF=88=83"; }
+
+.fa-toggle-off::before { content: "=EF=88=84"; }
+
+.fa-toggle-on::before { content: "=EF=88=85"; }
+
+.fa-bicycle::before { content: "=EF=88=86"; }
+
+.fa-bus::before { content: "=EF=88=87"; }
+
+.fa-ioxhost::before { content: "=EF=88=88"; }
+
+.fa-angellist::before { content: "=EF=88=89"; }
+
+.fa-cc::before { content: "=EF=88=8A"; }
+
+.fa-shekel::before, .fa-sheqel::before, .fa-ils::before { content: "=EF=88=
+=8B"; }
+
+.fa-meanpath::before { content: "=EF=88=8C"; }
+
+.fa-buysellads::before { content: "=EF=88=8D"; }
+
+.fa-connectdevelop::before { content: "=EF=88=8E"; }
+
+.fa-dashcube::before { content: "=EF=88=90"; }
+
+.fa-forumbee::before { content: "=EF=88=91"; }
+
+.fa-leanpub::before { content: "=EF=88=92"; }
+
+.fa-sellsy::before { content: "=EF=88=93"; }
+
+.fa-shirtsinbulk::before { content: "=EF=88=94"; }
+
+.fa-simplybuilt::before { content: "=EF=88=95"; }
+
+.fa-skyatlas::before { content: "=EF=88=96"; }
+
+.fa-cart-plus::before { content: "=EF=88=97"; }
+
+.fa-cart-arrow-down::before { content: "=EF=88=98"; }
+
+.fa-diamond::before { content: "=EF=88=99"; }
+
+.fa-ship::before { content: "=EF=88=9A"; }
+
+.fa-user-secret::before { content: "=EF=88=9B"; }
+
+.fa-motorcycle::before { content: "=EF=88=9C"; }
+
+.fa-street-view::before { content: "=EF=88=9D"; }
+
+.fa-heartbeat::before { content: "=EF=88=9E"; }
+
+.fa-venus::before { content: "=EF=88=A1"; }
+
+.fa-mars::before { content: "=EF=88=A2"; }
+
+.fa-mercury::before { content: "=EF=88=A3"; }
+
+.fa-intersex::before, .fa-transgender::before { content: "=EF=88=A4"; }
+
+.fa-transgender-alt::before { content: "=EF=88=A5"; }
+
+.fa-venus-double::before { content: "=EF=88=A6"; }
+
+.fa-mars-double::before { content: "=EF=88=A7"; }
+
+.fa-venus-mars::before { content: "=EF=88=A8"; }
+
+.fa-mars-stroke::before { content: "=EF=88=A9"; }
+
+.fa-mars-stroke-v::before { content: "=EF=88=AA"; }
+
+.fa-mars-stroke-h::before { content: "=EF=88=AB"; }
+
+.fa-neuter::before { content: "=EF=88=AC"; }
+
+.fa-genderless::before { content: "=EF=88=AD"; }
+
+.fa-facebook-official::before { content: "=EF=88=B0"; }
+
+.fa-pinterest-p::before { content: "=EF=88=B1"; }
+
+.fa-whatsapp::before { content: "=EF=88=B2"; }
+
+.fa-server::before { content: "=EF=88=B3"; }
+
+.fa-user-plus::before { content: "=EF=88=B4"; }
+
+.fa-user-times::before { content: "=EF=88=B5"; }
+
+.fa-hotel::before, .fa-bed::before { content: "=EF=88=B6"; }
+
+.fa-viacoin::before { content: "=EF=88=B7"; }
+
+.fa-train::before { content: "=EF=88=B8"; }
+
+.fa-subway::before { content: "=EF=88=B9"; }
+
+.fa-medium::before { content: "=EF=88=BA"; }
+
+.fa-yc::before, .fa-y-combinator::before { content: "=EF=88=BB"; }
+
+.fa-optin-monster::before { content: "=EF=88=BC"; }
+
+.fa-opencart::before { content: "=EF=88=BD"; }
+
+.fa-expeditedssl::before { content: "=EF=88=BE"; }
+
+.fa-battery-4::before, .fa-battery::before, .fa-battery-full::before { cont=
+ent: "=EF=89=80"; }
+
+.fa-battery-3::before, .fa-battery-three-quarters::before { content: "=EF=
+=89=81"; }
+
+.fa-battery-2::before, .fa-battery-half::before { content: "=EF=89=82"; }
+
+.fa-battery-1::before, .fa-battery-quarter::before { content: "=EF=89=83"; =
+}
+
+.fa-battery-0::before, .fa-battery-empty::before { content: "=EF=89=84"; }
+
+.fa-mouse-pointer::before { content: "=EF=89=85"; }
+
+.fa-i-cursor::before { content: "=EF=89=86"; }
+
+.fa-object-group::before { content: "=EF=89=87"; }
+
+.fa-object-ungroup::before { content: "=EF=89=88"; }
+
+.fa-sticky-note::before { content: "=EF=89=89"; }
+
+.fa-sticky-note-o::before { content: "=EF=89=8A"; }
+
+.fa-cc-jcb::before { content: "=EF=89=8B"; }
+
+.fa-cc-diners-club::before { content: "=EF=89=8C"; }
+
+.fa-clone::before { content: "=EF=89=8D"; }
+
+.fa-balance-scale::before { content: "=EF=89=8E"; }
+
+.fa-hourglass-o::before { content: "=EF=89=90"; }
+
+.fa-hourglass-1::before, .fa-hourglass-start::before { content: "=EF=89=91"=
+; }
+
+.fa-hourglass-2::before, .fa-hourglass-half::before { content: "=EF=89=92";=
+ }
+
+.fa-hourglass-3::before, .fa-hourglass-end::before { content: "=EF=89=93"; =
+}
+
+.fa-hourglass::before { content: "=EF=89=94"; }
+
+.fa-hand-grab-o::before, .fa-hand-rock-o::before { content: "=EF=89=95"; }
+
+.fa-hand-stop-o::before, .fa-hand-paper-o::before { content: "=EF=89=96"; }
+
+.fa-hand-scissors-o::before { content: "=EF=89=97"; }
+
+.fa-hand-lizard-o::before { content: "=EF=89=98"; }
+
+.fa-hand-spock-o::before { content: "=EF=89=99"; }
+
+.fa-hand-pointer-o::before { content: "=EF=89=9A"; }
+
+.fa-hand-peace-o::before { content: "=EF=89=9B"; }
+
+.fa-trademark::before { content: "=EF=89=9C"; }
+
+.fa-registered::before { content: "=EF=89=9D"; }
+
+.fa-creative-commons::before { content: "=EF=89=9E"; }
+
+.fa-gg::before { content: "=EF=89=A0"; }
+
+.fa-gg-circle::before { content: "=EF=89=A1"; }
+
+.fa-tripadvisor::before { content: "=EF=89=A2"; }
+
+.fa-odnoklassniki::before { content: "=EF=89=A3"; }
+
+.fa-odnoklassniki-square::before { content: "=EF=89=A4"; }
+
+.fa-get-pocket::before { content: "=EF=89=A5"; }
+
+.fa-wikipedia-w::before { content: "=EF=89=A6"; }
+
+.fa-safari::before { content: "=EF=89=A7"; }
+
+.fa-chrome::before { content: "=EF=89=A8"; }
+
+.fa-firefox::before { content: "=EF=89=A9"; }
+
+.fa-opera::before { content: "=EF=89=AA"; }
+
+.fa-internet-explorer::before { content: "=EF=89=AB"; }
+
+.fa-tv::before, .fa-television::before { content: "=EF=89=AC"; }
+
+.fa-contao::before { content: "=EF=89=AD"; }
+
+.fa-500px::before { content: "=EF=89=AE"; }
+
+.fa-amazon::before { content: "=EF=89=B0"; }
+
+.fa-calendar-plus-o::before { content: "=EF=89=B1"; }
+
+.fa-calendar-minus-o::before { content: "=EF=89=B2"; }
+
+.fa-calendar-times-o::before { content: "=EF=89=B3"; }
+
+.fa-calendar-check-o::before { content: "=EF=89=B4"; }
+
+.fa-industry::before { content: "=EF=89=B5"; }
+
+.fa-map-pin::before { content: "=EF=89=B6"; }
+
+.fa-map-signs::before { content: "=EF=89=B7"; }
+
+.fa-map-o::before { content: "=EF=89=B8"; }
+
+.fa-map::before { content: "=EF=89=B9"; }
+
+.fa-commenting::before { content: "=EF=89=BA"; }
+
+.fa-commenting-o::before { content: "=EF=89=BB"; }
+
+.fa-houzz::before { content: "=EF=89=BC"; }
+
+.fa-vimeo::before { content: "=EF=89=BD"; }
+
+.fa-black-tie::before { content: "=EF=89=BE"; }
+
+.fa-fonticons::before { content: "=EF=8A=80"; }
+
+.fa-reddit-alien::before { content: "=EF=8A=81"; }
+
+.fa-edge::before { content: "=EF=8A=82"; }
+
+.fa-credit-card-alt::before { content: "=EF=8A=83"; }
+
+.fa-codiepie::before { content: "=EF=8A=84"; }
+
+.fa-modx::before { content: "=EF=8A=85"; }
+
+.fa-fort-awesome::before { content: "=EF=8A=86"; }
+
+.fa-usb::before { content: "=EF=8A=87"; }
+
+.fa-product-hunt::before { content: "=EF=8A=88"; }
+
+.fa-mixcloud::before { content: "=EF=8A=89"; }
+
+.fa-scribd::before { content: "=EF=8A=8A"; }
+
+.fa-pause-circle::before { content: "=EF=8A=8B"; }
+
+.fa-pause-circle-o::before { content: "=EF=8A=8C"; }
+
+.fa-stop-circle::before { content: "=EF=8A=8D"; }
+
+.fa-stop-circle-o::before { content: "=EF=8A=8E"; }
+
+.fa-shopping-bag::before { content: "=EF=8A=90"; }
+
+.fa-shopping-basket::before { content: "=EF=8A=91"; }
+
+.fa-hashtag::before { content: "=EF=8A=92"; }
+
+.fa-bluetooth::before { content: "=EF=8A=93"; }
+
+.fa-bluetooth-b::before { content: "=EF=8A=94"; }
+
+.fa-percent::before { content: "=EF=8A=95"; }
+
+.fa-gitlab::before { content: "=EF=8A=96"; }
+
+.fa-wpbeginner::before { content: "=EF=8A=97"; }
+
+.fa-wpforms::before { content: "=EF=8A=98"; }
+
+.fa-envira::before { content: "=EF=8A=99"; }
+
+.fa-universal-access::before { content: "=EF=8A=9A"; }
+
+.fa-wheelchair-alt::before { content: "=EF=8A=9B"; }
+
+.fa-question-circle-o::before { content: "=EF=8A=9C"; }
+
+.fa-blind::before { content: "=EF=8A=9D"; }
+
+.fa-audio-description::before { content: "=EF=8A=9E"; }
+
+.fa-volume-control-phone::before { content: "=EF=8A=A0"; }
+
+.fa-braille::before { content: "=EF=8A=A1"; }
+
+.fa-assistive-listening-systems::before { content: "=EF=8A=A2"; }
+
+.fa-asl-interpreting::before, .fa-american-sign-language-interpreting::befo=
+re { content: "=EF=8A=A3"; }
+
+.fa-deafness::before, .fa-hard-of-hearing::before, .fa-deaf::before { conte=
+nt: "=EF=8A=A4"; }
+
+.fa-glide::before { content: "=EF=8A=A5"; }
+
+.fa-glide-g::before { content: "=EF=8A=A6"; }
+
+.fa-signing::before, .fa-sign-language::before { content: "=EF=8A=A7"; }
+
+.fa-low-vision::before { content: "=EF=8A=A8"; }
+
+.fa-viadeo::before { content: "=EF=8A=A9"; }
+
+.fa-viadeo-square::before { content: "=EF=8A=AA"; }
+
+.fa-snapchat::before { content: "=EF=8A=AB"; }
+
+.fa-snapchat-ghost::before { content: "=EF=8A=AC"; }
+
+.fa-snapchat-square::before { content: "=EF=8A=AD"; }
+
+.fa-pied-piper::before { content: "=EF=8A=AE"; }
+
+.fa-first-order::before { content: "=EF=8A=B0"; }
+
+.fa-yoast::before { content: "=EF=8A=B1"; }
+
+.fa-themeisle::before { content: "=EF=8A=B2"; }
+
+.fa-google-plus-circle::before, .fa-google-plus-official::before { content:=
+ "=EF=8A=B3"; }
+
+.fa-fa::before, .fa-font-awesome::before { content: "=EF=8A=B4"; }
+
+.fa-handshake-o::before { content: "=EF=8A=B5"; }
+
+.fa-envelope-open::before { content: "=EF=8A=B6"; }
+
+.fa-envelope-open-o::before { content: "=EF=8A=B7"; }
+
+.fa-linode::before { content: "=EF=8A=B8"; }
+
+.fa-address-book::before { content: "=EF=8A=B9"; }
+
+.fa-address-book-o::before { content: "=EF=8A=BA"; }
+
+.fa-vcard::before, .fa-address-card::before { content: "=EF=8A=BB"; }
+
+.fa-vcard-o::before, .fa-address-card-o::before { content: "=EF=8A=BC"; }
+
+.fa-user-circle::before { content: "=EF=8A=BD"; }
+
+.fa-user-circle-o::before { content: "=EF=8A=BE"; }
+
+.fa-user-o::before { content: "=EF=8B=80"; }
+
+.fa-id-badge::before { content: "=EF=8B=81"; }
+
+.fa-drivers-license::before, .fa-id-card::before { content: "=EF=8B=82"; }
+
+.fa-drivers-license-o::before, .fa-id-card-o::before { content: "=EF=8B=83"=
+; }
+
+.fa-quora::before { content: "=EF=8B=84"; }
+
+.fa-free-code-camp::before { content: "=EF=8B=85"; }
+
+.fa-telegram::before { content: "=EF=8B=86"; }
+
+.fa-thermometer-4::before, .fa-thermometer::before, .fa-thermometer-full::b=
+efore { content: "=EF=8B=87"; }
+
+.fa-thermometer-3::before, .fa-thermometer-three-quarters::before { content=
+: "=EF=8B=88"; }
+
+.fa-thermometer-2::before, .fa-thermometer-half::before { content: "=EF=8B=
+=89"; }
+
+.fa-thermometer-1::before, .fa-thermometer-quarter::before { content: "=EF=
+=8B=8A"; }
+
+.fa-thermometer-0::before, .fa-thermometer-empty::before { content: "=EF=8B=
+=8B"; }
+
+.fa-shower::before { content: "=EF=8B=8C"; }
+
+.fa-bathtub::before, .fa-s15::before, .fa-bath::before { content: "=EF=8B=
+=8D"; }
+
+.fa-podcast::before { content: "=EF=8B=8E"; }
+
+.fa-window-maximize::before { content: "=EF=8B=90"; }
+
+.fa-window-minimize::before { content: "=EF=8B=91"; }
+
+.fa-window-restore::before { content: "=EF=8B=92"; }
+
+.fa-times-rectangle::before, .fa-window-close::before { content: "=EF=8B=93=
+"; }
+
+.fa-times-rectangle-o::before, .fa-window-close-o::before { content: "=EF=
+=8B=94"; }
+
+.fa-bandcamp::before { content: "=EF=8B=95"; }
+
+.fa-grav::before { content: "=EF=8B=96"; }
+
+.fa-etsy::before { content: "=EF=8B=97"; }
+
+.fa-imdb::before { content: "=EF=8B=98"; }
+
+.fa-ravelry::before { content: "=EF=8B=99"; }
+
+.fa-eercast::before { content: "=EF=8B=9A"; }
+
+.fa-microchip::before { content: "=EF=8B=9B"; }
+
+.fa-snowflake-o::before { content: "=EF=8B=9C"; }
+
+.fa-superpowers::before { content: "=EF=8B=9D"; }
+
+.fa-wpexplorer::before { content: "=EF=8B=9E"; }
+
+.fa-meetup::before { content: "=EF=8B=A0"; }
+
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0px; margi=
+n: -1px; overflow: hidden; clip: rect(0px, 0px, 0px, 0px); border: 0px; }
+
+.sr-only-focusable:active, .sr-only-focusable:focus { position: static; wid=
+th: auto; height: auto; margin: 0px; overflow: visible; clip: auto; }
+------MultipartBoundary--zBVcE6wDR8GWJQwTuzeBRVUs3lvNmxnehhbUhJO4dX----
+Content-Type: text/css
+Content-Transfer-Encoding: quoted-printable
+Content-Location: file:///C:/Users/Christopher%20Susie/AppData/Local/Markdown%20Monster/PreviewThemes/Dharkan/Theme.css
+
+@charset "utf-8";
+
+html, body { color: rgb(51, 51, 51); font-family: -apple-system, BlinkMacSy=
+stemFont, "Segoe UI", Helvetica, Helvetica, Arial, sans-serif, "Segoe UI Sy=
+mbol", "Apple Color Emoji"; font-size: 17px; -webkit-font-smoothing: antial=
+iased; height: 100%; line-height: 1.55; margin: 0px; }
+
+#MainContent { margin: 20px 20px 20px 30px; }
+
+h1, h2, h3, h4, h5, h6, .byline, .content-title { color: rgb(85, 85, 85); f=
+ont-weight: bold; font-family: "Trebuchet MS", "Lucida Sans Unicode", "Luci=
+da Grande", "Lucida Sans"; margin-top: 1.2em; margin-bottom: 0.4em; }
+
+h1 { font-size: 1.9em; padding-bottom: 10px; border-bottom: 1px solid rgb(2=
+38, 238, 238); }
+
+h2 { font-size: 1.55em; }
+
+h3 { font-size: 1.35em; }
+
+h4 { font-size: 1.18em; }
+
+h5, h6 { color: rgb(101, 101, 101); font-size: 1.09em; }
+
+h6 { color: rgb(119, 119, 119); font-size: 1.03em; }
+
+p { margin: 0.5rem 0px 1rem; }
+
+a { font-weight: 600; color: rgb(51, 122, 183); text-decoration: none; }
+
+a:hover { text-decoration: underline; }
+
+img { max-width: 100%; }
+
+ul, ol { margin: 1.1em 0px; }
+
+li { margin: 0.6em 0.2em 0.6em 1em; }
+
+ul > li > ul > li > ul > li { list-style: disc; }
+
+ul > li > ul > li { list-style: square; }
+
+.task-list-item { list-style: none; margin-left: -2em; }
+
+dt { font-size: 1.08em; font-weight: bold; text-decoration: underline; padd=
+ing-top: 0.5em; cursor: pointer; }
+
+dd { margin: 0px; padding: 0px 0px 0.2em 1em; display: none; }
+
+b, strong { font-weight: 600; }
+
+dt { font-size: 1.08em; font-weight: bold; text-decoration: underline; padd=
+ing-top: 0.5em; }
+
+dd { margin: 0px; padding: 0px 0px 0.2em 1em; }
+
+.hidden { display: none; }
+
+.hidden-nowidth { width: 0px; }
+
+.visually-hidden { border: 0px; clip: rect(0px, 0px, 0px, 0px); height: 1px=
+; margin: -1px; overflow: hidden; padding: 0px; position: absolute; width: =
+1px; }
+
+@media (min-width: 1080px) {
+  html, body { font-size: 1.06em; }
+}
+
+blockquote { background: rgb(245, 245, 245); color: rgb(101, 101, 101); bor=
+der-left: 8px solid rgb(170, 170, 170); border-radius: 4px; padding: 10px 2=
+0px; margin: 30px 20px; font-size: 1.03em; }
+
+blockquote :first-child { margin-top: 0px; }
+
+blockquote :last-child { margin-bottom: 0px; }
+
+hr { margin: 12px 0px; }
+
+.figure .caption, figure figcaption { font-size: 0.8em; font-style: italic;=
+ margin-top: 0px; }
+
+code { padding: 2px 5px; font-family: SFMono-Regular, Consolas, "Liberation=
+ Mono", Menlo, Courier, monospace; border-radius: 3px; font-weight: 600; ba=
+ckground: rgb(238, 238, 238); color: rgb(85, 85, 85); }
+
+pre { font-family: menlo, consolas, monospace; font-weight: normal; font-si=
+ze: 87%; line-height: 1.4; margin: 7px 0px; padding: 0px; border: 1px solid=
+ silver; border-radius: 5px; overflow-x: auto; max-width: 98%; white-space:=
+ pre; word-break: normal; overflow-wrap: normal; }
+
+pre > code { white-space: pre; display: block; font-weight: normal; padding=
+: 0.8em !important; }
+
+pre > code::-webkit-scrollbar { width: 8px; height: 8px; background: rgb(68=
+, 68, 68); }
+
+pre > code::-webkit-scrollbar-thumb { background: rgb(153, 153, 153); }
+
+table { width: 100%; overflow: auto; border-spacing: 0px; border-collapse: =
+collapse; margin: 15px 0px; border-color: gray; }
+
+td, th { border: 1px solid rgb(221, 221, 221); padding: 6px 13px; display: =
+table-cell; vertical-align: top; }
+
+th { font-weight: bold; color: white; background: rgb(85, 85, 85); }
+
+tbody > tr:nth-child(2n) { background: rgb(238, 238, 238); }
+
+.line-highlight { background: rgb(233, 245, 255) !important; }
+
+p.line-highlight, h1.line-highlight, h2.line-highlight, h3.line-highlight, =
+h4.line-highlight { border-radius: 4px; margin-left: -10px; margin-right: -=
+10px; padding-left: 10px; padding-right: 10px; }
+
+code.line-highlight { background: rgb(85, 85, 85) !important; }
+
+.hidden { display: none; }
+
+.hidden-nowidth { width: 0px; }
+
+.visually-hidden { border: 0px; clip: rect(0px, 0px, 0px, 0px); height: 1px=
+; margin: -1px; overflow: hidden; padding: 0px; position: absolute; width: =
+1px; }
+
+.line-highlight { background: rgb(245, 245, 245); border-radius: 3px; }
+
+.CAUTION, .IMPORTANT, .INFO, .TIP, .NOTE, .WARNING { padding: 0.1px 20px; m=
+argin: 15px 0px; border-radius: 4px; }
+
+.CAUTION > h5, .IMPORTANT > h5, .INFO > h5, .TIP > h5, .NOTE > h5, .WARNING=
+ > h5 { color: inherit; }
+
+.CAUTION, .IMPORTANT { color: rgb(169, 68, 66); background-color: rgb(242, =
+222, 222); border-color: rgb(235, 204, 209); }
+
+.WARNING { color: rgb(138, 109, 59); background-color: rgb(252, 248, 227); =
+border-color: rgb(250, 235, 204); }
+
+.INFO, .TIP, .NOTE { color: rgb(49, 112, 143); background-color: rgb(217, 2=
+37, 247); border-color: rgb(188, 232, 241); }
+
+.NOTE h5::before, .TIP h5::before { content: "=EF=81=9A"; font-family: Font=
+Awesome; padding-right: 6px; }
+
+.WARNING h5::before, .CAUTION h5::before { content: "=EF=81=B1"; font-famil=
+y: FontAwesome; padding-right: 6px; }
+
+.IMPORTANT h5::before { content: "=EF=81=AA"; font-family: FontAwesome; pad=
+ding-right: 6px; }
+
+xref { display: block; }
+
+.hljs { font-size: 1em; }
+
+@media (min-width: 1080px) {
+  html, body { font-size: 1.06em; }
+}
+
+@media print {
+  pre { white-space: pre-wrap; word-break: normal; overflow-wrap: normal; }
+  pre > code { white-space: pre-wrap; padding: 1em !important; }
+}
+------MultipartBoundary--zBVcE6wDR8GWJQwTuzeBRVUs3lvNmxnehhbUhJO4dX----
+Content-Type: text/css
+Content-Transfer-Encoding: quoted-printable
+Content-Location: file:///C:/Users/Christopher%20Susie/AppData/Local/Markdown%20Monster/PreviewThemes/scripts/highlightjs/styles/twilight.css
+
+@charset "utf-8";
+
+.hljs { display: block; overflow-x: auto; padding: 0.5em; background: rgb(3=
+7, 37, 37); color: rgb(226, 226, 226); font-weight: normal; font-size: 1.15=
+em !important; }
+
+.hljs-keyword, .hljs-selector-tag, .hljs-built_in, .hljs-tag { color: rgb(2=
+05, 168, 105); }
+
+.hljs-template-tag { color: rgb(220, 220, 220); }
+
+.hljs-number { color: rgb(207, 106, 76); }
+
+.hljs-attr { color: cornsilk; }
+
+.hljs-variable, .hljs-template-variable { color: rgb(239, 220, 188); }
+
+.hljs-literal { color: rgb(207, 106, 76); }
+
+.hljs-subst { color: rgb(143, 143, 143); }
+
+.hljs-title { color: rgb(199, 140, 59); }
+
+.hljs-name, .hljs-selector-id, .hljs-selector-class, .hljs-section, .hljs-t=
+ype { color: rgb(213, 173, 105); }
+
+.hljs-symbol, .hljs-bullet, .hljs-link { color: rgb(220, 163, 163); }
+
+.hljs-string { color: rgb(143, 157, 106); }
+
+.hljs-deletion, .hljs-builtin-name { color: rgb(204, 147, 147); }
+
+.hljs-comment { font-style: italic; color: rgb(136, 136, 136); }
+
+.hljs-addition, .hljs-quote, .hljs-meta { color: rgb(127, 159, 127); }
+
+.hljs-emphasis { font-style: italic; }
+
+.hljs-strong { font-weight: bold; }
+------MultipartBoundary--zBVcE6wDR8GWJQwTuzeBRVUs3lvNmxnehhbUhJO4dX------
