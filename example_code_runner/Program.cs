@@ -6,14 +6,33 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Cjm.Numerics.Example
+namespace Cjm.Numerics.ExampleRunner
 {
     class Program
     {
         static void Main(string[] args)
         {
-            var workingDirectory = new DirectoryInfo(@"E:\Source\Repos\cjm-numerics\example_code\src\uint128_example");
-            var dict = GetRunInfo(workingDirectory);
+            
+            ImmutableSortedDictionary<string, FileInfo> dict;
+            try
+            {
+                DirectoryInfo workingDirectory = ProcessInputArgs(args);
+                dict = GetRunInfo(workingDirectory);
+            }
+            catch (DirectoryNotFoundException ex)
+            {
+                Console.Error.WriteLine(ex.Message);
+                Environment.Exit(-1);
+                return;
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"Problem finding the needed data files: \"{ex}\".");
+                Console.Error.WriteLine($"Supply path to command-line such as (for example): \"{FallbackPathTxt}\".");
+                Environment.Exit(-1);
+                return;
+            }
+            
             if (!Configurations.SetEquals(dict.Keys))
             {
                 Console.WriteLine($"Of the {Configurations.Count} configurations expected, {dict.Count} were found.");
@@ -180,6 +199,34 @@ namespace Cjm.Numerics.Example
             Configurations = ConfigRelPathLookup.Select(tupl => tupl.ConfigName).ToImmutableSortedSet();
         }
 
+        [JetBrains.Annotations.NotNull]
+        private static DirectoryInfo ProcessInputArgs(string[] args)
+        {
+            DirectoryInfo ret;
+            string txt;
+            if (args.Length < 1 || string.IsNullOrWhiteSpace(args[0]))
+            {
+                Console.Error.WriteLine(
+                    $"Path to example code working directory not provided in command line arguments.  Using fallback path of \"{FallbackPathTxt}\" instead.");
+                txt = FallbackPathTxt;
+            }
+            else
+            {
+                txt = args[0].Trim();
+            }
+            
+            ret = new DirectoryInfo(txt);
+            if (!ret.Exists)
+            {
+                throw new DirectoryNotFoundException(
+                    $"The directory \"{txt}\" was not found.  Please supply the directory path of the example code project.");
+            }
+            return ret;
+        }
+
+
+
+        private const string FallbackPathTxt = @"D:\repos\source\cjm_numerics\example_code\src\uint128_example";
         private static readonly ImmutableArray<(string ConfigName, string RelativePathToExe)> ConfigRelPathLookup;
         private static readonly ImmutableSortedSet<string> Configurations;
 
