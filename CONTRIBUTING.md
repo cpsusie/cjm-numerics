@@ -1,0 +1,1 @@
+Contributions, such as bug fixes, are welcome.  Before adding a feature or changing an existing (presumably correct behavior), please contact Christopher Susie (cpsusie on GitHub, reachable at cpsusie@hotmail.com).
