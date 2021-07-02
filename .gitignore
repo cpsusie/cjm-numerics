@@ -454,3 +454,5 @@ workspace.xml
 /out/build/x64-Debug/.cmake/api/v1/query/client-MicrosoftVS
 /out/build/x64-Debug
 /uint128_test_app/src/WinInt128/base_test*.txt
+/uint128_test_app/src/Debug-Installed
+/uint128_test_app/src/Release-Installed
