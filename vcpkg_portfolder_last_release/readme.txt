@@ -1,1 +1,1 @@
-Directions: copy folder "cjm-numerics-uint128" folder (folder itself + contents) into (?/vcpkg/ports) folder where ? is wherever you have vckpg installed on your system.
+Copy folder "cjm-numerics-uint128" folder (folder itself + contents) into your /vcpkg/ports folder wherever you have vckpg installed on your system.  Alternatively, I provide a fork of vcpkg at https://github.com/cpsusie/vcpkg.git which comes with the port for this project installed.  I try to keep it relatively up to date with Microsoft's repo.
