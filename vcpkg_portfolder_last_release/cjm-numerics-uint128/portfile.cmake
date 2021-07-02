@@ -2,9 +2,9 @@
 vcpkg_from_github(
     OUT_SOURCE_PATH SOURCE_PATH
     REPO cpsusie/cjm-numerics
-    REF v0.0.0.6-alpha
-    SHA512 af6ae38d549d690940a7d99e47a46225d906e9f8f0160339e9a7d0da3773e8165aa43e6fa1205283d3834ef7e5f90dfdbad0455f8805c5a72afca45d78f00552
-    HEAD_REF main
+    REF v0.9.0.0-beta
+    SHA512 bf7ee8037679a8fce6b88f83460fdfefd76aefba03c90681b7248855c43b08c0460e0b599eae3b4fd5d84ffb0d0f8d12664f998ad3e9a413ca0bc2b7013d122f
+    HEAD_REF issue_71
 )
 set(CMAKE_CXX_STANDARD 20)
 vcpkg_configure_cmake(
