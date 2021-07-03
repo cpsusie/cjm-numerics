@@ -225,6 +225,7 @@ namespace cjm
 		constexpr compiler_used value_or_other_ifndef(compiler_used v) noexcept;
 		
 		class uint128;
+		class int128;
 		constexpr bool is_windows =
 #if defined (CJM_DETECTED_WINDOWS)
 			true;

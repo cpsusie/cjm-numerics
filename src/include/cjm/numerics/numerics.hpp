@@ -85,6 +85,9 @@ namespace std
 	template<>
 	struct hash<cjm::numerics::uint128>;
 
+	template<>
+	struct hash<cjm::numerics::int128>;
+
 	/************************************************************************/
 	/* Defines numeric limits and various traits for this object
 	* to facilitate interoperability with code  that relies on these traits.  */
@@ -112,6 +115,61 @@ namespace std
 		static constexpr bool is_iec559 = std::numeric_limits<uint64_t>::is_iec559;
 		static constexpr bool is_modulo = std::numeric_limits<uint64_t>::is_modulo;
 		static constexpr int digits = std::numeric_limits<uint64_t>::digits * 2;
+		static constexpr int digits10 = digits * 301'299 / 1'000'000;
+		static constexpr int max_digits10 = std::numeric_limits<uint64_t>::max_digits10;
+		static constexpr int radix = 2;
+		static constexpr int min_exponent = 0;
+		static constexpr int max_exponent = 0;
+		static constexpr int min_exponent10 = 0;
+		static constexpr int max_exponent10 = 0;
+		static constexpr bool traps = true;
+
+		static constexpr cjm::numerics::uint128 min() noexcept;
+
+		static constexpr cjm::numerics::uint128 lowest() noexcept;
+
+		static constexpr cjm::numerics::uint128 max() noexcept;
+
+		static constexpr cjm::numerics::uint128 epsilon() noexcept;
+
+		static constexpr cjm::numerics::uint128 round_error() noexcept;
+
+		static constexpr cjm::numerics::uint128 infinity() noexcept;
+
+		static constexpr cjm::numerics::uint128 quiet_NaN() noexcept;
+
+		static constexpr cjm::numerics::uint128 signaling_NaN() noexcept;
+
+		static constexpr cjm::numerics::uint128 denorm_min() noexcept;
+	};
+
+	/************************************************************************/
+/* Defines numeric limits and various traits for this object
+* to facilitate interoperability with code  that relies on these traits.  */
+/************************************************************************/
+	template<>
+	class numeric_limits<cjm::numerics::int128> final
+	{
+		static constexpr int times_log10_of_two(int x)
+		{
+			return x * 301'299 / 1'000'000;
+		}
+	public:
+		static constexpr bool is_specialized = true;
+		static constexpr bool is_signed = true;
+		static constexpr bool is_integer{ true };
+		static constexpr bool is_exact = true;
+		static constexpr bool is_bounded = true;
+		static constexpr bool has_denorm = std::denorm_absent;
+		static constexpr bool has_infinity = false;
+		static constexpr bool has_quiet_NaN = std::numeric_limits<int64_t>::has_quiet_NaN;
+		static constexpr bool has_signaling_NaN = std::numeric_limits<int64_t>::has_signaling_NaN;
+		static constexpr bool has_denorm_loss = std::numeric_limits<int64_t>::has_denorm_loss;
+		static constexpr std::float_round_style round_style = std::numeric_limits<int64_t>::round_style;
+		static constexpr bool is_arithmetic = true;
+		static constexpr bool is_iec559 = std::numeric_limits<uint64_t>::is_iec559;
+		static constexpr bool is_modulo = std::numeric_limits<uint64_t>::is_modulo;
+		static constexpr int digits = std::numeric_limits<cjm::numerics::uint128>::digits - 1;
 		static constexpr int digits10 = digits * 301'299 / 1'000'000;
 		static constexpr int max_digits10 = std::numeric_limits<uint64_t>::max_digits10;
 		static constexpr int radix = 2;

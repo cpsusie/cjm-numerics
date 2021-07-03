@@ -137,6 +137,21 @@ namespace cjm::numerics
 	/// </summary>
 	constexpr uint128_calc_mode calculation_mode = init_eval_mode();
 
+	namespace uint128_literals
+	{
+		template<char... Chars>
+			requires (sizeof...(Chars) > 0)
+		constexpr uint128 operator"" _u128();
+
+	}
+
+	namespace int128_literals
+	{
+		template<char... Chars>
+			requires (sizeof...(Chars) > 0)
+		constexpr int128 operator"" _i128();
+	}
+	
 	namespace internal
 	{
 		constexpr int fls_int_part(std::uint64_t n) noexcept;
@@ -230,8 +245,6 @@ namespace cjm::numerics
 	constexpr uint128 operator-(uint128 lhs, uint128 rhs) noexcept;
 	constexpr uint128 operator*(uint128 lhs, uint128 rhs) noexcept;
 	//Division and modulus are friends declared within class
-
-
 
 	enum class u128_str_format
 	{
@@ -434,8 +447,8 @@ namespace cjm::numerics
 		/// <exception cref="std::invalid_argument">A uint128 could not be parsed from
 		/// the supplied value.</exception>
 		template<typename Chars, typename CharTraits = std::char_traits<Chars>>
-		requires cjm::numerics::concepts::char_with_traits<Chars, CharTraits>
-			static uint128 make_from_string(std::basic_string_view<Chars, CharTraits>
+			requires cjm::numerics::concepts::char_with_traits<Chars, CharTraits>
+		static uint128 make_from_string(std::basic_string_view<Chars, CharTraits>
 				parse_me);
 
 		/// <summary>
@@ -704,6 +717,14 @@ namespace cjm
 		{
 			class fixed_uint_lit_helper;
 		}
+
+		namespace int128_literals
+		{
+			template<char... Chars>
+				requires (sizeof...(Chars) > 0)
+			constexpr int128 operator"" _i128();
+		}
+		
 		namespace uint128_literals
 		{
 			/************************************************************************/
@@ -753,8 +774,11 @@ namespace cjm
 				template<char... Chars>
 					requires (sizeof...(Chars) > 0)
 				friend constexpr uint128 operator"" _u128();
-				
 
+				template<char... Chars>
+					requires (sizeof...(Chars) > 0)
+				friend constexpr int128 int128_literals::operator"" _i128();
+				
 				template<char... Chars>
 					requires (sizeof...(Chars) > 0)
 				static CJM_LIT_CONST bool are_all_chars_0();

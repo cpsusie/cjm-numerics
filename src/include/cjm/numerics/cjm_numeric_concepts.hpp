@@ -66,18 +66,32 @@ namespace cjm::numerics::concepts
 	concept unsigned_integer = integer<T> && !std::numeric_limits<T>::is_signed;
 
 	/// <summary>
+	/// True for a signed integer, whether built-in or user-defined
+	/// </summary>
+	/// <remarks>bases determination off of specialization of std::numeric_limits for the
+	/// type in question.</remarks>
+	template<typename T>
+	concept signed_integer = integer<T> && std::numeric_limits<T>::is_signed;
+
+	/// <summary>
 	/// Applies to unsigned integers that are also built-in fundamental types
 	/// </summary>
 	template<typename T>
 	concept builtin_unsigned_integer = builtin_integer<T> && unsigned_integer<T>;
 
 	/// <summary>
+	/// Applies to signed integers that are also built-in fundamental types
+	/// </summary>
+	template<typename T>
+	concept builtin_signed_integer = builtin_integer<T> && signed_integer<T>;
+	
+	/// <summary>
 	/// Applies to floating point numbers that are built in types.
 	/// </summary>
 	template<typename T>
 	concept builtin_floating_point = std::floating_point<T>;
 
-
+	
 
 }
 

@@ -86,6 +86,9 @@
     <ClInclude Include="..\headers\output_guard.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\src\include\cjm\numerics\int128.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="..\cpp\llvm_int_typedefs.txt">
@@ -109,6 +112,9 @@
       <Filter>Header Files</Filter>
     </None>
     <None Include="..\..\..\src\include\cjm\string\cjm_string.inl">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="..\..\..\src\include\cjm\numerics\int128.inl">
       <Filter>Header Files</Filter>
     </None>
   </ItemGroup>

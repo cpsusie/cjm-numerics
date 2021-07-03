@@ -37,19 +37,41 @@ namespace cjm::numerics::fixed_uint_container
 			false;
 #endif
 
+		template<typename Si>
+		concept is_builtin_i128 =
+#if (defined (CJM_DIV_ONLY_INTRINSIC_U128)) || (defined(CJM_USE_INTRINSIC_U128))
+			(sizeof(Si) == sizeof(std::int64_t) * 2) &&
+			std::is_same_v<__int128, std::remove_cvref_t<std::remove_const_t<Si>>>;
+#else
+			false;
+#endif
+
 		template<typename Ui>
 		concept is_full_builtin_u128 = is_builtin_u128<Ui> && std::is_arithmetic_v<Ui> &&
 			std::numeric_limits<Ui>::is_specialized;
 
+		template<typename Si>
+		concept is_full_builtin_i128 = is_builtin_i128<Si> && std::is_arithmetic_v<Si> &&
+			std::numeric_limits<Si>::is_specialized;
+
+		
 		template<typename Ui>
 		concept is_partial_builtin_u128 = is_builtin_u128<Ui> && !is_full_builtin_u128<Ui>;
 
 		constexpr bool exits_builtin_u128 = is_builtin_u128<natuint128_t>;
+
+		template<typename Si>
+		concept is_partial_builtin_i128 = is_builtin_i128<Si> && !is_full_builtin_u128<Si>;
 		
 		template<typename Ui, size_t Digits>
 		concept is_unsigned_int_with_digits = (cjm::numerics::concepts::builtin_unsigned_integer<Ui> && Digits >= 64u &&
 			Digits == std::numeric_limits<Ui>::digits) || (is_builtin_u128<Ui> &&
 				sizeof(Ui) == (sizeof(std::uint64_t) * 2) && Digits == 128);
+
+		template<typename Si, size_t Digits>
+		concept is_signed_int_with_digits = (cjm::numerics::concepts::builtin_signed_integer<Si> && Digits >= 64u &&
+			Digits == std::numeric_limits<Si>::digits) || (is_builtin_u128<Si> &&
+				sizeof(Si) == (sizeof(std::int64_t) * 2) && Digits == 128);
 
 		constexpr size_t uint128_alignment = is_x64 ? alignof(std::uint64_t) * 2 : alignof(std::uint64_t);
 
