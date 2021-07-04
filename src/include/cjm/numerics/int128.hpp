@@ -40,7 +40,7 @@
 #ifndef CJM_INT128_HPP_
 #define CJM_INT128_HPP_
 #include <cjm/numerics/uint128.hpp>
-
+#include <cjm/numerics/cjm_numeric_concepts.hpp>
 namespace cjm::numerics
 {
 	class int128;
@@ -49,8 +49,8 @@ namespace cjm::numerics
 	{
 		constexpr int countl_zero(int128 n) noexcept;
 
-		template<concepts::builtin_floating_point TFloat>
-		int128 make_from_floating_point(TFloat v) noexcept;
+		template<numerics::concepts::builtin_floating_point TFloat>
+		int128 make_signed_from_floating_point(TFloat v) noexcept;
 
 	}
 
@@ -219,7 +219,7 @@ namespace cjm::numerics
 		constexpr explicit operator std::uint32_t() const noexcept;
 		constexpr explicit operator std::int64_t() const noexcept;
 		constexpr explicit operator std::uint64_t() const noexcept;
-		constexpr explicit operator uint128() const noexcept;
+		constexpr explicit operator uint128() const noexcept { return m_unsigned_rep; }
 		inline explicit operator float() const;
 		inline explicit operator double() const;
 		inline explicit operator long double() const;

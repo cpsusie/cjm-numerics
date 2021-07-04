@@ -59,6 +59,8 @@ namespace cjm::base_test_program
 		std::cout << "Thing that isn't unsigned integer: [" << std::dec << val << "]." << newl;
 	}
 
+	void prelim_int128_test();
+
 	int execute_test_program(int argc, char* argv[]) noexcept;
 
 	void native_test();

@@ -432,7 +432,7 @@ namespace cjm::numerics
 	{
 	public:
 		static constexpr size_t byte_array_size = 16;
-
+		friend class int128;
 		using int_part = std::uint64_t;
 		using byte_array = std::array<unsigned char, byte_array_size>;
 		using divmod_result_t = divmod_result<uint128>;

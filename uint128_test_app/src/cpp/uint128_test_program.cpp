@@ -17,7 +17,7 @@
 // For information about copyright and licensing of the original work of others,
 // see Notices file in cjm/ folder.
 #include "uint128_test_program.hpp"
-
+#include <cjm/numerics/int128.hpp>
 int cjm::base_test_program::print_args(int argc, char* argv[]) noexcept
 {
 	using namespace cjm::base_test_program;
@@ -116,6 +116,18 @@ int cjm::base_test_program::execute_log_arg_processing(int argc, char* argv[]) n
 	return 0;
 }
 
+void cjm::base_test_program::prelim_int128_test()
+{
+	using uint128_t = cjm::numerics::uint128;
+	using int128_t = cjm::numerics::int128;
+	float neg_one = -1.0;
+	float pos_one = 1.0;
+	int128_t x = static_cast<int128_t>(neg_one);
+	int128_t y = static_cast<int128_t>(pos_one);
+ 	std::cout << "x: [0x" << std::hex << static_cast<uint128_t>(x) << "]." << newl;
+	std::cout << "y: [0x" << std::hex << static_cast<uint128_t>(y) << "]." << newl;
+}
+
 int cjm::base_test_program::execute_test_program(int argc, char* argv[]) noexcept
 {
 	try
@@ -124,6 +136,8 @@ int cjm::base_test_program::execute_test_program(int argc, char* argv[]) noexcep
 		using uint128_t = numerics::uint128;
 		using testing::cjm_assert;
 		using namespace std::string_view_literals;
+
+		prelim_int128_test();
 
 			
 		static_assert(cjm::numerics::concepts::unsigned_integer<uint128_t>);
