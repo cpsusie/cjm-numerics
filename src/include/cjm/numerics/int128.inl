@@ -47,49 +47,7 @@ namespace cjm::numerics
 		
 		
 
-		CJM_LIT_CONST std::array<char, std::numeric_limits<uint128>::digits10 + 1> max_pos_signed_dec_128_v = std::array<char, std::numeric_limits<uint128>::digits10 + 1>
-		{
-			'1', '7', '0',
-			'1', '4', '1',
-			'1', '8', '3',
-			'4', '6', '0',
-			'4', '6', '9',
-			'2', '3', '1',
-			'7', '3', '1',
-			'6', '8', '7',
-			'3', '0', '3',
-			'7', '1', '5',
-			'8', '8', '4',
-			'1', '0', '5',
-			'7', '2', '7'
-		};
-		
-		template<char... Chars>
-		CJM_LIT_CONST bool lit_helper::validate_decimal_size_as_signed_uint128()
-		{
-			if (get_lit_type<Chars...>() != lit_type::Decimal)
-				return false;
-			constexpr std::optional<size_t> dec_digits = count_decimal_chars<Chars...>();
-			constexpr size_t max_dec_digits = std::numeric_limits<uint128>::digits10 + 1;
-			if (!dec_digits.has_value() || *dec_digits > max_dec_digits)
-				return false;
-			if (*dec_digits < max_dec_digits)
-				return true;
-			//the hard part, need if it has max digits
-			constexpr auto arr = std::array<char, sizeof...(Chars)>{ Chars... };
-			size_t max_idx = 0;
-			for (char c : arr)
-			{
-				if (c == '\'') continue;
-				char comparand = max_pos_signed_dec_128_v<Ui>[max_idx++];
-				if (c < comparand)
-					return true;
-				if (c > comparand)
-					return false;
-			}
-			return true;
-			
-		}
+
 	}
 	
 	namespace int128_literals
@@ -98,14 +56,10 @@ namespace cjm::numerics
 			requires (sizeof...(Chars) > 0)
 		constexpr int128 operator""_i128()
 		{
-			using namespace uint128_literals;
-			constexpr uint128 min_signed = uint128::make_uint128(0x8000'0000'0000'0000, 0x0000'0000'0000'0000);
-			constexpr uint128 max_signed = min_signed - 1ull;
-			constexpr std::optional<uint128> result = uint128_literals::lit_helper::parse_literal<uint128, Chars...>();
-			static_assert(result.has_value(), "The literal is not a valid 128-bit decimal or hexadecimal integer.");
-			static_assert(*result == min_signed || *result <= max_signed, 
-				"The value is too large or to small to fit in a signed two's complement 128 bit integer.");
-			return static_cast<int128>(*result);
+			constexpr std::optional<int128> temp = lit_helper::parse_literal_i128<Chars...>();
+			static_assert(temp.has_value(), 
+				"The specified literal is not a valid int128.  NOTE: if you desire the minimum value, you must use hexadecimal format or use std::numeric_limits<int128>::min().");
+			return *temp;
 		}
 		
 		
@@ -352,5 +306,65 @@ constexpr cjm::numerics::int128 std::numeric_limits<cjm::numerics::int128>::sign
 constexpr cjm::numerics::int128 std::numeric_limits<cjm::numerics::int128>::denorm_min() noexcept
 {
 	return std::numeric_limits<int64_t>::denorm_min();
+}
+
+namespace cjm::numerics::int128_literals
+{
+
+	template<char... Chars>
+	CJM_LIT_CONST bool lit_helper::validate_decimal_size_as_signed_uint128()
+	{
+		if (ulit_helper::get_lit_type<Chars...>() != lit_type::Decimal)
+			return false;
+		constexpr std::optional<size_t> dec_digits = ulit_helper::count_decimal_chars<Chars...>();
+		constexpr size_t max_dec_digits = std::numeric_limits<uint128>::digits10 + 1;
+		if (!dec_digits.has_value() || *dec_digits > max_dec_digits)
+			return false;
+		if (*dec_digits < max_dec_digits)
+			return true;
+		//the hard part, need if it has max digits
+		constexpr auto arr = std::array<char, sizeof...(Chars)>{ Chars... };
+		size_t max_idx = 0;
+		for (char c : arr)
+		{
+			if (c == '\'') continue;
+			char comparand = max_pos_signed_dec_128_v[max_idx++];
+			if (c < comparand)
+				return true;
+			if (c > comparand)
+				return false;
+		}
+		return true;
+	}
+	
+	template <char... Chars> requires (sizeof...(Chars) > 0)
+	CJM_LIT_CONST std::optional<uint128> lit_helper::parse_literal_as_unsigned()
+	{
+		constexpr lit_type type = ulit_helper::get_lit_type<Chars...>();
+		if (type != lit_type::Decimal && type != lit_type::Hexadecimal && type != lit_type::Zero)
+			return std::nullopt;
+		if constexpr (type != lit_type::Decimal || validate_decimal_size_as_signed_uint128<Chars...>())
+		{
+			return ulit_helper::parse_literal<uint128, Chars...>();
+		}
+		return std::nullopt;
+		
+	}
+	
+	
+
+	
+
+	template <char... Chars>
+		requires(sizeof...(Chars) > 0)
+	CJM_LIT_CONST std::optional<int128> lit_helper::parse_literal_i128()
+	{
+		constexpr std::optional<uint128> ures = parse_literal_as_unsigned<Chars...>();
+		if (ures.has_value())
+		{
+			return static_cast<int128>(*ures);
+		}
+		return std::nullopt;
+	}
 }
 #endif

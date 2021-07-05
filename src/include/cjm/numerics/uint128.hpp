@@ -150,6 +150,8 @@ namespace cjm::numerics
 		template<char... Chars>
 			requires (sizeof...(Chars) > 0)
 		constexpr int128 operator"" _i128();
+
+		class lit_helper;
 	}
 	
 	namespace internal
@@ -770,7 +772,8 @@ namespace cjm
 			/************************************************************************/
 			class lit_helper final
 			{
-			
+				friend class int128_literals::lit_helper;
+				
 				template<char... Chars>
 					requires (sizeof...(Chars) > 0)
 				friend constexpr uint128 operator"" _u128();

@@ -274,5 +274,60 @@ namespace cjm::numerics
 		uint128 m_unsigned_rep;
 	};
 }
+
+namespace cjm::numerics::int128_literals
+{
+	using lit_type = uint128_literals::lit_type;
+	using uint128_literals::operator ""_u128;
+	using ulit_helper = uint128_literals::lit_helper;
+
+	constexpr std::array<char, std::numeric_limits<uint128>::digits10 + 1> max_pos_signed_dec_128_v = std::array<char, std::numeric_limits<uint128>::digits10 + 1>
+	{
+			'1', '7', '0',
+			'1', '4', '1',
+			'1', '8', '3',
+			'4', '6', '0',
+			'4', '6', '9',
+			'2', '3', '1',
+			'7', '3', '1',
+			'6', '8', '7',
+			'3', '0', '3',
+			'7', '1', '5',
+			'8', '8', '4',
+			'1', '0', '5',
+			'7', '2', '7'
+	};
+
+	
+	class lit_helper final
+	{
+		template<char... Chars>
+			requires (sizeof...(Chars) > 0)
+		friend constexpr int128 int128_literals::operator"" _i128();
+
+		template<char... Chars>
+			requires (sizeof...(Chars) > 0)
+		static CJM_LIT_CONST std::optional<uint128> parse_literal_as_unsigned();
+
+		template<char... Chars>
+		static CJM_LIT_CONST bool validate_decimal_size_as_signed_uint128();
+	public:
+		
+		template<char... Chars>
+			requires(sizeof...(Chars) > 0)
+		static CJM_LIT_CONST std::optional<int128> parse_literal_i128();
+
+		lit_helper() = delete;
+		~lit_helper() = delete;
+		lit_helper(const lit_helper& other) = delete;
+		lit_helper(lit_helper&& other) noexcept = delete;
+		lit_helper& operator=(const lit_helper& other) = delete;
+		lit_helper& operator=(lit_helper&& other) noexcept = delete;
+		
+	};
+
+	
+}
+
 #include <cjm/numerics/int128.inl>
 #endif
