@@ -179,23 +179,23 @@ namespace std
 		static constexpr int max_exponent10 = 0;
 		static constexpr bool traps = true;
 
-		static constexpr cjm::numerics::uint128 min() noexcept;
+		static constexpr cjm::numerics::int128 min() noexcept;
 
-		static constexpr cjm::numerics::uint128 lowest() noexcept;
+		static constexpr cjm::numerics::int128 lowest() noexcept;
 
-		static constexpr cjm::numerics::uint128 max() noexcept;
+		static constexpr cjm::numerics::int128 max() noexcept;
 
-		static constexpr cjm::numerics::uint128 epsilon() noexcept;
+		static constexpr cjm::numerics::int128 epsilon() noexcept;
 
-		static constexpr cjm::numerics::uint128 round_error() noexcept;
+		static constexpr cjm::numerics::int128 round_error() noexcept;
 
-		static constexpr cjm::numerics::uint128 infinity() noexcept;
+		static constexpr cjm::numerics::int128 infinity() noexcept;
 
-		static constexpr cjm::numerics::uint128 quiet_NaN() noexcept;
+		static constexpr cjm::numerics::int128 quiet_NaN() noexcept;
 
-		static constexpr cjm::numerics::uint128 signaling_NaN() noexcept;
+		static constexpr cjm::numerics::int128 signaling_NaN() noexcept;
 
-		static constexpr cjm::numerics::uint128 denorm_min() noexcept;
+		static constexpr cjm::numerics::int128 denorm_min() noexcept;
 	};
 }
 #include <cjm/numerics/numerics.inl>

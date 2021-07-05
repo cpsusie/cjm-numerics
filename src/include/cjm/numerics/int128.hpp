@@ -81,35 +81,37 @@ namespace cjm::numerics
 		requires cjm::numerics::concepts::char_with_traits<Char, CharTraits>
 	std::basic_istream<Char, CharTraits>& operator>>(std::basic_istream<Char, CharTraits>& is, int128& v);
 
+	//will return a positive value if v is positive, a negative value if v is negative and zero value if v is 0
+	constexpr int signum(int128 v) noexcept;
+	constexpr bool is_negative(int128 v) noexcept;
+	//Comparison operators
+	constexpr std::strong_ordering operator <=>(int128 lhs, int128 rhs) noexcept;
+	constexpr bool operator==(int128 lhs, int128 rhs) noexcept;
+	constexpr bool operator!=(int128 lhs, int128 rhs) noexcept;
+	constexpr bool operator>(int128 lhs, int128 rhs) noexcept;
+	constexpr bool operator<(int128 lhs, int128 rhs) noexcept;
+	constexpr bool operator>=(int128 lhs, int128 rhs) noexcept;
+	constexpr bool operator<=(int128 lhs, int128 rhs) noexcept;
 
-		//Comparison operators
-		constexpr std::strong_ordering operator <=>(int128 lhs, int128 rhs) noexcept;
-		constexpr bool operator==(int128 lhs, int128 rhs) noexcept;
-		constexpr bool operator!=(int128 lhs, int128 rhs) noexcept;
-		constexpr bool operator>(int128 lhs, int128 rhs) noexcept;
-		constexpr bool operator<(int128 lhs, int128 rhs) noexcept;
-		constexpr bool operator>=(int128 lhs, int128 rhs) noexcept;
-		constexpr bool operator<=(int128 lhs, int128 rhs) noexcept;
-	
-		//Unary operators
-		constexpr int128 operator-(int128 operand) noexcept;
-		constexpr int128 operator+(int128 operand) noexcept;
-		constexpr int128 operator~(int128 operand) noexcept;
-		constexpr bool operator!(int128 operand) noexcept;
-		//Logical operators
-		constexpr int128 operator&(int128 lhs, int128 rhs) noexcept;
-		constexpr int128 operator|(int128 lhs, int128 rhs) noexcept;
-		constexpr int128 operator^(int128 lhs, int128 rhs) noexcept;
-		//bit shift operators
-		constexpr int128 operator>>(int128 lhs, int amount) noexcept;
-		constexpr int128 operator<<(int128 lhs, int amount) noexcept;
-		constexpr int128 operator>>(int128 lhs, int128 amount) noexcept;
-		constexpr int128 operator<<(int128 lhs, int128 amount) noexcept;
-		//arithmetic operators
-		constexpr int128 operator+(int128 lhs, int128 rhs) noexcept;
-		constexpr int128 operator-(int128 lhs, int128 rhs) noexcept;
-		constexpr int128 operator*(int128 lhs, int128 rhs) noexcept;
-		//Division and modulus are friends declared within class
+	//Unary operators
+	constexpr int128 operator-(int128 operand) noexcept;
+	constexpr int128 operator+(int128 operand) noexcept;
+	constexpr int128 operator~(int128 operand) noexcept;
+	constexpr bool operator!(int128 operand) noexcept;
+	//Logical operators
+	constexpr int128 operator&(int128 lhs, int128 rhs) noexcept;
+	constexpr int128 operator|(int128 lhs, int128 rhs) noexcept;
+	constexpr int128 operator^(int128 lhs, int128 rhs) noexcept;
+	//bit shift operators
+	constexpr int128 operator>>(int128 lhs, int amount) noexcept;
+	constexpr int128 operator<<(int128 lhs, int amount) noexcept;
+	constexpr int128 operator>>(int128 lhs, int128 amount) noexcept;
+	constexpr int128 operator<<(int128 lhs, int128 amount) noexcept;
+	//arithmetic operators
+	constexpr int128 operator+(int128 lhs, int128 rhs) noexcept;
+	constexpr int128 operator-(int128 lhs, int128 rhs) noexcept;
+	constexpr int128 operator*(int128 lhs, int128 rhs) noexcept;
+	//Division and modulus are friends declared within class
 }
 
 namespace std
@@ -176,7 +178,7 @@ namespace cjm::numerics
 		static inline void instrumented_div_mod(std::basic_ostream<char>& stream, int128 dividend,
 			int128 divisor, int128* quotient_ret, uint128* remainder_ret);
 		
-		
+		friend constexpr int signum(int128 v) noexcept;
 		constexpr int128() noexcept;
 		constexpr int128(const int128& other) noexcept = default;
 		constexpr int128(int128 && other) noexcept = default;

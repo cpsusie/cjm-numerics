@@ -42,9 +42,73 @@
 
 namespace cjm::numerics
 {
+	namespace uint128_literals
+	{
+		
+		
+
+		CJM_LIT_CONST std::array<char, std::numeric_limits<uint128>::digits10 + 1> max_pos_signed_dec_128_v = std::array<char, std::numeric_limits<uint128>::digits10 + 1>
+		{
+			'1', '7', '0',
+			'1', '4', '1',
+			'1', '8', '3',
+			'4', '6', '0',
+			'4', '6', '9',
+			'2', '3', '1',
+			'7', '3', '1',
+			'6', '8', '7',
+			'3', '0', '3',
+			'7', '1', '5',
+			'8', '8', '4',
+			'1', '0', '5',
+			'7', '2', '7'
+		};
+		
+		template<char... Chars>
+		CJM_LIT_CONST bool lit_helper::validate_decimal_size_as_signed_uint128()
+		{
+			if (get_lit_type<Chars...>() != lit_type::Decimal)
+				return false;
+			constexpr std::optional<size_t> dec_digits = count_decimal_chars<Chars...>();
+			constexpr size_t max_dec_digits = std::numeric_limits<uint128>::digits10 + 1;
+			if (!dec_digits.has_value() || *dec_digits > max_dec_digits)
+				return false;
+			if (*dec_digits < max_dec_digits)
+				return true;
+			//the hard part, need if it has max digits
+			constexpr auto arr = std::array<char, sizeof...(Chars)>{ Chars... };
+			size_t max_idx = 0;
+			for (char c : arr)
+			{
+				if (c == '\'') continue;
+				char comparand = max_pos_signed_dec_128_v<Ui>[max_idx++];
+				if (c < comparand)
+					return true;
+				if (c > comparand)
+					return false;
+			}
+			return true;
+			
+		}
+	}
+	
 	namespace int128_literals
 	{
-		//todo insert literal operator definition here
+		template<char... Chars>
+			requires (sizeof...(Chars) > 0)
+		constexpr int128 operator""_i128()
+		{
+			using namespace uint128_literals;
+			constexpr uint128 min_signed = uint128::make_uint128(0x8000'0000'0000'0000, 0x0000'0000'0000'0000);
+			constexpr uint128 max_signed = min_signed - 1ull;
+			constexpr std::optional<uint128> result = uint128_literals::lit_helper::parse_literal<uint128, Chars...>();
+			static_assert(result.has_value(), "The literal is not a valid 128-bit decimal or hexadecimal integer.");
+			static_assert(*result == min_signed || *result <= max_signed, 
+				"The value is too large or to small to fit in a signed two's complement 128 bit integer.");
+			return static_cast<int128>(*result);
+		}
+		
+		
 	}
 
 	//todo insert stream insertion and extraction operator definitions here
@@ -58,6 +122,25 @@ namespace cjm::numerics
 	constexpr int128::int128() noexcept : m_unsigned_rep{} {}
 
 	//todo insert div_mod func def here
+
+	constexpr int signum(int128 v) noexcept
+	{
+		using namespace cjm::numerics::uint128_literals;
+		if (v == 0)
+			return 0;
+		if ((v.m_unsigned_rep & 0x8000'0000'0000'0000'000'0000'0000'0000_u128)
+			== 0x8000'0000'0000'0000'000'0000'0000'0000_u128)
+			return -1;
+		return 1;
+	}
+	constexpr bool is_negative(int128 v) noexcept
+	{
+		return signum(v) < 0;
+	}
+	constexpr bool operator==(int128 lhs, int128 rhs) noexcept
+	{
+		return static_cast<uint128>(lhs) == static_cast<uint128>(rhs);
+	}
 
 	constexpr int128::int128(int v) noexcept		
 	{
@@ -222,5 +305,52 @@ namespace cjm::numerics::internal
 		}
 		return static_cast<int128>(temp);		
 	}
+}
+
+constexpr cjm::numerics::int128 std::numeric_limits<cjm::numerics::int128>::min() noexcept
+{
+	using namespace cjm::numerics;
+	return static_cast<int128>(uint128::make_uint128(0x8000'0000'0000'0000, 0x0000'0000'0000'0000));
+}
+
+constexpr cjm::numerics::int128 std::numeric_limits<cjm::numerics::int128>::lowest() noexcept
+{
+	return min();
+}
+
+constexpr cjm::numerics::int128 std::numeric_limits<cjm::numerics::int128>::max() noexcept
+{
+	using namespace cjm::numerics;
+	return static_cast<int128>(uint128::make_uint128(0x8000'0000'0000'0000, 0x0000'0000'0000'0000) - 1ull);
+}
+
+constexpr cjm::numerics::int128 std::numeric_limits<cjm::numerics::int128>::epsilon() noexcept
+{
+	return std::numeric_limits<int64_t>::epsilon();
+}
+
+constexpr cjm::numerics::int128 std::numeric_limits<cjm::numerics::int128>::round_error() noexcept
+{
+	return std::numeric_limits<int64_t>::round_error();
+}
+
+constexpr cjm::numerics::int128 std::numeric_limits<cjm::numerics::int128>::infinity() noexcept
+{
+	return std::numeric_limits<int64_t>::infinity();
+}
+
+constexpr cjm::numerics::int128 std::numeric_limits<cjm::numerics::int128>::quiet_NaN() noexcept
+{
+	return std::numeric_limits<int64_t>::quiet_NaN();
+}
+
+constexpr cjm::numerics::int128 std::numeric_limits<cjm::numerics::int128>::signaling_NaN() noexcept
+{
+	return std::numeric_limits<int64_t>::signaling_NaN();
+}
+
+constexpr cjm::numerics::int128 std::numeric_limits<cjm::numerics::int128>::denorm_min() noexcept
+{
+	return std::numeric_limits<int64_t>::denorm_min();
 }
 #endif

@@ -118,14 +118,27 @@ int cjm::base_test_program::execute_log_arg_processing(int argc, char* argv[]) n
 
 void cjm::base_test_program::prelim_int128_test()
 {
+	using namespace cjm::numerics::int128_literals;
+	using namespace numerics::uint128_literals;
 	using uint128_t = cjm::numerics::uint128;
 	using int128_t = cjm::numerics::int128;
+	using test_uint128_t = boost::multiprecision::uint128_t;
+	using test_int128_t =  boost::multiprecision::int128_t;
 	float neg_one = -1.0;
 	float pos_one = 1.0;
 	int128_t x = static_cast<int128_t>(neg_one);
 	int128_t y = static_cast<int128_t>(pos_one);
  	std::cout << "x: [0x" << std::hex << static_cast<uint128_t>(x) << "]." << newl;
 	std::cout << "y: [0x" << std::hex << static_cast<uint128_t>(y) << "]." << newl;
+	constexpr uint128_t big_pos_u = 0x1337'c0de'd00d'fea2'cafe'babe'b00b'dad0_u128;
+	constexpr uint128_t big_neg_u = 0xdead'beef'600d'f00d'5a1d'1337'c0de'd00d_u128;
+	
+	constexpr int128_t big_positive = 0x1337'c0de'd00d'fea2'cafe'babe'b00b'dad0_i128;
+	constexpr int128_t big_negative = 0xdead'beef'600d'f00d'5a1d'1337'c0de'd00d_i128;
+
+	static_assert(static_cast<uint128_t>(big_positive) == big_pos_u);
+	static_assert(static_cast<uint128_t>(big_negative) == big_neg_u);
+	
 }
 
 int cjm::base_test_program::execute_test_program(int argc, char* argv[]) noexcept
