@@ -133,11 +133,26 @@ void cjm::base_test_program::prelim_int128_test()
 	constexpr uint128_t big_neg_u = 0xdead'beef'600d'f00d'5a1d'1337'c0de'd00d_u128;
 	
 	constexpr int128_t big_positive = 0x1337'c0de'd00d'fea2'cafe'babe'b00b'dad0_i128;
+	constexpr int128_t lil_pos = 123_i128;
 	constexpr int128_t big_negative = 0xdead'beef'600d'f00d'5a1d'1337'c0de'd00d_i128;
+	constexpr int128_t  lil_neg = -123_i128;
 
 	static_assert(static_cast<uint128_t>(big_positive) == big_pos_u);
 	static_assert(static_cast<uint128_t>(big_negative) == big_neg_u);
-	
+
+	static_assert(big_positive <=> lil_pos == std::strong_ordering::greater);
+	static_assert(big_negative <=> lil_neg == std::strong_ordering::less);
+	static_assert(lil_pos <=> big_negative == std::strong_ordering::greater);
+	static_assert(lil_neg <=> lil_pos == std::strong_ordering::less);
+	static_assert(-lil_pos <=> lil_neg == std::strong_ordering::equal);
+	static_assert(lil_pos <=> -lil_neg == std::strong_ordering::equal);
+	static_assert(lil_pos != lil_neg);
+	static_assert(0_i128 <=> lil_neg == std::strong_ordering::greater);
+	static_assert(0_i128 <=> lil_pos == std::strong_ordering::less);
+
+	constexpr int128_t anoth_big_pos = static_cast<int128_t>(big_pos_u + 1 - 1);
+	constexpr auto hasher = std::hash<int128_t>{};
+	static_assert(hasher(anoth_big_pos) == hasher(big_positive));
 }
 
 int cjm::base_test_program::execute_test_program(int argc, char* argv[]) noexcept

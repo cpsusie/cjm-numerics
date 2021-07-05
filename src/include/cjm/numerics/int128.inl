@@ -1,4 +1,4 @@
-// Copyright © 2021 CJM Screws, LLC
+// Copyright ï¿½ 2021 CJM Screws, LLC
 // Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"),
 // to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense,
 // and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
@@ -40,16 +40,13 @@
 #define CJM_INT128_INL_
 #include "int128.hpp"
 
+constexpr size_t std::hash<cjm::numerics::int128>::operator()(const cjm::numerics::int128& i) const noexcept
+{
+	return i.hash_code();
+}
+
 namespace cjm::numerics
 {
-	namespace uint128_literals
-	{
-		
-		
-
-
-	}
-	
 	namespace int128_literals
 	{
 		template<char... Chars>
@@ -82,8 +79,8 @@ namespace cjm::numerics
 		using namespace cjm::numerics::uint128_literals;
 		if (v == 0)
 			return 0;
-		if ((v.m_unsigned_rep & 0x8000'0000'0000'0000'000'0000'0000'0000_u128)
-			== 0x8000'0000'0000'0000'000'0000'0000'0000_u128)
+		if ((v.m_unsigned_rep & 0x8000'0000'0000'0000'0000'0000'0000'0000_u128)
+			== 0x8000'0000'0000'0000'0000'0000'0000'0000_u128)
 			return -1;
 		return 1;
 	}
@@ -91,12 +88,63 @@ namespace cjm::numerics
 	{
 		return signum(v) < 0;
 	}
+
 	constexpr bool operator==(int128 lhs, int128 rhs) noexcept
 	{
 		return static_cast<uint128>(lhs) == static_cast<uint128>(rhs);
 	}
 
-	constexpr int128::int128(int v) noexcept		
+	constexpr bool operator!=(int128 lhs, int128 rhs) noexcept
+	{
+		return static_cast<uint128>(lhs) != static_cast<uint128>(rhs);
+	}
+
+	constexpr bool operator>(int128 lhs, int128 rhs) noexcept
+	{
+		int l_sign = signum(lhs);
+		int r_sign = signum(rhs);
+		if (l_sign > r_sign)
+			return true;
+		else if (l_sign < r_sign)
+			return false;
+		return static_cast<uint128>(lhs) > static_cast<uint128>(rhs);
+
+	}
+	constexpr bool operator<(int128 lhs, int128 rhs) noexcept
+	{
+		int l_sign = signum(lhs);
+		int r_sign = signum(rhs);
+		if (l_sign < r_sign)
+			return true;
+		else if (l_sign > r_sign)
+			return false;
+		return static_cast<uint128>(lhs) < static_cast<uint128>(rhs);
+	}
+
+	constexpr bool operator>=(int128 lhs, int128 rhs) noexcept
+	{
+		return !(lhs<rhs);
+	}
+	constexpr bool operator<=(int128 lhs, int128 rhs) noexcept
+	{
+		return !(lhs>rhs);
+	}
+
+	constexpr std::strong_ordering operator<=>(int128 lhs, int128 rhs) noexcept
+	{
+		if (lhs == rhs)
+			return std::strong_ordering::equal;
+		else if (lhs < rhs)
+			return std::strong_ordering::less;
+		return std::strong_ordering::greater;
+	}
+
+	[[nodiscard]] constexpr size_t int128::hash_code() const noexcept
+	{
+		return m_unsigned_rep.hash_code();
+	}
+
+	constexpr int128::int128(int v) noexcept
 	{
 		m_unsigned_rep = v < 0 ? 
 			uint128::make_uint128(std::numeric_limits<typename uint128::int_part>::max(), 
@@ -104,6 +152,8 @@ namespace cjm::numerics
 			uint128::make_uint128(std::numeric_limits<typename uint128::int_part>::min(), 
 				static_cast<typename uint128::int_part>(static_cast<int64_t>(v)));		
 	}
+
+
 
 	constexpr int128::int128(unsigned int v) noexcept : m_unsigned_rep{v} {}
 	constexpr int128::int128(long v) noexcept
@@ -243,6 +293,23 @@ namespace cjm::numerics
 	constexpr int128::operator std::uint64_t() const noexcept
 	{
 		return static_cast<std::uint64_t>(m_unsigned_rep.m_limbs.m_low);
+	}
+
+	constexpr int128 operator-(int128 operand) noexcept
+	{
+		return static_cast<int128>(-(operand.m_unsigned_rep));
+	}
+	constexpr int128 operator+(int128 operand) noexcept
+	{
+		return operand;
+	}
+	constexpr int128 operator~(int128 operand) noexcept
+	{
+		return static_cast<int128>(~(operand.m_unsigned_rep));
+	}
+	constexpr bool operator!(int128 operand) noexcept
+	{
+		return !static_cast<bool>(operand.m_unsigned_rep);
 	}
 }
 namespace cjm::numerics::internal
