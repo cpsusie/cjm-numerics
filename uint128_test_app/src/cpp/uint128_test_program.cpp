@@ -122,8 +122,7 @@ void cjm::base_test_program::prelim_int128_test()
 	using namespace numerics::uint128_literals;
 	using uint128_t = cjm::numerics::uint128;
 	using int128_t = cjm::numerics::int128;
-	using test_uint128_t = boost::multiprecision::uint128_t;
-	using test_int128_t =  boost::multiprecision::int128_t;
+
 	float neg_one = -1.0;
 	float pos_one = 1.0;
 	int128_t x = static_cast<int128_t>(neg_one);
