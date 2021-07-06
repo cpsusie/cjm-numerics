@@ -637,7 +637,7 @@ namespace cjm::numerics
 		}
 		else
 		{
-			ret = ret = static_cast<float>(this->m_unsigned_rep);
+			ret = static_cast<float>(this->m_unsigned_rep);
 		}
 		return ret;
 	}
@@ -661,7 +661,7 @@ namespace cjm::numerics
 		}
 		else
 		{
-			ret = ret = static_cast<double>(this->m_unsigned_rep);
+			ret = static_cast<double>(this->m_unsigned_rep);
 		}
 		return ret;
 	}
@@ -685,7 +685,7 @@ namespace cjm::numerics
 		}
 		else
 		{
-			ret = ret = static_cast<long double>(this->m_unsigned_rep);
+			ret = static_cast<long double>(this->m_unsigned_rep);
 		}
 		return ret;
 	}
