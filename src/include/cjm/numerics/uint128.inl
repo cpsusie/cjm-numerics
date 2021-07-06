@@ -67,8 +67,8 @@ namespace cjm
 			}
 		}
 		template <typename Char, typename CharTraits, typename Allocator>
-		requires cjm::numerics::concepts::char_with_traits_and_allocator<Char, CharTraits, Allocator>
-			std::basic_ostream<Char, CharTraits>& operator<<(std::basic_ostream<Char, CharTraits>& os, uint128 v)
+			requires cjm::numerics::concepts::char_with_traits_and_allocator<Char, CharTraits, Allocator>
+		std::basic_ostream<Char, CharTraits>& operator<<(std::basic_ostream<Char, CharTraits>& os, uint128 v)
 		{
 			using ios = std::basic_ios<Char, CharTraits>;
 			using iosflags = typename ios::fmtflags;
@@ -478,8 +478,8 @@ namespace cjm
 		}
 
 		template<typename Chars, typename CharTraits>
-		requires cjm::numerics::concepts::char_with_traits<Chars, CharTraits>
-			uint128 uint128::make_from_string(std::basic_string_view<Chars, CharTraits> parse_me)
+			requires cjm::numerics::concepts::char_with_traits<Chars, CharTraits>
+		uint128 uint128::make_from_string(std::basic_string_view<Chars, CharTraits> parse_me)
 		{
 			using ph = u128_parsing_helper<Chars, CharTraits>;
 			auto str = std::basic_string<Chars, CharTraits>{ parse_me };

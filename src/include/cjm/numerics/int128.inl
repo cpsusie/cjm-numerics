@@ -40,6 +40,17 @@
 #define CJM_INT128_INL_
 #include "int128.hpp"
 
+constexpr size_t std::hash<cjm::numerics::i128_str_format>::operator()(
+	cjm::numerics::i128_str_format key) const noexcept
+{
+	size_t hash = 0u;
+	const size_t neg_code = static_cast<size_t>(key.is_negative());
+	const size_t fmt_code = static_cast<size_t>(key.format());
+	hash = neg_code + +0x9e37'79b9 + (hash << 6) + (hash >> 2);
+	hash = fmt_code + 0x9e37'79b9 + (hash << 6) + (hash >> 2);
+	return hash;
+}
+
 constexpr size_t std::hash<cjm::numerics::int128>::operator()(const cjm::numerics::int128& i) const noexcept
 {
 	return i.hash_code();
@@ -179,7 +190,75 @@ namespace cjm::numerics
 	constexpr int128::int128(unsigned long long v) noexcept : m_unsigned_rep{v}{}
 
 	constexpr int128::int128(uint128 v) noexcept : m_unsigned_rep{v} {}
-	
+
+	constexpr int128& int128::operator=(int v) noexcept
+	{
+		if (v < 0)
+		{
+			m_unsigned_rep.m_limbs.m_high = std::numeric_limits<uint64_t>::max();
+			m_unsigned_rep.m_limbs.m_low = static_cast<std::uint64_t>(static_cast<std::int64_t>(v));
+		}
+		else
+		{
+			m_unsigned_rep = static_cast<uint128>(static_cast<int64_t>(v));
+		}
+		return *this;
+	}
+
+	constexpr int128& int128::operator=(unsigned v) noexcept
+	{
+		m_unsigned_rep = v;
+		return *this;
+	}
+
+	constexpr int128& int128::operator=(long v) noexcept
+	{
+		if (v < 0)
+		{
+			m_unsigned_rep.m_limbs.m_high = std::numeric_limits<uint64_t>::max();
+			m_unsigned_rep.m_limbs.m_low = static_cast<std::uint64_t>(static_cast<std::int64_t>(v));
+		}
+		else
+		{
+			m_unsigned_rep = static_cast<uint128>(static_cast<int64_t>(v));
+		}
+		return *this;
+	}
+
+	constexpr int128& int128::operator=(unsigned long v) noexcept
+	{
+		m_unsigned_rep = v;
+		return *this;
+	}
+
+	constexpr int128& int128::operator=(long long v) noexcept
+	{
+		if (v < 0)
+		{
+			m_unsigned_rep.m_limbs.m_high = std::numeric_limits<uint64_t>::max();
+			// ReSharper disable once CppRedundantCastExpression -- it is not guaranteed by standard that long long same as int64_t
+			m_unsigned_rep.m_limbs.m_low = static_cast<std::uint64_t>(static_cast<std::int64_t>(v));
+		}
+		else
+		{
+			// ReSharper disable once CppRedundantCastExpression -- it is not guaranteed by standard that long long same as int64_t
+			m_unsigned_rep = static_cast<uint128>(static_cast<int64_t>(v));
+		}
+		return *this;
+	}
+
+	constexpr int128& int128::operator=(unsigned long long v) noexcept
+	{
+		m_unsigned_rep = v;
+		return *this;
+	}
+
+	constexpr int128& int128::operator=(uint128 v) noexcept
+	{
+		m_unsigned_rep = v;
+		return *this;
+	}
+
 	//converting ctors from floating point types
 	inline int128::int128(float f) noexcept
 	{
@@ -195,6 +274,9 @@ namespace cjm::numerics
 	{
 		m_unsigned_rep = static_cast<uint128>(internal::make_signed_from_floating_point<long double>(d));
 	}
+
+	
+
 	constexpr int128::operator bool() const noexcept
 	{
 		return m_unsigned_rep.m_limbs.m_low || m_unsigned_rep.m_limbs.m_high;
@@ -295,6 +377,11 @@ namespace cjm::numerics
 		return static_cast<std::uint64_t>(m_unsigned_rep.m_limbs.m_low);
 	}
 
+	constexpr int128::operator uint128() const noexcept
+	{
+		return m_unsigned_rep;
+	}
+
 	constexpr int128 operator-(int128 operand) noexcept
 	{
 		return static_cast<int128>(-(operand.m_unsigned_rep));
@@ -311,6 +398,299 @@ namespace cjm::numerics
 	{
 		return !static_cast<bool>(operand.m_unsigned_rep);
 	}
+
+	constexpr int128 operator&(int128 lhs, int128 rhs) noexcept
+	{
+		return static_cast<int128>(lhs.m_unsigned_rep &  rhs.m_unsigned_rep);
+	}
+
+	constexpr int128 operator|(int128 lhs, int128 rhs) noexcept
+	{
+		return static_cast<int128>(lhs.m_unsigned_rep | rhs.m_unsigned_rep);
+	}
+
+	constexpr int128 operator^(int128 lhs, int128 rhs) noexcept
+	{
+		return static_cast<int128>(lhs.m_unsigned_rep ^ rhs.m_unsigned_rep);
+	}
+
+	constexpr int128 operator>>(int128 lhs, int amount) noexcept
+	{
+		assert(amount < std::numeric_limits<uint128>::digits && amount > -1);
+		uint128 ret = lhs.m_unsigned_rep >> amount;
+		if (is_negative(lhs))
+		{
+			uint128 ones_mask = std::numeric_limits<uint128>::max() << (std::numeric_limits<uint128>::digits - amount);
+			ret |= ones_mask;
+		}
+		return static_cast<int128>( ret);		
+	}
+
+	constexpr int128 operator>>(int128 lhs, int128 amount) noexcept
+	{
+		assert(amount < std::numeric_limits<uint128>::digits && amount > -1);
+		uint128 ret = lhs.m_unsigned_rep >> amount.m_unsigned_rep;
+		if (is_negative(lhs))
+		{
+			uint128 ones_mask = std::numeric_limits<uint128>::max() << (std::numeric_limits<uint128>::digits - amount.m_unsigned_rep);
+			ret |= ones_mask;
+		}
+		return static_cast<int128>(ret);
+	}
+
+	constexpr int128 operator<<(int128 lhs, int amount) noexcept
+	{
+		assert(amount < std::numeric_limits<uint128>::digits&& amount > -1);
+		return static_cast<int128>(lhs.m_unsigned_rep << amount);
+	}
+
+	constexpr int128 operator<<(int128 lhs, int128 amount) noexcept
+	{
+		assert(amount < std::numeric_limits<uint128>::digits&& amount > -1);
+		return static_cast<int128>(lhs.m_unsigned_rep << amount.m_unsigned_rep);
+	}
+
+	constexpr int128 operator+(int128 lhs, int128 rhs) noexcept
+	{
+		return static_cast<int128>(lhs.m_unsigned_rep + rhs.m_unsigned_rep);
+	}
+
+	constexpr int128 operator-(int128 lhs, int128 rhs) noexcept
+	{
+		return static_cast<int128>(lhs.m_unsigned_rep - rhs.m_unsigned_rep);
+	}
+
+	constexpr int128 operator*(int128 lhs, int128 rhs) noexcept
+	{
+		bool l_neg = is_negative(lhs);
+		bool r_neg = is_negative(rhs);
+		uint128 product = l_neg ? -(lhs.m_unsigned_rep) : (lhs.m_unsigned_rep);
+		product *= (r_neg ? (-(rhs.m_unsigned_rep)) : (rhs.m_unsigned_rep));
+		return l_neg == r_neg ? static_cast<int128>(product) : static_cast<int128>((-product));
+	}
+
+	constexpr int128 operator/(int128 lhs, int128 rhs)
+	{
+		if (rhs == 0) throw std::domain_error("Division by zero is illegal.");
+		
+		int l_sign = signum(lhs);
+		int r_sign = signum(rhs);
+		uint128 quotient;
+		if (l_sign == 0)
+			quotient = 0;
+		else
+			quotient = l_sign < 0 ? (-lhs.m_unsigned_rep) : (lhs.m_unsigned_rep);
+		quotient /= (r_sign < 0 ? (-rhs.m_unsigned_rep) : rhs.m_unsigned_rep);
+		return static_cast<int128>(quotient);		
+	}
+
+	constexpr int128 operator%(int128 lhs, int128 rhs)
+	{
+		if (rhs == 0) throw std::domain_error("Modulus by zero is illegal.");
+
+		int l_sign = signum(lhs);
+		int r_sign = signum(rhs);
+		uint128 remainder;
+		if (l_sign == 0)
+			remainder = 0;
+		else
+			remainder = l_sign < 0 ? (-lhs.m_unsigned_rep) : (lhs.m_unsigned_rep);
+		remainder %= (r_sign < 0 ? (-rhs.m_unsigned_rep) : rhs.m_unsigned_rep);
+		return static_cast<int128>(remainder);
+	}
+	
+	constexpr int128& int128::operator+=(int128 other) noexcept
+	{
+		*this = (*this + other);
+		return *this;
+	}
+
+	constexpr int128& int128::operator-=(int128 other) noexcept
+	{
+		*this = (*this - other);
+		return *this;
+	}
+
+	constexpr int128& int128::operator*=(int128 other) noexcept
+	{
+		*this = (*this * other);
+		return *this;
+	}
+	constexpr int128& int128::operator/=(int128 other) 
+	{
+		*this = (*this / other);
+		return *this;
+	}
+	constexpr int128& int128::operator%=(int128 other) 
+	{
+		*this = (*this % other);
+		return *this;
+	}
+
+	constexpr int128& int128::operator&=(int128 other) noexcept
+	{
+		*this = (*this & other);
+		return *this;
+	}
+
+	constexpr int128& int128::operator|=(int128 other) noexcept
+	{
+		*this = (*this | other);
+		return *this;
+	}
+	
+	constexpr int128& int128::operator^=(int128 other) noexcept
+	{
+		*this = (*this | other);
+		return *this;
+	}
+
+	constexpr int128& int128::operator<<=(int128 other) noexcept
+	{
+		*this = (*this << other);
+		return *this;
+	}
+
+	constexpr int128& int128::operator<<=(int other) noexcept
+	{
+		*this = (*this << other);
+		return *this;
+	}
+
+	constexpr int128& int128::operator>>=(int128 other) noexcept
+	{
+		*this = (*this >> other);
+		return *this;
+	}
+
+	constexpr int128& int128::operator>>=(int other) noexcept
+	{
+		*this = (*this >> other);
+		return *this;
+	}
+
+	constexpr int128& int128::operator<<=(unsigned amount) noexcept
+	{
+		assert(amount < std::numeric_limits<uint128>::digits);
+		*this = (*this << static_cast<int>(amount));
+		return *this;
+	}
+
+	constexpr int128& int128::operator>>=(unsigned amount) noexcept
+	{
+		assert(amount < std::numeric_limits<uint128>::digits);
+		*this = (*this >> static_cast<int>(amount));
+		return *this;
+	}
+
+
+	constexpr int128& int128::operator++() noexcept
+	{
+		*this += 1;
+		return *this;
+	}
+	constexpr int128& int128::operator--() noexcept
+	{
+		*this -= 1;
+		return *this;
+	}
+
+	constexpr int128::byte_array int128::to_little_endian_arr() const noexcept
+	{
+		return m_unsigned_rep.to_little_endian_arr();
+	}
+
+	constexpr int128::byte_array int128::to_big_endian_arr() const noexcept
+	{
+		return m_unsigned_rep.to_little_endian_arr();
+	}
+
+	constexpr int128 int128::operator++(int) noexcept
+	{
+		int128 copy = *this;
+		*this += 1;
+		return copy;
+	}
+	constexpr int128 int128::operator--(int) noexcept
+	{
+		int128 copy = *this;
+		*this -= 1;
+		return copy;
+	}
+
+	inline int128::operator float() const
+	{
+		float ret;
+		bool neg = is_negative(*this);
+		if (neg)
+		{
+			if (*this != std::numeric_limits<int128>::min())
+			{
+				ret = static_cast<float>(-(this->m_unsigned_rep));
+				ret = -ret;
+			}
+			else
+			{
+				ret = static_cast<float>(this->m_unsigned_rep);
+				ret = -ret;
+			}
+		}
+		else
+		{
+			ret = ret = static_cast<float>(this->m_unsigned_rep);
+		}
+		return ret;
+	}
+
+	inline int128::operator double() const
+	{
+		double ret; 
+		bool neg = is_negative(*this);
+		if (neg)
+		{
+			if (*this != std::numeric_limits<int128>::min())
+			{
+				ret = static_cast<double>(-(this->m_unsigned_rep));
+				ret = -ret;
+			}
+			else
+			{
+				ret = static_cast<double>(this->m_unsigned_rep);
+				ret = -ret;
+			}
+		}
+		else
+		{
+			ret = ret = static_cast<double>(this->m_unsigned_rep);
+		}
+		return ret;
+	}
+
+	inline int128::operator long double() const
+	{
+		long double ret;
+		bool neg = is_negative(*this);
+		if (neg)
+		{
+			if (*this != std::numeric_limits<int128>::min())
+			{
+				ret = static_cast<long double>(-(this->m_unsigned_rep));
+				ret = -ret;
+			}
+			else
+			{
+				ret = static_cast<long double>(this->m_unsigned_rep);
+				ret = -ret;
+			}
+		}
+		else
+		{
+			ret = ret = static_cast<long double>(this->m_unsigned_rep);
+		}
+		return ret;
+	}
+
+	
 }
 namespace cjm::numerics::internal
 {

@@ -604,11 +604,11 @@ namespace cjm::numerics
 		}
 
 		template<fixed_uint_container::internal::is_partial_builtin_u128 Ui>
-		inline uint128(Ui other) noexcept : m_limbs{ bit_cast<fixed_uint_container::uint128_always_split_container_t,
+		uint128(Ui other) noexcept : m_limbs{ bit_cast<fixed_uint_container::uint128_always_split_container_t,
 				Ui>(other) } {}	
 		
 		template<fixed_uint_container::internal::is_partial_builtin_u128 Ui>
-		inline uint128& operator=(Ui other) noexcept
+		uint128& operator=(Ui other) noexcept
 		{
 			m_limbs = bit_cast<fixed_uint_container::uint128_always_split_container_t,
 				Ui>(other);
@@ -616,7 +616,7 @@ namespace cjm::numerics
 		}
 		
 		template<fixed_uint_container::internal::is_partial_builtin_u128 Ui>
-		inline explicit operator Ui() const noexcept
+		explicit operator Ui() const noexcept
 		{
 			return bit_cast<Ui, fixed_uint_container::uint128_always_split_container_t>(m_limbs);
 		}

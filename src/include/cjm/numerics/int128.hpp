@@ -39,6 +39,7 @@
 
 #ifndef CJM_INT128_HPP_
 #define CJM_INT128_HPP_
+#include <compare>
 #include <cjm/numerics/uint128.hpp>
 #include <cjm/numerics/cjm_numeric_concepts.hpp>
 namespace cjm::numerics
@@ -111,11 +112,20 @@ namespace cjm::numerics
 	constexpr int128 operator+(int128 lhs, int128 rhs) noexcept;
 	constexpr int128 operator-(int128 lhs, int128 rhs) noexcept;
 	constexpr int128 operator*(int128 lhs, int128 rhs) noexcept;
-	//Division and modulus are friends declared within class
+
+	struct i128_str_format;
 }
 
 namespace std
 {
+
+	template<>
+	struct hash<cjm::numerics::i128_str_format> final
+	{
+		constexpr hash() noexcept = default;
+		constexpr size_t operator()(cjm::numerics::i128_str_format key) const noexcept;
+	};
+	
 	/************************************************************************/
 	/* Defines the default hash-code generator struct
 	* so uint128's can be used in unordered_maps, unordered_sets,
@@ -125,12 +135,56 @@ namespace std
 	struct hash<cjm::numerics::int128> final
 	{
 		constexpr hash() noexcept = default;
-		constexpr size_t operator()(const cjm::numerics::int128& keyVal) const noexcept;
+		constexpr size_t operator()(const cjm::numerics::int128 & keyVal) const noexcept;
 	};
 }
 
 namespace cjm::numerics
 {
+	struct i128_str_format final
+	{
+	public:
+		[[nodiscard]] constexpr bool is_negative() const noexcept { return m_neg_sign; }
+		[[nodiscard]] constexpr u128_str_format format() const noexcept { return m_format; }
+
+		constexpr i128_str_format() noexcept : m_neg_sign{}, m_format{}{}
+		constexpr i128_str_format(u128_str_format format, bool is_neg) noexcept : m_neg_sign{ is_neg }, m_format{ format } {}
+		constexpr i128_str_format(const i128_str_format& other) noexcept = default;
+		constexpr i128_str_format(i128_str_format&& other) noexcept = default;
+		constexpr i128_str_format& operator=(const i128_str_format& other) noexcept = default;
+		constexpr i128_str_format& operator=(i128_str_format&& other) noexcept = default;
+		constexpr ~i128_str_format() = default;
+
+
+		friend constexpr std::strong_ordering  operator<=>(i128_str_format lhs, i128_str_format rhs) noexcept
+		{
+			using enum_underly_t = std::underlying_type_t<u128_str_format>;
+			auto ret = std::strong_ordering::equal;
+			const std::strong_ordering neg_order = lhs.m_neg_sign <=> rhs.m_neg_sign;
+			if (neg_order == std::strong_ordering::equal)
+			{
+				ret = static_cast<enum_underly_t>(lhs.m_format) <=> static_cast<enum_underly_t>(rhs.m_format);
+			}
+			else
+			{
+				ret = neg_order;
+			}
+			return ret;
+		}
+
+		friend constexpr bool operator==(i128_str_format lhs, i128_str_format rhs) noexcept = default;
+		friend constexpr bool operator!=(i128_str_format lhs, i128_str_format rhs) noexcept = default;
+		friend constexpr bool operator<(i128_str_format lhs, i128_str_format rhs) noexcept = default;
+		friend constexpr bool operator>(i128_str_format lhs, i128_str_format rhs) noexcept = default;
+		friend constexpr bool operator<=(i128_str_format lhs, i128_str_format rhs) noexcept = default;
+		friend constexpr bool operator>=(i128_str_format lhs, i128_str_format rhs) noexcept = default;
+
+	private:
+		bool m_neg_sign;
+		u128_str_format m_format;
+	};
+
+	
 	class alignas(uint128) int128 final
 	{
 	public:
@@ -221,7 +275,7 @@ namespace cjm::numerics
 		constexpr explicit operator std::uint32_t() const noexcept;
 		constexpr explicit operator std::int64_t() const noexcept;
 		constexpr explicit operator std::uint64_t() const noexcept;
-		constexpr explicit operator uint128() const noexcept { return m_unsigned_rep; }
+		constexpr explicit operator uint128() const noexcept;
 		inline explicit operator float() const;
 		inline explicit operator double() const;
 		inline explicit operator long double() const;
@@ -262,6 +316,19 @@ namespace cjm::numerics
 		friend constexpr int128 operator<<(int128 lhs, int amount) noexcept;
 		friend constexpr int128 operator>>(int128 lhs, int128 amount) noexcept;
 		friend constexpr int128 operator<<(int128 lhs, int128 amount) noexcept;
+		//Logical operators
+		friend constexpr int128 operator&(int128 lhs, int128 rhs) noexcept;
+		friend constexpr int128 operator|(int128 lhs, int128 rhs) noexcept;
+		friend constexpr int128 operator^(int128 lhs, int128 rhs) noexcept;
+		//bit shift operators
+		friend constexpr int128 operator>>(int128 lhs, int amount) noexcept;
+		friend constexpr int128 operator<<(int128 lhs, int amount) noexcept;
+		friend constexpr int128 operator>>(int128 lhs, int128 amount) noexcept;
+		friend constexpr int128 operator<<(int128 lhs, int128 amount) noexcept;
+		//arithmetic operators
+		friend constexpr int128 operator+(int128 lhs, int128 rhs) noexcept;
+		friend constexpr int128 operator-(int128 lhs, int128 rhs) noexcept;
+		friend constexpr int128 operator*(int128 lhs, int128 rhs) noexcept;
 		template<typename Char, typename CharTraits, typename Allocator>
 			requires cjm::numerics::concepts::char_with_traits_and_allocator<Char,
 				CharTraits, Allocator>
