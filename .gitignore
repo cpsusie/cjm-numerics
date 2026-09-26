@@ -434,6 +434,9 @@ MigrationBackup/
 # Ionide (cross platform F# VS Code tools) working folder
 .ionide/
 
+# Jetbrains CLion IDE
+.idea/
+
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
 workspace.xml
