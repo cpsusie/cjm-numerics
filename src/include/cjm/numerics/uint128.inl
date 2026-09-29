@@ -789,7 +789,7 @@ namespace cjm
 			{
 				if constexpr (constexpr_bit_casting)
 				{
-					return bit_cast<uint128, byte_array>(bytes);
+					return numerics::bit_cast<uint128, byte_array>(bytes);
 				}
 				else if constexpr (std::endian::native == std::endian::little)
 				{
@@ -822,7 +822,7 @@ namespace cjm
 			// ReSharper disable once CppRedundantElseKeywordInsideCompoundStatement
 			else // ReSharper disable once CppUnreachableCode
 			{
-				return bit_cast<uint128, byte_array>(bytes);
+				return numerics::bit_cast<uint128, byte_array>(bytes);
 			}
 		}
 
