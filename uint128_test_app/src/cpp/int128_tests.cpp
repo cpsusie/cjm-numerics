@@ -28,7 +28,7 @@ namespace
 	using namespace std::chrono_literals;
 	constexpr auto hex_char_arr = std::array<char, 16> {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'};
 
-	std::shared_ptr<output_guard::dedicated_output> output_guard_ptr{};
+	std::atomic<std::shared_ptr<output_guard::dedicated_output>> output_guard_ptr{};
 	void init_output_guard();
 	inline cjm::uint128_tests::test_func_lookup_t init_test_func_lookup();
 	const cjm::uint128_tests::test_func_lookup_t test_func_lookup = init_test_func_lookup();
@@ -368,11 +368,11 @@ cjm::uint128_tests::uint128_t cjm::uint128_tests::to_test(const ctrl_uint128_t& 
 #endif
 std::shared_ptr<cjm::testing::output_guard::dedicated_output> cjm::uint128_tests::get_dedicated()
 {
-	auto sp = std::atomic_load(&output_guard_ptr);
+	auto sp = output_guard_ptr.load(std::memory_order::acquire);
 	if (sp == nullptr)
 	{
 		init_output_guard();
-		sp = std::atomic_load(&output_guard_ptr);
+		sp = output_guard_ptr.load(std::memory_order::acquire);
 	}
 	assert(sp != nullptr);
 	return sp;

@@ -79,7 +79,7 @@ namespace cjm::string
 	auto move_extract_string(TStringStream&& stream)
 		-> std::basic_string<typename TStringStream::char_type, typename TStringStream::traits_type, typename TStringStream::allocator_type>
 	{
-		return std::move((*(stream.rdbuf())).str());
+		return std::forward<TStringStream>(stream).str();
 	}
 	
 	template<typename Char, typename CharTraits = std::char_traits<Char>, typename Allocator = std::allocator<Char>>
