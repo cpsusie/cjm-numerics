@@ -30,7 +30,7 @@ namespace
 
 	std::atomic<std::shared_ptr<output_guard::dedicated_output>> output_guard_ptr{};
 	void init_output_guard();
-	inline cjm::uint128_tests::test_func_lookup_t init_test_func_lookup();
+	cjm::uint128_tests::test_func_lookup_t init_test_func_lookup();
 	const cjm::uint128_tests::test_func_lookup_t test_func_lookup = init_test_func_lookup();
 
 
@@ -60,8 +60,8 @@ namespace
 			std::shared_ptr<output_guard::dedicated_output> want_to_be = output_guard::dedicated_output
 				::make_dedicated_output(std::cout,
 					std::cerr);
-			std::atomic_compare_exchange_strong(&output_guard_ptr, &should_be_now, want_to_be);
-			current = std::atomic_load(&output_guard_ptr);
+			output_guard_ptr.compare_exchange_strong( should_be_now, want_to_be);
+			current = output_guard_ptr.load(std::memory_order_acquire);
 		}
 		assert(current != nullptr);		
 	}
